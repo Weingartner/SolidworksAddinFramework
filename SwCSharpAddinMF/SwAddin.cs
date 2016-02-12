@@ -28,6 +28,8 @@ namespace SwCSharpAddinMF
     {
         #region Local Variables
         ISldWorks iSwApp = null;
+        IModelDoc2 iModelDoc = null;
+
         ICommandManager iCmdMgr = null;
         int addinID = 0;
         BitmapHandler iBmp;
@@ -197,18 +199,28 @@ namespace SwCSharpAddinMF
         #region ISwComFeature Implementation
         Object ISwComFeature.Edit(Object app, Object modelDoc, Object feature)
         {
-            MessageBox.Show("MF Edit");
+            iSwApp = app as ISldWorks;
+            iModelDoc = modelDoc as IModelDoc2;
+            
+            ppage = new UserPMPage(this);
+            ppage.Show();
             return null;
         }
 
         Object ISwComFeature.Regenerate(Object app, Object modelDoc, Object feature)
         {
+            iSwApp = app as ISldWorks;
+            iModelDoc = modelDoc as IModelDoc2;
+
             MessageBox.Show("MF Regenerate");
             return null;
         }
 
         Object ISwComFeature.Security(Object app, Object modelDoc, Object feature)
         {
+            iSwApp = app as ISldWorks;
+            iModelDoc = modelDoc as IModelDoc2;
+
             MessageBox.Show("MF Security");
             return null;
         }
@@ -433,6 +445,9 @@ namespace SwCSharpAddinMF
         #region UI Callbacks
         public void CreateCube()
         {
+            AddMacroFeature();
+            return;
+
             //make sure we have a part open
             string partTemplate = iSwApp.GetUserPreferenceStringValue((int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
             if ((partTemplate != null) && (partTemplate != ""))
@@ -633,12 +648,6 @@ namespace SwCSharpAddinMF
         //Events
         public int OnDocChange()
         {
-            Boolean bRet;
-            bRet = AddMacroFeature();
-            if (bRet == false)
-            {
-                return 0;
-            }
 
             return 1;
         }
