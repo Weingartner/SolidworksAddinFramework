@@ -281,7 +281,7 @@ namespace SwCSharpAddinMF.SWAddin
             //Close events on all currently open docs
             DocumentEventHandler docHandler;
             int numKeys = openDocs.Count;
-            object[] keys = new Object[numKeys];
+            object[] keys = new object[numKeys];
 
             //Remove all document event handlers
             openDocs.Keys.CopyTo(keys, 0);

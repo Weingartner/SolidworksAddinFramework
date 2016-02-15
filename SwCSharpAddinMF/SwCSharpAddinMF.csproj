@@ -130,7 +130,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MacroFeature.cs" />
+    <Compile Include="SampleMacroFeature.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -142,7 +142,7 @@
     <Compile Include="SWAddin\PmpBase.cs" />
     <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />
     <Compile Include="SWAddin\SwAddinBase.cs" />
-    <Compile Include="UserPMPage.cs" />
+    <Compile Include="SamplePropertyPage.cs" />
     <EmbeddedResource Include="ToolbarLarge.bmp" />
     <EmbeddedResource Include="ToolbarSmall.bmp" />
     <EmbeddedResource Include="MainIconLarge.bmp" />

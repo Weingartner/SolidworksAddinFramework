@@ -184,7 +184,7 @@ namespace SwCSharpAddinMF
         #region UI Callbacks
         public void CreateCube()
         {
-            new MacroFeature().AddMacroFeature(SwApp);
+            new SampleMacroFeature().AddMacroFeature(SwApp);
             return;
 
             //make sure we have a part open

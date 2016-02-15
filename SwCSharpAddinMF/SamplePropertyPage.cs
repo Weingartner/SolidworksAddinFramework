@@ -6,7 +6,7 @@ using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {
-    public class UserPmPage : PmpBase
+    public class SamplePropertyPage : PmpBase
     {
 
         #region Property Manager Page Controls
@@ -48,7 +48,7 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public UserPmPage(ISldWorks swApp) : base(swApp, "Sample PMP", Options)
+        public SamplePropertyPage(ISldWorks swApp) : base(swApp, "Sample PMP", Options)
         {
             if (swApp == null) throw new ArgumentNullException(nameof(swApp));
         }
