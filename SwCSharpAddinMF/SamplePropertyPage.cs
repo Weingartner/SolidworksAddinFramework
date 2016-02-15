@@ -9,7 +9,6 @@ namespace SwCSharpAddinMF
     public class SamplePropertyPage : PmpBase
     {
         public SampleMacroFeature MacroFeature { get; set; }
-        private IMacroFeatureData _Data;
 
         #region Property Manager Page Controls
         //Groups
@@ -55,67 +54,58 @@ namespace SwCSharpAddinMF
             if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
 
             MacroFeature = macroFeature;
-            _Data = (IMacroFeatureData) MacroFeature.SwFeature.GetDefinition();
         }
 
         #region PMPHandlerBase
         //Implement these methods from the interface
-        public override void AfterClose()
-        {
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-            int IndentSize;
-            IndentSize = System.Diagnostics.Debug.IndentSize;
-            System.Diagnostics.Debug.WriteLine(IndentSize);
-        }
 
-        public override void OnClose(int reason)
+        protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
             //This function must contain code, even if it does nothing, to prevent the
             //.NET runtime environment from doing garbage collection at the wrong time.
 
-            if (reason == (int) swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
             {
-                MacroFeature.SwFeature.ModifyDefinition(_Data, MacroFeature.ModelDoc, null);
-            }else if (reason ==(int) swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+                this.MacroFeature.Write();
+                MacroFeature.ModifyDefinition();
+            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
             {
-                _Data.ReleaseSelectionAccess();
+                MacroFeature.ReleaseSelectionAccess();
             }
             MacroFeature.ModelDoc.ClearSelection2(true);
         }
 
-        public override bool OnSubmitSelection(int id, object selection, int selType, ref string itemText)
+        protected override bool OnSubmitSelection(int id, object selection, swSelectType_e selType, ref string itemText)
         {
             IBody2[]selections = {(IBody2)selection};
-            _Data.EditBodies = selections;
+            MacroFeature.SwFeatureData.EditBodies = selections;
             return true;
         }
 
 
+
+
         //Controls are displayed on the page top to bottom in the order 
         //in which they are added to the object.
-        protected  override void AddControls()
+        protected override  IEnumerable<IDisposable> AddControlsImpl()
         {
             //Add the groups
 
             group1 = Page.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
+
             group2 = Page.CreateGroup(group2ID, "Sample Group 2", new [] {swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             //Add the controls to group1
+            yield return CreateTextBox(textbox1ID, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
+            yield return CreateCheckBox(checkbox1ID, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
 
 
-            textbox1 = group1.CreateTextBox(textbox1ID, "Type here", "This is a text box");
-
-
-            checkbox1 = group1.CreateCheckBox(checkbox1ID, "Sample Checkbox", "This is a sample checkbox");
-
-
-            option1 = group1.CreateOption(option1ID, "Option1", "Radio Buttons");
-            option2 = group1.CreateOption(option2ID, "Option2", "Radio Buttons");
-            option3 = group1.CreateOption(option3ID, "Option3", "Radio Buttons");
+            yield return CreateOption(group1, option1ID, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
+            yield return CreateOption(group1, option2ID, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
+            yield return CreateOption(group1, option3ID, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
 
 
             list1 = group1.CreateListBox(list1ID, "Sample Listbox", "List of selectable items");
@@ -134,12 +124,10 @@ namespace SwCSharpAddinMF
                 selection1.SetSelectionFilters(filter);
             }
 
-            num1 = group1.CreateNumberBox(num1ID, "Sample numberbox", "Allows for numerical input");
-            if (num1 != null)
+            yield return CreateNumberBox(num1ID, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
             {
-                num1.Value = 50.0;
-                num1.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
-            }
+                box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
+            });
 
             combo1 = group2.CreateComboBox(combo1ID, "Sample Combobox", "Combo list");
             if (combo1 != null)
@@ -150,6 +138,42 @@ namespace SwCSharpAddinMF
 
             }
         }
+
+        private IDisposable CreateTextBox(int id, string caption, string tip, Func<string> get, Action<string> set)
+        {
+            var text = group1.CreateTextBox(id, caption, tip);
+            text.Text = get();
+            return TextBoxChangedObservable(id).Subscribe(set);
+        }
+
+        private IDisposable CreateCheckBox(int id, string caption, string tip, Func<bool> get, Action<bool> set)
+        {
+            var text = group1.CreateCheckBox(id, caption, tip);
+            text.Checked = get();
+            return CheckBoxChangedObservable(id).Subscribe(set);
+        }
+
+        private IDisposable CreateNumberBox(int id, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
+        {
+            var box = group1.CreateNumberBox(id, caption, tip);
+            box.Value = get();
+            config?.Invoke(box);
+            return NumberBoxChangedObservable(id).Subscribe(set);
+        }
+
+        private IDisposable CreateOption<T>(IPropertyManagerPageGroup group1, int id, string tip, string caption, Func<T> get, Action<T> set, T match)
+        {
+            if (match == null) throw new ArgumentNullException(nameof(match));
+
+            var option = group1.CreateOption(id, tip, caption);
+            if (get().Equals(match))
+            {
+                option.Checked = true;
+            }
+            return OptionCheckedObservable(id).Subscribe(v=>set(match));
+        }
+
+
         #endregion
 
     }
