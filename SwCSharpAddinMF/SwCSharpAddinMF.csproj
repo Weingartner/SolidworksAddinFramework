@@ -131,7 +131,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MacroFeature.cs" />
-    <Compile Include="PMPHandler.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -140,7 +139,7 @@
     <Compile Include="SWAddin\DocView.cs" />
     <Compile Include="SWAddin\DrawingEventHandler.cs" />
     <Compile Include="SWAddin\PartEventHandler.cs" />
-    <Compile Include="SWAddin\PmpHandlerBase.cs" />
+    <Compile Include="SWAddin\PmpBase.cs" />
     <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />
     <Compile Include="SWAddin\SwAddinBase.cs" />
     <Compile Include="UserPMPage.cs" />

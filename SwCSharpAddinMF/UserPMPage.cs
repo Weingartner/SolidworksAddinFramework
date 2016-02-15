@@ -1,15 +1,13 @@
 using System;
+using System.Collections.Generic;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {
-    public class UserPmPage
+    public class UserPmPage : PmpBase
     {
-        //Local Objects
-        IPropertyManagerPage2 swPropertyPage = null;
-        PMPHandler handler = null;
 
         #region Property Manager Page Controls
         //Groups
@@ -44,48 +42,48 @@ namespace SwCSharpAddinMF
         public const int combo1ID = 10;
         #endregion
 
-        public UserPmPage(ISldWorks swApp)
+        private static IEnumerable<swPropertyManagerPageOptions_e> Options => new[]
+        {
+            swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton,
+            swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
+        };
+
+        public UserPmPage(ISldWorks swApp) : base(swApp, "Sample PMP", Options)
         {
             if (swApp == null) throw new ArgumentNullException(nameof(swApp));
-            SwApp = swApp;
-            CreatePropertyManagerPage();
         }
 
-        public ISldWorks SwApp { get; set; }
-
-
-        protected void CreatePropertyManagerPage()
+        #region PMPHandlerBase
+        //Implement these methods from the interface
+        public override void AfterClose()
         {
-            int errors = -1;
-            int options = (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton |
-                (int)swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton;
+            //This function must contain code, even if it does nothing, to prevent the
+            //.NET runtime environment from doing garbage collection at the wrong time.
+            int IndentSize;
+            IndentSize = System.Diagnostics.Debug.IndentSize;
+            System.Diagnostics.Debug.WriteLine(IndentSize);
+        }
 
-            handler = new PMPHandler(this);
-            swPropertyPage = (IPropertyManagerPage2)SwApp.CreatePropertyManagerPage("Sample PMP", options, handler, ref errors);
-            if (swPropertyPage != null && errors == (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
-            {
-                try
-                {
-                    AddControls();
-                }
-                catch (Exception e)
-                {
-                    SwApp.SendMsgToUser2(e.Message, 0, 0);
-                }
-            }
+        public override void OnClose(int reason)
+        {
+            //This function must contain code, even if it does nothing, to prevent the
+            //.NET runtime environment from doing garbage collection at the wrong time.
+            int IndentSize;
+            IndentSize = System.Diagnostics.Debug.IndentSize;
+            System.Diagnostics.Debug.WriteLine(IndentSize);
         }
 
 
         //Controls are displayed on the page top to bottom in the order 
         //in which they are added to the object.
-        protected void AddControls()
+        protected  override void AddControls()
         {
             //Add the groups
 
-            group1 = swPropertyPage.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            group1 = Page.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            group2 = swPropertyPage.CreateGroup(group2ID, "Sample Group 2", new [] {swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox ,
+            group2 = Page.CreateGroup(group2ID, "Sample Group 2", new [] {swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             //Add the controls to group1
@@ -134,10 +132,7 @@ namespace SwCSharpAddinMF
 
             }
         }
+        #endregion
 
-        public void Show()
-        {
-            swPropertyPage?.Show();
-        }
     }
 }

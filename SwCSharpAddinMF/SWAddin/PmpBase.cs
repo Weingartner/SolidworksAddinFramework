@@ -1,10 +1,45 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
 namespace SwCSharpAddinMF.SWAddin
 {
-    public class PmpHandlerBase : IPropertyManagerPage2Handler9
+    public abstract class PmpBase : IPropertyManagerPage2Handler9
     {
+        public readonly ISldWorks SwApp;
+
+        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE )
+        {
+            SwApp = swApp;
+            int options = optionsE.Aggregate(0,(acc,v)=>(int)v | acc);
+            int errors = 0;
+            Page = (IPropertyManagerPage2)SwApp.CreatePropertyManagerPage(name, options, this, ref errors);
+            if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
+            {
+            }
+            else
+            {
+                throw new Exception("Unable to Create PMP");
+            }
+        }
+
+        private bool ControlsAdded = false;
+        public void Show()
+        {
+            if(!ControlsAdded)
+                AddControls();
+            ControlsAdded = true;
+            Page?.Show();
+        }
+
+        protected abstract void AddControls();
+
+
+        public IPropertyManagerPage2 Page { get; }
+
         public virtual void AfterActivation()
         {
         }
