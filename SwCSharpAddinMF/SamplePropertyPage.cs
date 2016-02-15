@@ -8,6 +8,8 @@ namespace SwCSharpAddinMF
 {
     public class SamplePropertyPage : PmpBase
     {
+        public SampleMacroFeature MacroFeature { get; set; }
+        private IMacroFeatureData _Data;
 
         #region Property Manager Page Controls
         //Groups
@@ -48,9 +50,12 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(ISldWorks swApp) : base(swApp, "Sample PMP", Options)
+        public SamplePropertyPage(SampleMacroFeature macroFeature) : base(macroFeature.SwApp, "Sample PMP", Options)
         {
-            if (swApp == null) throw new ArgumentNullException(nameof(swApp));
+            if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
+
+            MacroFeature = macroFeature;
+            _Data = (IMacroFeatureData) MacroFeature.SwFeature.GetDefinition();
         }
 
         #region PMPHandlerBase
@@ -68,9 +73,22 @@ namespace SwCSharpAddinMF
         {
             //This function must contain code, even if it does nothing, to prevent the
             //.NET runtime environment from doing garbage collection at the wrong time.
-            int IndentSize;
-            IndentSize = System.Diagnostics.Debug.IndentSize;
-            System.Diagnostics.Debug.WriteLine(IndentSize);
+
+            if (reason == (int) swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                MacroFeature.SwFeature.ModifyDefinition(_Data, MacroFeature.ModelDoc, null);
+            }else if (reason ==(int) swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+            {
+                _Data.ReleaseSelectionAccess();
+            }
+            MacroFeature.ModelDoc.ClearSelection2(true);
+        }
+
+        public override bool OnSubmitSelection(int id, object selection, int selType, ref string itemText)
+        {
+            IBody2[]selections = {(IBody2)selection};
+            _Data.EditBodies = selections;
+            return true;
         }
 
 

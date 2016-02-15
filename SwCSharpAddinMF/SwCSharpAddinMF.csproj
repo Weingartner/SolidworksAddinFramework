@@ -138,6 +138,7 @@
     <Compile Include="SWAddin\DocumentEventHandler.cs" />
     <Compile Include="SWAddin\DocView.cs" />
     <Compile Include="SWAddin\DrawingEventHandler.cs" />
+    <Compile Include="SWAddin\MacroFeatureBase.cs" />
     <Compile Include="SWAddin\PartEventHandler.cs" />
     <Compile Include="SWAddin\PmpBase.cs" />
     <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />

@@ -2,11 +2,11 @@ using System;
 using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using SolidWorks.Interop.swpublished;
+using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {
-    public class SampleMacroFeature : ISwComFeature
+    public class SampleMacroFeature : MacroFeatureBase
     {
         private SamplePropertyPage ppage = null;
 
@@ -14,34 +14,26 @@ namespace SwCSharpAddinMF
         {
         }
 
-        object ISwComFeature.Edit(object app, object modelDoc, object feature)
+        protected override object Edit()
         {
-            SwApp = app as ISldWorks;
-
-            ppage = new SamplePropertyPage(SwApp);
+            ppage = new SamplePropertyPage(this);
             ppage.Show();
             return null;
         }
-
-        public ISldWorks SwApp { get; set; }
-
-        object ISwComFeature.Regenerate(object app, object modelDoc, object feature)
+        protected override object Regenerate()
         {
-            SwApp = app as ISldWorks;
-
             MessageBox.Show("MF Regenerate");
             return null;
         }
 
-        object ISwComFeature.Security(object app, object modelDoc, object feature)
+        protected override object Security()
         {
-            SwApp = app as ISldWorks;
-
             MessageBox.Show("MF Security");
             return null;
         }
 
-        public bool AddMacroFeature(ISldWorks app) 
+        public static bool AddMacroFeature(ISldWorks app) 
+
         {
             var names = new string[3];
             var types = new int[3]; //Use int for 64 bit compatibility
@@ -65,15 +57,12 @@ namespace SwCSharpAddinMF
             values[1] = "0.005"; //Offset
             values[2] = "0.006"; //Depth
 
-            object paramNames = names;
-            object paramTypes = types;
-            object paramValues = values;
 
             IBody2 editBody = null;
 
             const int opts = 0;
 
-            IFeature MacroFeature = featMgr.InsertMacroFeature3("ORingGroove", nameof(SwCSharpAddinMF) + "." + nameof(MacroFeature), null, (paramNames), (paramTypes), (paramValues), null, null, editBody, null, opts);
+            featMgr.InsertMacroFeature<SampleMacroFeature>("ORingGroove", names, types, values, editBody, opts);
 
             names = null;
             types = null;
