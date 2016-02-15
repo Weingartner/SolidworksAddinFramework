@@ -170,9 +170,17 @@ namespace SwCSharpAddinMF.SWAddin
 
         #region listbox
 
+        Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
+
         public virtual void OnListboxSelectionChanged(int id, int item)
         {
+            _ListBoxSelectionSubject.OnNext(Tuple.Create(id,item));
         }
+
+        public IObservable<int> ListBoxSelectionObservable(int id) => _ListBoxSelectionSubject
+            .Where(i => i.Item1 == id).Select(t => t.Item2);
+
+
         public virtual void OnListboxRMBUp(int id, int posX, int posY)
         {
         }
@@ -246,6 +254,48 @@ namespace SwCSharpAddinMF.SWAddin
 
         public virtual void OnNumberBoxTrackingCompleted(int id, double value)
         {
+        }
+
+        protected IDisposable CreateListBox(IPropertyManagerPageGroup @group, int id, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageListbox> config)
+        {
+            var list = @group.CreateListBox(id, caption, tip);
+            config(list);
+            list.CurrentSelection = (short) get();
+            return ListBoxSelectionObservable(id).Subscribe(set);
+        }
+
+        protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group,int id, string caption, string tip, Func<string> get, Action<string> set)
+        {
+            var text = @group.CreateTextBox(id, caption, tip);
+            text.Text = get();
+            return TextBoxChangedObservable(id).Subscribe(set);
+        }
+
+        protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group,int id, string caption, string tip, Func<bool> get, Action<bool> set)
+        {
+            var text = @group.CreateCheckBox(id, caption, tip);
+            text.Checked = get();
+            return CheckBoxChangedObservable(id).Subscribe(set);
+        }
+
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,int id, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
+        {
+            var box = @group.CreateNumberBox(id, caption, tip);
+            box.Value = get();
+            config?.Invoke(box);
+            return NumberBoxChangedObservable(id).Subscribe(set);
+        }
+
+        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, int id, string tip, string caption, Func<T> get, Action<T> set, T match)
+        {
+            if (match == null) throw new ArgumentNullException(nameof(match));
+
+            var option = @group.CreateOption(id, tip, caption);
+            if (get().Equals(match))
+            {
+                option.Checked = true;
+            }
+            return OptionCheckedObservable(id).Subscribe(v=>set(match));
         }
     }
 }

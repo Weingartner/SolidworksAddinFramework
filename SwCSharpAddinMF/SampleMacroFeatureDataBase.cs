@@ -25,5 +25,7 @@ namespace SwCSharpAddinMF
         [MacroFeatureDataField]
         public int Param3 { get; set; } = 27;
 
+        [MacroFeatureDataField]
+        public int ListItem { get; set; }
     }
 }

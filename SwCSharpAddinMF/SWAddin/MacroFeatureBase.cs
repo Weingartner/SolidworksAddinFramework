@@ -81,6 +81,12 @@ namespace SwCSharpAddinMF.SWAddin
                 return _Values; }
         }
 
+        public override string ToString()
+        {
+            return "{ " + string.Join(", ", BindingProperties
+                .Select(prop => $"{prop.Name}: {prop.GetValue(this, new object[] {})}")) + " }"; 
+        }
+
         public void WriteTo(IMacroFeatureData data)
         {
             foreach (var bindingProperty in BindingProperties)
