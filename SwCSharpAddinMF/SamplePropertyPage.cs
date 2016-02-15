@@ -76,8 +76,14 @@ namespace SwCSharpAddinMF
             return true;
         }
 
-
-
+        IEnumerable<int> Generator()
+        {
+            int i = 0;
+            while (true)
+            {
+                yield return i++;
+            }
+        }
 
         //Controls are displayed on the page top to bottom in the order 
         //in which they are added to the object.
@@ -92,17 +98,18 @@ namespace SwCSharpAddinMF
             group2 = Page.CreateGroup(group2ID, "Sample Group 2", new [] {swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            yield return CreateTextBox(group1,textbox1ID, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
-            yield return CreateCheckBox(group1,checkbox1ID, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
+
+            yield return CreateTextBox(group1, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
+            yield return CreateCheckBox(group1, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
 
 
-            yield return CreateOption(group1, option1ID, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
-            yield return CreateOption(group1, option2ID, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
-            yield return CreateOption(group1, option3ID, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
+            yield return CreateOption(group1, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
+            yield return CreateOption(group1, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
+            yield return CreateOption(group1, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
 
 
             yield return
-                CreateListBox(group1, list1ID, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
+                CreateListBox(group1, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
                     list =>
                     {
                         string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
@@ -111,7 +118,7 @@ namespace SwCSharpAddinMF
                         
                     });
 
-            yield return CreateNumberBox(group1,num1ID, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
+            yield return CreateNumberBox(group1, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
             });

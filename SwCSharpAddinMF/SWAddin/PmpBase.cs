@@ -171,6 +171,7 @@ namespace SwCSharpAddinMF.SWAddin
         #region listbox
 
         Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        private int _NextId = 0;
 
         public virtual void OnListboxSelectionChanged(int id, int item)
         {
@@ -256,38 +257,43 @@ namespace SwCSharpAddinMF.SWAddin
         {
         }
 
-        protected IDisposable CreateListBox(IPropertyManagerPageGroup @group, int id, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageListbox> config)
+        protected IDisposable CreateListBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageListbox> config)
         {
+            var id = NextId();
             var list = @group.CreateListBox(id, caption, tip);
             config(list);
             list.CurrentSelection = (short) get();
             return ListBoxSelectionObservable(id).Subscribe(set);
         }
 
-        protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group,int id, string caption, string tip, Func<string> get, Action<string> set)
+        protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<string> get, Action<string> set)
         {
+            var id = NextId();
             var text = @group.CreateTextBox(id, caption, tip);
             text.Text = get();
             return TextBoxChangedObservable(id).Subscribe(set);
         }
 
-        protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group,int id, string caption, string tip, Func<bool> get, Action<bool> set)
+        protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<bool> get, Action<bool> set)
         {
+            var id = NextId();
             var text = @group.CreateCheckBox(id, caption, tip);
             text.Checked = get();
             return CheckBoxChangedObservable(id).Subscribe(set);
         }
 
-        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,int id, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
         {
+            var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
             box.Value = get();
             config?.Invoke(box);
             return NumberBoxChangedObservable(id).Subscribe(set);
         }
 
-        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, int id, string tip, string caption, Func<T> get, Action<T> set, T match)
+        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, Func<T> get, Action<T> set, T match)
         {
+            var id = NextId();
             if (match == null) throw new ArgumentNullException(nameof(match));
 
             var option = @group.CreateOption(id, tip, caption);
@@ -296,6 +302,12 @@ namespace SwCSharpAddinMF.SWAddin
                 option.Checked = true;
             }
             return OptionCheckedObservable(id).Subscribe(v=>set(match));
+        }
+
+        private int NextId()
+        {
+            _NextId++;
+            return _NextId;
         }
     }
 }
