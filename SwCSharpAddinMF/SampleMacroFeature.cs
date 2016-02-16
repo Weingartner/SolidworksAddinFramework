@@ -41,13 +41,17 @@ namespace SwCSharpAddinMF
                     object componentXForms;
                     SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms);
 
-                    var objectsArray = ((object[])objects).Cast<IBody2>().ToList();
-                    swSelectType_e[] typesArray = (swSelectType_e[])objectTypes;
-
-                    ModelDoc.ClearSelection2(true);
-                    foreach (var feature in objectsArray)
+                    if(objects!=null)
                     {
-                        feature.Select2(true, null);
+                        var objectsArray = ((object[])objects).Cast<IBody2>().ToList();
+                        swSelectType_e[] typesArray = (swSelectType_e[])objectTypes;
+
+                        ModelDoc.ClearSelection2(true);
+                        foreach (var feature in objectsArray)
+                        {
+                            feature.Select2(true, null);
+                        }
+                        
                     }
                 }
 

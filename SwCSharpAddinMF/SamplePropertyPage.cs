@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -56,28 +58,20 @@ namespace SwCSharpAddinMF
             if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
             {
                     
-                //var count = this.MacroFeature.SelectionMgr.GetSelectedObjectCount();
-
-                //var editBodies =
-                //    this.MacroFeature.SelectionMgr.GetSelectedObjects(
-                //        (type, mark) => type == swSelectType_e.swSelSOLIDBODIES)
-                //        .ToArray();
-
-                //{
-                //    object objects;
-                //    object objectTypes;
-                //    object marks;
-                //    object drViews;
-                //    object componentXForms;
-                //    this.MacroFeature.SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms  );
-
-                //    object[] objectsArray = (object[]) objects;
-                //    swSelectType_e[] typesArray = (swSelectType_e[]) objectTypes;
-                //}
-
                 //this.MacroFeature.SwFeatureData.EditBodies = editBodies;
                 if(State==StateEnum.Edit)
                 {
+                    IBody2[] objects = this.MacroFeature.SelectionMgr.GetSelectedObjects((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES)
+                        .Cast<IBody2>()
+                        .ToArray();
+
+                    int[] marks =
+                        Enumerable.Range(1, objects.Length)
+                            .Select(i => this.MacroFeature.SelectionMgr.GetSelectedObjectMark(i))
+                            .ToArray();
+
+                    this.MacroFeature.SwFeatureData.SetSelections(objects,marks);
+                    Debug.Assert(this.MacroFeature.SwFeatureData.GetSelectionCount()==objects.Length);
                     this.MacroFeature.Write();
                     MacroFeature.ModifyDefinition();
                 }

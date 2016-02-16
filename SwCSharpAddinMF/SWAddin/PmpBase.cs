@@ -204,8 +204,11 @@ namespace SwCSharpAddinMF.SWAddin
         {
         }
 
+        Subject<int> _SelectionChangedSubject = new Subject<int>();
+        public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default); 
         public virtual void OnSelectionboxListChanged(int id, int count)
         {
+            _SelectionChangedSubject.OnNext(id);
         }
 
         public virtual void OnSelectionboxCalloutCreated(int id)
@@ -223,12 +226,9 @@ namespace SwCSharpAddinMF.SWAddin
 
         protected virtual bool OnSubmitSelection(int id, object selection, swSelectType_e selType, ref string itemText)
         {
-            _SelectionChangedSubject.OnNext(id);
             return true;
         }
-        Subject<int> _SelectionChangedSubject = new Subject<int>();
 
-        public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default); 
 
         public virtual int OnActiveXControlCreated(int id, bool status)
         {

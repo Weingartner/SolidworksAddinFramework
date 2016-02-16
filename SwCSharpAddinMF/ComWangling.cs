@@ -31,5 +31,10 @@ namespace SwCSharpAddinMF
                     }
                 });
         }
+
+        public static DispatchWrapper[] ObjectArrayToDispatchWrapper(IEnumerable<object> objects)
+        {
+            return objects.Select(o => new DispatchWrapper(o)).ToArray();
+        }
     }
 }
