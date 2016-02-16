@@ -146,6 +146,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ComWangling.cs" />
     <Compile Include="SampleMacroFeatureDataBase.cs" />
     <Compile Include="SampleMacroFeature.cs" />
     <Compile Include="SwAddin.cs">
@@ -160,6 +161,7 @@
     <Compile Include="SWAddin\PartEventHandler.cs" />
     <Compile Include="SWAddin\PmpBase.cs" />
     <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />
+    <Compile Include="SWAddin\SelectionManagerExtensions.cs" />
     <Compile Include="SWAddin\SwAddinBase.cs" />
     <Compile Include="SamplePropertyPage.cs" />
     <EmbeddedResource Include="ToolbarLarge.bmp" />

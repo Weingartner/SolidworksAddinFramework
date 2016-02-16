@@ -163,19 +163,30 @@ namespace SwCSharpAddinMF.SWAddin
         public ISldWorks SwApp { get; set; }
         public abstract T Database { get; set; }
 
+        public ISelectionMgr SelectionMgr { get; set; }
+
         public object Edit(object app, object modelDoc, object feature)
+        {
+            Init(app, modelDoc, feature);
+            return Edit();
+        }
+
+        private void Init(object app, object modelDoc, object feature)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
             if (modelDoc == null) throw new ArgumentNullException(nameof(modelDoc));
-            if (feature == null) throw new ArgumentNullException(nameof(feature));
+            // feature can be null
 
-            SwApp = app as ISldWorks;
-            SwFeature = feature as IFeature;
-            SwFeatureData = (IMacroFeatureData) SwFeature.GetDefinition();
-            ModelDoc = modelDoc as IModelDoc2;
+            SwApp = (ISldWorks) app;
             Database = new T();
-            Database.ReadFrom(SwFeatureData);
-            return Edit();
+            if (feature != null)
+            {
+                SwFeature = (IFeature) feature;
+                SwFeatureData = (IMacroFeatureData) SwFeature.GetDefinition();
+                Database.ReadFrom(SwFeatureData);
+            }
+            ModelDoc = (IModelDoc2) modelDoc;
+            SelectionMgr = (ISelectionMgr) ModelDoc.SelectionManager;
         }
 
         public void Write()
@@ -191,7 +202,7 @@ namespace SwCSharpAddinMF.SWAddin
 
         public void ReleaseSelectionAccess()
         {
-            SwFeatureData.ReleaseSelectionAccess();
+            SwFeatureData?.ReleaseSelectionAccess();
         }
 
 
@@ -201,25 +212,13 @@ namespace SwCSharpAddinMF.SWAddin
 
         public object Regenerate(object app, object modelDoc, object feature)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (modelDoc == null) throw new ArgumentNullException(nameof(modelDoc));
-            if (feature == null) throw new ArgumentNullException(nameof(feature));
-            
-            SwApp = app as ISldWorks;
-            SwFeature = feature as IFeature;
-            ModelDoc = modelDoc as IModelDoc2;
+            Init(app, modelDoc, feature);
             return Regenerate();
         }
 
         public object Security(object app, object modelDoc, object feature)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (modelDoc == null) throw new ArgumentNullException(nameof(modelDoc));
-            if (feature == null) throw new ArgumentNullException(nameof(feature));
-
-            SwApp = app as ISldWorks;
-            SwFeature = feature as IFeature;
-            ModelDoc = modelDoc as IModelDoc2;
+            Init(app, modelDoc, feature);
             return Security();
         }
     }

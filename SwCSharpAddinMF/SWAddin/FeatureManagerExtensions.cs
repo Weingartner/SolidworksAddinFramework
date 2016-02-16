@@ -20,10 +20,9 @@ namespace SwCSharpAddinMF.SWAddin
 
 
         public static void InsertMacroFeature<T>(IFeatureManager featMgr, string featureName,
-            IBody2 editBody, int opts)
+            IBody2 editBody, int opts, T data)
             where T : MacroFeatureDataBase, new()
         {
-            var data = new T();
             featMgr.InsertMacroFeature<SampleMacroFeature>(featureName,
                 data.Names,
                 data.Types,

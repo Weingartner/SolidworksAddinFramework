@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SwCSharpAddinMF.SWAddin;
@@ -13,27 +15,20 @@ namespace SwCSharpAddinMF
 
         #region Property Manager Page Controls
         //Groups
-        IPropertyManagerPageGroup group1;
-        IPropertyManagerPageGroup group2;
+        IPropertyManagerPageGroup pageGroup;
 
         //Controls
         IPropertyManagerPageSelectionbox selection1;
         IPropertyManagerPageNumberbox num1;
         IPropertyManagerPageCombobox combo1;
 
+        private string featureName = "Foo Feature";
+
         //Control IDs
         public const int group1ID = 0;
         public const int group2ID = 1;
 
-        public const int textbox1ID = 2;
-        public const int checkbox1ID = 3;
-        public const int option1ID = 4;
-        public const int option2ID = 5;
-        public const int option3ID = 6;
-        public const int list1ID = 7;
-
         public const int selection1ID = 8;
-        public const int num1ID = 9;
         public const int combo1ID = 10;
         #endregion
 
@@ -43,7 +38,7 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SampleMacroFeature macroFeature) : base(macroFeature.SwApp, "Sample PMP", Options)
+        public SamplePropertyPage(SampleMacroFeature macroFeature, StateEnum state) : base(macroFeature.SwApp, "Sample PMP", Options, state)
         {
             if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
 
@@ -60,30 +55,45 @@ namespace SwCSharpAddinMF
 
             if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
             {
-                this.MacroFeature.Write();
-                MacroFeature.ModifyDefinition();
+                    
+                //var count = this.MacroFeature.SelectionMgr.GetSelectedObjectCount();
+
+                //var editBodies =
+                //    this.MacroFeature.SelectionMgr.GetSelectedObjects(
+                //        (type, mark) => type == swSelectType_e.swSelSOLIDBODIES)
+                //        .ToArray();
+
+                //{
+                //    object objects;
+                //    object objectTypes;
+                //    object marks;
+                //    object drViews;
+                //    object componentXForms;
+                //    this.MacroFeature.SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms  );
+
+                //    object[] objectsArray = (object[]) objects;
+                //    swSelectType_e[] typesArray = (swSelectType_e[]) objectTypes;
+                //}
+
+                //this.MacroFeature.SwFeatureData.EditBodies = editBodies;
+                if(State==StateEnum.Edit)
+                {
+                    this.MacroFeature.Write();
+                    MacroFeature.ModifyDefinition();
+                }
+                else
+                {
+                    IBody2 editBody = null;
+                    const int opts = 0;
+                    FeatureManagerExtensions.InsertMacroFeature
+                        (this.MacroFeature.ModelDoc.FeatureManager, featureName, editBody, opts, this.MacroFeature.Database);
+                }
             }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
             {
                 MacroFeature.ReleaseSelectionAccess();
             }
-            MacroFeature.ModelDoc.ClearSelection2(true);
         }
 
-        protected override bool OnSubmitSelection(int id, object selection, swSelectType_e selType, ref string itemText)
-        {
-            IBody2[]selections = {(IBody2)selection};
-            MacroFeature.SwFeatureData.EditBodies = selections;
-            return true;
-        }
-
-        IEnumerable<int> Generator()
-        {
-            int i = 0;
-            while (true)
-            {
-                yield return i++;
-            }
-        }
 
         //Controls are displayed on the page top to bottom in the order 
         //in which they are added to the object.
@@ -91,55 +101,60 @@ namespace SwCSharpAddinMF
         {
             //Add the groups
 
-            group1 = Page.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            pageGroup = Page.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
+            yield return CreateTextBox(pageGroup, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
 
-            group2 = Page.CreateGroup(group2ID, "Sample Group 2", new [] {swAddGroupBoxOptions_e.swGroupBoxOptions_Checkbox ,
-                swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
-
-
-            yield return CreateTextBox(group1, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
-            yield return CreateCheckBox(group1, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
-
-
-            yield return CreateOption(group1, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
-            yield return CreateOption(group1, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
-            yield return CreateOption(group1, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
-
-
-            yield return
-                CreateListBox(group1, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
-                    list =>
-                    {
-                        string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
-                        list.Height = 50;
-                        list.AddItems(items);
-                        
-                    });
-
-            yield return CreateNumberBox(group1, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
+            yield return CreateNumberBox(pageGroup, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
             });
 
-            selection1 = group1.CreateSelectionBox(selection1ID, "Sample Selection", "Displays features selected in main view");
-            if (selection1 != null)
-            {
-                int[] filter = { (int)swSelectType_e.swSelEDGES, (int)swSelectType_e.swSelVERTICES };
-                selection1.Height = 40;
-                selection1.SetSelectionFilters(filter);
-            }
+            yield return CreateCheckBox(pageGroup, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
 
 
-            combo1 = group2.CreateComboBox(combo1ID, "Sample Combobox", "Combo list");
-            if (combo1 != null)
-            {
-                string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
-                combo1.AddItems(items);
-                combo1.Height = 50;
+            yield return CreateOption(pageGroup, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
+            yield return CreateOption(pageGroup, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
+            yield return CreateOption(pageGroup, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
 
-            }
+
+            yield return
+                CreateListBox(pageGroup, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
+                    listBox =>
+                    {
+                        string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
+                        listBox.Height = 50;
+                        listBox.AddItems(items);
+                        
+                    });
+
+            yield return
+                CreateComboBox(pageGroup, "Listbox", "List of items", () => MacroFeature.Database.ComboBoxItem, v => MacroFeature.Database.ComboBoxItem = v,
+                    comboBox =>
+                    {
+                        string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
+                        comboBox.Height = 50;
+                        comboBox.AddItems(items);
+                        
+                    });
+
+
+            yield return CreateSelectionBox(pageGroup, "Sample Selection", "Displays features selected in main view",
+                (selectionBox, observable) =>
+                {
+                    if (selectionBox != null)
+                    {
+                        int[] filter = { (int)swSelectType_e.swSelSOLIDBODIES};
+                        selectionBox.Height = 40;
+                        selectionBox.SetSelectionFilters(filter);
+                        selectionBox.SingleEntityOnly = false;
+                    }
+
+                    return observable.Subscribe(v => MacroFeature.Database.SelectedObjects = v);
+                });
+
+
         }
 
         #endregion

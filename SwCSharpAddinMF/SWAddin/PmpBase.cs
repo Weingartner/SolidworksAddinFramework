@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using SolidWorks.Interop.sldworks;
@@ -14,9 +15,14 @@ namespace SwCSharpAddinMF.SWAddin
     {
         public readonly ISldWorks SwApp;
 
-        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE )
+        public enum StateEnum {  Insert, Edit }
+
+        public StateEnum State{ get; }
+
+        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, StateEnum state)
         {
             SwApp = swApp;
+            State = state;
             int options = optionsE.Aggregate(0,(acc,v)=>(int)v | acc);
             int errors = 0;
             Page = (IPropertyManagerPage2)SwApp.CreatePropertyManagerPage(name, options, this, ref errors);
@@ -160,17 +166,24 @@ namespace SwCSharpAddinMF.SWAddin
         }
         #endregion
 
+        #region combobox
         public virtual void OnComboboxEditChanged(int id, string text)
         {
         }
 
+        readonly Subject<Tuple<int,int>> _ComboBoxSelectionSubject = new Subject<Tuple<int, int>>();
         public virtual void OnComboboxSelectionChanged(int id, int item)
         {
+            _ComboBoxSelectionSubject.OnNext(Tuple.Create(id,item));
         }
+        public IObservable<int> ComboBoxSelectionObservable(int id) => _ComboBoxSelectionSubject
+            .Where(i => i.Item1 == id).Select(t => t.Item2);
+
+        #endregion
 
         #region listbox
 
-        Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        readonly Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
         private int _NextId = 0;
 
         public virtual void OnListboxSelectionChanged(int id, int item)
@@ -185,7 +198,7 @@ namespace SwCSharpAddinMF.SWAddin
         public virtual void OnListboxRMBUp(int id, int posX, int posY)
         {
         }
-#endregion
+        #endregion
 
         public virtual void OnSelectionboxFocusChanged(int id)
         {
@@ -210,8 +223,12 @@ namespace SwCSharpAddinMF.SWAddin
 
         protected virtual bool OnSubmitSelection(int id, object selection, swSelectType_e selType, ref string itemText)
         {
+            _SelectionChangedSubject.OnNext(id);
             return true;
         }
+        Subject<int> _SelectionChangedSubject = new Subject<int>();
+
+        public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default); 
 
         public virtual int OnActiveXControlCreated(int id, bool status)
         {
@@ -265,6 +282,15 @@ namespace SwCSharpAddinMF.SWAddin
             list.CurrentSelection = (short) get();
             return ListBoxSelectionObservable(id).Subscribe(set);
         }
+        protected IDisposable CreateComboBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageCombobox> config)
+        {
+            var id = NextId();
+            var comboBox = @group.CreateComboBox(id, caption, tip);
+            config(comboBox);
+            comboBox.CurrentSelection = (short) get();
+            return ComboBoxSelectionObservable(id).Subscribe(set);
+        }
+
 
         protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<string> get, Action<string> set)
         {
@@ -303,6 +329,25 @@ namespace SwCSharpAddinMF.SWAddin
             }
             return OptionCheckedObservable(id).Subscribe(v=>set(match));
         }
+
+        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
+            Func<IPropertyManagerPageSelectionbox, IObservable<object[]>,  IDisposable> config)
+        {
+            var id = NextId();
+            var box = @group.CreateSelectionBox(id, caption, tip);
+            return config(box, SelectionChangedObservable(id).Select(_=>box.GetSelectedItems() as object[]));
+            // For the moment we don't have any callbacks / rx stuff to register.
+        }
+        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
+            Action<IPropertyManagerPageSelectionbox> config)
+        {
+            var id = NextId();
+            var box = @group.CreateSelectionBox(id, caption, tip);
+            config(box);
+            // For the moment we don't have any callbacks / rx stuff to register.
+            return Disposable.Empty;
+        }
+
 
         private int NextId()
         {
