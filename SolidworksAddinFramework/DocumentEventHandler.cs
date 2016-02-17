@@ -1,7 +1,7 @@
 using System.Collections;
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     public class DocumentEventHandler
     {

@@ -146,24 +146,11 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ComWangling.cs" />
     <Compile Include="SampleMacroFeatureDataBase.cs" />
     <Compile Include="SampleMacroFeature.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SWAddin\AssemblyEventHandler.cs" />
-    <Compile Include="SWAddin\DocumentEventHandler.cs" />
-    <Compile Include="SWAddin\DocView.cs" />
-    <Compile Include="SWAddin\DrawingEventHandler.cs" />
-    <Compile Include="SWAddin\FeatureManagerExtensions.cs" />
-    <Compile Include="SWAddin\MacroFeatureBase.cs" />
-    <Compile Include="SWAddin\PartEventHandler.cs" />
-    <Compile Include="SWAddin\PmpBase.cs" />
-    <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />
-    <Compile Include="SWAddin\PropertyManagerPage2Handler9Wrapper.cs" />
-    <Compile Include="SWAddin\SelectionManagerExtensions.cs" />
-    <Compile Include="SWAddin\SwAddinBase.cs" />
     <Compile Include="SamplePropertyPage.cs" />
     <EmbeddedResource Include="ToolbarLarge.bmp" />
     <EmbeddedResource Include="ToolbarSmall.bmp" />
@@ -180,6 +167,8 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\SolidworksAddinFramework\SolidworksAddinFramework.projitems" Label="Shared" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

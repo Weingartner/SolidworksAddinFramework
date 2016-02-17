@@ -1,6 +1,6 @@
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     public class DocView
     {

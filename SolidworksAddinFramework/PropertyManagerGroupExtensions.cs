@@ -4,7 +4,7 @@ using System.Linq;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     public static class PropertyManagerGroupExtensions
     {

@@ -9,7 +9,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     //public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
     public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
@@ -297,7 +297,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected IDisposable CreateListBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageListbox> config)
         {
             var id = NextId();
-            var list = @group.CreateListBox(id, caption, tip);
+            var list = PropertyManagerGroupExtensions.CreateListBox(@group, id, caption, tip);
             config(list);
             list.CurrentSelection = (short) get();
             return ListBoxSelectionObservable(id).Subscribe(set);
@@ -305,7 +305,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected IDisposable CreateComboBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageCombobox> config)
         {
             var id = NextId();
-            var comboBox = @group.CreateComboBox(id, caption, tip);
+            var comboBox = PropertyManagerGroupExtensions.CreateComboBox(@group, id, caption, tip);
             config(comboBox);
             comboBox.CurrentSelection = (short) get();
             return ComboBoxSelectionObservable(id).Subscribe(set);
@@ -315,7 +315,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<string> get, Action<string> set)
         {
             var id = NextId();
-            var text = @group.CreateTextBox(id, caption, tip);
+            var text = PropertyManagerGroupExtensions.CreateTextBox(@group, id, caption, tip);
             text.Text = get();
             return TextBoxChangedObservable(id).Subscribe(set);
         }
@@ -323,7 +323,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<bool> get, Action<bool> set)
         {
             var id = NextId();
-            var text = @group.CreateCheckBox(id, caption, tip);
+            var text = PropertyManagerGroupExtensions.CreateCheckBox(@group, id, caption, tip);
             text.Checked = get();
             return CheckBoxChangedObservable(id).Subscribe(set);
         }
@@ -331,7 +331,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
         {
             var id = NextId();
-            var box = @group.CreateNumberBox(id, caption, tip);
+            var box = PropertyManagerGroupExtensions.CreateNumberBox(@group, id, caption, tip);
             box.Value = get();
             config?.Invoke(box);
             return NumberBoxChangedObservable(id).Subscribe(set);
@@ -342,7 +342,7 @@ namespace SwCSharpAddinMF.SWAddin
             var id = NextId();
             if (match == null) throw new ArgumentNullException(nameof(match));
 
-            var option = @group.CreateOption(id, tip, caption);
+            var option = PropertyManagerGroupExtensions.CreateOption(@group, id, tip, caption);
             if (get().Equals(match))
             {
                 option.Checked = true;
@@ -354,7 +354,7 @@ namespace SwCSharpAddinMF.SWAddin
             Func<IPropertyManagerPageSelectionbox, IObservable<object[]>,  IDisposable> config)
         {
             var id = NextId();
-            var box = @group.CreateSelectionBox(id, caption, tip);
+            var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
             return config(box, SelectionChangedObservable(id).Select(_=>box.GetSelectedItems() as object[]));
             // For the moment we don't have any callbacks / rx stuff to register.
         }
@@ -362,7 +362,7 @@ namespace SwCSharpAddinMF.SWAddin
             Action<IPropertyManagerPageSelectionbox> config)
         {
             var id = NextId();
-            var box = @group.CreateSelectionBox(id, caption, tip);
+            var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
             config(box);
             // For the moment we don't have any callbacks / rx stuff to register.
             return Disposable.Empty;

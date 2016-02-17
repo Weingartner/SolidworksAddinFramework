@@ -7,7 +7,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class MacroFeatureDataFieldAttribute : System.Attribute
@@ -244,7 +244,7 @@ namespace SwCSharpAddinMF.SWAddin
 
         private static void SaveSelections(MacroFeatureBase<TMacroFeature,TData> sampleMacroFeature)
         {
-            var objects = sampleMacroFeature.SelectionMgr.GetSelectedObjects((type, mark) => true)
+            var objects = SelectionManagerExtensions.GetSelectedObjects(sampleMacroFeature.SelectionMgr, (type, mark) => true)
                 .Cast<IBody2>()
                 .ToArray();
 

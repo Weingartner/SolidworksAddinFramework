@@ -9,6 +9,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SolidworksAddinFramework", 
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SolidworksAddinFramework\SolidworksAddinFramework.projitems*{a67399be-aaf7-433f-8f72-9b0424c5be67}*SharedItemsImports = 4
 		SolidworksAddinFramework\SolidworksAddinFramework.projitems*{55562487-76b1-4868-8726-e14f674fbd06}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,7 +13,7 @@ using SolidWorksTools;
 using SolidWorksTools.File;
 using Attribute = System.Attribute;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     public abstract class SwAddinBase : ISwAddin
     {

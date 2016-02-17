@@ -1,15 +1,16 @@
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
-    public class DrawingEventHandler : DocumentEventHandler
+    public class PartEventHandler : DocumentEventHandler
     {
-        private DrawingDoc _Doc;
+        private readonly PartDoc _Doc;
 
-        public DrawingEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
+        public PartEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
-            _Doc = (DrawingDoc)Document;
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            _Doc = (PartDoc)Document;
         }
 
         public override bool AttachEventHandlers()

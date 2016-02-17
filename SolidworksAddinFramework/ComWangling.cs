@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace SwCSharpAddinMF
+namespace SolidworksAddinFramework
 {
     public class ComWangling
     {

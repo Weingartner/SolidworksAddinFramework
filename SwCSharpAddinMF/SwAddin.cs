@@ -1,11 +1,10 @@
 using System.Runtime.InteropServices;
 using System.Reflection;
-
+using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools;
 using SolidWorksTools.File;
-using SwCSharpAddinMF.SWAddin;
 
 
 namespace SwCSharpAddinMF

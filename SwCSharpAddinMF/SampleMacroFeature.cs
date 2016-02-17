@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {

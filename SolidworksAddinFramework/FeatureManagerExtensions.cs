@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
     public static class FeatureManagerExtensions
     {
@@ -24,7 +24,7 @@ namespace SwCSharpAddinMF.SWAddin
             IEnumerable<IBody2> editBodies, int opts, TData data)
             where TData : MacroFeatureDataBase, new()
         {
-            featMgr.InsertMacroFeature<TFeature>(featureName,
+            InsertMacroFeature<TFeature>(featMgr, featureName,
                 data.Names,
                 data.Types,
                 data.Values.Select(ToFormattedString).ToArray(),

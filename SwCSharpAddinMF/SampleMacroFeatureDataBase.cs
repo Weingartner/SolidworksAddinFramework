@@ -1,5 +1,5 @@
+using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
-using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {

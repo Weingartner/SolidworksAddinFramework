@@ -1,6 +1,6 @@
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF.SWAddin
+namespace SolidworksAddinFramework
 {
 
     /// <summary>

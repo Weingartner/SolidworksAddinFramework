@@ -9,5 +9,18 @@
     <Import_RootNamespace>SolidworksAddinFramework</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComWangling.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DocumentEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DocView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FeatureManagerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PartEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PmpBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerGroupExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPage2Handler9Wrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SelectionManagerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SwAddinBase.cs" />
   </ItemGroup>
 </Project>
