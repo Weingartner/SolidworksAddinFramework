@@ -33,20 +33,18 @@ namespace SwCSharpAddinMF
 
 
         #region UI Methods
-        public void AddCommandMgr()
+        public override void AddCommandMgr()
         {
-            if (Bmp == null)
-                Bmp = new BitmapHandler();
-            var cmdIndex1 = 0;
+            const int cmdIndex1 = 0;
             const string title = "C# Addin";
             const string toolTip = "C# Addin";
 
 
             int[] docTypes = {(int)swDocumentTypes_e.swDocASSEMBLY,
+
                                        (int)swDocumentTypes_e.swDocDRAWING,
                                        (int)swDocumentTypes_e.swDocPART};
 
-            var thisAssembly = Assembly.GetAssembly(GetType());
 
 
             var cmdGroupErr = 0;
@@ -54,7 +52,7 @@ namespace SwCSharpAddinMF
 
             object registryIDs;
             //get the ID information stored in the registry
-            var getDataResult = ICmdMgr.GetGroupDataFromRegistry(MainCmdGroupId, out registryIDs);
+            var getDataResult = CommandManager.GetGroupDataFromRegistry(MainCmdGroupId, out registryIDs);
 
             int[] knownIDs = { MainItemId1, MainItemId2 };
 
@@ -66,11 +64,11 @@ namespace SwCSharpAddinMF
                 }
             }
 
-            ICommandGroup cmdGroup = ICmdMgr.CreateCommandGroup2(MainCmdGroupId, title, toolTip, "", -1, ignorePrevious, ref cmdGroupErr);
-            cmdGroup.LargeIconList = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.ToolbarLarge.bmp", thisAssembly);
-            cmdGroup.SmallIconList = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.ToolbarSmall.bmp", thisAssembly);
-            cmdGroup.LargeMainIcon = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.MainIconLarge.bmp", thisAssembly);
-            cmdGroup.SmallMainIcon = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.MainIconSmall.bmp", thisAssembly);
+            ICommandGroup cmdGroup = CommandManager.CreateCommandGroup2(MainCmdGroupId, title, toolTip, "", -1, ignorePrevious, ref cmdGroupErr);
+            cmdGroup.LargeIconList = GetBitMap("SwCSharpAddinMF.ToolbarLarge.bmp");
+            cmdGroup.SmallIconList = GetBitMap("SwCSharpAddinMF.ToolbarSmall.bmp");
+            cmdGroup.LargeMainIcon = GetBitMap("SwCSharpAddinMF.MainIconLarge.bmp");
+            cmdGroup.SmallMainIcon = GetBitMap("SwCSharpAddinMF.MainIconSmall.bmp");
 
             var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
             var cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, nameof(CreateCube), "", MainItemId1, menuToolbarOption);
@@ -80,29 +78,31 @@ namespace SwCSharpAddinMF
             cmdGroup.Activate();
 
 
-            var flyGroup = ICmdMgr.CreateFlyoutGroup(FlyoutGroupId, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
+            var flyGroup = CommandManager.CreateFlyoutGroup(FlyoutGroupId, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
               cmdGroup.SmallMainIcon, cmdGroup.LargeMainIcon, cmdGroup.SmallIconList, cmdGroup.LargeIconList, nameof(FlyoutCallback), nameof(FlyoutEnable));
 
 
-            flyGroup.AddCommandItem("FlyoutCommand 1", "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
+            flyGroup.AddCommandItem("FlyoutCommand 1", "test", 0, nameof(FlyoutCommandItem1), nameof(FlyoutEnableCommandItem1));
 
             flyGroup.FlyoutType = (int)swCommandFlyoutStyle_e.swCommandFlyoutStyle_Simple;
 
 
             foreach (var type in docTypes)
             {
-                var cmdTab = ICmdMgr.GetCommandTab(type, title);
+                var cmdTab = CommandManager.GetCommandTab(type, title);
 
-                if (cmdTab != null & !getDataResult | ignorePrevious)//if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.  Otherwise the ids won't matchup and the tab will be blank
+                // if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.
+                // Otherwise the ids won't matchup and the tab will be blank
+                if (cmdTab != null & !getDataResult | ignorePrevious)
                 {
-                    ICmdMgr.RemoveCommandTab(cmdTab);
+                    CommandManager.RemoveCommandTab(cmdTab);
                     cmdTab = null;
                 }
 
                 //if cmdTab is null, must be first load (possibly after reset), add the commands to the tabs
                 if (cmdTab == null)
                 {
-                    cmdTab = ICmdMgr.AddCommandTab(type, title);
+                    cmdTab = CommandManager.AddCommandTab(type, title);
 
                     var cmdBox = cmdTab.AddCommandTabBox();
 
@@ -141,12 +141,11 @@ namespace SwCSharpAddinMF
             }
         }
 
-        public void RemoveCommandMgr()
+        public override void RemoveCommandMgr()
         {
-            Bmp.Dispose();
 
-            ICmdMgr.RemoveCommandGroup(MainCmdGroupId);
-            ICmdMgr.RemoveFlyoutGroup(FlyoutGroupId);
+            CommandManager.RemoveFlyoutGroup(FlyoutGroupId);
+            CommandManager.RemoveCommandGroup(MainCmdGroupId);
         }
 
         #endregion
@@ -160,10 +159,10 @@ namespace SwCSharpAddinMF
 
         public void FlyoutCallback()
         {
-            var flyGroup = ICmdMgr.GetFlyoutGroup(FlyoutGroupId);
+            var flyGroup = CommandManager.GetFlyoutGroup(FlyoutGroupId);
             flyGroup.RemoveAllCommandItems();
 
-            flyGroup.AddCommandItem(System.DateTime.Now.ToLongTimeString(), "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
+            flyGroup.AddCommandItem(System.DateTime.Now.ToLongTimeString(), "test", 0, nameof(FlyoutCommandItem1), nameof(FlyoutEnableCommandItem1));
 
         }
         public int FlyoutEnable()
@@ -183,16 +182,6 @@ namespace SwCSharpAddinMF
         #endregion
 
 
-        public override void Connect()
-        {
-            ICmdMgr = ISwApp.GetCommandManager(AddinId);
-            AddCommandMgr();
-        }
-
-        public override void Disconnect()
-        {
-           RemoveCommandMgr(); 
-        }
     }
 
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -15,7 +16,6 @@ namespace SwCSharpAddinMF.SWAddin
 {
     public abstract class SwAddinBase : ISwAddin
     {
-        protected ICommandManager ICmdMgr;
         public int AddinId { get; private set; }
         protected BitmapHandler Bmp;
         private Hashtable _OpenDocs = new Hashtable();
@@ -23,7 +23,7 @@ namespace SwCSharpAddinMF.SWAddin
 
         public ISldWorks SwApp => ISwApp;
 
-        public ICommandManager CmdMgr => ICmdMgr;
+        public ICommandManager CommandManager { get; private set; }
 
         public Hashtable OpenDocs => _OpenDocs;
 
@@ -124,17 +124,68 @@ namespace SwCSharpAddinMF.SWAddin
 
             return true;
         }
+        public void Connect()
+        {
+            Bmp = new BitmapHandler();
+            CommandManager = ISwApp.GetCommandManager(AddinId);
+            AddCommandMgr();
+        }
 
-        public abstract void Connect();
-        public abstract void Disconnect();
+        public void Disconnect()
+        {
+           RemoveCommandMgr();
+           DisconnectFromSW();
+           Bmp.Dispose();
+        }
+
+        private BitmapHandler BitmapHandler = new BitmapHandler();
+
+        /// <summary>
+        /// Get a bitmap resource string from bitmap name located relative
+        /// to the assembly the current type is in.
+        /// </summary>
+        /// <example>
+        /// <![CDATA[cmdGroup.LargeIconList = this.GetBitMap("MyProject.ToolbarLarge.bmp")]]>
+        /// </example>
+        /// <param name="name"></param>
+        /// <param name="t">The type to use to look up the assembly the bitmap is relative to. If null
+        /// uses the type of 'this'</param>
+        /// <returns></returns>
+        public string GetBitMap(string name, Type t = null)
+        {
+            var assembly = Assembly.GetAssembly(t ?? GetType());
+            return Bmp.CreateFileFromResourceBitmap(name, assembly);
+        }
+
+        /*
+        public void AddTab(swDocumentTypes_e docType, string title)
+        {
+            
+                var cmdTab = CommandManager.GetCommandTab(type, title);
+
+                if (cmdTab != null & !getDataResult | ignorePrevious)//if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.  Otherwise the ids won't matchup and the tab will be blank
+                {
+                    CommandManager.RemoveCommandTab(cmdTab);
+                    cmdTab = null;
+                }
+
+                //if cmdTab is null, must be first load (possibly after reset), add the commands to the tabs
+            if (cmdTab == null)
+            {
+            }
+        }
+        */
+
+        public abstract void AddCommandMgr();
+        public abstract void RemoveCommandMgr();
 
         public bool DisconnectFromSW()
         {
             Disconnect();
             DetachEventHandlers();
 
-            Marshal.ReleaseComObject(ICmdMgr);
-            ICmdMgr = null;
+            Marshal.ReleaseComObject(CommandManager);
+            CommandManager = null;
             Marshal.ReleaseComObject(ISwApp);
             ISwApp = null;
             //The addin _must_ call GC.Collect() here in order to retrieve all managed code pointers 
@@ -149,24 +200,9 @@ namespace SwCSharpAddinMF.SWAddin
 
         public bool CompareIDs(int[] storedIDs, int[] addinIDs)
         {
-            var storedList = new List<int>(storedIDs);
-            var addinList = new List<int>(addinIDs);
-
-            addinList.Sort();
-            storedList.Sort();
-
-            if (addinList.Count != storedList.Count)
-            {
-                return false;
-            }
-            for (var i = 0; i < addinList.Count; i++)
-            {
-                if (addinList[i] != storedList[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            var storedList = new HashSet<int>(storedIDs);
+            var addinList = new HashSet<int>(addinIDs);
+            return storedList.SetEquals(addinList);
         }
 
         public bool AttachEventHandlers()
@@ -176,6 +212,7 @@ namespace SwCSharpAddinMF.SWAddin
             AttachEventsToAllDocuments();
             return true;
         }
+
 
         private bool AttachSwEvents()
         {
