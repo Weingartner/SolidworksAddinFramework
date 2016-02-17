@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -16,6 +17,11 @@ namespace SolidworksAddinFramework
 
             IFeature macroFeature = featMgr.InsertMacroFeature3(featureName, typeof (T).FullName, null, (paramNames),
                 (paramTypes), (paramValues), null, null, editBodies, null, opts);
+
+            if (macroFeature == null)
+            {
+                MessageBox.Show("Unable to create feature");
+            }
             Console.WriteLine(macroFeature);
         }
 
