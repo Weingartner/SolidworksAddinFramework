@@ -20,11 +20,11 @@ namespace SwCSharpAddinMF.SWAddin
         }
 
 
-        public static void InsertMacroFeature<T>(IFeatureManager featMgr, string featureName,
-            IEnumerable<IBody2> editBodies, int opts, T data)
-            where T : MacroFeatureDataBase, new()
+        public static void InsertMacroFeature<TFeature,TData>(IFeatureManager featMgr, string featureName,
+            IEnumerable<IBody2> editBodies, int opts, TData data)
+            where TData : MacroFeatureDataBase, new()
         {
-            featMgr.InsertMacroFeature<SampleMacroFeature>(featureName,
+            featMgr.InsertMacroFeature<TFeature>(featureName,
                 data.Names,
                 data.Types,
                 data.Values.Select(ToFormattedString).ToArray(),

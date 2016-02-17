@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -33,17 +34,9 @@ namespace SwCSharpAddinMF.SWAddin
         public static void RegisterFunction(Type t)
         {
             #region Get Custom Attribute: SwAddinAttribute
-            SwAddinAttribute sWattr = null;
-            var type = typeof(SwAddin);
-
-            foreach (Attribute attr in type.GetCustomAttributes(false))
-            {
-                if (attr is SwAddinAttribute)
-                {
-                    sWattr = attr as SwAddinAttribute;
-                    break;
-                }
-            }
+            var sWattr = t
+                .GetCustomAttributes(false).OfType<SwAddinAttribute>()
+                .FirstOrDefault();
 
             #endregion
 

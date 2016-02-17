@@ -5,7 +5,12 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinMF", "SwCSharpAddinMF\SwCSharpAddinMF.csproj", "{A67399BE-AAF7-433F-8F72-9B0424C5BE67}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SolidworksAddinFramework", "SolidworksAddinFramework\SolidworksAddinFramework.shproj", "{55562487-76B1-4868-8726-E14F674FBD06}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SolidworksAddinFramework\SolidworksAddinFramework.projitems*{55562487-76b1-4868-8726-e14f674fbd06}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

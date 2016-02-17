@@ -152,8 +152,9 @@ namespace SwCSharpAddinMF.SWAddin
         
     }
 
-    public abstract class MacroFeatureBase<T> : ISwComFeature
-        where T : MacroFeatureDataBase, new()
+    public abstract class MacroFeatureBase<TMacroFeature,TData> : ISwComFeature
+        where TData : MacroFeatureDataBase, new()
+        where TMacroFeature : MacroFeatureBase<TMacroFeature, TData>
     {
         public IModelDoc2 ModelDoc { get; set; }
 
@@ -162,7 +163,7 @@ namespace SwCSharpAddinMF.SWAddin
         public IMacroFeatureData SwFeatureData { get; set; }
 
         public ISldWorks SwApp { get; set; }
-        public abstract T Database { get; set; }
+        public abstract TData Database { get; set; }
 
         public abstract string FeatureName { get; }
 
@@ -186,7 +187,7 @@ namespace SwCSharpAddinMF.SWAddin
             // feature can be null
 
             SwApp = (ISldWorks) app;
-            Database = new T();
+            Database = new TData();
             if (feature != null)
             {
                 SwFeature = (IFeature) feature;
@@ -220,7 +221,8 @@ namespace SwCSharpAddinMF.SWAddin
         {
 
             FeatureManagerExtensions
-                .InsertMacroFeature(ModelDoc.FeatureManager, featureName, editBody, opts, Database);
+                .InsertMacroFeature<TMacroFeature, TData>
+                (ModelDoc.FeatureManager, featureName, editBody, opts, Database);
         }
 
 
@@ -240,7 +242,7 @@ namespace SwCSharpAddinMF.SWAddin
             return Security();
         }
 
-        private static void SaveSelections(MacroFeatureBase<T> sampleMacroFeature)
+        private static void SaveSelections(MacroFeatureBase<TMacroFeature,TData> sampleMacroFeature)
         {
             var objects = sampleMacroFeature.SelectionMgr.GetSelectedObjects((type, mark) => true)
                 .Cast<IBody2>()

@@ -6,7 +6,7 @@ using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {
-    public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeatureDataBase>
+    public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
         private SamplePropertyPage _Ppage = null;
 

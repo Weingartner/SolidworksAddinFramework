@@ -14,7 +14,7 @@ namespace SwCSharpAddinMF.SWAddin
     //public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
     public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
         where TData : MacroFeatureDataBase, new()
-        where TMacroFeature : MacroFeatureBase<TData>
+        where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
