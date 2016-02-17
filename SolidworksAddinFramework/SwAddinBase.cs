@@ -54,7 +54,7 @@ namespace SolidworksAddinFramework
                 keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID + "}";
                 addinkey = hkcu.CreateSubKey(keyname);
                 addinkey.SetValue(null, Convert.ToInt32(sWattr.LoadAtStartup), RegistryValueKind.DWord);
-                MessageBox.Show("Registered pluging with GUID.\n\"" + t.GUID + "\"");
+                //MessageBox.Show("Registered pluging with GUID.\n\"" + t.GUID + "\"");
             }
             catch (NullReferenceException nl)
             {
