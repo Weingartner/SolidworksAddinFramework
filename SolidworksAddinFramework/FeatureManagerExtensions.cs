@@ -28,7 +28,7 @@ namespace SolidworksAddinFramework
                 data.Names,
                 data.Types,
                 data.Values.Select(ToFormattedString).ToArray(),
-                editBodies.ToArray(),
+                editBodies?.ToArray() ?? new IBody2[] {},
                 opts);
         }
 
