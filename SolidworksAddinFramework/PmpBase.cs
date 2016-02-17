@@ -24,11 +24,11 @@ namespace SolidworksAddinFramework
 
         public TMacroFeature MacroFeature { get; set; }
 
-        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
+        protected PmpBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
         {
             if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
 
-            SwApp = swApp;
+            SwApp = macroFeature.SwApp;
             _Name = name;
             _OptionsE = optionsE;
             MacroFeature = macroFeature;

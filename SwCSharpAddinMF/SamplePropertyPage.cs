@@ -27,7 +27,7 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SampleMacroFeature macroFeature) : base(macroFeature.SwApp, "Sample PMP", Options, macroFeature)
+        public SamplePropertyPage(SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
         {
         }
 
