@@ -185,34 +185,6 @@ namespace SwCSharpAddinMF
         public void CreateCube()
         {
             SampleMacroFeature.AddMacroFeature(SwApp);
-            return;
-
-            //make sure we have a part open
-            string partTemplate = ISwApp.GetUserPreferenceStringValue((int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
-            if ((partTemplate != null) && (partTemplate != ""))
-            {
-                IModelDoc2 modDoc = (IModelDoc2)ISwApp.NewDocument(partTemplate, (int)swDwgPaperSizes_e.swDwgPaperA2size, 0.0, 0.0);
-
-                modDoc.InsertSketch2(true);
-                modDoc.SketchRectangle(0, 0, 0, .1, .1, .1, false);
-                //Extrude the sketch
-                IFeatureManager featMan = modDoc.FeatureManager;
-                featMan.FeatureExtrusion(true,
-                    false, false,
-                    (int)swEndConditions_e.swEndCondBlind, (int)swEndConditions_e.swEndCondBlind,
-                    0.1, 0.0,
-                    false, false,
-                    false, false,
-                    0.0, 0.0,
-                    false, false,
-                    false, false,
-                    true,
-                    false, false);
-            }
-            else
-            {
-                System.Windows.Forms.MessageBox.Show("There is no part template available. Please check your options and make sure there is a part template selected, or select a new part template.");
-            }
         }
 
 
