@@ -1,10 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SwCSharpAddinMF.SWAddin;
@@ -16,10 +11,10 @@ namespace SwCSharpAddinMF
 
         #region Property Manager Page Controls
         //Groups
-        IPropertyManagerPageGroup pageGroup;
+        private IPropertyManagerPageGroup _PageGroup;
 
         //Control IDs
-        public const int group1ID = 0;
+        public const int Group1Id = 0;
         #endregion
 
         private static IEnumerable<swPropertyManagerPageOptions_e> Options => new[]
@@ -42,26 +37,26 @@ namespace SwCSharpAddinMF
         {
             //Add the groups
 
-            pageGroup = Page.CreateGroup(group1ID, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            _PageGroup = Page.CreateGroup(Group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            yield return CreateTextBox(pageGroup, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
+            yield return CreateTextBox(_PageGroup, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
 
-            yield return CreateNumberBox(pageGroup, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
+            yield return CreateNumberBox(_PageGroup, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
             });
 
-            yield return CreateCheckBox(pageGroup, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
+            yield return CreateCheckBox(_PageGroup, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
 
 
-            yield return CreateOption(pageGroup, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
-            yield return CreateOption(pageGroup, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
-            yield return CreateOption(pageGroup, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
+            yield return CreateOption(_PageGroup, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
+            yield return CreateOption(_PageGroup, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
+            yield return CreateOption(_PageGroup, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
 
 
             yield return
-                CreateListBox(pageGroup, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
+                CreateListBox(_PageGroup, "Listbox", "List of items", () => MacroFeature.Database.ListItem, v => MacroFeature.Database.ListItem = v,
                     listBox =>
                     {
                         string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
@@ -71,7 +66,7 @@ namespace SwCSharpAddinMF
                     });
 
             yield return
-                CreateComboBox(pageGroup, "Listbox", "List of items", () => MacroFeature.Database.ComboBoxItem, v => MacroFeature.Database.ComboBoxItem = v,
+                CreateComboBox(_PageGroup, "Listbox", "List of items", () => MacroFeature.Database.ComboBoxItem, v => MacroFeature.Database.ComboBoxItem = v,
                     comboBox =>
                     {
                         string[] items = { "One Fish", "Two Fish", "Red Fish", "Blue Fish" };
@@ -81,7 +76,7 @@ namespace SwCSharpAddinMF
                     });
 
 
-            yield return CreateSelectionBox(pageGroup, "Sample Selection", "Displays features selected in main view",
+            yield return CreateSelectionBox(_PageGroup, "Sample Selection", "Displays features selected in main view",
                 (selectionBox, observable) =>
                 {
                     if (selectionBox != null)

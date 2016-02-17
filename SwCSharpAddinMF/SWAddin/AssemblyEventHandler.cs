@@ -5,40 +5,41 @@ namespace SwCSharpAddinMF.SWAddin
 {
     public class AssemblyEventHandler : DocumentEventHandler
     {
-        AssemblyDoc doc;
-        SwAddinBase swAddin;
+        private readonly AssemblyDoc _Doc;
+        private readonly SwAddinBase _SwAddin;
 
         public AssemblyEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
-            doc = (AssemblyDoc)document;
-            swAddin = addin;
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            _Doc = (AssemblyDoc)Document;
+            _SwAddin = addin;
         }
 
-        override public bool AttachEventHandlers()
+        public override bool AttachEventHandlers()
         {
-            doc.DestroyNotify += new DAssemblyDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify += new DAssemblyDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
-            doc.ComponentStateChangeNotify2 += new DAssemblyDocEvents_ComponentStateChangeNotify2EventHandler(ComponentStateChangeNotify2);
-            doc.ComponentStateChangeNotify += new DAssemblyDocEvents_ComponentStateChangeNotifyEventHandler(ComponentStateChangeNotify);
-            doc.ComponentVisualPropertiesChangeNotify += new DAssemblyDocEvents_ComponentVisualPropertiesChangeNotifyEventHandler(ComponentVisualPropertiesChangeNotify);
-            doc.ComponentDisplayStateChangeNotify += new DAssemblyDocEvents_ComponentDisplayStateChangeNotifyEventHandler(ComponentDisplayStateChangeNotify);
+            _Doc.DestroyNotify += OnDestroy;
+            _Doc.NewSelectionNotify += OnNewSelection;
+            _Doc.ComponentStateChangeNotify2 += ComponentStateChangeNotify2;
+            _Doc.ComponentStateChangeNotify += ComponentStateChangeNotify;
+            _Doc.ComponentVisualPropertiesChangeNotify += ComponentVisualPropertiesChangeNotify;
+            _Doc.ComponentDisplayStateChangeNotify += ComponentDisplayStateChangeNotify;
             ConnectModelViews();
 
             return true;
         }
 
-        override public bool DetachEventHandlers()
+        public override bool DetachEventHandlers()
         {
-            doc.DestroyNotify -= new DAssemblyDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify -= new DAssemblyDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
-            doc.ComponentStateChangeNotify2 -= new DAssemblyDocEvents_ComponentStateChangeNotify2EventHandler(ComponentStateChangeNotify2);
-            doc.ComponentStateChangeNotify -= new DAssemblyDocEvents_ComponentStateChangeNotifyEventHandler(ComponentStateChangeNotify);
-            doc.ComponentVisualPropertiesChangeNotify -= new DAssemblyDocEvents_ComponentVisualPropertiesChangeNotifyEventHandler(ComponentVisualPropertiesChangeNotify);
-            doc.ComponentDisplayStateChangeNotify -= new DAssemblyDocEvents_ComponentDisplayStateChangeNotifyEventHandler(ComponentDisplayStateChangeNotify);
+            _Doc.DestroyNotify -= OnDestroy;
+            _Doc.NewSelectionNotify -= OnNewSelection;
+            _Doc.ComponentStateChangeNotify2 -= ComponentStateChangeNotify2;
+            _Doc.ComponentStateChangeNotify -= ComponentStateChangeNotify;
+            _Doc.ComponentVisualPropertiesChangeNotify -= ComponentVisualPropertiesChangeNotify;
+            _Doc.ComponentDisplayStateChangeNotify -= ComponentDisplayStateChangeNotify;
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(Document);
             return true;
         }
 
@@ -57,8 +58,8 @@ namespace SwCSharpAddinMF.SWAddin
         //attach events to a component if it becomes resolved
         protected int ComponentStateChange(object componentModel, short newCompState)
         {
-            ModelDoc2 modDoc = (ModelDoc2)componentModel;
-            swComponentSuppressionState_e newState = (swComponentSuppressionState_e)newCompState;
+            var modDoc = (ModelDoc2)componentModel;
+            var newState = (swComponentSuppressionState_e)newCompState;
 
 
             switch (newState)
@@ -66,18 +67,18 @@ namespace SwCSharpAddinMF.SWAddin
 
                 case swComponentSuppressionState_e.swComponentFullyResolved:
                 {
-                    if ((modDoc != null) & !this.swAddin.OpenDocs.Contains(modDoc))
+                    if (modDoc != null && !_SwAddin.OpenDocs.Contains(modDoc))
                     {
-                        this.swAddin.AttachModelDocEventHandler(modDoc);
+                        _SwAddin.AttachModelDocEventHandler(modDoc);
                     }
                     break;
                 }
 
                 case swComponentSuppressionState_e.swComponentResolved:
                 {
-                    if ((modDoc != null) & !this.swAddin.OpenDocs.Contains(modDoc))
+                    if (modDoc != null && !_SwAddin.OpenDocs.Contains(modDoc))
                     {
-                        this.swAddin.AttachModelDocEventHandler(modDoc);
+                        _SwAddin.AttachModelDocEventHandler(modDoc);
                     }
                     break;
                 }
@@ -93,28 +94,28 @@ namespace SwCSharpAddinMF.SWAddin
         }
 
 
-        public int ComponentStateChangeNotify2(object componentModel, string CompName, short oldCompState, short newCompState)
+        public int ComponentStateChangeNotify2(object componentModel, string compName, short oldCompState, short newCompState)
         {
             return ComponentStateChange(componentModel, newCompState);
         }
 
-        int ComponentStateChangeNotify(object componentModel, short oldCompState, short newCompState)
+        private int ComponentStateChangeNotify(object componentModel, short oldCompState, short newCompState)
         {
             return ComponentStateChange(componentModel, newCompState);
         }
 
-        int ComponentDisplayStateChangeNotify(object swObject)
+        private int ComponentDisplayStateChangeNotify(object swObject)
         {
-            Component2 component = (Component2)swObject;
-            ModelDoc2 modDoc = (ModelDoc2)component.GetModelDoc();
+            var component = (Component2)swObject;
+            var modDoc = (ModelDoc2)component.GetModelDoc();
 
             return ComponentStateChange(modDoc);
         }
 
-        int ComponentVisualPropertiesChangeNotify(object swObject)
+        private int ComponentVisualPropertiesChangeNotify(object swObject)
         {
-            Component2 component = (Component2)swObject;
-            ModelDoc2 modDoc = (ModelDoc2)component.GetModelDoc();
+            var component = (Component2)swObject;
+            var modDoc = (ModelDoc2)component.GetModelDoc();
 
             return ComponentStateChange(modDoc);
         }

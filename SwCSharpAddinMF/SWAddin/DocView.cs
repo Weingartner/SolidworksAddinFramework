@@ -4,31 +4,31 @@ namespace SwCSharpAddinMF.SWAddin
 {
     public class DocView
     {
-        ISldWorks iSwApp;
-        SwAddinBase userAddin;
-        ModelView mView;
-        DocumentEventHandler parent;
+        private ISldWorks _ISwApp;
+        private SwAddinBase _UserAddin;
+        private ModelView _MView;
+        private DocumentEventHandler _Parent;
 
         public DocView(SwAddinBase addin, IModelView mv, DocumentEventHandler doc)
         {
-            userAddin = addin;
-            mView = (ModelView)mv;
-            iSwApp = (ISldWorks)userAddin.SwApp;
-            parent = doc;
+            _UserAddin = addin;
+            _MView = (ModelView)mv;
+            _ISwApp = (ISldWorks)_UserAddin.SwApp;
+            _Parent = doc;
         }
 
         public bool AttachEventHandlers()
         {
-            mView.DestroyNotify2 += new DModelViewEvents_DestroyNotify2EventHandler(OnDestroy);
-            mView.RepaintNotify += new DModelViewEvents_RepaintNotifyEventHandler(OnRepaint);
+            _MView.DestroyNotify2 += OnDestroy;
+            _MView.RepaintNotify += OnRepaint;
             return true;
         }
 
         public bool DetachEventHandlers()
         {
-            mView.DestroyNotify2 -= new DModelViewEvents_DestroyNotify2EventHandler(OnDestroy);
-            mView.RepaintNotify -= new DModelViewEvents_RepaintNotifyEventHandler(OnRepaint);
-            parent.DetachModelViewEventHandler(mView);
+            _MView.DestroyNotify2 -= OnDestroy;
+            _MView.RepaintNotify -= OnRepaint;
+            _Parent.DetachModelViewEventHandler(_MView);
             return true;
         }
 

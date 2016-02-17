@@ -4,32 +4,33 @@ namespace SwCSharpAddinMF.SWAddin
 {
     public class PartEventHandler : DocumentEventHandler
     {
-        PartDoc doc;
+        private readonly PartDoc _Doc;
 
         public PartEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
-            doc = (PartDoc)document;
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            _Doc = (PartDoc)Document;
         }
 
-        override public bool AttachEventHandlers()
+        public override bool AttachEventHandlers()
         {
-            doc.DestroyNotify += new DPartDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify += new DPartDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
+            _Doc.DestroyNotify += OnDestroy;
+            _Doc.NewSelectionNotify += OnNewSelection;
 
             ConnectModelViews();
 
             return true;
         }
 
-        override public bool DetachEventHandlers()
+        public override bool DetachEventHandlers()
         {
-            doc.DestroyNotify -= new DPartDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify -= new DPartDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
+            _Doc.DestroyNotify -= OnDestroy;
+            _Doc.NewSelectionNotify -= OnNewSelection;
 
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(Document);
             return true;
         }
 

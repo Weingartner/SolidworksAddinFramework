@@ -6,7 +6,6 @@ using System.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
-using Attribute = SolidWorks.Interop.sldworks.Attribute;
 
 namespace SwCSharpAddinMF.SWAddin
 {
@@ -67,7 +66,7 @@ namespace SwCSharpAddinMF.SWAddin
         {
             get
             {
-                return this.GetType().GetProperties()
+                return GetType().GetProperties()
                     .Where(p => p.GetCustomAttributes(typeof (MacroFeatureDataFieldAttribute), true).Length > 0)
                     .ToList();
             }
@@ -106,7 +105,7 @@ namespace SwCSharpAddinMF.SWAddin
                 }
                 else if (bindingProperty.PropertyType == typeof (bool))
                 {
-                    bool value = (bool) bindingProperty.GetValue(this, new object[] {});
+                    var value = (bool) bindingProperty.GetValue(this, new object[] {});
                     data.SetIntegerByName(bindingProperty.Name, value ? 1 : 0);
                 }
                 else
@@ -243,11 +242,11 @@ namespace SwCSharpAddinMF.SWAddin
 
         private static void SaveSelections(MacroFeatureBase<T> sampleMacroFeature)
         {
-            IBody2[] objects = sampleMacroFeature.SelectionMgr.GetSelectedObjects((type, mark) => true)
+            var objects = sampleMacroFeature.SelectionMgr.GetSelectedObjects((type, mark) => true)
                 .Cast<IBody2>()
                 .ToArray();
 
-            int[] marks =
+            var marks =
                 Enumerable.Range(1, objects.Length)
                     .Select(i => sampleMacroFeature.SelectionMgr.GetSelectedObjectMark(i))
                     .ToArray();
@@ -274,7 +273,7 @@ namespace SwCSharpAddinMF.SWAddin
                     if (objects != null)
                     {
                         var objectsArray = ((object[]) objects).Cast<IBody2>().ToList();
-                        swSelectType_e[] typesArray = (swSelectType_e[]) objectTypes;
+                        var typesArray = (swSelectType_e[]) objectTypes;
 
                         ModelDoc.ClearSelection2(true);
                         foreach (var feature in objectsArray)

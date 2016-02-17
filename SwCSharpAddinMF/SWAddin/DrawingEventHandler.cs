@@ -4,32 +4,32 @@ namespace SwCSharpAddinMF.SWAddin
 {
     public class DrawingEventHandler : DocumentEventHandler
     {
-        DrawingDoc doc;
+        private DrawingDoc _Doc;
 
         public DrawingEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
-            doc = (DrawingDoc)document;
+            _Doc = (DrawingDoc)Document;
         }
 
-        override public bool AttachEventHandlers()
+        public override bool AttachEventHandlers()
         {
-            doc.DestroyNotify += new DDrawingDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify += new DDrawingDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
+            _Doc.DestroyNotify += OnDestroy;
+            _Doc.NewSelectionNotify += OnNewSelection;
 
             ConnectModelViews();
 
             return true;
         }
 
-        override public bool DetachEventHandlers()
+        public override bool DetachEventHandlers()
         {
-            doc.DestroyNotify -= new DDrawingDocEvents_DestroyNotifyEventHandler(OnDestroy);
-            doc.NewSelectionNotify -= new DDrawingDocEvents_NewSelectionNotifyEventHandler(OnNewSelection);
+            _Doc.DestroyNotify -= OnDestroy;
+            _Doc.NewSelectionNotify -= OnNewSelection;
 
             DisconnectModelViews();
 
-            userAddin.DetachModelEventHandler(document);
+            UserAddin.DetachModelEventHandler(Document);
             return true;
         }
 

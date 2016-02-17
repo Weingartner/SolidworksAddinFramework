@@ -5,7 +5,6 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -33,11 +32,11 @@ namespace SwCSharpAddinMF.SWAddin
             MacroFeature = macroFeature;
         }
 
-        private bool ControlsAdded = false;
+        private bool _ControlsAdded = false;
         public void Show()
         {
-            int options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
-            int errors = 0;
+            var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
+            var errors = 0;
             var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, new PropertyManagerPage2Handler9Wrapper(this), ref errors);
             Page = (IPropertyManagerPage2)propertyManagerPage;
             if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
@@ -47,9 +46,9 @@ namespace SwCSharpAddinMF.SWAddin
             {
                 throw new Exception("Unable to Create PMP");
             }
-            if(!ControlsAdded)
+            if(!_ControlsAdded)
                 AddControls();
-            ControlsAdded = true;
+            _ControlsAdded = true;
             Page?.Show();
         }
 
@@ -138,7 +137,8 @@ namespace SwCSharpAddinMF.SWAddin
         }
 
         #region checkbox
-        readonly Subject<Tuple<int,bool>> _CheckBoxChanged = new Subject<Tuple<int,bool>>();
+
+        private readonly Subject<Tuple<int,bool>> _CheckBoxChanged = new Subject<Tuple<int,bool>>();
         public virtual void OnCheckboxCheck(int id, bool @checked)
         {
             _CheckBoxChanged.OnNext(Tuple.Create(id,@checked));
@@ -147,8 +147,7 @@ namespace SwCSharpAddinMF.SWAddin
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
         #endregion
 
-
-        readonly Subject<int> _OptionChecked = new Subject<int>();
+        private readonly Subject<int> _OptionChecked = new Subject<int>();
         public virtual void OnOptionCheck(int id)
         {
             _OptionChecked.OnNext(id);
@@ -166,7 +165,7 @@ namespace SwCSharpAddinMF.SWAddin
             _TextBoxChanged.OnNext(Tuple.Create(id,text));
         }
 
-        readonly Subject<Tuple<int,string>> _TextBoxChanged = new Subject<Tuple<int,string>>();
+        private readonly Subject<Tuple<int,string>> _TextBoxChanged = new Subject<Tuple<int,string>>();
 
         public IObservable<string> TextBoxChangedObservable(int id) => _TextBoxChanged
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
@@ -175,7 +174,8 @@ namespace SwCSharpAddinMF.SWAddin
         private List<IDisposable> _Disposables;
 
         #region numberbox
-        readonly Subject<Tuple<int,double>> _NumberBoxChanged = new Subject<Tuple<int,double>>();
+
+        private readonly Subject<Tuple<int,double>> _NumberBoxChanged = new Subject<Tuple<int,double>>();
 
         public IObservable<double> NumberBoxChangedObservable(int id) => _NumberBoxChanged
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
@@ -191,7 +191,7 @@ namespace SwCSharpAddinMF.SWAddin
         {
         }
 
-        readonly Subject<Tuple<int,int>> _ComboBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        private readonly Subject<Tuple<int,int>> _ComboBoxSelectionSubject = new Subject<Tuple<int, int>>();
         public virtual void OnComboboxSelectionChanged(int id, int item)
         {
             _ComboBoxSelectionSubject.OnNext(Tuple.Create(id,item));
@@ -203,7 +203,7 @@ namespace SwCSharpAddinMF.SWAddin
 
         #region listbox
 
-        readonly Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        private readonly Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
         private int _NextId = 0;
 
         public virtual void OnListboxSelectionChanged(int id, int item)
@@ -224,7 +224,7 @@ namespace SwCSharpAddinMF.SWAddin
         {
         }
 
-        Subject<int> _SelectionChangedSubject = new Subject<int>();
+        private Subject<int> _SelectionChangedSubject = new Subject<int>();
         public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default); 
         public virtual void OnSelectionboxListChanged(int id, int count)
         {

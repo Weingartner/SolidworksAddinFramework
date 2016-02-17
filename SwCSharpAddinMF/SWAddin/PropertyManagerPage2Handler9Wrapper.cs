@@ -17,7 +17,7 @@ namespace SwCSharpAddinMF.SWAddin
     /// </summary>
     public class PropertyManagerPage2Handler9Wrapper : IPropertyManagerPage2Handler9
     {
-        readonly IPropertyManagerPage2Handler9 _Implementation;
+        private readonly IPropertyManagerPage2Handler9 _Implementation;
 
         public PropertyManagerPage2Handler9Wrapper(IPropertyManagerPage2Handler9 implementation)
         {
@@ -29,9 +29,9 @@ namespace SwCSharpAddinMF.SWAddin
             _Implementation.AfterActivation();
         }
 
-        public void OnClose(int Reason)
+        public void OnClose(int reason)
         {
-            _Implementation.OnClose(Reason);
+            _Implementation.OnClose(reason);
         }
 
         public void AfterClose()
@@ -74,139 +74,139 @@ namespace SwCSharpAddinMF.SWAddin
             _Implementation.OnRedo();
         }
 
-        public bool OnTabClicked(int Id)
+        public bool OnTabClicked(int id)
         {
-            return _Implementation.OnTabClicked(Id);
+            return _Implementation.OnTabClicked(id);
         }
 
-        public void OnGroupExpand(int Id, bool Expanded)
+        public void OnGroupExpand(int id, bool expanded)
         {
-            _Implementation.OnGroupExpand(Id, Expanded);
+            _Implementation.OnGroupExpand(id, expanded);
         }
 
-        public void OnGroupCheck(int Id, bool Checked)
+        public void OnGroupCheck(int id, bool Checked)
         {
-            _Implementation.OnGroupCheck(Id, Checked);
+            _Implementation.OnGroupCheck(id, Checked);
         }
 
-        public void OnCheckboxCheck(int Id, bool Checked)
+        public void OnCheckboxCheck(int id, bool Checked)
         {
-            _Implementation.OnCheckboxCheck(Id, Checked);
+            _Implementation.OnCheckboxCheck(id, Checked);
         }
 
-        public void OnOptionCheck(int Id)
+        public void OnOptionCheck(int id)
         {
-            _Implementation.OnOptionCheck(Id);
+            _Implementation.OnOptionCheck(id);
         }
 
-        public void OnButtonPress(int Id)
+        public void OnButtonPress(int id)
         {
-            _Implementation.OnButtonPress(Id);
+            _Implementation.OnButtonPress(id);
         }
 
-        public void OnTextboxChanged(int Id, string Text)
+        public void OnTextboxChanged(int id, string text)
         {
-            _Implementation.OnTextboxChanged(Id, Text);
+            _Implementation.OnTextboxChanged(id, text);
         }
 
-        public void OnNumberboxChanged(int Id, double Value)
+        public void OnNumberboxChanged(int id, double value)
         {
-            _Implementation.OnNumberboxChanged(Id, Value);
+            _Implementation.OnNumberboxChanged(id, value);
         }
 
-        public void OnComboboxEditChanged(int Id, string Text)
+        public void OnComboboxEditChanged(int id, string text)
         {
-            _Implementation.OnComboboxEditChanged(Id, Text);
+            _Implementation.OnComboboxEditChanged(id, text);
         }
 
-        public void OnComboboxSelectionChanged(int Id, int Item)
+        public void OnComboboxSelectionChanged(int id, int item)
         {
-            _Implementation.OnComboboxSelectionChanged(Id, Item);
+            _Implementation.OnComboboxSelectionChanged(id, item);
         }
 
-        public void OnListboxSelectionChanged(int Id, int Item)
+        public void OnListboxSelectionChanged(int id, int item)
         {
-            _Implementation.OnListboxSelectionChanged(Id, Item);
+            _Implementation.OnListboxSelectionChanged(id, item);
         }
 
-        public void OnSelectionboxFocusChanged(int Id)
+        public void OnSelectionboxFocusChanged(int id)
         {
-            _Implementation.OnSelectionboxFocusChanged(Id);
+            _Implementation.OnSelectionboxFocusChanged(id);
         }
 
-        public void OnSelectionboxListChanged(int Id, int Count)
+        public void OnSelectionboxListChanged(int id, int count)
         {
-            _Implementation.OnSelectionboxListChanged(Id, Count);
+            _Implementation.OnSelectionboxListChanged(id, count);
         }
 
-        public void OnSelectionboxCalloutCreated(int Id)
+        public void OnSelectionboxCalloutCreated(int id)
         {
-            _Implementation.OnSelectionboxCalloutCreated(Id);
+            _Implementation.OnSelectionboxCalloutCreated(id);
         }
 
-        public void OnSelectionboxCalloutDestroyed(int Id)
+        public void OnSelectionboxCalloutDestroyed(int id)
         {
-            _Implementation.OnSelectionboxCalloutDestroyed(Id);
+            _Implementation.OnSelectionboxCalloutDestroyed(id);
         }
 
-        public bool OnSubmitSelection(int Id, object Selection, int SelType, ref string ItemText)
+        public bool OnSubmitSelection(int id, object selection, int selType, ref string itemText)
         {
-            return _Implementation.OnSubmitSelection(Id, Selection, SelType, ref ItemText);
+            return _Implementation.OnSubmitSelection(id, selection, selType, ref itemText);
         }
 
-        public int OnActiveXControlCreated(int Id, bool Status)
+        public int OnActiveXControlCreated(int id, bool status)
         {
-            return _Implementation.OnActiveXControlCreated(Id, Status);
+            return _Implementation.OnActiveXControlCreated(id, status);
         }
 
-        public void OnSliderPositionChanged(int Id, double Value)
+        public void OnSliderPositionChanged(int id, double value)
         {
-            _Implementation.OnSliderPositionChanged(Id, Value);
+            _Implementation.OnSliderPositionChanged(id, value);
         }
 
-        public void OnSliderTrackingCompleted(int Id, double Value)
+        public void OnSliderTrackingCompleted(int id, double value)
         {
-            _Implementation.OnSliderTrackingCompleted(Id, Value);
+            _Implementation.OnSliderTrackingCompleted(id, value);
         }
 
-        public bool OnKeystroke(int Wparam, int Message, int Lparam, int Id)
+        public bool OnKeystroke(int wparam, int message, int lparam, int id)
         {
-            return _Implementation.OnKeystroke(Wparam, Message, Lparam, Id);
+            return _Implementation.OnKeystroke(wparam, message, lparam, id);
         }
 
-        public void OnPopupMenuItem(int Id)
+        public void OnPopupMenuItem(int id)
         {
-            _Implementation.OnPopupMenuItem(Id);
+            _Implementation.OnPopupMenuItem(id);
         }
 
-        public void OnPopupMenuItemUpdate(int Id, ref int retval)
+        public void OnPopupMenuItemUpdate(int id, ref int retval)
         {
-            _Implementation.OnPopupMenuItemUpdate(Id, ref retval);
+            _Implementation.OnPopupMenuItemUpdate(id, ref retval);
         }
 
-        public void OnGainedFocus(int Id)
+        public void OnGainedFocus(int id)
         {
-            _Implementation.OnGainedFocus(Id);
+            _Implementation.OnGainedFocus(id);
         }
 
-        public void OnLostFocus(int Id)
+        public void OnLostFocus(int id)
         {
-            _Implementation.OnLostFocus(Id);
+            _Implementation.OnLostFocus(id);
         }
 
-        public int OnWindowFromHandleControlCreated(int Id, bool Status)
+        public int OnWindowFromHandleControlCreated(int id, bool status)
         {
-            return _Implementation.OnWindowFromHandleControlCreated(Id, Status);
+            return _Implementation.OnWindowFromHandleControlCreated(id, status);
         }
 
-        public void OnListboxRMBUp(int Id, int PosX, int PosY)
+        public void OnListboxRMBUp(int id, int posX, int posY)
         {
-            _Implementation.OnListboxRMBUp(Id, PosX, PosY);
+            _Implementation.OnListboxRMBUp(id, posX, posY);
         }
 
-        public void OnNumberBoxTrackingCompleted(int Id, double Value)
+        public void OnNumberBoxTrackingCompleted(int id, double value)
         {
-            _Implementation.OnNumberBoxTrackingCompleted(Id, Value);
+            _Implementation.OnNumberBoxTrackingCompleted(id, value);
         }
     }
 }

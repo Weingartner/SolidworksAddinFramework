@@ -18,14 +18,14 @@ namespace SwCSharpAddinMF.SWAddin
         protected ICommandManager ICmdMgr;
         public int AddinId { get; private set; }
         protected BitmapHandler Bmp;
-        private Hashtable openDocs = new Hashtable();
-        private SldWorks SwEventPtr;
+        private Hashtable _OpenDocs = new Hashtable();
+        private SldWorks _SwEventPtr;
 
         public ISldWorks SwApp => ISwApp;
 
         public ICommandManager CmdMgr => ICmdMgr;
 
-        public Hashtable OpenDocs => openDocs;
+        public Hashtable OpenDocs => _OpenDocs;
 
         public ISldWorks ISwApp { set; get; }
 
@@ -34,7 +34,7 @@ namespace SwCSharpAddinMF.SWAddin
         {
             #region Get Custom Attribute: SwAddinAttribute
             SwAddinAttribute sWattr = null;
-            Type type = typeof(SwAddin);
+            var type = typeof(SwAddin);
 
             foreach (Attribute attr in type.GetCustomAttributes(false))
             {
@@ -49,11 +49,11 @@ namespace SwCSharpAddinMF.SWAddin
 
             try
             {
-                RegistryKey hklm = Registry.LocalMachine;
-                RegistryKey hkcu = Registry.CurrentUser;
+                var hklm = Registry.LocalMachine;
+                var hkcu = Registry.CurrentUser;
 
-                string keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID + "}";
-                RegistryKey addinkey = hklm.CreateSubKey(keyname);
+                var keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID + "}";
+                var addinkey = hklm.CreateSubKey(keyname);
                 addinkey.SetValue(null, 0);
 
                 addinkey.SetValue("Description", sWattr.Description);
@@ -82,10 +82,10 @@ namespace SwCSharpAddinMF.SWAddin
         {
             try
             {
-                RegistryKey hklm = Registry.LocalMachine;
-                RegistryKey hkcu = Registry.CurrentUser;
+                var hklm = Registry.LocalMachine;
+                var hkcu = Registry.CurrentUser;
 
-                string keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID + "}";
+                var keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID + "}";
                 hklm.DeleteSubKey(keyname);
 
                 keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID + "}";
@@ -103,9 +103,9 @@ namespace SwCSharpAddinMF.SWAddin
             }
         }
 
-        public bool ConnectToSW(object ThisSW, int cookie)
+        public bool ConnectToSW(object thisSw, int cookie)
         {
-            ISwApp = (ISldWorks)ThisSW;
+            ISwApp = (ISldWorks)thisSw;
             AddinId = cookie;
 
             //Setup callbacks
@@ -116,8 +116,8 @@ namespace SwCSharpAddinMF.SWAddin
             #endregion
 
             #region Setup the Event Handlers
-            SwEventPtr = (SldWorks)ISwApp;
-            openDocs = new Hashtable();
+            _SwEventPtr = (SldWorks)ISwApp;
+            _OpenDocs = new Hashtable();
             AttachEventHandlers();
             #endregion
 
@@ -149,8 +149,8 @@ namespace SwCSharpAddinMF.SWAddin
 
         public bool CompareIDs(int[] storedIDs, int[] addinIDs)
         {
-            List<int> storedList = new List<int>(storedIDs);
-            List<int> addinList = new List<int>(addinIDs);
+            var storedList = new List<int>(storedIDs);
+            var addinList = new List<int>(addinIDs);
 
             addinList.Sort();
             storedList.Sort();
@@ -159,7 +159,7 @@ namespace SwCSharpAddinMF.SWAddin
             {
                 return false;
             }
-            for (int i = 0; i < addinList.Count; i++)
+            for (var i = 0; i < addinList.Count; i++)
             {
                 if (addinList[i] != storedList[i])
                 {
@@ -181,11 +181,11 @@ namespace SwCSharpAddinMF.SWAddin
         {
             try
             {
-                SwEventPtr.ActiveDocChangeNotify += OnDocChange;
-                SwEventPtr.DocumentLoadNotify2 += OnDocLoad;
-                SwEventPtr.FileNewNotify2 += OnFileNew;
-                SwEventPtr.ActiveModelDocChangeNotify += OnModelChange;
-                SwEventPtr.FileOpenPostNotify += FileOpenPostNotify;
+                _SwEventPtr.ActiveDocChangeNotify += OnDocChange;
+                _SwEventPtr.DocumentLoadNotify2 += OnDocLoad;
+                _SwEventPtr.FileNewNotify2 += OnFileNew;
+                _SwEventPtr.ActiveModelDocChangeNotify += OnModelChange;
+                _SwEventPtr.FileOpenPostNotify += FileOpenPostNotify;
                 return true;
             }
             catch (Exception e)
@@ -199,11 +199,11 @@ namespace SwCSharpAddinMF.SWAddin
         {
             try
             {
-                SwEventPtr.ActiveDocChangeNotify -= OnDocChange;
-                SwEventPtr.DocumentLoadNotify2 -= OnDocLoad;
-                SwEventPtr.FileNewNotify2 -= OnFileNew;
-                SwEventPtr.ActiveModelDocChangeNotify -= OnModelChange;
-                SwEventPtr.FileOpenPostNotify -= FileOpenPostNotify;
+                _SwEventPtr.ActiveDocChangeNotify -= OnDocChange;
+                _SwEventPtr.DocumentLoadNotify2 -= OnDocLoad;
+                _SwEventPtr.FileNewNotify2 -= OnFileNew;
+                _SwEventPtr.ActiveModelDocChangeNotify -= OnModelChange;
+                _SwEventPtr.FileOpenPostNotify -= FileOpenPostNotify;
                 return true;
             }
             catch (Exception e)
@@ -216,10 +216,10 @@ namespace SwCSharpAddinMF.SWAddin
 
         public void AttachEventsToAllDocuments()
         {
-            ModelDoc2 modDoc = (ModelDoc2)ISwApp.GetFirstDocument();
+            var modDoc = (ModelDoc2)ISwApp.GetFirstDocument();
             while (modDoc != null)
             {
-                if (!openDocs.Contains(modDoc))
+                if (!_OpenDocs.Contains(modDoc))
                 {
                     AttachModelDocEventHandler(modDoc);
                 }
@@ -234,7 +234,7 @@ namespace SwCSharpAddinMF.SWAddin
 
             DocumentEventHandler docHandler = null;
 
-            if (!openDocs.Contains(modDoc))
+            if (!_OpenDocs.Contains(modDoc))
             {
                 switch (modDoc.GetType())
                 {
@@ -259,7 +259,7 @@ namespace SwCSharpAddinMF.SWAddin
                     }
                 }
                 docHandler.AttachEventHandlers();
-                openDocs.Add(modDoc, docHandler);
+                _OpenDocs.Add(modDoc, docHandler);
             }
             return true;
         }
@@ -267,8 +267,8 @@ namespace SwCSharpAddinMF.SWAddin
         public bool DetachModelEventHandler(ModelDoc2 modDoc)
         {
             DocumentEventHandler docHandler;
-            docHandler = (DocumentEventHandler)openDocs[modDoc];
-            openDocs.Remove(modDoc);
+            docHandler = (DocumentEventHandler)_OpenDocs[modDoc];
+            _OpenDocs.Remove(modDoc);
             modDoc = null;
             docHandler = null;
             return true;
@@ -280,14 +280,14 @@ namespace SwCSharpAddinMF.SWAddin
 
             //Close events on all currently open docs
             DocumentEventHandler docHandler;
-            int numKeys = openDocs.Count;
-            object[] keys = new object[numKeys];
+            var numKeys = _OpenDocs.Count;
+            var keys = new object[numKeys];
 
             //Remove all document event handlers
-            openDocs.Keys.CopyTo(keys, 0);
+            _OpenDocs.Keys.CopyTo(keys, 0);
             foreach (ModelDoc2 key in keys)
             {
-                docHandler = (DocumentEventHandler)openDocs[key];
+                docHandler = (DocumentEventHandler)_OpenDocs[key];
                 docHandler.DetachEventHandlers(); //This also removes the pair from the hash
                 docHandler = null;
             }
@@ -305,7 +305,7 @@ namespace SwCSharpAddinMF.SWAddin
             return 0;
         }
 
-        private int FileOpenPostNotify(string FileName)
+        private int FileOpenPostNotify(string fileName)
         {
             AttachEventsToAllDocuments();
             return 0;

@@ -10,7 +10,7 @@ namespace SwCSharpAddinMF.SWAddin
         public static IEnumerable<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
             var count = selMgr.GetSelectedObjectCount();
-            for (int i = 1; i <= count; i++)
+            for (var i = 1; i <= count; i++)
             {
                 var type = (swSelectType_e) selMgr.GetSelectedObjectType3(i, -1);
                 var mark = selMgr.GetSelectedObjectMark(i);

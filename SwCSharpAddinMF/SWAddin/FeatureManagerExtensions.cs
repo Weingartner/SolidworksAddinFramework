@@ -14,9 +14,9 @@ namespace SwCSharpAddinMF.SWAddin
             object paramTypes = types;
             object paramValues = values;
 
-            IFeature MacroFeature = featMgr.InsertMacroFeature3(featureName, typeof (T).FullName, null, (paramNames),
+            IFeature macroFeature = featMgr.InsertMacroFeature3(featureName, typeof (T).FullName, null, (paramNames),
                 (paramTypes), (paramValues), null, null, editBodies, null, opts);
-            Console.WriteLine(MacroFeature);
+            Console.WriteLine(macroFeature);
         }
 
 

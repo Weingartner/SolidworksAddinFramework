@@ -5,8 +5,6 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools;
 using SolidWorksTools.File;
-using System.Diagnostics;
-using System.Windows.Forms;
 using SwCSharpAddinMF.SWAddin;
 
 
@@ -25,30 +23,11 @@ namespace SwCSharpAddinMF
     {
         #region Local Variables
 
-        public const int mainCmdGroupID = 5;
-        public const int mainItemID1 = 0;
-        public const int mainItemID2 = 1;
-        public const int mainItemID3 = 2;
-        public const int flyoutGroupID = 91;
-
-        #region Event Handler Variables
-
-        #endregion
-
-
-
-        // Public Properties
-
-        #endregion
-
-        #region SolidWorks Registration
-
-        #endregion
-
-        #region ISwAddin Implementation
-        public SwAddin() : base()
-        {
-        }
+        public const int MainCmdGroupId = 5;
+        public const int MainItemId1 = 0;
+        public const int MainItemId2 = 1;
+        public const int MainItemId3 = 2;
+        public const int FlyoutGroupId = 91;
 
         #endregion
 
@@ -56,29 +35,28 @@ namespace SwCSharpAddinMF
         #region UI Methods
         public void AddCommandMgr()
         {
-            ICommandGroup cmdGroup;
             if (Bmp == null)
                 Bmp = new BitmapHandler();
-            Assembly thisAssembly;
-            int cmdIndex0, cmdIndex1;
-            string Title = "C# Addin", ToolTip = "C# Addin";
+            var cmdIndex1 = 0;
+            const string title = "C# Addin";
+            const string toolTip = "C# Addin";
 
 
-            int[] docTypes = new int[]{(int)swDocumentTypes_e.swDocASSEMBLY,
+            int[] docTypes = {(int)swDocumentTypes_e.swDocASSEMBLY,
                                        (int)swDocumentTypes_e.swDocDRAWING,
                                        (int)swDocumentTypes_e.swDocPART};
 
-            thisAssembly = System.Reflection.Assembly.GetAssembly(this.GetType());
+            var thisAssembly = Assembly.GetAssembly(GetType());
 
 
-            int cmdGroupErr = 0;
-            bool ignorePrevious = false;
+            var cmdGroupErr = 0;
+            var ignorePrevious = false;
 
             object registryIDs;
             //get the ID information stored in the registry
-            bool getDataResult = ICmdMgr.GetGroupDataFromRegistry(mainCmdGroupID, out registryIDs);
+            var getDataResult = ICmdMgr.GetGroupDataFromRegistry(MainCmdGroupId, out registryIDs);
 
-            int[] knownIDs = new int[2] { mainItemID1, mainItemID2 };
+            int[] knownIDs = { MainItemId1, MainItemId2 };
 
             if (getDataResult)
             {
@@ -88,26 +66,22 @@ namespace SwCSharpAddinMF
                 }
             }
 
-            cmdGroup = ICmdMgr.CreateCommandGroup2(mainCmdGroupID, Title, ToolTip, "", -1, ignorePrevious, ref cmdGroupErr);
+            ICommandGroup cmdGroup = ICmdMgr.CreateCommandGroup2(MainCmdGroupId, title, toolTip, "", -1, ignorePrevious, ref cmdGroupErr);
             cmdGroup.LargeIconList = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.ToolbarLarge.bmp", thisAssembly);
             cmdGroup.SmallIconList = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.ToolbarSmall.bmp", thisAssembly);
             cmdGroup.LargeMainIcon = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.MainIconLarge.bmp", thisAssembly);
             cmdGroup.SmallMainIcon = Bmp.CreateFileFromResourceBitmap("SwCSharpAddinMF.MainIconSmall.bmp", thisAssembly);
 
-            int menuToolbarOption = (int)(swCommandItemType_e.swMenuItem | swCommandItemType_e.swToolbarItem);
-            cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, "CreateCube", "", mainItemID1, menuToolbarOption);
-            cmdIndex1 = cmdGroup.AddCommandItem2("Show PMP", -1, "Display sample property manager", "Show PMP", 2, "ShowPMP", "EnablePMP", mainItemID2, menuToolbarOption);
+            var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
+            var cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, nameof(CreateCube), "", MainItemId1, menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
 
-            bool bResult;
 
-
-
-            FlyoutGroup flyGroup = ICmdMgr.CreateFlyoutGroup(flyoutGroupID, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
-              cmdGroup.SmallMainIcon, cmdGroup.LargeMainIcon, cmdGroup.SmallIconList, cmdGroup.LargeIconList, "FlyoutCallback", "FlyoutEnable");
+            var flyGroup = ICmdMgr.CreateFlyoutGroup(FlyoutGroupId, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
+              cmdGroup.SmallMainIcon, cmdGroup.LargeMainIcon, cmdGroup.SmallIconList, cmdGroup.LargeIconList, nameof(FlyoutCallback), nameof(FlyoutEnable));
 
 
             flyGroup.AddCommandItem("FlyoutCommand 1", "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
@@ -115,68 +89,64 @@ namespace SwCSharpAddinMF
             flyGroup.FlyoutType = (int)swCommandFlyoutStyle_e.swCommandFlyoutStyle_Simple;
 
 
-            foreach (int type in docTypes)
+            foreach (var type in docTypes)
             {
-                CommandTab cmdTab;
-
-                cmdTab = ICmdMgr.GetCommandTab(type, Title);
+                var cmdTab = ICmdMgr.GetCommandTab(type, title);
 
                 if (cmdTab != null & !getDataResult | ignorePrevious)//if tab exists, but we have ignored the registry info (or changed command group ID), re-create the tab.  Otherwise the ids won't matchup and the tab will be blank
                 {
-                    bool res = ICmdMgr.RemoveCommandTab(cmdTab);
+                    ICmdMgr.RemoveCommandTab(cmdTab);
                     cmdTab = null;
                 }
 
                 //if cmdTab is null, must be first load (possibly after reset), add the commands to the tabs
                 if (cmdTab == null)
                 {
-                    cmdTab = ICmdMgr.AddCommandTab(type, Title);
+                    cmdTab = ICmdMgr.AddCommandTab(type, title);
 
-                    CommandTabBox cmdBox = cmdTab.AddCommandTabBox();
+                    var cmdBox = cmdTab.AddCommandTabBox();
 
-                    int[] cmdIDs = new int[3];
-                    int[] TextType = new int[3];
+                    var cmdIDs = new int[3];
+                    var textType = new int[3];
 
-                    cmdIDs[0] = cmdGroup.get_CommandID(cmdIndex0);
+                    cmdIDs[0] = cmdGroup.CommandID[cmdIndex0];
 
-                    TextType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
+                    textType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
 
-                    cmdIDs[1] = cmdGroup.get_CommandID(cmdIndex1);
+                    cmdIDs[1] = cmdGroup.CommandID[cmdIndex1];
 
-                    TextType[1] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
+                    textType[1] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
 
                     cmdIDs[2] = cmdGroup.ToolbarId;
 
-                    TextType[2] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
+                    textType[2] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
 
-                    bResult = cmdBox.AddCommands(cmdIDs, TextType);
+                    cmdBox.AddCommands(cmdIDs, textType);
 
 
 
-                    CommandTabBox cmdBox1 = cmdTab.AddCommandTabBox();
+                    var cmdBox1 = cmdTab.AddCommandTabBox();
                     cmdIDs = new int[1];
-                    TextType = new int[1];
+                    textType = new int[1];
 
                     cmdIDs[0] = flyGroup.CmdID;
-                    TextType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextBelow | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
+                    textType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextBelow | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
 
-                    bResult = cmdBox1.AddCommands(cmdIDs, TextType);
+                    cmdBox1.AddCommands(cmdIDs, textType);
 
                     cmdTab.AddSeparator(cmdBox1, cmdIDs[0]);
 
                 }
 
             }
-            thisAssembly = null;
-
         }
 
         public void RemoveCommandMgr()
         {
             Bmp.Dispose();
 
-            ICmdMgr.RemoveCommandGroup(mainCmdGroupID);
-            ICmdMgr.RemoveFlyoutGroup(flyoutGroupID);
+            ICmdMgr.RemoveCommandGroup(MainCmdGroupId);
+            ICmdMgr.RemoveFlyoutGroup(FlyoutGroupId);
         }
 
         #endregion
@@ -190,7 +160,7 @@ namespace SwCSharpAddinMF
 
         public void FlyoutCallback()
         {
-            FlyoutGroup flyGroup = ICmdMgr.GetFlyoutGroup(flyoutGroupID);
+            var flyGroup = ICmdMgr.GetFlyoutGroup(FlyoutGroupId);
             flyGroup.RemoveAllCommandItems();
 
             flyGroup.AddCommandItem(System.DateTime.Now.ToLongTimeString(), "test", 0, "FlyoutCommandItem1", "FlyoutEnableCommandItem1");
