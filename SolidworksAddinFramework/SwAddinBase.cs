@@ -11,32 +11,9 @@ using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using SolidWorksTools;
 using SolidWorksTools.File;
-using Attribute = System.Attribute;
 
 namespace SolidworksAddinFramework
 {
-    [ClassInterface(ClassInterfaceType.None )]
-    [ComDefaultInterface(typeof(ISwAddin))]
-    public class SwAddinWrapper : ISwAddin
-    {
-        private readonly ISwAddin _SwAddin;
-
-        public SwAddinWrapper(ISwAddin swAddin)
-        {
-            _SwAddin = swAddin;
-        }
-
-
-        public bool ConnectToSW(object ThisSW, int Cookie)
-        {
-            return _SwAddin.ConnectToSW(ThisSW, Cookie);
-        }
-
-        public bool DisconnectFromSW()
-        {
-            return _SwAddin.DisconnectFromSW();
-        }
-    }
     public abstract class SwAddinBase : ISwAddin
     {
         public int AddinId { get; private set; }
