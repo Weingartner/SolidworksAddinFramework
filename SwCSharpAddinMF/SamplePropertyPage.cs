@@ -18,17 +18,8 @@ namespace SwCSharpAddinMF
         //Groups
         IPropertyManagerPageGroup pageGroup;
 
-        //Controls
-        IPropertyManagerPageSelectionbox selection1;
-        IPropertyManagerPageNumberbox num1;
-        IPropertyManagerPageCombobox combo1;
-
         //Control IDs
         public const int group1ID = 0;
-        public const int group2ID = 1;
-
-        public const int selection1ID = 8;
-        public const int combo1ID = 10;
         #endregion
 
         private static IEnumerable<swPropertyManagerPageOptions_e> Options => new[]
@@ -101,6 +92,7 @@ namespace SwCSharpAddinMF
                         selectionBox.SingleEntityOnly = false;
                     }
 
+                    // TODO remove
                     return observable.Subscribe(v => MacroFeature.Database.SelectedObjects = v);
                 });
 

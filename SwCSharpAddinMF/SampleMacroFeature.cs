@@ -21,7 +21,7 @@ namespace SwCSharpAddinMF
         public override SampleMacroFeatureDataBase Database { get; set; }
         public override string FeatureName { get; } = "Sample Feature";
         public override swMacroFeatureOptions_e FeatureOptions { get; } = 0;
-        public override IBody2 EditBody { get; } = null;
+        public override IEnumerable<IBody2> EditBodies => Enumerable.Empty<IBody2>();
 
         protected override object Edit()
         {

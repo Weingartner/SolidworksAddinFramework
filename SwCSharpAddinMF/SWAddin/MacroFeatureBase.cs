@@ -169,7 +169,7 @@ namespace SwCSharpAddinMF.SWAddin
 
         public abstract swMacroFeatureOptions_e FeatureOptions { get; }
 
-        public abstract IBody2 EditBody { get; }
+        public abstract IEnumerable<IBody2> EditBodies { get; }
 
         public ISelectionMgr SelectionMgr { get; set; }
 
@@ -217,7 +217,7 @@ namespace SwCSharpAddinMF.SWAddin
             SwFeatureData?.ReleaseSelectionAccess();
         }
 
-        public void InsertDefinition(string featureName, IBody2 editBody, int opts)
+        public void InsertDefinition(string featureName, IEnumerable<IBody2> editBody, int opts)
         {
 
             FeatureManagerExtensions
@@ -291,7 +291,7 @@ namespace SwCSharpAddinMF.SWAddin
         {
             if (State==StateEnum.Insert)
             {
-                InsertDefinition(FeatureName, EditBody, (int) FeatureOptions);
+                InsertDefinition(FeatureName, EditBodies, (int) FeatureOptions);
             }
             else
             {
