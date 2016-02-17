@@ -134,7 +134,6 @@ namespace SwCSharpAddinMF.SWAddin
         public void Disconnect()
         {
            RemoveCommandMgr();
-           DisconnectFromSW();
            Bmp.Dispose();
         }
 
