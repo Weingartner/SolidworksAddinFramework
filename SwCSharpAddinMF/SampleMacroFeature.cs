@@ -13,50 +13,19 @@ namespace SwCSharpAddinMF
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeatureDataBase>
     {
         private SamplePropertyPage ppage = null;
-        public PmpBase.StateEnum State { get; }
 
-        public SampleMacroFeature() : this(PmpBase.StateEnum.Edit)
+        public SampleMacroFeature() 
         {
-        }
-        public SampleMacroFeature(PmpBase.StateEnum state)
-        {
-            State = state;
         }
 
         public override SampleMacroFeatureDataBase Database { get; set; }
+        public override string FeatureName { get; } = "Sample Feature";
+        public override swMacroFeatureOptions_e FeatureOptions { get; } = 0;
+        public override IBody2 EditBody { get; } = null;
 
         protected override object Edit()
         {
-            ppage = new SamplePropertyPage(this, State);
-            if (SwFeatureData != null)
-            {
-                var result = SwFeatureData.AccessSelections(ModelDoc, null);
-                if(!result)
-                    throw new Exception("Expected to get true");
-                {
-                    object objects;
-                    object objectTypes;
-                    object marks;
-                    object drViews;
-                    object componentXForms;
-                    SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms);
-
-                    if(objects!=null)
-                    {
-                        var objectsArray = ((object[])objects).Cast<IBody2>().ToList();
-                        swSelectType_e[] typesArray = (swSelectType_e[])objectTypes;
-
-                        ModelDoc.ClearSelection2(true);
-                        foreach (var feature in objectsArray)
-                        {
-                            feature.Select2(true, null);
-                        }
-                        
-                    }
-                }
-
-            }
-
+            ppage = new SamplePropertyPage(this);
             ppage.Show();
             return null;
         }
@@ -78,7 +47,7 @@ namespace SwCSharpAddinMF
         {
 
             var moddoc = (IModelDoc2) app.ActiveDoc;
-            var macroFeature = new SampleMacroFeature(PmpBase.StateEnum.Insert);
+            var macroFeature = new SampleMacroFeature();
             macroFeature.Edit(app, moddoc, null);
 
             return true;

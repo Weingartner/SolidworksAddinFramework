@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SolidWorks.Interop.sldworks;
@@ -14,6 +15,7 @@ namespace SwCSharpAddinMF.SWAddin
     {
         
     }
+    public enum StateEnum {  Insert, Edit }
 
     public class MacroFeatureDataBase
     {
@@ -163,11 +165,18 @@ namespace SwCSharpAddinMF.SWAddin
         public ISldWorks SwApp { get; set; }
         public abstract T Database { get; set; }
 
+        public abstract string FeatureName { get; }
+
+        public abstract swMacroFeatureOptions_e FeatureOptions { get; }
+
+        public abstract IBody2 EditBody { get; }
+
         public ISelectionMgr SelectionMgr { get; set; }
 
         public object Edit(object app, object modelDoc, object feature)
         {
             Init(app, modelDoc, feature);
+            LoadSelections();
             return Edit();
         }
 
@@ -189,8 +198,11 @@ namespace SwCSharpAddinMF.SWAddin
             SelectionMgr = (ISelectionMgr) ModelDoc.SelectionManager;
         }
 
+        public StateEnum State => SwFeatureData == null ? StateEnum.Insert : StateEnum.Edit;
+
         public void Write()
         {
+            SaveSelections(this);
             Database.WriteTo(SwFeatureData);
         }
 
@@ -203,6 +215,13 @@ namespace SwCSharpAddinMF.SWAddin
         public void ReleaseSelectionAccess()
         {
             SwFeatureData?.ReleaseSelectionAccess();
+        }
+
+        public void InsertDefinition(string featureName, IBody2 editBody, int opts)
+        {
+
+            FeatureManagerExtensions
+                .InsertMacroFeature(ModelDoc.FeatureManager, featureName, editBody, opts, Database);
         }
 
 
@@ -220,6 +239,64 @@ namespace SwCSharpAddinMF.SWAddin
         {
             Init(app, modelDoc, feature);
             return Security();
+        }
+
+        private static void SaveSelections(MacroFeatureBase<T> sampleMacroFeature)
+        {
+            IBody2[] objects = sampleMacroFeature.SelectionMgr.GetSelectedObjects((type, mark) => true)
+                .Cast<IBody2>()
+                .ToArray();
+
+            int[] marks =
+                Enumerable.Range(1, objects.Length)
+                    .Select(i => sampleMacroFeature.SelectionMgr.GetSelectedObjectMark(i))
+                    .ToArray();
+
+            sampleMacroFeature.SwFeatureData.SetSelections(ComWangling.ObjectArrayToDispatchWrapper(objects), marks);
+            Debug.Assert(sampleMacroFeature.SwFeatureData.GetSelectionCount() == objects.Length);
+        }
+
+        protected void LoadSelections()
+        {
+            if (SwFeatureData != null)
+            {
+                var result = SwFeatureData.AccessSelections(ModelDoc, null);
+                if (!result)
+                    throw new Exception("Expected to get true");
+                {
+                    object objects;
+                    object objectTypes;
+                    object marks;
+                    object drViews;
+                    object componentXForms;
+                    SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms);
+
+                    if (objects != null)
+                    {
+                        var objectsArray = ((object[]) objects).Cast<IBody2>().ToList();
+                        swSelectType_e[] typesArray = (swSelectType_e[]) objectTypes;
+
+                        ModelDoc.ClearSelection2(true);
+                        foreach (var feature in objectsArray)
+                        {
+                            feature.Select2(true, null);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public void Commit()
+        {
+            if (State==StateEnum.Insert)
+            {
+                InsertDefinition(FeatureName, EditBody, (int) FeatureOptions);
+            }
+            else
+            {
+                ModifyDefinition();
+            }
         }
     }
 }

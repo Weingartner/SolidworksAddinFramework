@@ -161,6 +161,7 @@
     <Compile Include="SWAddin\PartEventHandler.cs" />
     <Compile Include="SWAddin\PmpBase.cs" />
     <Compile Include="SWAddin\PropertyManagerGroupExtensions.cs" />
+    <Compile Include="SWAddin\PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="SWAddin\SelectionManagerExtensions.cs" />
     <Compile Include="SWAddin\SwAddinBase.cs" />
     <Compile Include="SamplePropertyPage.cs" />

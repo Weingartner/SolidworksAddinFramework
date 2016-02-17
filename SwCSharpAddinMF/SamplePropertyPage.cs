@@ -11,9 +11,8 @@ using SwCSharpAddinMF.SWAddin;
 
 namespace SwCSharpAddinMF
 {
-    public class SamplePropertyPage : PmpBase
+    public class SamplePropertyPage : PmpBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-        public SampleMacroFeature MacroFeature { get; set; }
 
         #region Property Manager Page Controls
         //Groups
@@ -23,8 +22,6 @@ namespace SwCSharpAddinMF
         IPropertyManagerPageSelectionbox selection1;
         IPropertyManagerPageNumberbox num1;
         IPropertyManagerPageCombobox combo1;
-
-        private string featureName = "Foo Feature";
 
         //Control IDs
         public const int group1ID = 0;
@@ -40,53 +37,12 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SampleMacroFeature macroFeature, StateEnum state) : base(macroFeature.SwApp, "Sample PMP", Options, state)
+        public SamplePropertyPage(SampleMacroFeature macroFeature) : base(macroFeature.SwApp, "Sample PMP", Options, macroFeature)
         {
-            if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
-
-            MacroFeature = macroFeature;
         }
 
         #region PMPHandlerBase
         //Implement these methods from the interface
-
-        protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
-        {
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-
-            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
-            {
-                    
-                //this.MacroFeature.SwFeatureData.EditBodies = editBodies;
-                if(State==StateEnum.Edit)
-                {
-                    IBody2[] objects = this.MacroFeature.SelectionMgr.GetSelectedObjects((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES)
-                        .Cast<IBody2>()
-                        .ToArray();
-
-                    int[] marks =
-                        Enumerable.Range(1, objects.Length)
-                            .Select(i => this.MacroFeature.SelectionMgr.GetSelectedObjectMark(i))
-                            .ToArray();
-
-                    this.MacroFeature.SwFeatureData.SetSelections(objects,marks);
-                    Debug.Assert(this.MacroFeature.SwFeatureData.GetSelectionCount()==objects.Length);
-                    this.MacroFeature.Write();
-                    MacroFeature.ModifyDefinition();
-                }
-                else
-                {
-                    IBody2 editBody = null;
-                    const int opts = 0;
-                    FeatureManagerExtensions.InsertMacroFeature
-                        (this.MacroFeature.ModelDoc.FeatureManager, featureName, editBody, opts, this.MacroFeature.Database);
-                }
-            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
-            {
-                MacroFeature.ReleaseSelectionAccess();
-            }
-        }
 
 
         //Controls are displayed on the page top to bottom in the order 

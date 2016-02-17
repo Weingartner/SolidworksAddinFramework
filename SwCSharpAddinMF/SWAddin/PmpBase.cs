@@ -5,27 +5,41 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
 namespace SwCSharpAddinMF.SWAddin
 {
-    public abstract class PmpBase : IPropertyManagerPage2Handler9
+    //public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+    public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+        where TData : MacroFeatureDataBase, new()
+        where TMacroFeature : MacroFeatureBase<TData>
     {
         public readonly ISldWorks SwApp;
+        private readonly string _Name;
+        private readonly IEnumerable<swPropertyManagerPageOptions_e> _OptionsE;
 
-        public enum StateEnum {  Insert, Edit }
+        public TMacroFeature MacroFeature { get; set; }
 
-        public StateEnum State{ get; }
-
-        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, StateEnum state)
+        protected PmpBase(ISldWorks swApp, string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
         {
+            if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
+
             SwApp = swApp;
-            State = state;
-            int options = optionsE.Aggregate(0,(acc,v)=>(int)v | acc);
+            _Name = name;
+            _OptionsE = optionsE;
+            MacroFeature = macroFeature;
+        }
+
+        private bool ControlsAdded = false;
+        public void Show()
+        {
+            int options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
             int errors = 0;
-            Page = (IPropertyManagerPage2)SwApp.CreatePropertyManagerPage(name, options, this, ref errors);
+            var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, new PropertyManagerPage2Handler9Wrapper(this), ref errors);
+            Page = (IPropertyManagerPage2)propertyManagerPage;
             if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
             }
@@ -33,11 +47,6 @@ namespace SwCSharpAddinMF.SWAddin
             {
                 throw new Exception("Unable to Create PMP");
             }
-        }
-
-        private bool ControlsAdded = false;
-        public void Show()
-        {
             if(!ControlsAdded)
                 AddControls();
             ControlsAdded = true;
@@ -52,7 +61,7 @@ namespace SwCSharpAddinMF.SWAddin
         protected abstract IEnumerable<IDisposable> AddControlsImpl();
 
 
-        public IPropertyManagerPage2 Page { get; }
+        public IPropertyManagerPage2 Page { get; set; }
 
         public virtual void AfterActivation()
         {
@@ -63,13 +72,24 @@ namespace SwCSharpAddinMF.SWAddin
             OnClose((swPropertyManagerPageCloseReasons_e)reason);
         }
 
-        protected virtual void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        protected void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
+            //This function must contain code, even if it does nothing, to prevent the
+            //.NET runtime environment from doing garbage collection at the wrong time.
+
+            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                MacroFeature.Commit();
+            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+            {
+                MacroFeature.ReleaseSelectionAccess();
+            }
         }
 
         public void AfterClose()
         {
             _Disposables?.ForEach(d=>d.Dispose());
+            Page = null;
         }
 
         public virtual bool OnHelp()
