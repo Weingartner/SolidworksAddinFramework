@@ -219,12 +219,12 @@ namespace SolidworksAddinFramework
             SwFeatureData?.ReleaseSelectionAccess();
         }
 
-        public void InsertDefinition(string featureName, IEnumerable<IBody2> editBody, int opts)
+        public void InsertDefinition(string featureName, IEnumerable<IBody2> editBodies, int opts)
         {
 
             FeatureManagerExtensions
                 .InsertMacroFeature<TMacroFeature, TData>
-                (ModelDoc.FeatureManager, featureName, editBody, opts, Database);
+                (ModelDoc.FeatureManager, featureName, editBodies, opts, Database);
         }
 
 
