@@ -152,10 +152,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SamplePropertyPage.cs" />
-    <EmbeddedResource Include="ToolbarLarge.bmp" />
-    <EmbeddedResource Include="ToolbarSmall.bmp" />
-    <EmbeddedResource Include="MainIconLarge.bmp" />
-    <EmbeddedResource Include="MainIconSmall.bmp" />
+    <EmbeddedResource Include="Icons\ToolbarLarge.bmp" />
+    <EmbeddedResource Include="Icons\ToolbarSmall.bmp" />
+    <EmbeddedResource Include="Icons\MainIconLarge.bmp" />
+    <EmbeddedResource Include="Icons\MainIconSmall.bmp" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

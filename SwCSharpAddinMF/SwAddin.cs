@@ -64,10 +64,10 @@ namespace SwCSharpAddinMF
             }
 
             ICommandGroup cmdGroup = CommandManager.CreateCommandGroup2(MainCmdGroupId, title, toolTip, "", -1, ignorePrevious, ref cmdGroupErr);
-            cmdGroup.LargeIconList = GetBitMap("SwCSharpAddinMF.ToolbarLarge.bmp");
-            cmdGroup.SmallIconList = GetBitMap("SwCSharpAddinMF.ToolbarSmall.bmp");
-            cmdGroup.LargeMainIcon = GetBitMap("SwCSharpAddinMF.MainIconLarge.bmp");
-            cmdGroup.SmallMainIcon = GetBitMap("SwCSharpAddinMF.MainIconSmall.bmp");
+            cmdGroup.LargeIconList = GetBitMap("SwCSharpAddinMF.Icons.ToolbarLarge.bmp");
+            cmdGroup.SmallIconList = GetBitMap("SwCSharpAddinMF.Icons.ToolbarSmall.bmp");
+            cmdGroup.LargeMainIcon = GetBitMap("SwCSharpAddinMF.Icons.MainIconLarge.bmp");
+            cmdGroup.SmallMainIcon = GetBitMap("SwCSharpAddinMF.Icons.MainIconSmall.bmp");
 
             var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
             var cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, nameof(CreateCube), "", MainItemId1, menuToolbarOption);
