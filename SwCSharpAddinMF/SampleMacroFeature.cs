@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using SolidWorks.Interop.swpublished;
 
 namespace SwCSharpAddinMF
 {
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComDefaultInterface(typeof(ISwComFeature))]
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
         private SamplePropertyPage _Ppage = null;

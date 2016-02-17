@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -152,6 +153,7 @@ namespace SolidworksAddinFramework
         
     }
 
+    [ComVisible(false)]
     public abstract class MacroFeatureBase<TMacroFeature,TData> : ISwComFeature
         where TData : MacroFeatureDataBase, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature, TData>

@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using SolidWorks.Interop.swpublished;
 
 namespace SwCSharpAddinMF
 {
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
     public class SamplePropertyPage : PmpBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
 

@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -12,6 +13,7 @@ using SolidWorks.Interop.swpublished;
 namespace SolidworksAddinFramework
 {
     //public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+    [ComVisible(false)]
     public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
         where TData : MacroFeatureDataBase, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
