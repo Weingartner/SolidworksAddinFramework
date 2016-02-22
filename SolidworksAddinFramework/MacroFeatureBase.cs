@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -171,7 +172,7 @@ namespace SolidworksAddinFramework
 
         public abstract swMacroFeatureOptions_e FeatureOptions { get; }
 
-        public abstract IEnumerable<IBody2> EditBodies { get; }
+        public abstract List<IBody2> EditBodies { get; }
 
         public ISelectionMgr SelectionMgr { get; set; }
 
@@ -211,6 +212,7 @@ namespace SolidworksAddinFramework
         public void ModifyDefinition()
         {
             Write();
+            SwFeatureData.EditBodies = EditBodies.ToArray();
             SwFeature.ModifyDefinition(SwFeatureData, ModelDoc, null);
         }
 
@@ -247,7 +249,6 @@ namespace SolidworksAddinFramework
         private static void SaveSelections(MacroFeatureBase<TMacroFeature,TData> sampleMacroFeature)
         {
             var objects = SelectionManagerExtensions.GetSelectedObjects(sampleMacroFeature.SelectionMgr, (type, mark) => true)
-                .Cast<IBody2>()
                 .ToArray();
 
             var marks =
@@ -274,15 +275,29 @@ namespace SolidworksAddinFramework
                     object componentXForms;
                     SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms);
 
-                    if (objects != null)
-                    {
-                        var objectsArray = ((object[]) objects).Cast<IBody2>().ToList();
-                        var typesArray = (swSelectType_e[]) objectTypes;
+                    var objectsArray = (object[]) objects;
+                    var typesArray = (swSelectType_e[]) objectTypes;
+                    var marksArray = (int[]) marks;
+                    //var viewsArray = (IView[]) drViews;
+                    //var xformsArray = (IMathTransform[]) componentXForms;
 
-                        ModelDoc.ClearSelection2(true);
-                        foreach (var feature in objectsArray)
+                    var selections = objectsArray.Select((o, i) => 
+                    new {o,
+                        t = typesArray[i],
+                        m = marksArray[i]
+                        }).ToList();
+                    var selectionsByMark = selections.GroupBy(s => s.m);
+
+
+                    foreach (var s in selectionsByMark)
+                    {
+                        var selectionData = SelectionMgr.CreateSelectData();
+                        selectionData.Mark = s.Key;
+                        var array = s.Select(o=>o.o).ToArray();
+                        var count = ModelDoc.Extension.MultiSelect2( ComWangling.ObjectArrayToDispatchWrapper(array), true, selectionData);
+                        if (array.Length ==0 && array.Length!=0 )
                         {
-                            feature.Select2(true, null);
+                            MessageBox.Show("Unable to select objects");
                         }
                     }
                 }
