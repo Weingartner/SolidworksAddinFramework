@@ -66,6 +66,18 @@ namespace SolidworksAddinFramework
             return AddControl<IPropertyManagerPageSelectionbox>(@group, id, caption, tip, leftAlign, options);
         }
 
+        public static IPropertyManagerPageLabel
+            CreateLabel(this IPropertyManagerPageGroup group,
+                int id,
+                string caption,
+                string tip,
+                swPropertyManagerPageControlLeftAlign_e leftAlign = 0,
+                IEnumerable<swAddControlOptions_e> options = null
+            )
+        {
+            return AddControl<IPropertyManagerPageLabel>(@group, id, caption, tip, leftAlign, options);
+        }
+
         public static IPropertyManagerPageCombobox
             CreateComboBox(this IPropertyManagerPageGroup group,
                 int id,
@@ -147,6 +159,9 @@ namespace SolidworksAddinFramework
                     break;
                 case nameof(IPropertyManagerPageOption):
                     typeE = swPropertyManagerPageControlType_e.swControlType_Option;
+                    break;
+                case nameof(IPropertyManagerPageLabel):
+                    typeE = swPropertyManagerPageControlType_e.swControlType_Label;
                     break;
                 default:
                     throw new ArgumentException($"Cannot handle type{typeof(T).Name}");

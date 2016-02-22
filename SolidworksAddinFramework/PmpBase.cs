@@ -338,6 +338,12 @@ namespace SolidworksAddinFramework
             config?.Invoke(box);
             return NumberBoxChangedObservable(id).Subscribe(set);
         }
+        protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
+        {
+            var id = NextId();
+            var box = PropertyManagerGroupExtensions.CreateLabel(@group, id, caption, tip);
+            return Disposable.Empty;
+        }
 
         protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, Func<T> get, Action<T> set, T match)
         {
@@ -360,6 +366,7 @@ namespace SolidworksAddinFramework
             return config(box, SelectionChangedObservable(id).Select(_=>box.GetSelectedItems() as object[]));
             // For the moment we don't have any callbacks / rx stuff to register.
         }
+
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
             Action<IPropertyManagerPageSelectionbox> config)
         {

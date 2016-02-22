@@ -212,7 +212,7 @@ namespace SolidworksAddinFramework
         public void ModifyDefinition()
         {
             Write();
-            SwFeatureData.EditBodies = EditBodies.ToArray();
+            SwFeatureData.EditBodies = EditBodies?.ToArray() ;
             SwFeature.ModifyDefinition(SwFeatureData, ModelDoc, null);
         }
 
@@ -232,12 +232,13 @@ namespace SolidworksAddinFramework
 
         protected abstract object Edit();
         protected abstract object Security();
-        protected abstract object Regenerate();
+        protected abstract object Regenerate(IModeler modeler);
 
         public object Regenerate(object app, object modelDoc, object feature)
         {
             Init(app, modelDoc, feature);
-            return Regenerate();
+            var modeller = (IModeler) SwApp.GetModeler();
+            return Regenerate(modeller);
         }
 
         public object Security(object app, object modelDoc, object feature)
@@ -303,6 +304,17 @@ namespace SolidworksAddinFramework
                 }
             }
         }
+
+        protected IBody2 TestBox()
+        {
+            var box = new double[]
+            {
+                0, 0, 0, 1, 0, 0, 0.1, 0.1, 0.1
+            };
+            var body = ((IModeler)SwApp.GetModeler()).CreateBodyFromBox3(box);
+            return body;
+        }
+
 
 
         public void Commit()

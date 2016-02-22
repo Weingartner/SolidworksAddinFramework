@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DrawingEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FeatureManagerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PartEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PmpBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerGroupExtensions.cs" />

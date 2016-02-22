@@ -30,7 +30,7 @@ namespace SwCSharpAddinMF
             return null;
         }
 
-        protected override object Regenerate()
+        protected override object Regenerate(IModeler modeler)
         {
             //MessageBox.Show("MF Regenerate");
             return null;
