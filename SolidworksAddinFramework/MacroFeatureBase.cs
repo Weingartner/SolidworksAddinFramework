@@ -238,7 +238,16 @@ namespace SolidworksAddinFramework
         {
             Init(app, modelDoc, feature);
             var modeller = (IModeler) SwApp.GetModeler();
-            return Regenerate(modeller);
+            try
+            {
+                return Regenerate(modeller);
+            }
+            catch (Exception e)
+            {
+                
+            }
+
+
         }
 
         public object Security(object app, object modelDoc, object feature)
