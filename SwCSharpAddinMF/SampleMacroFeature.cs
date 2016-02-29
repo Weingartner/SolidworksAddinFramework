@@ -39,7 +39,7 @@ namespace SwCSharpAddinMF
         protected override object Regenerate(IModeler modeler)
         {
             // Get the body to edit
-            var body = SwFeatureData.EditBody;
+            var body = (IBody2) SwFeatureData.EditBody.Copy();
             var box = body.GetBodyBoxTs();
             var center = box.Center;
             var axisX = new double[] {1, 0, 0};
