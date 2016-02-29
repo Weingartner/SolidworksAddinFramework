@@ -96,5 +96,13 @@ Just change the GUID to another GUID. If you have Resharper just type __nguid__ 
 
 Then refactor rename all the class names as you wish.
 
+Sample project
+==============
+
+The sample project creates an addin that can split a solid body into two pieces. There is one
+parameter __alpha__ that determines the position of the split plane. See a video for the results
+
+https://dl.dropboxusercontent.com/s/dwx4h2kbioamtic/2016-02-29_11-11-09.mp4?dl=0
+
 
 
