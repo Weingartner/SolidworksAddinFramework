@@ -9,21 +9,25 @@
     <Import_RootNamespace>SolidworksAddinFramework</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AssemblyEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BodyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComWangling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DocumentEventHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DocView.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DrawingEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\AssemblyEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DocumentEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DocView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DrawingEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\PartEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FeatureManagerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataFieldAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModellerExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PartEventHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PmpBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPageBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerGroupExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SelectionManagerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SurfaceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SwAddinBase.cs" />
   </ItemGroup>
 </Project>

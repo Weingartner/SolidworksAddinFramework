@@ -12,9 +12,13 @@ using SolidWorks.Interop.swpublished;
 
 namespace SolidworksAddinFramework
 {
-    //public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+    /// <summary>
+    /// Base class for all property manager pages. See sample for more info
+    /// </summary>
+    /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
+    /// <typeparam name="TData">The type of the macro feature database this page will serialize data to and from</typeparam>
     [ComVisible(false)]
-    public abstract class PmpBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+    public abstract class PropertyManagerPageBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
         where TData : MacroFeatureDataBase, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
@@ -24,7 +28,7 @@ namespace SolidworksAddinFramework
 
         public TMacroFeature MacroFeature { get; set; }
 
-        protected PmpBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
+        protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
         {
             if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
 
@@ -35,6 +39,7 @@ namespace SolidworksAddinFramework
         }
 
         private bool _ControlsAdded = false;
+
         public void Show()
         {
             var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
@@ -54,14 +59,22 @@ namespace SolidworksAddinFramework
             Page?.Show();
         }
 
-        protected void AddControls()
+        private void AddControls()
         {
             _Disposables = AddControlsImpl().ToList();
         }
 
+        /// <summary>
+        /// Implement this method to add all controls to the page. See sample for more info 
+        /// </summary>
+        /// <returns></returns>
         protected abstract IEnumerable<IDisposable> AddControlsImpl();
 
 
+        /// <summary>
+        /// The instance of the real solid works property manager page. You will still have to call some
+        /// methods on this. Not all magic is done automatically.
+        /// </summary>
         public IPropertyManagerPage2 Page { get; set; }
 
         public virtual void AfterActivation()
@@ -83,7 +96,7 @@ namespace SolidworksAddinFramework
                 MacroFeature.Commit();
             }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
             {
-                MacroFeature.ReleaseSelectionAccess();
+                MacroFeature.Cancel();
             }
         }
 
@@ -359,12 +372,12 @@ namespace SolidworksAddinFramework
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
-            Func<IPropertyManagerPageSelectionbox, IObservable<object[]>,  IDisposable> config)
+            Func<IPropertyManagerPageSelectionbox, IDisposable> config)
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
-            return config(box, SelectionChangedObservable(id).Select(_=>box.GetSelectedItems() as object[]));
-            // For the moment we don't have any callbacks / rx stuff to register.
+            config(box);
+            return Disposable.Empty;
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,

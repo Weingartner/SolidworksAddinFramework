@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
@@ -24,7 +25,6 @@ namespace SwCSharpAddinMF
         public const int MainItemId1 = 0;
         public const int MainItemId2 = 1;
         public const int MainItemId3 = 2;
-        public const int FlyoutGroupId = 91;
 
         #endregion
 
@@ -32,17 +32,10 @@ namespace SwCSharpAddinMF
         #region UI Methods
         public override void AddCommandMgr()
         {
-            const int cmdIndex1 = 0;
             const string title = "C# Addin";
             const string toolTip = "C# Addin";
 
-
-            int[] docTypes = {(int)swDocumentTypes_e.swDocASSEMBLY,
-
-                                       (int)swDocumentTypes_e.swDocDRAWING,
-                                       (int)swDocumentTypes_e.swDocPART};
-
-
+            int[] docTypes = { (int)swDocumentTypes_e.swDocPART};
 
             var cmdGroupErr = 0;
             var ignorePrevious = false;
@@ -68,20 +61,11 @@ namespace SwCSharpAddinMF
             cmdGroup.SmallMainIcon = GetBitMap("SwCSharpAddinMF.Icons.MainIconSmall.bmp");
 
             var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
-            var cmdIndex0 = cmdGroup.AddCommandItem2("CreateCube", -1, "Create a cube", "Create cube", 0, nameof(CreateCube), "", MainItemId1, menuToolbarOption);
+            var cmdIndex0 = cmdGroup.AddCommandItem2(nameof(CreateSampleMacroFeature), -1, "Alpha Split", "Alpha Split", 0, nameof(CreateSampleMacroFeature), "", MainItemId1, menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
-
-
-            var flyGroup = CommandManager.CreateFlyoutGroup(FlyoutGroupId, "Dynamic Flyout", "Flyout Tooltip", "Flyout Hint",
-              cmdGroup.SmallMainIcon, cmdGroup.LargeMainIcon, cmdGroup.SmallIconList, cmdGroup.LargeIconList, nameof(FlyoutCallback), nameof(FlyoutEnable));
-
-
-            flyGroup.AddCommandItem("FlyoutCommand 1", "test", 0, nameof(FlyoutCommandItem1), nameof(FlyoutEnableCommandItem1));
-
-            flyGroup.FlyoutType = (int)swCommandFlyoutStyle_e.swCommandFlyoutStyle_Simple;
 
 
             foreach (var type in docTypes)
@@ -103,35 +87,16 @@ namespace SwCSharpAddinMF
 
                     var cmdBox = cmdTab.AddCommandTabBox();
 
-                    var cmdIDs = new int[3];
-                    var textType = new int[3];
+                    var cmdIDs = new[] {cmdIndex0}
+                        .Select(id => cmdGroup.CommandID[id])
+                        .ToArray();
 
-                    cmdIDs[0] = cmdGroup.CommandID[cmdIndex0];
+                    var textType = cmdIDs
+                        .Select(id => (int) swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal)
+                        .ToArray();
 
-                    textType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
-
-                    cmdIDs[1] = cmdGroup.CommandID[cmdIndex1];
-
-                    textType[1] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal;
-
-                    cmdIDs[2] = cmdGroup.ToolbarId;
-
-                    textType[2] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
-
+                        
                     cmdBox.AddCommands(cmdIDs, textType);
-
-
-
-                    var cmdBox1 = cmdTab.AddCommandTabBox();
-                    cmdIDs = new int[1];
-                    textType = new int[1];
-
-                    cmdIDs[0] = flyGroup.CmdID;
-                    textType[0] = (int)swCommandTabButtonTextDisplay_e.swCommandTabButton_TextBelow | (int)swCommandTabButtonFlyoutStyle_e.swCommandTabButton_ActionFlyout;
-
-                    cmdBox1.AddCommands(cmdIDs, textType);
-
-                    cmdTab.AddSeparator(cmdBox1, cmdIDs[0]);
 
                 }
 
@@ -140,42 +105,18 @@ namespace SwCSharpAddinMF
 
         public override void RemoveCommandMgr()
         {
-
-            CommandManager.RemoveFlyoutGroup(FlyoutGroupId);
             CommandManager.RemoveCommandGroup(MainCmdGroupId);
         }
 
         #endregion
 
         #region UI Callbacks
-        public void CreateCube()
+        public void CreateSampleMacroFeature()
         {
             SampleMacroFeature.AddMacroFeature(SwApp);
         }
 
 
-        public void FlyoutCallback()
-        {
-            var flyGroup = CommandManager.GetFlyoutGroup(FlyoutGroupId);
-            flyGroup.RemoveAllCommandItems();
-
-            flyGroup.AddCommandItem(System.DateTime.Now.ToLongTimeString(), "test", 0, nameof(FlyoutCommandItem1), nameof(FlyoutEnableCommandItem1));
-
-        }
-        public int FlyoutEnable()
-        {
-            return 1;
-        }
-
-        public void FlyoutCommandItem1()
-        {
-            ISwApp.SendMsgToUser("Flyout command 1");
-        }
-
-        public int FlyoutEnableCommandItem1()
-        {
-            return 1;
-        }
         #endregion
 
 

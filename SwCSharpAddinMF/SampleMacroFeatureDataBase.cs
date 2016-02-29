@@ -17,7 +17,7 @@ namespace SwCSharpAddinMF
         public string Param0 { get; set; } = "hello";
 
         [MacroFeatureDataField]
-        public double Param1 { get; set; } = 1.1;
+        public double Alpha { get; set; } = 0.25;
 
         [MacroFeatureDataField]
         public bool Param2 { get; set; } = true;
@@ -31,7 +31,5 @@ namespace SwCSharpAddinMF
         [MacroFeatureDataField]
         public int ComboBoxItem { get; set; }
 
-        // This doesn't need to be serialized
-        public object[] SelectedObjects { get; set; } = new object[] {};
     }
 }

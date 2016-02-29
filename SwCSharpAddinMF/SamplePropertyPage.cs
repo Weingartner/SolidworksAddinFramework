@@ -10,7 +10,7 @@ namespace SwCSharpAddinMF
 {
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
-    public class SamplePropertyPage : PmpBase<SampleMacroFeature,SampleMacroFeatureDataBase>
+    public class SamplePropertyPage : PropertyManagerPageBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
 
         #region Property Manager Page Controls
@@ -44,16 +44,40 @@ namespace SwCSharpAddinMF
             _PageGroup = Page.CreateGroup(Group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            yield return CreateTextBox(_PageGroup, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
-
-            yield return CreateNumberBox(_PageGroup, "Sample numberbox", "Allows for numerical input", ()=>MacroFeature.Database.Param1,v=>MacroFeature.Database.Param1=v, box =>
+            yield return CreateLabel(_PageGroup, "Alpha", "Alpha");
+            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", ()=>MacroFeature.Database.Alpha,v=>MacroFeature.Database.Alpha=v, box =>
             {
-                box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 100.0, 0.01, true);
+                box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.01, true);
             });
 
+            yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
+            yield return CreateSelectionBox(_PageGroup, "Sample Selection", "Displays features selected in main view",
+                (selectionBox) =>
+                {
+                    if (selectionBox != null)
+                    {
+                        int[] filter = { (int)swSelectType_e.swSelSOLIDBODIES};
+                        selectionBox.Height = 40;
+                        selectionBox.SetSelectionFilters(filter);
+                        selectionBox.SingleEntityOnly = false;
+                    }
+
+                });
+
+
+            /* Some example of other things you can create */
+
+            /*
+
+            yield return CreateLabel(_PageGroup, "Dummy", "Dummy");
+            yield return CreateTextBox(_PageGroup, "Param0", "tool tip", ()=> MacroFeature.Database.Param0, v=>MacroFeature.Database.Param0=v);
+
+
+            yield return CreateLabel(_PageGroup, "Checkbox", "Checkbox");
             yield return CreateCheckBox(_PageGroup, "Param2", "tool tip", ()=>MacroFeature.Database.Param2, v=>MacroFeature.Database.Param2=v);
 
 
+            yield return CreateLabel(_PageGroup, "Options", "Options");
             yield return CreateOption(_PageGroup, "Option1", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 0);
             yield return CreateOption(_PageGroup, "Option2", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 1);
             yield return CreateOption(_PageGroup, "Option3", "Radio buttons", () => MacroFeature.Database.Param3 , v => MacroFeature.Database.Param3 = v, 2);
@@ -79,21 +103,9 @@ namespace SwCSharpAddinMF
                         
                     });
 
+            */
 
-            yield return CreateSelectionBox(_PageGroup, "Sample Selection", "Displays features selected in main view",
-                (selectionBox, observable) =>
-                {
-                    if (selectionBox != null)
-                    {
-                        int[] filter = { (int)swSelectType_e.swSelSOLIDBODIES};
-                        selectionBox.Height = 40;
-                        selectionBox.SetSelectionFilters(filter);
-                        selectionBox.SingleEntityOnly = false;
-                    }
 
-                    // TODO remove
-                    return observable.Subscribe(v => MacroFeature.Database.SelectedObjects = v);
-                });
 
 
         }

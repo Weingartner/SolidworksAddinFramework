@@ -7,6 +7,12 @@ namespace SolidworksAddinFramework
 {
     public static class SelectionManagerExtensions
     {
+        /// <summary>
+        /// Get selected objects filtered by type and mark
+        /// </summary>
+        /// <param name="selMgr"></param>
+        /// <param name="filter">(type,mark)=>bool</param>
+        /// <returns></returns>
         public static IEnumerable<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
             var count = selMgr.GetSelectedObjectCount();

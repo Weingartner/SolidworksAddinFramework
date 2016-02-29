@@ -31,6 +31,12 @@ namespace SolidworksAddinFramework
                 });
         }
 
+        /// <summary>
+        /// Wrap an enumerable of objects into an array of DispatchWrapper. Sometimes you need this,
+        /// sometimes you don't. If symptoms persist see your doctor!
+        /// </summary>
+        /// <param name="objects"></param>
+        /// <returns></returns>
         public static DispatchWrapper[] ObjectArrayToDispatchWrapper(IEnumerable<object> objects)
         {
             return objects.Select(o => new DispatchWrapper(o)).ToArray();

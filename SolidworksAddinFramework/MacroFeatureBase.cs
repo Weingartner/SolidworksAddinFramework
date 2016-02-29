@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
@@ -11,149 +10,14 @@ using SolidWorks.Interop.swpublished;
 
 namespace SolidworksAddinFramework
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class MacroFeatureDataFieldAttribute : System.Attribute
-    {
-        
-    }
     public enum StateEnum {  Insert, Edit }
 
-    public class MacroFeatureDataBase
-    {
-        private int[] _Types;
-        private string[] _Names;
-        private object[] _Values;
-
-        public MacroFeatureDataBase()
-        {
-            _Types = BindingProperties.Select(p =>
-            {
-                if (p.PropertyType == typeof (string))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeString;
-                }
-                else if (p.PropertyType == typeof (int))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
-
-                }
-                else if (p.PropertyType == typeof (double))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeDouble;
-                }
-                else if (p.PropertyType == typeof (bool))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
-                }
-                else
-                {
-                    throw new InvalidCastException($"Cannot bind the type {p.PropertyType.Name} ");
-                }
-
-            })
-                .Select(v=>(int)v)
-                .ToArray();
-            _Names = BindingProperties.Select(p => p.Name).ToArray();
-            _Values = BindingProperties.Select(p => p.GetValue(this, new object[] {})).ToArray();
-        }
-
-        private void UpdateValues()
-        {
-            var tmp = BindingProperties.Select(p => p.GetValue(this, new object[] {})).ToList();
-            tmp.CopyTo(_Values);
-
-        }
-
-        private List<PropertyInfo> BindingProperties
-        {
-            get
-            {
-                return GetType().GetProperties()
-                    .Where(p => p.GetCustomAttributes(typeof (MacroFeatureDataFieldAttribute), true).Length > 0)
-                    .ToList();
-            }
-        }
-
-        public string[] Names => _Names;
-
-        public int[] Types => _Types;
-
-        public object[] Values
-        {
-            get { UpdateValues();
-                return _Values; }
-        }
-
-        public override string ToString()
-        {
-            return "{ " + string.Join(", ", BindingProperties
-                .Select(prop => $"{prop.Name}: {prop.GetValue(this, new object[] {})}")) + " }"; 
-        }
-
-        public void WriteTo(IMacroFeatureData data)
-        {
-            foreach (var bindingProperty in BindingProperties)
-            {
-                if (bindingProperty.PropertyType == typeof (string))
-                {
-                    data.SetStringByName(bindingProperty.Name, (string) bindingProperty.GetValue(this,new object[] {}));
-                }else if (bindingProperty.PropertyType == typeof (int))
-                {
-                    data.SetIntegerByName(bindingProperty.Name, (int) bindingProperty.GetValue(this,new object[] {}));
-                    
-                }else if (bindingProperty.PropertyType == typeof (double))
-                {
-                    data.SetDoubleByName(bindingProperty.Name, (double) bindingProperty.GetValue(this,new object[] {}));
-                }
-                else if (bindingProperty.PropertyType == typeof (bool))
-                {
-                    var value = (bool) bindingProperty.GetValue(this, new object[] {});
-                    data.SetIntegerByName(bindingProperty.Name, value ? 1 : 0);
-                }
-                else
-                {
-                    throw new InvalidCastException($"Cannot bind the type {bindingProperty.PropertyType.Name} ");
-                }
-            }
-        }
-
-        public void ReadFrom(IMacroFeatureData data)
-        {
-            foreach (var bindingProperty in BindingProperties)
-            {
-                if (bindingProperty.PropertyType == typeof (string))
-                {
-                    string v;
-                    data.GetStringByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                }else if (bindingProperty.PropertyType == typeof (int))
-                {
-                    int v;
-                    data.GetIntegerByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                    
-                }else if (bindingProperty.PropertyType == typeof (double))
-                {
-                    double v;
-                    data.GetDoubleByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                }
-                else if (bindingProperty.PropertyType == typeof (bool))
-                {
-                    int v;
-                    data.GetIntegerByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v==1,new object[] {});
-                }
-                else
-                {
-                    throw new InvalidCastException($"Cannot bind the type {bindingProperty.PropertyType.Name} ");
-                }
-            }
-            
-        }
-        
-    }
-
+    /// <summary>
+    /// Base class for macro features. Just inherit and fill out the abstract methods. See the
+    /// sample for a full working sample.
+    /// </summary>
+    /// <typeparam name="TMacroFeature"></typeparam>
+    /// <typeparam name="TData"></typeparam>
     [ComVisible(false)]
     public abstract class MacroFeatureBase<TMacroFeature,TData> : ISwComFeature
         where TData : MacroFeatureDataBase, new()
@@ -183,6 +47,13 @@ namespace SolidworksAddinFramework
             return Edit();
         }
 
+        /// <summary>
+        /// This should be called on all callbacks defined in ISwComFeature to
+        /// initialize all the instance variables.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="modelDoc"></param>
+        /// <param name="feature"></param>
         private void Init(object app, object modelDoc, object feature)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
@@ -203,25 +74,39 @@ namespace SolidworksAddinFramework
 
         public StateEnum State => SwFeatureData == null ? StateEnum.Insert : StateEnum.Edit;
 
-        public void Write()
+
+        /// <summary>
+        /// Save all the selections and the parameters to the macro feature
+        /// </summary>
+        private void Write()
         {
             SaveSelections(this);
             Database.WriteTo(SwFeatureData);
         }
 
-        public void ModifyDefinition()
+        /// <summary>
+        /// Save all selection and parameters and modify the definition of the macro feature
+        /// </summary>
+        private void ModifyDefinition()
         {
             Write();
             SwFeatureData.EditBodies = EditBodies?.ToArray() ;
             SwFeature.ModifyDefinition(SwFeatureData, ModelDoc, null);
         }
 
-        public void ReleaseSelectionAccess()
+        private void ReleaseSelectionAccess()
         {
             SwFeatureData?.ReleaseSelectionAccess();
         }
 
-        public void InsertDefinition(string featureName, IEnumerable<IBody2> editBodies, int opts)
+
+        /// <summary>
+        /// Insert the new macro feature into the design tree.
+        /// </summary>
+        /// <param name="featureName"></param>
+        /// <param name="editBodies"></param>
+        /// <param name="opts"></param>
+        private void InsertDefinition(string featureName, IEnumerable<IBody2> editBodies, int opts)
         {
 
             FeatureManagerExtensions
@@ -230,10 +115,23 @@ namespace SolidworksAddinFramework
         }
 
 
-        protected abstract object Edit();
+        /// <summary>
+        /// Implement to perform the edit function. See sample project
+        /// </summary>
+        /// <returns></returns>
+        protected abstract bool Edit();
+        /// <summary>
+        /// Implement to perform the security function. See sample project
+        /// </summary>
+        /// <returns></returns>
         protected abstract object Security();
+        /// <summary>
+        /// Implement to perform the rebuild function. See sample project
+        /// </summary>
+        /// <returns></returns>
         protected abstract object Regenerate(IModeler modeler);
 
+        #region ISWComFeature callbacks
         public object Regenerate(object app, object modelDoc, object feature)
         {
             Init(app, modelDoc, feature);
@@ -244,10 +142,8 @@ namespace SolidworksAddinFramework
             }
             catch (Exception e)
             {
-                
+                return e.Message;
             }
-
-
         }
 
         public object Security(object app, object modelDoc, object feature)
@@ -255,7 +151,12 @@ namespace SolidworksAddinFramework
             Init(app, modelDoc, feature);
             return Security();
         }
+        #endregion
 
+        /// <summary>
+        /// Serialize all selected objects and marks to the the macro feature data
+        /// </summary>
+        /// <param name="sampleMacroFeature"></param>
         private static void SaveSelections(MacroFeatureBase<TMacroFeature,TData> sampleMacroFeature)
         {
             var objects = SelectionManagerExtensions.GetSelectedObjects(sampleMacroFeature.SelectionMgr, (type, mark) => true)
@@ -270,6 +171,11 @@ namespace SolidworksAddinFramework
             Debug.Assert(sampleMacroFeature.SwFeatureData.GetSelectionCount() == objects.Length);
         }
 
+        /// <summary>
+        /// Deserialize all selected objects and marks from the macro feature data. The selections
+        /// will be active. Note you have to call Commit or Cancel after calling this or the feature
+        /// manager tree will be in a rollback state.
+        /// </summary>
         protected void LoadSelections()
         {
             if (SwFeatureData != null)
@@ -314,17 +220,6 @@ namespace SolidworksAddinFramework
             }
         }
 
-        protected IBody2 TestBox()
-        {
-            var box = new double[]
-            {
-                0, 0, 0, 1, 0, 0, 0.1, 0.1, 0.1
-            };
-            var body = ((IModeler)SwApp.GetModeler()).CreateBodyFromBox3(box);
-            return body;
-        }
-
-
 
         public void Commit()
         {
@@ -336,6 +231,14 @@ namespace SolidworksAddinFramework
             {
                 ModifyDefinition();
             }
+        }
+
+        /// <summary>
+        /// Cancel editing of the macro feature.
+        /// </summary>
+        public void Cancel()
+        {
+            ReleaseSelectionAccess();
         }
     }
 }
