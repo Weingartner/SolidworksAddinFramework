@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -29,6 +30,23 @@ namespace SolidworksAddinFramework
                 P0 = p0;
                 P1 = p1;
             }
+
+            public double XMin => Math.Min(P0[0], P1[0]);
+            public double XMax => Math.Max(P0[0], P1[0]);
+
+            public double YMin => Math.Min(P0[1], P1[1]);
+            public double YMax => Math.Max(P0[1], P1[1]);
+            public double ZMin => Math.Min(P0[2], P1[2]);
+            public double ZMax => Math.Max(P0[2], P1[2]);
+
+            public double[] XRange => new[] {XMin, XMax};
+            public double[] YRange => new[] {YMin, YMax};
+            public double[] ZRange => new[] {ZMin, ZMax};
+        }
+
+        public static IBody2 Add(this IEnumerable<IBody2> bodies)
+        {
+            return bodies.Aggregate((a, acc) => a.Add(acc).Bodies[0]);
         }
 
         /// <summary>
