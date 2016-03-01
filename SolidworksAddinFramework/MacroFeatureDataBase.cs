@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Reactive.Bindings;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -19,29 +20,7 @@ namespace SolidworksAddinFramework
 
         public MacroFeatureDataBase()
         {
-            _Types = BindingProperties.Select(p =>
-            {
-                if (p.PropertyType == typeof (string))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeString;
-                }
-                if (p.PropertyType == typeof (int))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
-
-                }
-                if (p.PropertyType == typeof (double))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeDouble;
-                }
-                if (p.PropertyType == typeof (bool))
-                {
-                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
-                }
-                throw new InvalidCastException($"Cannot bind the type {p.PropertyType.Name} ");
-            })
-                .Select(v=>(int)v)
-                .ToArray();
+            _Types = GetTypes().Select(v=>(int)v).ToArray();
             _Names = BindingProperties.Select(p => p.Name).ToArray();
             _Values = BindingProperties.Select(p => p.GetValue(this, new object[] {})).ToArray();
         }
@@ -51,7 +30,18 @@ namespace SolidworksAddinFramework
         /// </summary>
         private void UpdateValues()
         {
-            var tmp = BindingProperties.Select(p => p.GetValue(this, new object[] {})).ToList();
+            var tmp = BindingProperties.Select(p =>
+            {
+                if (IsReactiveProperty(p.PropertyType))
+                {
+                    var reactiveProperty = p.GetValue(this, new object[0]);
+                    return
+                        reactiveProperty.GetType()
+                            .GetProperty(nameof(ReactiveProperty<object>.Value))
+                            .GetValue(reactiveProperty, new object[0]);
+                }
+                return p.GetValue(this, new object[] {});
+            }).ToList();
             tmp.CopyTo(_Values);
 
         }
@@ -94,75 +84,157 @@ namespace SolidworksAddinFramework
                 .Select(prop => $"{prop.Name}: {prop.GetValue(this, new object[] {})}")) + " }"; 
         }
 
-        /// <summary>
-        /// Write the database to the macro feature macroFeatureData.
-        /// </summary>
-        /// <param name="macroFeatureData"></param>
         public void WriteTo(IMacroFeatureData macroFeatureData)
         {
-            foreach (var bindingProperty in BindingProperties)
+            IEnumerable<PropertyInfo> bindingProperties = BindingProperties;
+            foreach (var bindingProperty in bindingProperties)
             {
-                if (bindingProperty.PropertyType == typeof (string))
+                var o = bindingProperty.GetValue(this,new object[] {});
+                var propertyType = bindingProperty.PropertyType;
+                if (IsReactiveProperty(propertyType))
                 {
-                    macroFeatureData.SetStringByName(bindingProperty.Name, (string) bindingProperty.GetValue(this,new object[] {}));
-                }else if (bindingProperty.PropertyType == typeof (int))
-                {
-                    macroFeatureData.SetIntegerByName(bindingProperty.Name, (int) bindingProperty.GetValue(this,new object[] {}));
-                    
-                }else if (bindingProperty.PropertyType == typeof (double))
-                {
-                    macroFeatureData.SetDoubleByName(bindingProperty.Name, (double) bindingProperty.GetValue(this,new object[] {}));
-                }
-                else if (bindingProperty.PropertyType == typeof (bool))
-                {
-                    var value = (bool) bindingProperty.GetValue(this, new object[] {});
-                    macroFeatureData.SetIntegerByName(bindingProperty.Name, value ? 1 : 0);
+                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
+                    var valuePropertyInfo = o.GetType().GetProperty(valuePropertyName);
+                    var value = valuePropertyInfo.GetValue(o, new object[] {});
+                    WriteTo(macroFeatureData, valuePropertyInfo.PropertyType, bindingProperty.Name, value);
                 }
                 else
                 {
-                    throw new InvalidCastException($"Cannot bind the type {bindingProperty.PropertyType.Name} ");
+                    WriteTo(macroFeatureData, propertyType, bindingProperty.Name, o);
                 }
             }
         }
 
-        /// <summary>
-        /// Read the values from the macro feature data and store in the database
-        /// </summary>
-        /// <param name="data"></param>
-        public void ReadFrom(IMacroFeatureData data)
+        private static bool IsReactiveProperty(Type propertyType)
         {
-            foreach (var bindingProperty in BindingProperties)
+            return propertyType.IsGenericType &&
+                   propertyType.GetGenericTypeDefinition() == typeof (ReactiveProperty<>);
+        }
+
+        private IEnumerable<swMacroFeatureParamType_e> GetTypes()
+        {
+            IEnumerable<PropertyInfo> bindingProperties = BindingProperties;
+            foreach (var bindingProperty in bindingProperties)
             {
-                if (bindingProperty.PropertyType == typeof (string))
+                var o = bindingProperty.GetValue(this,new object[] {});
+                var propertyType = bindingProperty.PropertyType;
+                if (IsReactiveProperty(propertyType))
                 {
-                    string v;
-                    data.GetStringByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                }else if (bindingProperty.PropertyType == typeof (int))
-                {
-                    int v;
-                    data.GetIntegerByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                    
-                }else if (bindingProperty.PropertyType == typeof (double))
-                {
-                    double v;
-                    data.GetDoubleByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v,new object[] {});
-                }
-                else if (bindingProperty.PropertyType == typeof (bool))
-                {
-                    int v;
-                    data.GetIntegerByName(bindingProperty.Name, out v);
-                    bindingProperty.SetValue(this,v==1,new object[] {});
+                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
+                    var valuePropertyInfo = o.GetType().GetProperty(valuePropertyName);
+                    var value = valuePropertyInfo.GetValue(o, new object[] {});
+                    yield return Type(valuePropertyInfo);
                 }
                 else
                 {
-                    throw new InvalidCastException($"Cannot bind the type {bindingProperty.PropertyType.Name} ");
+                    yield return Type(bindingProperty);
                 }
             }
-            
         }
-        
+
+        swMacroFeatureParamType_e Type(PropertyInfo p)
+        {
+            
+                if (p.PropertyType == typeof (string))
+                {
+                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeString;
+                }
+                if (p.PropertyType == typeof (int))
+                {
+                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
+
+                }
+                if (p.PropertyType == typeof (double))
+                {
+                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeDouble;
+                }
+                if (p.PropertyType == typeof (bool))
+                {
+                    return swMacroFeatureParamType_e.swMacroFeatureParamTypeInteger;
+                }
+                throw new InvalidCastException($"Cannot bind the type {p.PropertyType.Name} ");
+        }
+
+        private static void WriteTo(IMacroFeatureData macroFeatureData, Type propertyType, string paramName, object o)
+        {
+            if (propertyType == typeof (string))
+            {
+                macroFeatureData.SetStringByName(paramName, (string) o);
+            }
+            else if (propertyType == typeof (int))
+            {
+                macroFeatureData.SetIntegerByName(paramName, (int) o);
+            }
+            else if (propertyType == typeof (double))
+            {
+                macroFeatureData.SetDoubleByName(paramName, (double) o);
+            }
+            else if (propertyType == typeof (bool))
+            {
+                var value = (bool) o;
+                macroFeatureData.SetIntegerByName(paramName, value ? 1 : 0);
+            }
+            else
+            {
+                throw new InvalidCastException($"Cannot bind the type {propertyType.Name} ");
+            }
+        }
+
+        public void ReadFrom(IMacroFeatureData macroFeatureData)
+        {
+            foreach (var bindingProperty in (IEnumerable<PropertyInfo>) BindingProperties)
+            {
+                var propertyType = bindingProperty.PropertyType;
+
+                var paramName = bindingProperty.Name;
+
+                if (IsReactiveProperty(propertyType))
+                {
+                    var reactiveProperty = bindingProperty.GetValue(this, new object[] {});
+
+                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
+                    var valueProperty = reactiveProperty.GetType().GetProperty(valuePropertyName);
+                    ReadValue(reactiveProperty, valueProperty, macroFeatureData, paramName);
+                }else
+                {
+                    ReadValue(this, bindingProperty, macroFeatureData, paramName);
+                    
+                }
+            }
+        }
+
+        private static void ReadValue(object o, PropertyInfo property, IMacroFeatureData macroFeatureData, string paramName)
+        {
+            var propertyType = property.PropertyType;
+
+            if (propertyType == typeof (string))
+            {
+                string v;
+                macroFeatureData.GetStringByName(paramName, out v);
+                property.SetValue(o, v, new object[] {});
+            }
+            else if (propertyType == typeof (int))
+            {
+                int v;
+                macroFeatureData.GetIntegerByName(paramName, out v);
+                property.SetValue(o, v, new object[] {});
+            }
+            else if (propertyType == typeof (double))
+            {
+                double v;
+                macroFeatureData.GetDoubleByName(paramName, out v);
+                property.SetValue(o, v, new object[] {});
+            }
+            else if (propertyType == typeof (bool))
+            {
+                int v;
+                macroFeatureData.GetIntegerByName(paramName, out v);
+                property.SetValue(o, v == 1, new object[] {});
+            }
+            else
+            {
+                throw new InvalidCastException($"Cannot bind the type {propertyType.Name} ");
+            }
+        }
     }
 }

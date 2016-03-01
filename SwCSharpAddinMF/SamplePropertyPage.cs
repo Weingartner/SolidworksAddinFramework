@@ -45,7 +45,7 @@ namespace SwCSharpAddinMF
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             yield return CreateLabel(_PageGroup, "Alpha", "Alpha");
-            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", ()=>MacroFeature.Database.Alpha,v=>MacroFeature.Database.Alpha=v, box =>
+            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", ()=>MacroFeature.Database.Alpha.Value,v=>MacroFeature.Database.Alpha.Value=v, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.01, true);
             });

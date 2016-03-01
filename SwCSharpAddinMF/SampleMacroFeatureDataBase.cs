@@ -1,3 +1,4 @@
+using Reactive.Bindings;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 
@@ -17,7 +18,7 @@ namespace SwCSharpAddinMF
         public string Param0 { get; set; } = "hello";
 
         [MacroFeatureDataField]
-        public double Alpha { get; set; } = 0.25;
+        public ReactiveProperty<double> Alpha { get; private set; } = new ReactiveProperty<double>(0.25);
 
         [MacroFeatureDataField]
         public bool Param2 { get; set; } = true;
