@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using System.Xml;
 using SolidworksAddinFramework;
+using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -29,6 +34,9 @@ namespace SwCSharpAddinMF
 
         public SamplePropertyPage(SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
         {
+            var body = MacroFeature.SelectionMgr.GetSelectedObject(1) as IBody2;
+            if (body==null)
+                MacroFeature.ModelDoc.ClearSelection2(true);
         }
 
         #region PMPHandlerBase
@@ -47,7 +55,7 @@ namespace SwCSharpAddinMF
             yield return CreateLabel(_PageGroup, "Alpha", "Alpha");
             yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", ()=>MacroFeature.Database.Alpha.Value,v=>MacroFeature.Database.Alpha.Value=v, box =>
             {
-                box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.01, true);
+                box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.1, true);
             });
 
             yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
@@ -59,10 +67,65 @@ namespace SwCSharpAddinMF
                         int[] filter = { (int)swSelectType_e.swSelSOLIDBODIES};
                         selectionBox.Height = 40;
                         selectionBox.SetSelectionFilters(filter);
-                        selectionBox.SingleEntityOnly = false;
+                        selectionBox.SingleEntityOnly = true;
                     }
 
                 });
+
+
+            // When the alpha value or the selection changes we want to 
+            // show a temporary body with the split in it
+            var d = new SerialDisposable();
+            yield return d;
+            yield return Observable
+                .CombineLatest(
+                    MacroFeature.Database.Alpha.WhenAnyValue(),
+                    SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
+                    (alpha, selection) => new { alpha, selection }
+                )
+                .Select(o =>
+                {
+                    var body = o.selection;
+
+                    var newBody = (IBody2)body?.Copy();
+                    if (newBody == null)
+                        return null;
+
+                    var splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
+                        MacroFeature.Database);
+
+                    return splits == null ? null : new { body, splits = splits.ToList() };
+                })
+                .Subscribe(v =>
+                {
+
+                    if (v == null)
+                    {
+                        d.Disposable = Disposable.Empty;
+                        return;
+                    }
+
+                    d.Disposable = Disposable.Create(() =>
+                    {
+                        v.body.HideBody(false);
+                        foreach (var split in v.splits)
+                        {
+                            split.Hide(MacroFeature.ModelDoc);
+                        }
+
+                    });
+
+                    // Hide the current selected body and show the new split
+                    v.body.HideBody(true);
+                    foreach (var split in v.splits)
+                    {
+                        split.Display3(MacroFeature.ModelDoc, 155, 0);
+                    }
+
+
+                });
+
+
 
 
             /* Some example of other things you can create */

@@ -191,6 +191,9 @@ namespace SolidworksAddinFramework
                     object componentXForms;
                     SwFeatureData.GetSelections3(out objects, out objectTypes, out marks, out drViews, out componentXForms);
 
+                    if (objects == null)
+                        return;
+
                     var objectsArray = (object[]) objects;
                     var typesArray = (swSelectType_e[]) objectTypes;
                     var marksArray = (int[]) marks;

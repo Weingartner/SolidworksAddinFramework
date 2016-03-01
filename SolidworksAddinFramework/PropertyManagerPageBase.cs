@@ -91,6 +91,7 @@ namespace SolidworksAddinFramework
             //This function must contain code, even if it does nothing, to prevent the
             //.NET runtime environment from doing garbage collection at the wrong time.
 
+            _Disposables?.ForEach(d=>d.Dispose());
             if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
             {
                 MacroFeature.Commit();
@@ -102,7 +103,6 @@ namespace SolidworksAddinFramework
 
         public void AfterClose()
         {
-            _Disposables?.ForEach(d=>d.Dispose());
             Page = null;
         }
 
@@ -239,8 +239,52 @@ namespace SolidworksAddinFramework
         {
         }
 
+        #region selection changed observables
         private Subject<int> _SelectionChangedSubject = new Subject<int>();
-        public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default); 
+        public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default);
+        /// <summary>
+        /// Observe when selections change. Does not generate an event on subscription. 
+        /// </summary>
+        /// <returns></returns>
+        public IObservable<int> SelectionChangedObservable() => _SelectionChangedSubject; 
+
+        /// <summary>
+        /// An observable of the current selection state.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IObservable<object[]>SelectionChangedObservable(Func<swSelectType_e, int, bool> predicate)
+        {
+            return _SelectionChangedSubject
+                .StartWith(0)
+                .Select(_ => MacroFeature.SelectionMgr.GetSelectedObjects(predicate).ToArray());
+        }
+        /// <summary>
+        /// An observable of the current selection state filtered by mark and type. The generic
+        /// type just casts the return objects to that type. Usefull if you know all your selections
+        /// are of a single type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IObservable<T[]>SelectionChangedObservable<T>(Func<swSelectType_e, int, bool> predicate)
+        {
+            return SelectionChangedObservable(predicate).Select(list => list.Cast<T>().ToArray());
+        }
+        /// <summary>
+        /// Shorthand for when you know there will be only a single object selected. T is the type
+        /// you expect back, IBody2 for example and the predicate allows you to filter selections
+        /// based on type and mark.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IObservable<T>SingleSelectionChangedObservable<T>(Func<swSelectType_e, int, bool> predicate)
+        {
+            return SelectionChangedObservable(predicate).Select(list => list.Cast<T>().FirstOrDefault());
+        }
+        #endregion
+
         public virtual void OnSelectionboxListChanged(int id, int count)
         {
             _SelectionChangedSubject.OnNext(id);

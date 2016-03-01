@@ -38,24 +38,32 @@ namespace SwCSharpAddinMF
 
         protected override object Regenerate(IModeler modeler)
         {
+            if (SwFeatureData.EditBody == null)
+                return null;
             // Get the body to edit
             var body = (IBody2) SwFeatureData.EditBody.Copy();
+            SwFeatureData.EnableMultiBodyConsume = true;
+            var splitBodies = SplitBodies(modeler, body, Database);
+            if(splitBodies!=null)
+            foreach (var body1 in splitBodies)
+            {
+                SwFeatureData.AddIdsToBody(body1);
+            }
+            return (object)splitBodies ?? "There was some error";
+        }
+
+        public static IBody2[] SplitBodies(IModeler modeler, IBody2 body, SampleMacroFeatureDataBase database)
+        {
             var box = body.GetBodyBoxTs();
             var center = box.Center;
             var axisX = new double[] {1, 0, 0};
 
             // Find the point to cut the object
-            center[0] = Database.Alpha.Value*box.P0[0] + (1 - Database.Alpha.Value)*box.P1[0];
+            center[0] = database.Alpha.Value*box.P0[0] + (1 - database.Alpha.Value)*box.P1[0];
             var sheet = modeler.CreateSheet(center, axisX, box.P0, box.P1);
 
-            SwFeatureData.EnableMultiBodyConsume = true;
             var cutResult = body.Cut(sheet);
-            if(cutResult.Error==0)
-                foreach (var body1 in cutResult.Bodies)
-                {
-                    SwFeatureData.AddIdsToBody(body1);
-                }
-            return cutResult.Bodies;
+            return cutResult.Error == 0 ? cutResult.Bodies : null;
         }
 
         protected override object Security()
