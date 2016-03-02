@@ -4,6 +4,7 @@ using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools;
+using SwCSharpAddinMF.ManipulatorSample;
 
 
 namespace SwCSharpAddinMF
@@ -62,6 +63,7 @@ namespace SwCSharpAddinMF
 
             var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
             var cmdIndex0 = cmdGroup.AddCommandItem2(nameof(CreateSampleMacroFeature), -1, "Alpha Split", "Alpha Split", 0, nameof(CreateSampleMacroFeature), "", MainItemId1, menuToolbarOption);
+            var cmdIndex1 = cmdGroup.AddCommandItem2(nameof(CreateManipulatorSample), -1, "Manipulator", "Manipulator", 0, nameof(CreateManipulatorSample), "", MainItemId1, menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
@@ -87,7 +89,7 @@ namespace SwCSharpAddinMF
 
                     var cmdBox = cmdTab.AddCommandTabBox();
 
-                    var cmdIDs = new[] {cmdIndex0}
+                    var cmdIDs = new[] {cmdIndex0, cmdIndex1}
                         .Select(id => cmdGroup.CommandID[id])
                         .ToArray();
 
@@ -114,6 +116,13 @@ namespace SwCSharpAddinMF
         public void CreateSampleMacroFeature()
         {
             SampleMacroFeature.SampleMacroFeature.AddMacroFeature(SwApp);
+        }
+
+        public void CreateManipulatorSample()
+        {
+
+            var page = new ManipulatorSamplePropertyManagerPage(SwApp, (IModelDoc2)SwApp.ActiveDoc);
+            page.Show();
         }
 
 
