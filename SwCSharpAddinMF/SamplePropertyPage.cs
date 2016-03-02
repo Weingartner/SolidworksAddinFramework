@@ -16,7 +16,7 @@ namespace SwCSharpAddinMF
 {
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
-    public class SamplePropertyPage : PropertyManagerPageBase<SampleMacroFeature,SampleMacroFeatureDataBase>
+    public class SamplePropertyPage : MacroFeaturePropertyManagerPageBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
 
         #region Property Manager Page Controls

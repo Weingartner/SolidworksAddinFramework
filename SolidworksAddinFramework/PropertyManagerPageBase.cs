@@ -12,30 +12,55 @@ using SolidWorks.Interop.swpublished;
 
 namespace SolidworksAddinFramework
 {
+
+    public abstract class MacroFeaturePropertyManagerPageBase<TMacroFeature, TData> : PropertyManagerPageBase<TData>
+        where TData : MacroFeatureDataBase, new()
+        where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
+    {
+        protected MacroFeaturePropertyManagerPageBase( string name, IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
+            : base(name, options, macroFeature.SwApp, macroFeature.ModelDoc)
+        {
+            MacroFeature = macroFeature;
+        }
+
+        public TMacroFeature MacroFeature { get; private set; }
+        protected void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        {
+            base.OnClose(reason);
+            //This function must contain code, even if it does nothing, to prevent the
+            //.NET runtime environment from doing garbage collection at the wrong time.
+
+            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
+            {
+                MacroFeature.Commit();
+            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
+            {
+                MacroFeature.Cancel();
+            }
+        }
+        
+    }
     /// <summary>
     /// Base class for all property manager pages. See sample for more info
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
     /// <typeparam name="TData">The type of the macro feature database this page will serialize data to and from</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase<TMacroFeature,TData> : IPropertyManagerPage2Handler9
+    public abstract class PropertyManagerPageBase<TData> : IPropertyManagerPage2Handler9
         where TData : MacroFeatureDataBase, new()
-        where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
         private readonly IEnumerable<swPropertyManagerPageOptions_e> _OptionsE;
 
-        public TMacroFeature MacroFeature { get; set; }
 
-        protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, TMacroFeature macroFeature)
+        protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
         {
-            if (macroFeature == null) throw new ArgumentNullException(nameof(macroFeature));
 
-            SwApp = macroFeature.SwApp;
+            SwApp = swApp;
+            ModelDoc = modelDoc;
             _Name = name;
             _OptionsE = optionsE;
-            MacroFeature = macroFeature;
         }
 
         private bool _ControlsAdded = false;
@@ -92,13 +117,6 @@ namespace SolidworksAddinFramework
             //.NET runtime environment from doing garbage collection at the wrong time.
 
             _Disposables?.ForEach(d=>d.Dispose());
-            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
-            {
-                MacroFeature.Commit();
-            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
-            {
-                MacroFeature.Cancel();
-            }
         }
 
         public void AfterClose()
@@ -241,6 +259,8 @@ namespace SolidworksAddinFramework
 
         #region selection changed observables
         private Subject<int> _SelectionChangedSubject = new Subject<int>();
+
+
         public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default);
         /// <summary>
         /// Observe when selections change. Does not generate an event on subscription. 
@@ -257,8 +277,11 @@ namespace SolidworksAddinFramework
         {
             return _SelectionChangedSubject
                 .StartWith(0)
-                .Select(_ => MacroFeature.SelectionMgr.GetSelectedObjects(predicate).ToArray());
+                .Select(_ => ((ISelectionMgr)ModelDoc.SelectionManager).GetSelectedObjects(predicate).ToArray());
         }
+
+        public IModelDoc2 ModelDoc { get; }
+
         /// <summary>
         /// An observable of the current selection state filtered by mark and type. The generic
         /// type just casts the return objects to that type. Usefull if you know all your selections
@@ -441,4 +464,5 @@ namespace SolidworksAddinFramework
             return _NextId;
         }
     }
+
 }
