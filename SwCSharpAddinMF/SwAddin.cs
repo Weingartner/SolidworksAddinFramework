@@ -113,7 +113,7 @@ namespace SwCSharpAddinMF
         #region UI Callbacks
         public void CreateSampleMacroFeature()
         {
-            SampleMacroFeature.AddMacroFeature(SwApp);
+            SampleMacroFeature.SampleMacroFeature.AddMacroFeature(SwApp);
         }
 
 

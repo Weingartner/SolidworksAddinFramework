@@ -184,12 +184,12 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SampleMacroFeatureDataBase.cs" />
-    <Compile Include="SampleMacroFeature.cs" />
+    <Compile Include="SampleMacroFeature\SampleMacroFeature.cs" />
+    <Compile Include="SampleMacroFeature\SampleMacroFeatureDataBase.cs" />
+    <Compile Include="SampleMacroFeature\SamplePropertyPage.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SamplePropertyPage.cs" />
     <EmbeddedResource Include="Icons\ToolbarLarge.bmp" />
     <EmbeddedResource Include="Icons\ToolbarSmall.bmp" />
     <EmbeddedResource Include="Icons\MainIconLarge.bmp" />

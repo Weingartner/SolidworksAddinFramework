@@ -2,7 +2,7 @@ using Reactive.Bindings;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF
+namespace SwCSharpAddinMF.SampleMacroFeature
 {
     public class SampleMacroFeatureDataBase : MacroFeatureDataBase
     {

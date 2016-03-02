@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Xml;
 using SolidworksAddinFramework;
 using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF
+namespace SwCSharpAddinMF.SampleMacroFeature
 {
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
@@ -33,7 +30,7 @@ namespace SwCSharpAddinMF
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
+        public SamplePropertyPage(SwCSharpAddinMF.SampleMacroFeature.SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
         {
             var body = MacroFeature.SelectionMgr.GetSelectedObject(1) as IBody2;
             if (body==null)
@@ -90,7 +87,7 @@ namespace SwCSharpAddinMF
                     if (newBody == null)
                         return null;
 
-                    var splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
+                    var splits = SwCSharpAddinMF.SampleMacroFeature.SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
                         MacroFeature.Database);
 
                     return splits == null ? null : new { body, splits = splits.ToList() };
