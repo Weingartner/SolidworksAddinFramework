@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
@@ -104,6 +106,29 @@ namespace SolidworksAddinFramework
         }
         #endregion
 
+        public static void HideAll(this IEnumerable<IBody2> bodies, IModelDoc2 doc)
+        {
+            foreach (var body in bodies)
+            {
+                body.Hide(doc);
+            }
+        }
+
+        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, System.Drawing.Color c, swTempBodySelectOptions_e opt)
+        {
+            var colorref = System.Drawing.ColorTranslator.ToWin32(c);
+            body.Display3(doc, colorref, (int) opt);
+        }
+
+        public static void DisplayAll(this IEnumerable<IBody2> bodies, IModelDoc2 doc, System.Drawing.Color c, swTempBodySelectOptions_e opt)
+        {
+            foreach (var body in bodies)
+            {
+                body.DisplayTs(doc, c, opt);
+            }
+        } 
+
+
         /// <summary>
         /// Return the bounding box of the solid body.
         /// </summary>
@@ -115,6 +140,33 @@ namespace SolidworksAddinFramework
             return new TwoPointRange(
                 new[] {box[0], box[1], box[2]}, 
                 new[] {box[3], box[4], box[5]});
+        }
+    }
+
+    public static class DisplayTransaction
+    {
+        public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, System.Drawing.Color? c = null,
+            swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        {
+            c = c ?? Color.Yellow;
+            body.Display3(doc, System.Drawing.ColorTranslator.ToWin32(c.Value), (int) opt);
+            return Disposable.Create(() => body.Hide(doc));
+        }
+
+        public static IDisposable DisplayBodiesUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc, Color? c = null,
+            swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        {
+            return new CompositeDisposable(bodies.Select(b=>b.DisplayUndoable(doc,c,opt)));
+        }
+
+        public static IDisposable HideBodyUndoable(this IBody2 body)
+        {
+            body.HideBody(true);
+            return Disposable.Create(() => body.HideBody(false));
+        }
+        public static IDisposable HideBodiesUndoable(this IEnumerable<IBody2> bodies)
+        {
+            return new CompositeDisposable(bodies.Select(b=>b.HideBodyUndoable()));
         }
     }
 }

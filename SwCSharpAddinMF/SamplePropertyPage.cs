@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -77,7 +78,7 @@ namespace SwCSharpAddinMF
             // show a temporary body with the split in it
             var d = new SerialDisposable();
             yield return d;
-            yield return Observable
+            Observable
                 .CombineLatest(
                     MacroFeature.Database.Alpha.WhenAnyValue(),
                     SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
@@ -96,32 +97,15 @@ namespace SwCSharpAddinMF
 
                     return splits == null ? null : new { body, splits = splits.ToList() };
                 })
-                .Subscribe(v =>
+                .SubscribeDisposable((v, yield) =>
                 {
-
                     if (v == null)
                     {
-                        d.Disposable = Disposable.Empty;
                         return;
                     }
 
-                    d.Disposable = Disposable.Create(() =>
-                    {
-                        v.body.HideBody(false);
-                        foreach (var split in v.splits)
-                        {
-                            split.Hide(MacroFeature.ModelDoc);
-                        }
-
-                    });
-
-                    // Hide the current selected body and show the new split
-                    v.body.HideBody(true);
-                    foreach (var split in v.splits)
-                    {
-                        split.Display3(MacroFeature.ModelDoc, 155, 0);
-                    }
-
+                    yield(v.body.HideBodyUndoable());
+                    yield(v.splits.DisplayBodiesUndoable(MacroFeature.ModelDoc));
 
                 });
 

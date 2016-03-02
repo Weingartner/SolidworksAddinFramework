@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataFieldAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModellerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObservableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPageBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerGroupExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPage2Handler9Wrapper.cs" />
