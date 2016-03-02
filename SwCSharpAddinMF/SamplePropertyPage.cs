@@ -76,9 +76,7 @@ namespace SwCSharpAddinMF
 
             // When the alpha value or the selection changes we want to 
             // show a temporary body with the split in it
-            var d = new SerialDisposable();
-            yield return d;
-            Observable
+            yield return Observable
                 .CombineLatest(
                     MacroFeature.Database.Alpha.WhenAnyValue(),
                     SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
