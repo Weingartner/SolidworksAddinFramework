@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+<Project DefaultTargets="Build" InitialTargets="RestorePackages" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -211,8 +211,6 @@
   <Import Project="..\SolidworksAddinFramework\SolidworksAddinFramework.projitems" Label="Shared" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
     <PostBuildEvent>
 IF "$(TargetFrameworkVersion)"=="v4.0" GOTO NET40
 IF "$(TargetFrameworkVersion)"=="v3.5" GOTO NET20
@@ -251,5 +249,11 @@ GOTO END
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <Target Name="RestorePackages">
+    <PropertyGroup>
+      <BaseDir>$(MSBuildProjectDirectory)\..</BaseDir>
+    </PropertyGroup>
+    <Exec Command="$(BaseDir)\NuGet\NuGet.exe restore $(MSBuildProjectFullPath) -SolutionDir $(BaseDir)" />
   </Target>
 </Project>
