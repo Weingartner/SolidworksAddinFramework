@@ -31,5 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SelectionManagerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SurfaceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SwAddinBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TriadManipulatorExtensions.cs" />
   </ItemGroup>
 </Project>

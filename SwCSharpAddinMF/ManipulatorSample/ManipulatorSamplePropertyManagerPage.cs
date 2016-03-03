@@ -50,19 +50,24 @@ namespace SwCSharpAddinMF.ManipulatorSample
                         return;
 
                     var newbody = (IBody2) body.Copy();
-                    var handler = new SampleManipulatorHandler(newbody, (IMathUtility)SwApp.GetMathUtility(), ModelDoc);
+                    var handler = new SampleManipulatorHandler(newbody, (IMathUtility)SwApp.GetMathUtility(), ModelDoc, SwApp);
                     var manipulator = ModelDoc.ModelViewManager.CreateManipulator((int)swManipulatorType_e.swTriadManipulator, handler);
-                    var spec = (ITriadManipulator)manipulator.GetSpecificManipulator();
-                    var box = body.GetBodyBoxTs();
-                    spec.Origin = (MathPoint) ((IMathUtility)SwApp.GetMathUtility()).CreatePoint(box.Center);
+                    SetManipulatorPositionToBodyCenter(SwApp, manipulator, body, ModelDoc);
                     manipulator.Show(ModelDoc);
-
                     yielder(Disposable.Create(manipulator.Remove));
                     yielder(newbody.DisplayUndoable(ModelDoc));
                     yielder(body.HideBodyUndoable());
 
 
                 });
+        }
+
+        public static void SetManipulatorPositionToBodyCenter(ISldWorks sldWorks, IManipulator manipulator, IBody2 body, IModelDoc2 model)
+        {
+            var spec = (ITriadManipulator) manipulator.GetSpecificManipulator();
+            var box = body.GetBodyBoxTs();
+            spec.Origin = (MathPoint) ((IMathUtility) sldWorks.GetMathUtility()).CreatePoint(box.Center);
+            spec.UpdatePosition();
         }
 
         public override void AfterActivation()
@@ -77,34 +82,87 @@ namespace SwCSharpAddinMF.ManipulatorSample
     {
         private readonly IMathUtility _Math;
         private readonly IModelDoc2 _ModelDoc;
+        private ISldWorks swApp;
         public IBody2 Body { get; set; }
+        public IBody2 DisplayedBody { get; set; }
 
-        public SampleManipulatorHandler(IBody2 body, IMathUtility math, IModelDoc2 modelDoc)
+        public SampleManipulatorHandler(IBody2 body, IMathUtility math, IModelDoc2 modelDoc, ISldWorks swApp)
         {
             _Math = math;
             _ModelDoc = modelDoc;
+            this.swApp = swApp;
             Body = body;
+            DisplayedBody = (IBody2)Body.Copy();
         }
 
-        public override bool OnDoubleValueChanged(object pManipulator, int handleIndex, ref double Value)
+        public override bool OnDoubleValueChanged(object pManipulator, int handleIndexInt, ref double value)
         {
-            Console.WriteLine($"{handleIndex} - {Value}");
-            var xAxis = (MathVector)_Math.CreateVector(new[] {1, 0, 0});
-            var yAxis = (MathVector)_Math.CreateVector(new[] {0, 1, 0});
-            var zAxis = (MathVector)_Math.CreateVector(new[] {0, 0, 1});
-            var value = Value;
-            var translate =(MathVector)_Math.CreateVector(new[] {handleIndex == 1 ? value : 0, handleIndex == 2 ? value : 0, handleIndex == 3 ? value : 0});
-            var transform = _Math.ComposeTransform(xAxis, yAxis, zAxis, translate,1);
-            if(!Body.ApplyTransform(transform))
-                throw new Exception("Unable to shift");
-            //Body.Hide(_ModelDoc);
-            //Body.DisplayTs(_ModelDoc, Color.Green, swTempBodySelectOptions_e.swTempBodySelectOptionNone);
-            IModelView view = ((IModelView)_ModelDoc.ActiveView);
-            //view.EnableGraphicsUpdate = (true);
-            //view.UpdateAllGraphicsLayers = true;
-            view.GraphicsRedraw(null);
+            //var handleIndex = (swTriadManipulatorControlPoints_e) handleIndexInt;
+            //var transform = CreateTranslationTransform(value, handleIndex);
+
+            //DisplayedBody.Hide(_ModelDoc);
+            //DisplayedBody = (IBody2) Body.Copy();
+            //GC.Collect();
+            //if(!DisplayedBody.ApplyTransform(transform))
+            //    throw new Exception("Unable to shift");
+            //DisplayedBody.DisplayTs(_ModelDoc, Color.Green, swTempBodySelectOptions_e.swTempBodySelectOptionNone);
+
+            //IModelView view = ((IModelView)_ModelDoc.ActiveView);
+            //////view.EnableGraphicsUpdate = (true);
+            //////view.UpdateAllGraphicsLayers = true;
+            //view.GraphicsRedraw(null);
             
             return true;
+        }
+
+
+        private MathVector CreateTranslationVector(swTriadManipulatorControlPoints_e handleIndex, double value)
+        {
+            return (MathVector)_Math.CreateVector(new[] {
+                handleIndex == swTriadManipulatorControlPoints_e.swTriadManipulatorXAxis ? value : 0,
+                handleIndex == swTriadManipulatorControlPoints_e.swTriadManipulatorYAxis ? value : 0,
+                handleIndex == swTriadManipulatorControlPoints_e.swTriadManipulatorZAxis ? value : 0});
+        }
+
+        public override void OnEndDrag(object pManipulator, int handleIndex)
+        {
+            IManipulator m = (IManipulator) pManipulator;
+            Body = DisplayedBody;
+            ManipulatorSamplePropertyManagerPage.SetManipulatorPositionToBodyCenter(swApp,m,Body, _ModelDoc);
+        }
+
+        public override void OnUpdateDrag(object pManipulator, int handleIndex, object newPosMathPt)
+        {
+            var m = (IManipulator) pManipulator;
+            var t = (ITriadManipulator) m.GetSpecificManipulator();
+
+            var p = (IMathPoint) newPosMathPt;
+
+            var modelView = ((IModelView) _ModelDoc.ActiveView);
+            var world2screen = modelView.Transform;
+            var pScreen = (MathPoint) p.MultiplyTransform(world2screen);
+            var vv = (IMathVector) _Math.CreateVector(new[] {1.0, 1, 1});
+            var pScreenUp = (MathPoint) pScreen.AddVector(vv);
+            var pWorldDelta = (MathPoint)pScreenUp.MultiplyTransform((MathTransform)world2screen.Inverse());
+            var viewVector = (MathVector)p.Subtract(pWorldDelta);
+
+            var translation = t.Project((swTriadManipulatorControlPoints_e)handleIndex, p, viewVector, _Math);
+
+
+            DisplayedBody.Hide(_ModelDoc);
+            DisplayedBody = (IBody2)Body.Copy();
+            GC.Collect();
+
+            var transform = _Math.ComposeTransform(t.XAxis, t.YAxis, t.ZAxis, translation, 1);
+            if (!DisplayedBody.ApplyTransform(transform))
+                throw new Exception("Unable to shift");
+            DisplayedBody.DisplayTs(_ModelDoc, Color.Green, swTempBodySelectOptions_e.swTempBodySelectOptionNone);
+
+            IModelView view = modelView;
+            ////view.EnableGraphicsUpdate = (true);
+            ////view.UpdateAllGraphicsLayers = true;
+            view.GraphicsRedraw(null);
+
         }
     };
 
@@ -149,7 +207,7 @@ namespace SwCSharpAddinMF.ManipulatorSample
             return true;
         }
 
-        public virtual bool OnDoubleValueChanged(object pManipulator, int handleIndex, ref double Value)
+        public virtual bool OnDoubleValueChanged(object pManipulator, int handleIndex, ref double value)
         {
             return true;
         }

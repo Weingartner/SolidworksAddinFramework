@@ -37,9 +37,6 @@ namespace SolidworksAddinFramework
 
             Debug.Assert(line != null, "line != null");
             return line;
-
-
-
         }
 
 
