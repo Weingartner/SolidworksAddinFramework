@@ -139,12 +139,8 @@ namespace SwCSharpAddinMF.ManipulatorSample
             var p = (IMathPoint) newPosMathPt;
 
             var modelView = ((IModelView) _ModelDoc.ActiveView);
-            var world2screen = modelView.Transform;
-            var pScreen = (MathPoint) p.MultiplyTransform(world2screen);
-            var vv = (IMathVector) _Math.CreateVector(new[] {1.0, 1, 1});
-            var pScreenUp = (MathPoint) pScreen.AddVector(vv);
-            var pWorldDelta = (MathPoint)pScreenUp.MultiplyTransform((MathTransform)world2screen.Inverse());
-            var viewVector = (MathVector)p.Subtract(pWorldDelta);
+            var mathUtility = _Math;
+            var viewVector = ViewVector(modelView, mathUtility, p);
 
             var translation = t.Project((swTriadManipulatorControlPoints_e)handleIndex, p, viewVector, _Math);
 
@@ -163,6 +159,25 @@ namespace SwCSharpAddinMF.ManipulatorSample
             ////view.UpdateAllGraphicsLayers = true;
             view.GraphicsRedraw(null);
 
+        }
+
+
+        /// <summary>
+        /// Find the vector in model space from the point to the viewers eye.
+        /// </summary>
+        /// <param name="modelView"></param>
+        /// <param name="mathUtility"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private static MathVector ViewVector(IModelView modelView, IMathUtility mathUtility, IMathPoint p)
+        {
+            var world2screen = modelView.Transform;
+            var pScreen = (MathPoint) p.MultiplyTransform(world2screen);
+            var vv = (IMathVector) mathUtility.CreateVector(new[] {0.0, 0, 1});
+            var pScreenUp = (MathPoint) pScreen.AddVector(vv);
+            var pWorldDelta = (MathPoint) pScreenUp.MultiplyTransform((MathTransform) world2screen.Inverse());
+            var viewVector = (MathVector) p.Subtract(pWorldDelta);
+            return viewVector;
         }
     };
 
