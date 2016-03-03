@@ -69,7 +69,8 @@ namespace SolidworksAddinFramework
         {
             var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
             var errors = 0;
-            var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, new PropertyManagerPage2Handler9Wrapper(this), ref errors);
+            _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
+            var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, _PropertyManagerPage2Handler9Wrapper, ref errors);
             Page = (IPropertyManagerPage2)propertyManagerPage;
             if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
@@ -82,6 +83,8 @@ namespace SolidworksAddinFramework
                 AddControls();
             _ControlsAdded = true;
             Page?.Show();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void AddControls()
@@ -259,6 +262,7 @@ namespace SolidworksAddinFramework
 
         #region selection changed observables
         private Subject<int> _SelectionChangedSubject = new Subject<int>();
+        private PropertyManagerPage2Handler9Wrapper _PropertyManagerPage2Handler9Wrapper;
 
 
         public IObservable<Unit> SelectionChangedObservable(int id) => _SelectionChangedSubject.Where(i => id == i).Select(_=>Unit.Default);

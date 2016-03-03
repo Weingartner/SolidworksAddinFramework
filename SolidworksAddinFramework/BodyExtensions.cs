@@ -114,9 +114,10 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, System.Drawing.Color c, swTempBodySelectOptions_e opt)
+        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, System.Drawing.Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
-            var colorref = System.Drawing.ColorTranslator.ToWin32(c);
+            c = c ?? Color.Yellow;
+            var colorref = System.Drawing.ColorTranslator.ToWin32(c.Value);
             body.Display3(doc, colorref, (int) opt);
         }
 
@@ -162,7 +163,10 @@ namespace SolidworksAddinFramework
         public static IDisposable HideBodyUndoable(this IBody2 body)
         {
             body.HideBody(true);
-            return Disposable.Create(() => body.HideBody(false));
+            return Disposable.Create(() =>
+            {
+                body.HideBody(false);
+            });
         }
         public static IDisposable HideBodiesUndoable(this IEnumerable<IBody2> bodies)
         {

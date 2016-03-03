@@ -120,11 +120,10 @@ namespace SwCSharpAddinMF
 
         public void CreateManipulatorSample()
         {
-
-            var page = new ManipulatorSamplePropertyManagerPage(SwApp, (IModelDoc2)SwApp.ActiveDoc);
+            var sldWorks = SwApp;
+            var page = ManipulatorSamplePropertyManagerPage.Create(sldWorks);
             page.Show();
         }
-
 
         #endregion
 
