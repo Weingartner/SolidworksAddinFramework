@@ -13,6 +13,12 @@ using SolidWorks.Interop.swconst;
 
 namespace SwCSharpAddinMF.ManipulatorSample
 {
+    /// <summary>
+    /// This page allows a user to select a body in the model and then move a copy of it around with
+    /// a manipulator. Demonstrates how to listen for change events on the manipulator. Note we have
+    /// wrapped the manipulator interfaces and objects returned by solidworks to provide a nicer
+    /// interface.
+    /// </summary>
     public class ManipulatorSamplePropertyManagerPage : PropertyManagerPageBase<ManipulatorSampleDatabase>
     {
         private IPropertyManagerPageGroup _PageGroup;
@@ -46,17 +52,31 @@ namespace SwCSharpAddinMF.ManipulatorSample
 
             yield return SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES)
                 .Finally(()=>Console.WriteLine("Finally"))
-                .SubscribeDisposable((body, yielder) =>
+                .SubscribeDisposable((body, yield) =>
                 {
+                    // The code here execute every time a new selection is made.
+                    // 'yield' is an action that you pass disposable to. These disposables
+                    // will get run before the next time this callback is activated. Thus
+                    // you can use it to "unselect" or destroy any resources made by
+                    // the previous selection.
+
                     if (body == null)
                         return;
 
+                    // Copy the selected body so we can transform it
                     var newbody = (IBody2) body.Copy();
                     var mathUtility = (IMathUtility)SwApp.GetMathUtility();
+
+                    // Create our triad. This is a custom class to make working with triads easier
                     var triad = new TriadManipulatorTs(ModelDoc); 
 
                     var displayedBody = newbody;
-                    yielder(triad.DoubleChangedObservable.Subscribe(o =>
+
+                    // Listen for changes to the axis. The subscribe callback
+                    // must accept a Tuple<swTriadManipulatorControPoints_e, double> which
+                    // lets you know which control point was changed and what it's
+                    // current value is.
+                    yield(triad.DoubleChangedObservable.Subscribe(o =>
                     {
                         var handleIndex = o.Item1;
                         var transform = triad.CreateTranslationTransform(handleIndex,mathUtility,o.Item2);
@@ -71,20 +91,31 @@ namespace SwCSharpAddinMF.ManipulatorSample
                         ((IModelView)ModelDoc.ActiveView).GraphicsRedraw(null);
 
                     }));
-                    yielder(triad.EndDragObservable.Subscribe(handle =>
+
+                    // Listen for end drag so we can move the triad to the
+                    // new position.
+                    yield(triad.EndDragObservable.Subscribe(handle =>
                     {
                         newbody = displayedBody;
                         SetManipulatorPositionToBodyCenter(SwApp,triad,newbody, ModelDoc);
                         GC.Collect();
 
                     }));
-                    SetManipulatorPositionToBodyCenter(SwApp, triad, body, ModelDoc);
-                    triad.Show(ModelDoc);
-                    yielder(Disposable.Create(triad.Remove));
 
+                    SetManipulatorPositionToBodyCenter(SwApp, triad, body, ModelDoc);
+
+                    // Show the triad and register it to be removed if the selection changes
+                    triad.Show(ModelDoc);
+                    yield(Disposable.Create(triad.Remove));
+
+                    // Display the copied body and register for the current copied
+                    // body to be removed if the selection changes.
                     displayedBody.DisplayTs(ModelDoc);
-                    yielder(Disposable.Create(() => displayedBody.Hide(ModelDoc)));
-                    yielder(body.HideBodyUndoable());
+                    yield(Disposable.Create(() => displayedBody.Hide(ModelDoc)));
+
+                    // Hide the selected body and register it to be shown again
+                    // if the selection changes
+                    yield(body.HideBodyUndoable());
 
 
                 });
