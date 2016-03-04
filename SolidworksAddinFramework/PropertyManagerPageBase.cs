@@ -71,6 +71,8 @@ namespace SolidworksAddinFramework
             var errors = 0;
             _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
             var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, _PropertyManagerPage2Handler9Wrapper, ref errors);
+
+
             Page = (IPropertyManagerPage2)propertyManagerPage;
             if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
@@ -82,9 +84,9 @@ namespace SolidworksAddinFramework
             if(!_ControlsAdded)
                 AddControls();
             _ControlsAdded = true;
+
+
             Page?.Show();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
         private void AddControls()
@@ -386,7 +388,8 @@ namespace SolidworksAddinFramework
             var list = PropertyManagerGroupExtensions.CreateListBox(@group, id, caption, tip);
             config(list);
             list.CurrentSelection = (short) get();
-            return ListBoxSelectionObservable(id).Subscribe(set);
+            var d = ListBoxSelectionObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(list, d);
         }
         protected IDisposable CreateComboBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageCombobox> config)
         {
@@ -394,7 +397,8 @@ namespace SolidworksAddinFramework
             var comboBox = PropertyManagerGroupExtensions.CreateComboBox(@group, id, caption, tip);
             config(comboBox);
             comboBox.CurrentSelection = (short) get();
-            return ComboBoxSelectionObservable(id).Subscribe(set);
+            var d = ComboBoxSelectionObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(comboBox, d);
         }
 
 
@@ -403,7 +407,8 @@ namespace SolidworksAddinFramework
             var id = NextId();
             var text = PropertyManagerGroupExtensions.CreateTextBox(@group, id, caption, tip);
             text.Text = get();
-            return TextBoxChangedObservable(id).Subscribe(set);
+            var d = TextBoxChangedObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(text, d);
         }
 
         protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<bool> get, Action<bool> set)
@@ -411,7 +416,8 @@ namespace SolidworksAddinFramework
             var id = NextId();
             var text = PropertyManagerGroupExtensions.CreateCheckBox(@group, id, caption, tip);
             text.Checked = get();
-            return CheckBoxChangedObservable(id).Subscribe(set);
+            var d = CheckBoxChangedObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(text, d);
         }
 
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
@@ -420,13 +426,14 @@ namespace SolidworksAddinFramework
             var box = PropertyManagerGroupExtensions.CreateNumberBox(@group, id, caption, tip);
             box.Value = get();
             config?.Invoke(box);
-            return NumberBoxChangedObservable(id).Subscribe(set);
+            var d = NumberBoxChangedObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(box, d);
         }
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateLabel(@group, id, caption, tip);
-            return Disposable.Empty;
+            return WrapControl(box);
         }
 
         protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, Func<T> get, Action<T> set, T match)
@@ -439,7 +446,8 @@ namespace SolidworksAddinFramework
             {
                 option.Checked = true;
             }
-            return OptionCheckedObservable(id).Subscribe(v=>set(match));
+            var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
+            return WrapControlAndDisposable(option, d);
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
@@ -448,7 +456,7 @@ namespace SolidworksAddinFramework
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
             config(box);
-            return Disposable.Empty;
+            return WrapControl(box);
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
@@ -458,8 +466,45 @@ namespace SolidworksAddinFramework
             var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
             config(box);
             // For the moment we don't have any callbacks / rx stuff to register.
-            return Disposable.Empty;
+            return WrapControl(box);
         }
+
+        #region control reference holding
+        private IDisposable WrapControlAndDisposable(object control, IDisposable d)
+        {
+            return new  ControlHolder(control, d);
+        }
+        private IDisposable WrapControl(object control)
+        {
+            return new  ControlHolder(control, Disposable.Empty);
+        }
+
+        /// <summary>
+        /// It is neccessary to keep reference to the property manager page controls. If you
+        /// lose the reference then the garbage collector may call the finalize method on the
+        /// control. The finalize method then will detach all callback or possibly remove
+        /// the control completely from the page. 
+        /// 
+        /// This object just allows the control to be help along with another IDisposable
+        /// which will get disposed when the dispose method on this class is called. 
+        /// </summary>
+        internal class ControlHolder : IDisposable
+        {
+            public ControlHolder(object control, IDisposable disposable)
+            {
+                Control = control;
+                Disposable = disposable;
+            }
+
+            public object Control { get; }
+            public IDisposable Disposable { get; }
+            public void Dispose()
+            {
+                Disposable.Dispose();
+            }
+        }
+        #endregion
+
 
 
         private int NextId()
