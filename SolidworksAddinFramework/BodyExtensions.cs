@@ -88,6 +88,9 @@ namespace SolidworksAddinFramework
 
             int error;
             var objects = (object[]) body.Operations2((int) type, tool, out error);
+            if(objects==null)
+                return new OperationsResult(error, new IBody2[] {});
+
             var bodies = error == 0 ?  objects.Cast<IBody2>().ToArray() : new IBody2[] {};
             return new OperationsResult(error, bodies);
         }
