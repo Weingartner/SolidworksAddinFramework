@@ -125,6 +125,7 @@ namespace SolidworksAddinFramework
         {
             _Manipulator = doc.ModelViewManager.CreateManipulator((int) swManipulatorType_e.swTriadManipulator, this);
             _Impl = (ITriadManipulator) _Manipulator.GetSpecificManipulator();
+            _Impl.Cursor = (int)swManipulatorCursor_e.swManipulatorMoveCursor;
         }
 
         public override bool OnDoubleValueChanged(object pManipulator, int handleIndex, ref double value)

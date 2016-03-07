@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
+using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -13,7 +14,7 @@ using SolidWorks.Interop.swpublished;
 namespace SolidworksAddinFramework
 {
 
-    public abstract class MacroFeaturePropertyManagerPageBase<TMacroFeature, TData> : PropertyManagerPageBase<TData>
+    public abstract class MacroFeaturePropertyManagerPageBase<TMacroFeature, TData> : PropertyManagerPageBase
         where TData : MacroFeatureDataBase, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
@@ -40,14 +41,13 @@ namespace SolidworksAddinFramework
         }
         
     }
+
     /// <summary>
     /// Base class for all property manager pages. See sample for more info
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
-    /// <typeparam name="TData">The type of the macro feature database this page will serialize data to and from</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase<TData> : IPropertyManagerPage2Handler9
-        where TData : MacroFeatureDataBase, new()
+    public abstract class PropertyManagerPageBase : IPropertyManagerPage2Handler9
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
@@ -429,6 +429,18 @@ namespace SolidworksAddinFramework
             var d = NumberBoxChangedObservable(id).Subscribe(set);
             return WrapControlAndDisposable(box, d);
         }
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Reactive.Bindings.ReactiveProperty<double> prop, Action<IPropertyManagerPageNumberbox> config = null)
+        {
+            Func<double> get = ()=>prop.Value;
+            Action<double> set = v => prop.Value = v;
+            var id = NextId();
+            var box = @group.CreateNumberBox(id, caption, tip);
+            prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v => box.Value = v);
+            config?.Invoke(box);
+            var d = NumberBoxChangedObservable(id).Subscribe(set);
+            return WrapControlAndDisposable(box, d);
+        }
+
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
         {
             var id = NextId();

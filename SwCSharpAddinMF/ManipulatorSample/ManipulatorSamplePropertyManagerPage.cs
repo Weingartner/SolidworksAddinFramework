@@ -19,7 +19,7 @@ namespace SwCSharpAddinMF.ManipulatorSample
     /// wrapped the manipulator interfaces and objects returned by solidworks to provide a nicer
     /// interface.
     /// </summary>
-    public class ManipulatorSamplePropertyManagerPage : PropertyManagerPageBase<ManipulatorSampleDatabase>
+    public class ManipulatorSamplePropertyManagerPage : PropertyManagerPageBase
     {
         private IPropertyManagerPageGroup _PageGroup;
         private int Group1Id = 1;
