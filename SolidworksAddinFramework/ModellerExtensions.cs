@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework
             var p0v = new DenseVector(p0);
             var p1v = new DenseVector(p1);
             var dir = (p1v - p0v).Normalize(2);
-            var line = (ICurve)modeler.CreateLine(p0, new[] {dir[0], dir[1] });
+            var line = (ICurve)modeler.CreateLine(p0, new[] {dir[0], dir[1], dir[2] });
             Debug.Assert(line != null, "line != null");
             if(p1.Length==3)
             {
