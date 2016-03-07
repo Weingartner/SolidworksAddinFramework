@@ -86,28 +86,9 @@ namespace SolidworksAddinFramework
             }
         }
 
-        /// <summary>
-        /// gives the multiplier for b which would be the projection of a on b
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private static double ProjectAOnB(IMathVector a, IMathVector b)
-        {
-            return a.Dot(b)/(b.Dot(b));
-        }
-
-        private static IMathPoint Project(IMathPoint origin, IMathVector axis, IMathPoint point)
-        {
-            var a = (IMathVector) point.Subtract(origin);
-            var t = ProjectAOnB(a, axis);
-            var v = (MathVector) axis.Scale(t);
-            return (IMathPoint) origin.AddVector(v);
-        }
-
         private static MathVector ProjectRelative(IMathPoint origin, IMathVector axis, IMathPoint point)
         {
-            return (MathVector) Project(origin, axis, point).Subtract(origin);
+            return (MathVector) point.Project(origin, axis).Subtract(origin);
         }
 
         /// <summary>
