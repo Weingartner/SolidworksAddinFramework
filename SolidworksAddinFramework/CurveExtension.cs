@@ -18,6 +18,11 @@ namespace SolidworksAddinFramework
             return (double[]) curve.Evaluate2(t, 0);
         }
 
+        public static double[] ClosestPointOnTs(this ICurve curve , double x, double y, double z)
+        {
+            return (double[]) curve.GetClosestPointOn(x, y, z);
+        }
+
         /// <summary>
         /// Return the length of the curve between the start
         /// and end parameters.
