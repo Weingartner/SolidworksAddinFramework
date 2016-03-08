@@ -74,9 +74,14 @@ namespace SolidworksAddinFramework
         public static IBody2 CreateSheet(this IModeler modeler, double[] center, double[] vNormal, double[] p0, double[] p1)
         {
             var surf = (Surface) modeler.CreatePlanarSurface(center, vNormal);
-            var uvLow = surf.GetClosestPointOnTs(p0);
-            var uvHigh = surf.GetClosestPointOnTs(p1);
-            return modeler.CreateSheetFromSurface(surf,uvLow, uvHigh);
+            return CreateSheetFromSurface(modeler, surf, p0, p1);
+        }
+
+        public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf, IMathPoint p0, IMathPoint p1)
+        {
+            var uvLow = surf.GetClosestPointOnTs((double[])p0.ArrayData);
+            var uvHigh = surf.GetClosestPointOnTs((double[])p1.ArrayData);
+            return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
     }
 }
