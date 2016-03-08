@@ -153,14 +153,19 @@ namespace SolidworksAddinFramework
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
             c = c ?? Color.Yellow;
-            double [] mat = new double[8];
+            double [] mat = new double[9];
             mat[0] = ((double) c.Value.R)/255;
             mat[1] = ((double) c.Value.G)/255;
             mat[2] = ((double) c.Value.B)/255;
+            mat[3] = 1;
+            mat[4] = 1;
+            mat[5] = 1;
+            mat[6] = 1;
             mat[7] = ((double) c.Value.A)/255;
+            mat[8] = 0;
 
 
-            body.Display3(doc, 0, (int) opt);
+            body.DisplayTs(doc, c, opt);
             body.MaterialPropertyValues2 = mat;
 
             return Disposable.Create(() => body.Hide(doc));
