@@ -62,6 +62,10 @@ namespace SolidworksAddinFramework
             return (double[]) ((IMathVector)v0.Cross(v1)).ArrayData;
 
         }
+        public static MathVector ScaleTs(this IMathVector a, double b)
+        {
+            return (MathVector) a.Scale(b);
+        }
 
         public static MathVector CrossTs(this IMathVector a, IMathVector b)
         {
