@@ -39,6 +39,11 @@ namespace SolidworksAddinFramework
             return line;
         }
 
+        public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
+        {
+            return CreateTrimmedLine(modeler, (double[])p0.ArrayData, (double[])p1.ArrayData);
+        }
+
 
         #region CreateSheetFromSurface
         public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf , SurfaceExtensions.PointUv uvLow, SurfaceExtensions.PointUv uvHigh)
