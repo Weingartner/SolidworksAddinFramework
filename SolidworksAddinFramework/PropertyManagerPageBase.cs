@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
+using Reactive.Bindings;
 using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -429,9 +430,8 @@ namespace SolidworksAddinFramework
             var d = NumberBoxChangedObservable(id).Subscribe(set);
             return WrapControlAndDisposable(box, d);
         }
-        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Reactive.Bindings.ReactiveProperty<double> prop, Action<IPropertyManagerPageNumberbox> config = null)
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, ReactiveProperty<double> prop, Action<IPropertyManagerPageNumberbox> config = null)
         {
-            Func<double> get = ()=>prop.Value;
             Action<double> set = v => prop.Value = v;
             var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
@@ -439,6 +439,25 @@ namespace SolidworksAddinFramework
             config?.Invoke(box);
             var d = NumberBoxChangedObservable(id).Subscribe(set);
             return WrapControlAndDisposable(box, d);
+        }
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
+            Action<IPropertyManagerPageNumberbox> config = null)
+        {
+            var id = NextId();
+            var box = @group.CreateNumberBox(id, caption, tip);
+
+            return propObservable
+                .SubscribeDisposable(prop =>
+                {
+                    Action<double> set = v => prop.Value = v;
+                    var d0 = prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v => box.Value = v);
+                    config?.Invoke(box);
+                    var d1 = NumberBoxChangedObservable(id).Subscribe(set);
+                    return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1));
+                });
         }
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
@@ -458,6 +477,24 @@ namespace SolidworksAddinFramework
             {
                 option.Checked = true;
             }
+            var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
+            return WrapControlAndDisposable(option, d);
+        }
+
+        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, ReactiveProperty<T> prop, T match)
+        {
+            var id = NextId();
+            if (match == null) throw new ArgumentNullException(nameof(match));
+
+            Action<T> set = v => prop.Value = v;
+            var option = @group.CreateOption(id, tip, caption);
+            prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v =>
+            {
+                if (v.Equals(match))
+                {
+                    option.Checked = true;
+                }
+            });
             var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
             return WrapControlAndDisposable(option, d);
         }

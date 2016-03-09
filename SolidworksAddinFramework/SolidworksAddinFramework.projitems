@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DocView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DrawingEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\PartEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FaceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FeatureManagerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MacroFeatureDataBase.cs" />
@@ -28,6 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ModelDocExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModellerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelViewExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerPageBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyManagerGroupExtensions.cs" />
@@ -37,5 +39,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SurfaceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SwAddinBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TriadManipulatorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TwoPointRange.cs" />
   </ItemGroup>
 </Project>

@@ -4,8 +4,10 @@ using System.Drawing;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text;
 using System.Xml;
+using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -13,39 +15,6 @@ namespace SolidworksAddinFramework
 {
     public static class BodyExtensions
     {
-
-        public class TwoPointRange
-        {
-            public double[] P0 { get; }
-
-            public double[] P1 { get; }
-
-            public double[] Center => new double[]
-            {
-                (P0[0]+P1[0])/2,
-                (P0[1]+P1[1])/2,
-                (P0[2]+P1[2])/2
-            };
-
-            public TwoPointRange(double[] p0, double[] p1)
-            {
-                P0 = p0;
-                P1 = p1;
-            }
-
-            public double XMin => Math.Min(P0[0], P1[0]);
-            public double XMax => Math.Max(P0[0], P1[0]);
-
-            public double YMin => Math.Min(P0[1], P1[1]);
-            public double YMax => Math.Max(P0[1], P1[1]);
-            public double ZMin => Math.Min(P0[2], P1[2]);
-            public double ZMax => Math.Max(P0[2], P1[2]);
-
-            public double[] XRange => new[] {XMin, XMax};
-            public double[] YRange => new[] {YMin, YMax};
-            public double[] ZRange => new[] {ZMin, ZMax};
-        }
-
         public static IBody2 Add(this IEnumerable<IBody2> bodies)
         {
             return bodies.Aggregate((a, acc) => a.Add(acc).Bodies[0]);
@@ -144,6 +113,48 @@ namespace SolidworksAddinFramework
             return new TwoPointRange(
                 new[] {box[0], box[1], box[2]}, 
                 new[] {box[3], box[4], box[5]});
+        }
+
+        public static bool GetDistance(this IBody2 body0, IBody2 body1, out double[] p0, out double []p1)
+        {
+            var faces0 = body0.GetFaces().CastArray<IFace2>();
+            var faces1 = body1.GetFaces().CastArray<IFace2>();
+            var distances = GetDistances(faces0, faces1);
+
+            p0 = null;
+            p1 = null;
+
+
+            var shortest = distances.MinBy(t => MathPointExtensions.Distance(t.Item1, t.Item2));
+            if (shortest.Count == 0)
+                return false;
+
+            p0 = shortest[0].Item1;
+            p1 = shortest[0].Item2;
+
+            return true;
+        }
+
+
+        public static IEnumerable<Tuple<double[],double[]>>
+            GetDistances(IEnumerable<IFace2> entities0, IEnumerable<IFace2> entities1)
+        {
+            var entities1List = entities1 as IList<IFace2> ?? entities1.ToList();
+
+            foreach (var entity0 in entities0)
+            {
+                foreach (var entity1 in entities1List)
+                {
+                    double[] posacast;
+                    double[] posbcast;
+                    if(entity0.GetDistance(entity1, out posacast, out posbcast))
+                        yield return Tuple.Create( posacast, posbcast);
+                    else
+                    {
+                        throw new Exception("Unable to get distance between faces");
+                    }
+                }
+            }
         }
     }
 

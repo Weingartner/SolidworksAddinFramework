@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -38,6 +39,13 @@ namespace SolidworksAddinFramework
                 output[i] = list.Select(a => a[i]).Sum()/length;
             }
             return output;
+        }
+
+        public static double Distance(double[] a, double[] b)
+        {
+            var av = new DenseVector(a);
+            var bv = new DenseVector(b);
+            return (av - bv).L2Norm();
         }
     }
 
