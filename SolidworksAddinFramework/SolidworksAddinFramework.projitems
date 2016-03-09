@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ManipulatorHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MathPointExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MathUtilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MathVectorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelDocExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModellerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelViewExtensions.cs" />

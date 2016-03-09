@@ -55,5 +55,16 @@ namespace SolidworksAddinFramework
             return new[] {start, end};
 
         }
+
+        public static double[] StartPoint(this ICurve curve)
+        {
+            var d = curve.Domain()[0];
+            return curve.PointAt(d);
+        }
+        public static double[] EndPoint(this ICurve curve)
+        {
+            var d = curve.Domain()[1];
+            return curve.PointAt(d);
+        }
     }
 }

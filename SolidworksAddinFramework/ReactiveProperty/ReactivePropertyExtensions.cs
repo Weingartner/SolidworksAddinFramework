@@ -14,9 +14,9 @@ namespace SolidworksAddinFramework.ReactiveProperty
         /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
         /// <returns></returns>
-        public static IObservable<T> WhenAnyValue<T>(this ReactiveProperty<T> @this)
+        public static IObservable<T> WhenAnyValue<T>(this IReadOnlyReactiveProperty<T> @this)
         {
-            return @this.StartWith(@this.Value);
+            return @this.DistinctUntilChanged().StartWith(@this.Value);
         } 
     }
 }
