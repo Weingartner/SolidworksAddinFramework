@@ -160,6 +160,25 @@ namespace SolidworksAddinFramework
 
     public static class DisplayTransaction
     {
+        public static IDisposable DisplayUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc,
+            System.Drawing.Color? c = null,
+            swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        {
+                var view = (IModelView)doc.ActiveView;
+                using (view.DisableGraphicsUpdate())
+                {
+                    var d = bodies.Select(toolBody => toolBody.DisplayUndoable(doc, c)).ToCompositeDisposable();
+                    return Disposable.Create(() =>
+                    {
+                        using (view.DisableGraphicsUpdate())
+                        {
+                            d.Dispose();
+                        }
+                    });
+                }
+
+        }
+
         public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, System.Drawing.Color? c = null,
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
@@ -179,7 +198,10 @@ namespace SolidworksAddinFramework
             body.DisplayTs(doc, c, opt);
             body.MaterialPropertyValues2 = mat;
 
-            return Disposable.Create(() => body.Hide(doc));
+            return Disposable.Create(() =>
+            {
+                body.Hide(doc);
+            });
         }
 
         public static IDisposable DisplayBodiesUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc, Color? c = null,

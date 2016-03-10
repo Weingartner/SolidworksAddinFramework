@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Text;
 using SolidWorks.Interop.sldworks;
 
@@ -23,6 +24,19 @@ namespace SolidworksAddinFramework
             var pWorldDelta = (MathPoint) pScreenUp.MultiplyTransform((MathTransform) world2screen.Inverse());
             var viewVector = (MathVector) p.Subtract(pWorldDelta);
             return viewVector;
+        }
+
+        public static IDisposable DisableGraphicsUpdate(this IModelView modelView)
+        {
+            if (modelView.EnableGraphicsUpdate)
+            {
+                modelView.EnableGraphicsUpdate = false;
+                return Disposable.Create(() => modelView.EnableGraphicsUpdate = true);
+            }
+            else
+            {
+                return Disposable.Empty;
+            }
         }
     }
 }

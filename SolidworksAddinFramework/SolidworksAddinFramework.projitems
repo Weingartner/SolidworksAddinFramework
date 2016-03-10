@@ -12,10 +12,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)BodyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComWangling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DisposableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DoubleExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\AssemblyEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DocumentEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DocView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\DrawingEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\OpenGL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventHandlers\PartEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FaceExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FeatureManagerExtensions.cs" />

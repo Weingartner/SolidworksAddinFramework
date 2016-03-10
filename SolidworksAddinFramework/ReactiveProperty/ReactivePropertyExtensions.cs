@@ -18,5 +18,20 @@ namespace SolidworksAddinFramework.ReactiveProperty
         {
             return @this.DistinctUntilChanged().StartWith(@this.Value);
         } 
+
+        /// <summary>
+        /// Chained WhenAnyValue for nested reactive properties.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="fn"></param>
+        /// <returns></returns>
+        public static IObservable<U> WhenAnyValue<T,U>(this IReadOnlyReactiveProperty<T> @this, Func<T,IReadOnlyReactiveProperty<U>> fn )
+        {
+            return @this.DistinctUntilChanged().StartWith(@this.Value)
+                .Select(v=>fn(v).WhenAnyValue())
+                .Switch();
+        } 
     }
 }

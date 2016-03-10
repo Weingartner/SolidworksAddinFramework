@@ -1,4 +1,7 @@
+using System;
 using SolidWorks.Interop.sldworks;
+using static OpenGl;
+
 
 namespace SolidworksAddinFramework
 {
@@ -21,7 +24,24 @@ namespace SolidworksAddinFramework
         {
             _MView.DestroyNotify2 += OnDestroy;
             _MView.RepaintNotify += OnRepaint;
+            _MView.BufferSwapNotify += OnBufferSwapNotify;
             return true;
+        }
+
+        private int OnBufferSwapNotify()
+        {
+            /*
+            const int GL_LINES = 1;
+
+            glLineWidth(3);
+
+            glBegin(GL_LINES);
+            glVertex3f(0.0F, 0.0F, 0.0F);
+            glVertex3f(0.5F, 0.5F, 0.5F);
+            glEnd();
+            */
+
+            return 0;
         }
 
         public bool DetachEventHandlers()
