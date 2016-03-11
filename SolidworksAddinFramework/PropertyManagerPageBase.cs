@@ -26,7 +26,7 @@ namespace SolidworksAddinFramework
         }
 
         public TMacroFeature MacroFeature { get; private set; }
-        protected void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
             base.OnClose(reason);
             //This function must contain code, even if it does nothing, to prevent the
@@ -117,7 +117,7 @@ namespace SolidworksAddinFramework
             OnClose((swPropertyManagerPageCloseReasons_e)reason);
         }
 
-        protected void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        protected virtual void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
             //This function must contain code, even if it does nothing, to prevent the
             //.NET runtime environment from doing garbage collection at the wrong time.
