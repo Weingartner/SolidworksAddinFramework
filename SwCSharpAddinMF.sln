@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinMF", "SwCSharp
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SolidworksAddinFramework", "SolidworksAddinFramework\SolidworksAddinFramework.shproj", "{55562487-76B1-4868-8726-E14F674FBD06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinSpecHelper", "SwCSharpAddinSpecHelper\SwCSharpAddinSpecHelper.csproj", "{D9C35464-37FE-48D9-9518-F43C57259C31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinMF.Spec", "SwCSharpAddinMF.Spec\SwCSharpAddinMF.Spec.csproj", "{117A5363-F5AF-462B-8769-C2733132EF2C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SolidworksAddinFramework\SolidworksAddinFramework.projitems*{a67399be-aaf7-433f-8f72-9b0424c5be67}*SharedItemsImports = 4
@@ -21,6 +25,14 @@ Global
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9C35464-37FE-48D9-9518-F43C57259C31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9C35464-37FE-48D9-9518-F43C57259C31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9C35464-37FE-48D9-9518-F43C57259C31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9C35464-37FE-48D9-9518-F43C57259C31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{117A5363-F5AF-462B-8769-C2733132EF2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{117A5363-F5AF-462B-8769-C2733132EF2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{117A5363-F5AF-462B-8769-C2733132EF2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{117A5363-F5AF-462B-8769-C2733132EF2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
