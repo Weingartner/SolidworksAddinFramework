@@ -16,5 +16,18 @@ namespace SolidworksAddinFramework
             var objects = (object[]) part.GetBodies2((int) type, visibleOnly);
             return objects.Cast<IBody2>().ToArray();
         }
+
+        /// <summary>
+        /// Get all reference planes from the model
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static IEnumerable<IRefPlane> GetPlanes(this IModelDoc2 doc)
+        {
+            return doc.FeatureManager
+                .GetFeatures(false)
+                .CastArray<IFeature>()
+                .Select(f => f.GetSpecificFeature2() as IRefPlane);
+        } 
     }
 }

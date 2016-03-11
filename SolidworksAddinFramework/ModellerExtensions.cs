@@ -22,6 +22,9 @@ namespace SolidworksAddinFramework
             Debug.Assert(p0.Length==p1.Length);
             var p0v = new DenseVector(p0);
             var p1v = new DenseVector(p1);
+
+            Debug.Assert(!p0v.Equals(p1v));
+
             var dir = (p1v - p0v).Normalize(2);
             var line = (ICurve)modeler.CreateLine(p0, new[] {dir[0], dir[1], dir[2] });
             Debug.Assert(line != null, "line != null");
@@ -83,5 +86,57 @@ namespace SolidworksAddinFramework
             var uvHigh = surf.GetClosestPointOnTs((double[])p1.ArrayData);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
+
+        public static Curve InterpolatePointsToCurve
+            (this IModeler modeler, double chordTolerance, List<double[]> points)
+        {
+            points = FilterOutShortLines(points, 1e-6).ToList();
+
+            var lines = points
+                .Buffer(2, 1)
+                .Where(b => b.Count == 2)
+                .Select(ps => modeler.CreateTrimmedLine(ps[0], ps[1]))
+                .Cast<ICurve>()
+                .ToArray();
+
+            var curve = modeler.MergeCurves(lines);
+            curve = curve.SimplifyBCurve(chordTolerance);
+            return curve;
+        }
+
+        public static IEnumerable<double[]> FilterOutShortLines(List<double[]> points, double tol)
+        {
+            double[] previous = null;
+            Func<double[],double[],double> distance = (p0,p1)=>(new DenseVector(p0)-new DenseVector(p1)).L2Norm();
+            var result = new List<double[]>();
+            foreach (var pt in points)
+            {
+                if (previous == null || distance(pt, previous) > tol)
+                {
+                    result.Add(pt);
+                    previous = pt;
+                }
+                
+            }
+            result.Add(points.Last());
+
+            result.Reverse();
+            points = result;
+            result = new List<double[]>();
+            previous = null;
+            foreach (var pt in points)
+            {
+                if (previous == null || distance(pt, previous) > tol)
+                {
+                    result.Add(pt);
+                    previous = pt;
+                }
+                
+            }
+
+            result.Reverse();
+
+            return result;
+        } 
     }
 }

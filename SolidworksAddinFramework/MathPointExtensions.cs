@@ -54,6 +54,10 @@ namespace SolidworksAddinFramework
             }
             return output;
         }
+        public static MathPoint MultiplyTransformTs(this IMathPoint v, IMathTransform t)
+        {
+            return (MathPoint) v.MultiplyTransform(t);
+        }
 
         public static double Distance(double[] a, double[] b)
         {

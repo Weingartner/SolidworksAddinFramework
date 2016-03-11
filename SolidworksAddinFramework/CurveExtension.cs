@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using SolidWorks.Interop.sldworks;
 
@@ -13,9 +14,9 @@ namespace SolidworksAddinFramework
         /// <param name="curve"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static double[] PointAt(this ICurve curve, double t)
+        public static double[] PointAt(this ICurve curve, double t, int derivatives = 0)
         {
-            return (double[]) curve.Evaluate2(t, 0);
+            return (double[]) curve.Evaluate2(t, derivatives);
         }
 
         public static double[] ClosestPointOnTs(this ICurve curve , double x, double y, double z)
@@ -56,15 +57,41 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static double[] StartPoint(this ICurve curve)
+        public static double[] StartPoint(this ICurve curve, int derivatives = 0)
         {
             var d = curve.Domain()[0];
-            return curve.PointAt(d);
+            return curve.PointAt(d, derivatives);
         }
-        public static double[] EndPoint(this ICurve curve)
+        public static double[] EndPoint(this ICurve curve, int derivatives = 0)
         {
             var d = curve.Domain()[1];
-            return curve.PointAt(d);
+            return curve.PointAt(d, derivatives);
+        }
+
+        public static double[][] GetTessPoints(this ICurve curve, double chordTol, double lengthTol)
+        {
+            bool isPeriodic;
+            double end;
+            bool isClosed;
+            double start;
+            curve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
+            var startPt = (double[]) curve.Evaluate2(start, 0);
+            var midPt = (double[]) curve.Evaluate2((start + end)/2, 0);
+            var endPt = (double[]) curve.Evaluate2(end, 0);
+            var set0 = ((double[]) curve.GetTessPts(chordTol, lengthTol, startPt, midPt))
+                .Buffer(3, 3)
+                .Select(b => b.ToArray())
+                .ToArray();
+            ;
+
+            var set1 = ((double[]) curve.GetTessPts(chordTol, lengthTol, midPt, endPt))
+                .Buffer(3, 3)
+                .Select(b => b.ToArray())
+                .ToArray();
+            ;
+
+
+            return set0.Concat(set1).ToArray();
         }
     }
 }

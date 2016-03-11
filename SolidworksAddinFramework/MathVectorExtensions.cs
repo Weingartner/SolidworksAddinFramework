@@ -33,6 +33,11 @@ namespace SolidworksAddinFramework
             return (MathVector) a.Cross(b);
         }
 
+        public static MathVector MultiplyTransformTs(this IMathVector v, IMathTransform t)
+        {
+            return (MathVector) v.MultiplyTransform(t);
+        }
+
 
     }
 }
