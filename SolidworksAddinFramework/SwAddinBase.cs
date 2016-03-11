@@ -14,6 +14,7 @@ using SolidWorksTools.File;
 
 namespace SolidworksAddinFramework
 {
+    [ComVisible(true)]
     public abstract class SwAddinBase : ISwAddin
     {
         public int AddinId { get; private set; }

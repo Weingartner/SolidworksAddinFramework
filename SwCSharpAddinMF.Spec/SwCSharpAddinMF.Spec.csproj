@@ -140,6 +140,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
+      <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
+      <Name>SolidworksAddinFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SwCSharpAddinSpecHelper\SwCSharpAddinSpecHelper.csproj">
       <Project>{d9c35464-37fe-48d9-9518-f43c57259c31}</Project>
       <Name>SwCSharpAddinSpecHelper</Name>

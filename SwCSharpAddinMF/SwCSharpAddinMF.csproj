@@ -211,8 +211,12 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="..\SolidworksAddinFramework\SolidworksAddinFramework.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
+      <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
+      <Name>SolidworksAddinFramework</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
