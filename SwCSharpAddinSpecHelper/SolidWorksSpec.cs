@@ -24,7 +24,7 @@ namespace SwCSharpAddinSpecHelper
 
     public class SwPoolFixture : IDisposable
     {
-        private readonly Pool<SldWorks> _Instances = new Pool<SldWorks>(() => new SldWorks { Visible = true });
+        private readonly Pool<SldWorks> _Instances = new Pool<SldWorks>(() => new SldWorks { Visible = false });
 
         public SldWorks Acquire()
         {
