@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using SolidWorks.Interop.swpublished;
 
 namespace SolidworksAddinFramework
@@ -15,6 +16,7 @@ namespace SolidworksAddinFramework
     /// are probably some nuget packages around that can do this automagically but I just used resharper
     /// to generate the below code.
     /// </summary>
+    [ComVisible(true)]
     public class PropertyManagerPage2Handler9Wrapper : IPropertyManagerPage2Handler9
     {
         private readonly IPropertyManagerPage2Handler9 _Implementation;
