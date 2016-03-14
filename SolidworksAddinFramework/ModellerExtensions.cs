@@ -90,7 +90,7 @@ namespace SolidworksAddinFramework
         }
 
         public static Curve InterpolatePointsToCurve
-            (this IModeler modeler, double chordTolerance, List<double[]> points)
+            (this IModeler modeler, double chordTolerance, List<double[]> points, bool simplify = true)
         {
             points = FilterOutShortLines(points, 1e-6).ToList();
 
@@ -102,7 +102,8 @@ namespace SolidworksAddinFramework
                 .ToArray();
 
             var curve = modeler.MergeCurves(lines);
-            curve = curve.SimplifyBCurve(chordTolerance);
+            if(simplify)
+                curve = curve.SimplifyBCurve(chordTolerance);
             return curve;
         }
 
