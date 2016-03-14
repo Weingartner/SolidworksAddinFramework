@@ -86,14 +86,14 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, System.Drawing.Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
             c = c ?? Color.Yellow;
-            var colorref = System.Drawing.ColorTranslator.ToWin32(c.Value);
+            var colorref = ColorTranslator.ToWin32(c.Value);
             body.Display3(doc, colorref, (int) opt);
         }
 
-        public static void DisplayAll(this IEnumerable<IBody2> bodies, IModelDoc2 doc, System.Drawing.Color c, swTempBodySelectOptions_e opt)
+        public static void DisplayAll(this IEnumerable<IBody2> bodies, IModelDoc2 doc, Color c, swTempBodySelectOptions_e opt)
         {
             foreach (var body in bodies)
             {
@@ -136,8 +136,7 @@ namespace SolidworksAddinFramework
         }
 
 
-        public static IEnumerable<Tuple<double[],double[]>>
-            GetDistances(IEnumerable<IFace2> entities0, IEnumerable<IFace2> entities1)
+        public static IEnumerable<Tuple<double[], double[]>> GetDistances(IEnumerable<IFace2> entities0, IEnumerable<IFace2> entities1)
         {
             var entities1List = entities1 as IList<IFace2> ?? entities1.ToList();
 
@@ -155,6 +154,11 @@ namespace SolidworksAddinFramework
                     }
                 }
             }
+        }
+
+        public static IEnumerable<IFace2> GetFacesTs(this IBody2 body)
+        {
+            return (IEnumerable<IFace2>) body.GetFaces();
         }
     }
 

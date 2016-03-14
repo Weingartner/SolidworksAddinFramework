@@ -29,5 +29,17 @@ namespace SolidworksAddinFramework
             posbcast = posb.CastArray<double>();
             return result == 0;
         }
+
+        private static float[][] GetTessTrianglesTs(this IFace2 face, bool noConversion)
+        {
+            var data = (float[])face.GetTessTriangles(noConversion);
+            return data.Select((value, index) => new { value, index })
+                .GroupBy(x => x.index / 3, x => x.value) // a group is a point of the triangle
+                .Select(x => x.ToArray())
+                .ToArray();
+        }
+
+        public static float[][] GetTessTrianglesNoConversion(this IFace2 face) => face.GetTessTrianglesTs(true);
+        public static float[][] GetTessTrianglesAllowConversion(this IFace2 face) => face.GetTessTrianglesTs(false);
     }
 }
