@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -61,6 +62,7 @@ namespace SolidworksAddinFramework
 
     }
 
+    [ComVisible(true)]
     public class TriadManipulatorTs : ManipulatorHandler, ITriadManipulator, IManipulator
     {
         ITriadManipulator _Impl;
