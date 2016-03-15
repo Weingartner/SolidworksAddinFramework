@@ -415,10 +415,10 @@ namespace SolidworksAddinFramework
         protected IDisposable CreateCheckBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<bool> get, Action<bool> set)
         {
             var id = NextId();
-            var text = PropertyManagerGroupExtensions.CreateCheckBox(@group, id, caption, tip);
-            text.Checked = get();
+            var checkBox = PropertyManagerGroupExtensions.CreateCheckBox(@group, id, caption, tip);
+            checkBox.Checked = get();
             var d = CheckBoxChangedObservable(id).Subscribe(set);
-            return WrapControlAndDisposable(text, d);
+            return WrapControlAndDisposable(checkBox, d);
         }
 
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, Func<double> get, Action<double> set, Action<IPropertyManagerPageNumberbox> config = null)
