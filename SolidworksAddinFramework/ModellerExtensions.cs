@@ -114,13 +114,6 @@ namespace SolidworksAddinFramework
             return curve;
         }
 
-        public static IBody2 CreateBodyFromCylTs(this IModeler modeler, double[] xyz, double[] axis, double radius, double length)
-        {
-            var array = xyz.Concat(axis).Concat(new[] { radius, length }).ToArray();
-            return (IBody2)modeler.CreateBodyFromCyl(array);
-        }
-
-
         public static IEnumerable<double[]> FilterOutShortLines(List<double[]> points, double tol)
         {
             double[] previous = null;
