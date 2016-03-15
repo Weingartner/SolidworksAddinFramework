@@ -432,13 +432,7 @@ namespace SolidworksAddinFramework
         }
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group, string tip, string caption, ReactiveProperty<double> prop, Action<IPropertyManagerPageNumberbox> config = null)
         {
-            Action<double> set = v => prop.Value = v;
-            var id = NextId();
-            var box = @group.CreateNumberBox(id, caption, tip);
-            prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v => box.Value = v);
-            config?.Invoke(box);
-            var d = NumberBoxChangedObservable(id).Subscribe(set);
-            return WrapControlAndDisposable(box, d);
+            return CreateNumberBox(@group, tip, caption, Observable.Return(prop), config);
         }
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
             string tip,
@@ -446,10 +440,22 @@ namespace SolidworksAddinFramework
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
             Action<IPropertyManagerPageNumberbox> config = null)
         {
+            return CreateNumberBox(@group, tip, caption, propObservable, Observable.Never<Unit>(), (_, __) => { }, config);
+        }
+
+        protected IDisposable CreateNumberBox<T>(IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
+            IObservable<T> changeObs,
+            Action<IPropertyManagerPageNumberbox, T> onChange,
+            Action<IPropertyManagerPageNumberbox> config = null,
+            bool enable = true)
+        {
             var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
 
-            return propObservable
+            var d2 = propObservable
                 .SubscribeDisposable(prop =>
                 {
                     Action<double> set = v => prop.Value = v;
@@ -458,6 +464,11 @@ namespace SolidworksAddinFramework
                     var d1 = NumberBoxChangedObservable(id).Subscribe(set);
                     return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1));
                 });
+            var d3 = changeObs.Subscribe(x => onChange(box, x));
+            // When calling e.g. `IPropertyManagerPageNUmberbox::SetRange2` disabling the control doesn't work before the PMP is activated.
+            // That's why we wait for the PMP activation here to deactivate the control.
+            var d4 = _AfterActivation.Subscribe(_ => ((IPropertyManagerPageControl) box).Enabled = enable);
+            return new CompositeDisposable(d2, d3, d4);
         }
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
