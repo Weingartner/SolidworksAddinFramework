@@ -108,8 +108,12 @@ namespace SolidworksAddinFramework
         /// </summary>
         public IPropertyManagerPage2 Page { get; set; }
 
+
+        private readonly Subject<Unit> _AfterActivation = new Subject<Unit>();
+        public IObservable<Unit> AfterActivationObs => _AfterActivation.AsObservable();
         public virtual void AfterActivation()
         {
+            _AfterActivation.OnNext(Unit.Default);
         }
 
         public void OnClose(int reason)
