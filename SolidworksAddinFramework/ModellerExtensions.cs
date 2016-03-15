@@ -42,6 +42,13 @@ namespace SolidworksAddinFramework
             return line;
         }
 
+        public static IBody2 CreateBodyFromCylTs(this IModeler modeler, double[] xyz, double[]axis, double radius, double length)
+        {
+            var array = xyz.Concat(axis).Concat(new[] {radius, length}).ToArray();
+            return (IBody2)modeler.CreateBodyFromCyl(array);
+        }
+
+
         public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
         {
             return CreateTrimmedLine(modeler, (double[])p0.ArrayData, (double[])p1.ArrayData);

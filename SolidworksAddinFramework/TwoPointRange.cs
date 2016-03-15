@@ -32,5 +32,9 @@ namespace SolidworksAddinFramework
         public double[] XRange => new[] {XMin, XMax};
         public double[] YRange => new[] {YMin, YMax};
         public double[] ZRange => new[] {ZMin, ZMax};
+
+        public double Dx => XMax - XMin;
+        public double Dy => YMax - YMin;
+        public double Dz => ZMax - ZMin;
     }
 }
