@@ -99,7 +99,9 @@ namespace SolidworksAddinFramework
         public static Curve InterpolatePointsToCurve
             (this IModeler modeler, double chordTolerance, List<double[]> points, bool simplify = true)
         {
-            points = FilterOutShortLines(points, 1e-6).ToList();
+            points = FilterOutShortLines(points, 1e-5).ToList();
+
+            points.Add(points.First());
 
             var lines = points
                 .Buffer(2, 1)
