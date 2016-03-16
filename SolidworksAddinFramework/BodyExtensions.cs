@@ -155,11 +155,6 @@ namespace SolidworksAddinFramework
                 }
             }
         }
-
-        public static IEnumerable<IFace2> GetFacesTs(this IBody2 body)
-        {
-            return (IEnumerable<IFace2>) body.GetFaces();
-        }
     }
 
     public static class DisplayTransaction

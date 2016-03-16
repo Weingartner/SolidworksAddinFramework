@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using static OpenGl;
 
 
@@ -30,16 +32,21 @@ namespace SolidworksAddinFramework
 
         private int OnBufferSwapNotify()
         {
-            /*
-            const int GL_LINES = 1;
+            var faces = ((IModelDoc2)_MView.GetModelDoc())
+                .GetBodiesTs()
+                .SelectMany(b => b.GetFaces().CastArray<IFace2>())
+                .ToArray();
+            OpenGlRenderer.MeshRender.Render(faces, _ISwApp);
 
-            glLineWidth(3);
+            //const int GL_LINES = 1;
 
-            glBegin(GL_LINES);
-            glVertex3f(0.0F, 0.0F, 0.0F);
-            glVertex3f(0.5F, 0.5F, 0.5F);
-            glEnd();
-            */
+            //glLineWidth(3);
+
+            //glBegin(GL_LINES);
+            //glVertex3f(0.0F, 0.0F, 0.0F);
+            //glVertex3f(0.5F, 0.5F, 0.5F);
+            //glEnd();
+
 
             return 0;
         }

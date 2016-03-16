@@ -14,7 +14,7 @@ namespace SolidworksAddinFramework
         {
             var part = (IPartDoc) doc;
             var objects = (object[]) part.GetBodies2((int) type, visibleOnly);
-            return objects.Cast<IBody2>().ToArray();
+            return objects?.Cast<IBody2>().ToArray() ?? new IBody2[0];
         }
 
         /// <summary>
