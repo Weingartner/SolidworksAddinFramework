@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using static OpenGl;
@@ -36,7 +37,7 @@ namespace SolidworksAddinFramework
                 .GetBodiesTs()
                 .SelectMany(b => b.GetFaces().CastArray<IFace2>())
                 .ToArray();
-            OpenGlRenderer.MeshRender.Render(faces, _ISwApp);
+            MeshRender.Render(faces, _ISwApp);
 
             //const int GL_LINES = 1;
 
