@@ -5,7 +5,7 @@ using SolidWorks.Interop.sldworks;
 using SwCSharpAddinSpecHelper;
 using Xunit;
 
-namespace SolidworksAddinFramework.Spec
+namespace SolidworksAddinFramework.Spec.opengl
 {
     public class MeshRenderSpec : SolidWorksSpec
     {
