@@ -16,7 +16,11 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static double[] PointAt(this ICurve curve, double t, int derivatives = 0)
         {
-            return (double[]) curve.Evaluate2(t, derivatives);
+            var ret = (double[]) curve.Evaluate2(t, derivatives);
+            //Evaluate2 returns always an additional value x,y,z, value which doesn't make sense
+            //Therefore we Skip the last value
+            ret = ret.SkipLast(1).ToArray();
+            return ret;
         }
 
         public static double[] ClosestPointOnTs(this ICurve curve , double x, double y, double z)
