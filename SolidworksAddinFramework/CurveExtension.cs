@@ -97,5 +97,10 @@ namespace SolidworksAddinFramework
 
             return set0.Concat(set1).ToArray();
         }
+
+        public static ICurve GetCurveTs(this IEdge edge)
+        {
+            return (ICurve)edge.GetCurve();
+        }
     }
 }
