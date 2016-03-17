@@ -105,14 +105,15 @@ namespace SolidworksAddinFramework.OpenGl
                 //context.LoadAll();
             }
 
-            GL.ShadeModel(ShadingModel.Smooth);
+            //GL.ShadeModel(ShadingModel.Smooth);
+            GL.ShadeModel(ShadingModel.Flat);
             using (SetColor(Color.Blue))
             using (SetLineWidth(2.0f))
             {
                 faces
                     .ForEach(face =>
                     {
-                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(false).CastArray<float>());
+                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(true).CastArray<float>());
                         var norms = FaceTriStrips.Unpack(face.GetTessTriStripNorms().CastArray<float>());
                         Debug.Assert(norms.Length == strips.Length);
                         Debug.Assert(norms.Zip(strips, (a, b) => a.Length == b.Length).All(x => x));
