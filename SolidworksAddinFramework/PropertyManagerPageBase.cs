@@ -315,7 +315,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public IObservable<T>SingleSelectionChangedObservable<T>(Func<swSelectType_e, int, bool> predicate)
         {
-            return SelectionChangedObservable(predicate).Select(list => list.Cast<T>().FirstOrDefault());
+            return SelectionChangedObservable(predicate).Select(list => list.Cast<T>().FirstOrDefault()).DistinctUntilChanged();
         }
         #endregion
 
