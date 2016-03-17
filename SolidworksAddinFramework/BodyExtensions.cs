@@ -178,29 +178,18 @@ namespace SolidworksAddinFramework
 
         }
 
+        public static BodyMaterials GetMaterial(this IBody2 body) => new BodyMaterials(body);
+        public static Color GetColor(this IBody2 body) => body.GetMaterial().Color;
+        public static void SetColor(this IBody2 body, Color color)
+        {
+            body.GetMaterial().Color = color;
+
+        }
+
         public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, System.Drawing.Color? c = null,
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
-            c = c ?? Color.Yellow;
-            double [] mat = new double[9];
-            mat[0] = ((double) c.Value.R)/255;
-            mat[1] = ((double) c.Value.G)/255;
-            mat[2] = ((double) c.Value.B)/255;
-            mat[3] = 1;
-            mat[4] = 1;
-            mat[5] = 1;
-            mat[6] = 1;
-            mat[7] = ((double) c.Value.A)/255;
-            mat[8] = 0;
-
-
-            body.DisplayTs(doc, c, opt);
-            body.MaterialPropertyValues2 = mat;
-
-            return Disposable.Create(() =>
-            {
-                body.Hide(doc);
-            });
+            return DocView.DisplayUndoable(body, c, doc);
         }
 
         public static IDisposable DisplayBodiesUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc, Color? c = null,

@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -8,6 +12,7 @@ using static OpenGl;
 
 namespace SolidworksAddinFramework
 {
+
     public class DocView
     {
         private ISldWorks _ISwApp;
@@ -31,13 +36,54 @@ namespace SolidworksAddinFramework
             return true;
         }
 
+        public static ConcurrentDictionary<IBody2, Tuple<IBody2, Color>> BodiesToRender = new ConcurrentDictionary<IBody2, Tuple<IBody2,Color>>();
+
+        public static IDisposable DisplayUndoable(IBody2 body, Color? color, IModelDoc2 doc)
+        {
+            var check = body.Check3;
+            if (!body.HasMaterialPropertyValues())
+            {
+                var r = body.SetMaterialProperty("Default", "solidworks materials.sldmat", "Steel");
+
+            }
+            Debug.Assert(body.IsTemporaryBody());
+            //Debug.Assert(body.HasMaterialPropertyValues());
+
+            // this is the only way to make sure that IFace2::GetTessTriangleCount always is greater than 0
+            // BUT it slows down the rendering of course. I can't find another way to force the body to
+            // tesselate the object.
+            //body.Display3(doc, 0, 0);
+            //body.Hide(doc);
+            var faces = body.GetFaces().CastArray<IFace2>();
+            foreach (var face in faces)
+            {
+                var norms = face.GetTessTriStripNorms();
+                var tri = face.GetTessTriangleCount();
+            }
+
+            BodiesToRender[body]=Tuple.Create(body,(color ?? Color.Yellow));
+            return Disposable.Create(() =>
+            {
+                Tuple<IBody2, Color> dummy;
+                BodiesToRender.TryRemove(body, out dummy);
+            });
+        }
+
         private int OnBufferSwapNotify()
         {
-            var faces = ((IModelDoc2)_MView.GetModelDoc())
-                .GetBodiesTs()
-                .SelectMany(b => b.GetFaces().CastArray<IFace2>())
-                .ToArray();
-            MeshRender.Render(faces, _ISwApp);
+
+            foreach (var o in BodiesToRender.Values)
+            {
+                var b = o.Item1;
+                //var tess = b.GetTessellation(b.GetFaces()) as ITessellation;
+                //tess?.Tessellate();
+                MeshRender.Render(b.GetFaces().CastArray<IFace2>(), _ISwApp, o.Item2, 2.0f);
+            }
+
+            //foreach (var body in ModelDoc.GetBodiesTs())
+            //{
+            //    MeshRender.Render(body, _ISwApp);
+            //}
 
             //const int GL_LINES = 1;
 
@@ -51,6 +97,8 @@ namespace SolidworksAddinFramework
 
             return 0;
         }
+
+        private IModelDoc2 ModelDoc => ((IModelDoc2)_MView.GetModelDoc());
 
         public bool DetachEventHandlers()
         {

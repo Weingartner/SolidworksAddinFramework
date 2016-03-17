@@ -9,6 +9,7 @@ using System.Security;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
@@ -77,10 +78,116 @@ namespace SolidworksAddinFramework.OpenGl
 
         private static bool _Setup;
 
-        public static void Render(IFace2[] faces, ISldWorks app)
+        public static ITessellation GetTess(IBody2 body, IFace2[] faceList)
+        {
+            var tess = (ITessellation)body.GetTessellation(faceList);
+            tess.NeedFaceFacetMap = true;
+            tess.NeedVertexParams = true;
+            tess.NeedVertexNormal = true;
+            tess.ImprovedQuality = true;
+            tess.MatchType = (int)swTesselationMatchType_e.swTesselationMatchFacetTopology;
+            tess.Tessellate();
+            return tess;
+
+        }
+
+        /// <summary>
+        /// This is slow and sux due tothe overhead of making many many COM calls. Do
+        /// not use it but it is a good reference.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="app"></param>
+        public static void Render(IBody2 body, ISldWorks app)
+        {
+            DoSetup(app);
+
+            var faceList = body.GetFaces().CastArray<IFace2>();
+            var tess = GetTess(body,faceList);
+
+            // Do it
+
+            GL.ShadeModel(ShadingModel.Flat);
+            using (SetColor(Color.Blue))
+            using (SetLineWidth(2.0f))
+            using (Begin(PrimitiveType.Triangles))
+            {
+                foreach (var face in faceList)
+                {
+                    foreach (var facet in tess.GetFaceFacets(face).CastArray<int>())
+                    {
+                        var finIds = tess.GetFacetFins(facet).CastArray<int>();
+                        var vertexIds = finIds
+                            .SelectMany(finId => tess.GetFinVertices(finId).CastArray<int>())
+                            .DistinctUntilChanged()
+                            .SkipLast(1)
+                            .ToList();
+
+                        var vertexs = vertexIds
+                            .Select(vId => tess.GetVertexPoint(vId).CastArray<double>())
+                            .ToList();
+
+                        var normals = vertexIds
+                            .Select(vId => tess.GetVertexNormal(vId).CastArray<double>())
+                            .ToList();
+
+                        {
+
+                            for (int i = 0; i < 3; i++)
+                            {
+                                GL.Vertex3(vertexs[i]);
+                                GL.Normal3(normals[i]);
+                                
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+        }
+
+        public static void Render(IFace2[] faces, ISldWorks app, Color color, float lineWidth)
         {
             if (faces.Length == 0) return;
 
+            DoSetup(app);
+
+            //GL.ShadeModel(ShadingModel.Flat);
+            using (SetColor(color))
+            using (SetLineWidth(lineWidth))
+            {
+                faces
+                    .ForEach(face =>
+                    {
+                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(true).CastArray<float>());
+                        var norms = FaceTriStrips.Unpack(face.GetTessTriStripNorms().CastArray<float>());
+                        if (strips == null || norms == null)
+                            return;
+                        Debug.Assert(norms.Length == strips.Length);
+                        Debug.Assert(norms.Zip(strips, (a, b) => a.Length == b.Length).All(x => x));
+                        norms.Zip(strips, (normStrip, pointStrip) => normStrip.Zip(pointStrip, (norm, point) => new { norm, point }))
+                        .ForEach(strip =>
+                        {
+                            using (Begin(PrimitiveType.TriangleStrip))
+                            {
+                                foreach (var vertex in strip)
+                                {
+                                    Debug.Assert(vertex.point.Length == 3);
+                                    GL.Vertex3(vertex.point);
+                                    Debug.Assert(vertex.norm.Length == 3);
+                                    GL.Normal3(vertex.norm);
+                                }
+                            }
+                        });
+                    });
+
+            }
+        }
+
+        private static void DoSetup(ISldWorks app)
+        {
             if (!_Setup)
             {
                 _Setup = true;
@@ -104,35 +211,6 @@ namespace SolidworksAddinFramework.OpenGl
                 //    new ContextHandle(windowHandle),null );
                 //context.LoadAll();
             }
-
-            //GL.ShadeModel(ShadingModel.Smooth);
-            GL.ShadeModel(ShadingModel.Flat);
-            using (SetColor(Color.Blue))
-            using (SetLineWidth(2.0f))
-            {
-                faces
-                    .ForEach(face =>
-                    {
-                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(true).CastArray<float>());
-                        var norms = FaceTriStrips.Unpack(face.GetTessTriStripNorms().CastArray<float>());
-                        Debug.Assert(norms.Length == strips.Length);
-                        Debug.Assert(norms.Zip(strips, (a, b) => a.Length == b.Length).All(x => x));
-                        norms.Zip(strips, (normStrip, pointStrip) => normStrip.Zip(pointStrip, (norm, point) => new { norm, point }))
-                        .ForEach(strip =>
-                        {
-                            using (Begin(PrimitiveType.TriangleStrip))
-                            {
-                                foreach (var vertex in strip)
-                                {
-                                    Debug.Assert(vertex.point.Length == 3);
-                                    GL.Vertex3(vertex.point);
-                                    Debug.Assert(vertex.norm.Length == 3);
-                                    GL.Normal3(vertex.norm);
-                                    }
-                            }
-                        });
-                    });
-            }
         }
     }
 
@@ -141,6 +219,8 @@ namespace SolidworksAddinFramework.OpenGl
         public float[][][] Data { get; }
         public static float[][][] Unpack(float[] packedData)
         {
+            if (packedData == null || packedData.Length == 0)
+                return null;
             var numStrips = (int)ToUnit32(packedData, 0);
             var vertexPerStrip = Enumerable.Range(1, numStrips)
                 .Select(i => ToUnit32(packedData, i))
