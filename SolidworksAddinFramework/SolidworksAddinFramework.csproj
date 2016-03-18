@@ -131,6 +131,7 @@
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
     <Compile Include="EventHandlers\AssemblyEventHandler.cs" />
+    <Compile Include="EventHandlers\ColorRenderable.cs" />
     <Compile Include="EventHandlers\DocumentEventHandler.cs" />
     <Compile Include="EventHandlers\DocView.cs" />
     <Compile Include="EventHandlers\DrawingEventHandler.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
+    <Compile Include="OpenGl\IRenderable.cs" />
     <Compile Include="OpenGl\Mesh.cs" />
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\TessellatableBody.cs" />

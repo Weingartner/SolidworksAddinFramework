@@ -9,7 +9,7 @@ using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Mesh
+    public class Mesh : IRenderable
     {
         private IList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
 
@@ -29,9 +29,9 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
-        public void RenderOpenGL(ISldWorks iSwApp, Color color)
+        public void Render(Color color)
         {
-            MeshRender.Render(this, iSwApp, color);
+            MeshRender.Render(this, color);
         }
 
         public static IEnumerable<Tuple<double[], double[]>> Tesselate(IFace2[] faceList, ITessellation tess)
@@ -80,7 +80,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         }
 
-        public void ApplyTransform(MathTransform transform)
+        public void ApplyTransform(IMathTransform transform)
         {
             var transformArray = transform.ArrayData.CastArray<double>();
             var rotation = new DenseMatrix(3, 3, transformArray.Take(9).ToArray());

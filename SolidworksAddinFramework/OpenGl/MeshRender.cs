@@ -76,14 +76,8 @@ namespace SolidworksAddinFramework.OpenGl
             return Disposable.Create(GL.End);
         }
 
-        private static bool _Setup;
-
-        public static void Render(Mesh mesh, ISldWorks app, Color color)
+        public static void Render(Mesh mesh, Color color)
         {
-            DoSetup(app);
-
-
-            // Do it
 
             GL.ShadeModel(ShadingModel.Smooth);
             using (SetColor(color))
@@ -99,11 +93,10 @@ namespace SolidworksAddinFramework.OpenGl
             }
         }
 
-        public static void Render(IFace2[] faces, ISldWorks app, Color color, float lineWidth)
+        public static void Render(IFace2[] faces, Color color, float lineWidth)
         {
             if (faces.Length == 0) return;
 
-            DoSetup(app);
 
             GL.ShadeModel(ShadingModel.Flat);
             using (SetColor(color))
@@ -134,33 +127,6 @@ namespace SolidworksAddinFramework.OpenGl
                         });
                     });
 
-            }
-        }
-
-        private static void DoSetup(ISldWorks app)
-        {
-            if (!_Setup)
-            {
-                _Setup = true;
-                var modelDoc = (IModelDoc2) app.ActiveDoc;
-                ////modelDoc.ViewOglShading();
-                var view = (IModelView) modelDoc.ActiveView;
-                ////view.InitializeShading();
-                //var windowHandle = (IntPtr) view.GetViewHWndx64();
-                view.UpdateAllGraphicsLayers = true;
-                view.InitializeShading();
-                //Toolkit.Init();
-                //var windowInfo = Utilities.CreateWindowsWindowInfo(windowHandle);
-                ////var context = new GraphicsContext(GraphicsMode.Default, windowInfo);
-                //var contextHandle = new ContextHandle(windowHandle);
-                //var context = new GraphicsContext(contextHandle, Wgl.GetProcAddress, () => contextHandle);
-                //context.MakeCurrent(windowInfo);
-                //context.LoadAll();
-                new GLControl().CreateGraphics();
-                //Toolkit.Init();
-                //IGraphicsContext context = new GraphicsContext(
-                //    new ContextHandle(windowHandle),null );
-                //context.LoadAll();
             }
         }
     }

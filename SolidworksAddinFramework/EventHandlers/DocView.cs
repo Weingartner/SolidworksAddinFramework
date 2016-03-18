@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Disposables;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -34,28 +35,16 @@ namespace SolidworksAddinFramework
             return true;
         }
 
-        public class BodyRender
+        public static ConcurrentDictionary<IRenderable, ColorRenderable> BodiesToRender = 
+            new ConcurrentDictionary<IRenderable, ColorRenderable>();
+
+        public static IDisposable DisplayUndoable(IRenderable body, Color? color, IModelDoc2 doc)
         {
-            public BodyRender(TessellatableBody body, Color color)
-            {
-                Body = body;
-                Color = color;
-            }
-
-            public TessellatableBody Body { get; }
-            public Color Color { get; }
-        }
-
-        public static ConcurrentDictionary<TessellatableBody, BodyRender> BodiesToRender = 
-            new ConcurrentDictionary<TessellatableBody, BodyRender>();
-
-        public static IDisposable DisplayUndoable(TessellatableBody body, Color? color, IModelDoc2 doc)
-        {
-            BodiesToRender[body]= new BodyRender(body, color ?? Color.Yellow);
+            BodiesToRender[body]= new ColorRenderable(body, color ?? Color.Yellow);
             ((IModelView)doc.ActiveView).GraphicsRedraw(null);
             return Disposable.Create(() =>
             {
-                BodyRender dummy;
+                ColorRenderable dummy;
                 BodiesToRender.TryRemove(body, out dummy);
             });
         }
@@ -63,9 +52,10 @@ namespace SolidworksAddinFramework
         private int OnBufferSwapNotify()
         {
 
+            DoSetup(_ISwApp);
             foreach (var o in BodiesToRender.Values)
             {
-                o.Body.Tesselation.RenderOpenGL(_ISwApp, o.Color);
+                o.Render();
             }
 
             return 0;
@@ -91,6 +81,34 @@ namespace SolidworksAddinFramework
         {
             return 0;
         }
-    }
 
+        public static bool _Setup;
+
+        public static void DoSetup(ISldWorks app)
+        {
+            if (!_Setup)
+            {
+                _Setup = true;
+                var modelDoc = (IModelDoc2) app.ActiveDoc;
+                ////modelDoc.ViewOglShading();
+                var view = (IModelView) modelDoc.ActiveView;
+                ////view.InitializeShading();
+                //var windowHandle = (IntPtr) view.GetViewHWndx64();
+                view.UpdateAllGraphicsLayers = true;
+                view.InitializeShading();
+                //Toolkit.Init();
+                //var windowInfo = Utilities.CreateWindowsWindowInfo(windowHandle);
+                ////var context = new GraphicsContext(GraphicsMode.Default, windowInfo);
+                //var contextHandle = new ContextHandle(windowHandle);
+                //var context = new GraphicsContext(contextHandle, Wgl.GetProcAddress, () => contextHandle);
+                //context.MakeCurrent(windowInfo);
+                //context.LoadAll();
+                new GLControl().CreateGraphics();
+                //Toolkit.Init();
+                //IGraphicsContext context = new GraphicsContext(
+                //    new ContextHandle(windowHandle),null );
+                //context.LoadAll();
+            }
+        }
+    }
 }

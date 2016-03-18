@@ -104,7 +104,7 @@ namespace SolidworksAddinFramework
 
 
         /// <summary>
-        /// Return the bounding box of the solid body.
+        /// Return the bounding box of the solid renderable.
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
@@ -187,10 +187,10 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static IDisposable DisplayUndoable(this TessellatableBody body, IModelDoc2 doc, System.Drawing.Color? c = null,
+        public static IDisposable DisplayUndoable(this IRenderable renderable, IModelDoc2 doc, System.Drawing.Color? c = null,
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
-            return DocView.DisplayUndoable(body, c, doc);
+            return DocView.DisplayUndoable(renderable, c, doc);
         }
         public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
