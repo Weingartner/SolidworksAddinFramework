@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Reactive.Bindings;
 using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 
-namespace SolidworksAddinFramework
+namespace SolidworksAddinFramework.OpenGl
 {
     /// <summary>
     /// This is a wrapper for IBody2 that can transform
@@ -18,7 +18,7 @@ namespace SolidworksAddinFramework
 
         public IBody2 _OriginalBody{ get; }
 
-        public Mesh Tesselation { get; private set; }
+        public SolidworksAddinFramework.Mesh Tesselation { get; private set; }
 
         public ReactiveProperty<IMathTransform> Transform { get; }
 
@@ -28,7 +28,7 @@ namespace SolidworksAddinFramework
             _OriginalBody = body;
             Transform = new ReactiveProperty<IMathTransform>(math.IdentityTransform());
 
-            Tesselation = new Mesh(body);
+            Tesselation = new SolidworksAddinFramework.Mesh(body);
 
             Transform
                 .WhenAnyValue()
