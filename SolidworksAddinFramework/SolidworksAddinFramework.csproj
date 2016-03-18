@@ -161,6 +161,7 @@
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
+    <Compile Include="TessellatableBody.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
     <Compile Include="TwoPointRange.cs" />
   </ItemGroup>

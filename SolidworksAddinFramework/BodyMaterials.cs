@@ -24,7 +24,7 @@ namespace SolidworksAddinFramework
             {
                 var materialPropertyValues2 = value ?? InitMat();
                 _Body.MaterialPropertyValues2 = materialPropertyValues2;
-                Debug.Assert(_Body.MaterialPropertyValues2!=null);
+                //Debug.Assert(_Body.MaterialPropertyValues2!=null);
             }
         }
 

@@ -78,72 +78,23 @@ namespace SolidworksAddinFramework.OpenGl
 
         private static bool _Setup;
 
-        public static ITessellation GetTess(IBody2 body, IFace2[] faceList)
-        {
-            var tess = (ITessellation)body.GetTessellation(faceList);
-            tess.NeedFaceFacetMap = true;
-            tess.NeedVertexParams = true;
-            tess.NeedVertexNormal = true;
-            tess.ImprovedQuality = true;
-            tess.MatchType = (int)swTesselationMatchType_e.swTesselationMatchFacetTopology;
-            tess.Tessellate();
-            return tess;
-
-        }
-
-        /// <summary>
-        /// This is slow and sux due tothe overhead of making many many COM calls. Do
-        /// not use it but it is a good reference.
-        /// </summary>
-        /// <param name="body"></param>
-        /// <param name="app"></param>
-        public static void Render(IBody2 body, ISldWorks app)
+        public static void Render(Mesh mesh, ISldWorks app)
         {
             DoSetup(app);
 
-            var faceList = body.GetFaces().CastArray<IFace2>();
-            var tess = GetTess(body,faceList);
 
             // Do it
 
-            GL.ShadeModel(ShadingModel.Flat);
+            GL.ShadeModel(ShadingModel.Smooth);
             using (SetColor(Color.Blue))
             using (SetLineWidth(2.0f))
             using (Begin(PrimitiveType.Triangles))
             {
-                foreach (var face in faceList)
+                var tris = mesh.TriangleVertices;
+                foreach (var tri in tris)
                 {
-                    foreach (var facet in tess.GetFaceFacets(face).CastArray<int>())
-                    {
-                        var finIds = tess.GetFacetFins(facet).CastArray<int>();
-                        var vertexIds = finIds
-                            .SelectMany(finId => tess.GetFinVertices(finId).CastArray<int>())
-                            .DistinctUntilChanged()
-                            .SkipLast(1)
-                            .ToList();
-
-                        var vertexs = vertexIds
-                            .Select(vId => tess.GetVertexPoint(vId).CastArray<double>())
-                            .ToList();
-
-                        var normals = vertexIds
-                            .Select(vId => tess.GetVertexNormal(vId).CastArray<double>())
-                            .ToList();
-
-                        {
-
-                            for (int i = 0; i < 3; i++)
-                            {
-                                GL.Vertex3(vertexs[i]);
-                                GL.Normal3(normals[i]);
-                                
-                            }
-
-                        }
-
-
-                    }
-
+                    GL.Vertex3(tri.Item1);
+                    GL.Normal3(tri.Item2);
                 }
             }
         }
@@ -154,7 +105,7 @@ namespace SolidworksAddinFramework.OpenGl
 
             DoSetup(app);
 
-            //GL.ShadeModel(ShadingModel.Flat);
+            GL.ShadeModel(ShadingModel.Flat);
             using (SetColor(color))
             using (SetLineWidth(lineWidth))
             {

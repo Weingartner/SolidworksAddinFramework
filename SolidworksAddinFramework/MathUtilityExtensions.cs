@@ -21,5 +21,18 @@ namespace SolidworksAddinFramework
         {
             return (MathPoint)m.CreatePoint(v);
         }
+
+        public static MathVector XAxis(this IMathUtility m) => m.Vector(new double[] {1, 0, 0});
+        public static MathVector YAxis(this IMathUtility m) => m.Vector(new double[] {0, 1, 0});
+        public static MathVector ZAxis(this IMathUtility m) => m.Vector(new double[] {0, 0, 1});
+
+        public static MathTransform ComposeTransform(this IMathUtility math, MathVector translate, double scale = 1.0)
+        {
+            return math.ComposeTransform(math.XAxis(), math.YAxis(), math.ZAxis(), translate, scale);
+        }
+        public static MathTransform IdentityTransform(this IMathUtility math)
+        {
+            return math.ComposeTransform( math.Vector(new double[] {0,0,0}));
+        }
     }
 }

@@ -186,10 +186,15 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, System.Drawing.Color? c = null,
+        public static IDisposable DisplayUndoable(this TessellatableBody body, IModelDoc2 doc, System.Drawing.Color? c = null,
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
             return DocView.DisplayUndoable(body, c, doc);
+        }
+        public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        {
+            //body.DisplayTs(doc, c, opt);
+            return Disposable.Create(() => body.Hide(doc));
         }
 
         public static IDisposable DisplayBodiesUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc, Color? c = null,
