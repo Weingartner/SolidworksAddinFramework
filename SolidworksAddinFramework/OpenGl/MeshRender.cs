@@ -87,8 +87,8 @@ namespace SolidworksAddinFramework.OpenGl
                 var tris = mesh.TriangleVertices;
                 foreach (var tri in tris)
                 {
-                    GL.Vertex3(tri.Item1);
                     GL.Normal3(tri.Item2);
+                    GL.Vertex3(tri.Item1);
                 }
             }
         }
@@ -98,7 +98,7 @@ namespace SolidworksAddinFramework.OpenGl
             if (faces.Length == 0) return;
 
 
-            GL.ShadeModel(ShadingModel.Flat);
+            GL.ShadeModel(ShadingModel.Smooth);
             using (SetColor(color))
             using (SetLineWidth(lineWidth))
             {
@@ -118,10 +118,8 @@ namespace SolidworksAddinFramework.OpenGl
                             {
                                 foreach (var vertex in strip)
                                 {
-                                    Debug.Assert(vertex.point.Length == 3);
-                                    GL.Vertex3(vertex.point);
-                                    Debug.Assert(vertex.norm.Length == 3);
                                     GL.Normal3(vertex.norm);
+                                    GL.Vertex3(vertex.point);
                                 }
                             }
                         });
