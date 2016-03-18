@@ -145,6 +145,7 @@
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
     <Compile Include="ManipulatorHandler.cs" />
     <Compile Include="MathPointExtensions.cs" />
+    <Compile Include="MathTransformExtensions.cs" />
     <Compile Include="MathUtilityExtensions.cs" />
     <Compile Include="MathVectorExtensions.cs" />
     <Compile Include="ModelDocExtensions.cs" />
