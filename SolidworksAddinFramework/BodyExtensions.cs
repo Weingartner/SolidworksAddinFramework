@@ -8,6 +8,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Xml;
 using MathNet.Numerics.LinearAlgebra.Double;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -193,7 +194,7 @@ namespace SolidworksAddinFramework
         }
         public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
-            //body.DisplayTs(doc, c, opt);
+            body.DisplayTs(doc, c, opt);
             return Disposable.Create(() => body.Hide(doc));
         }
 

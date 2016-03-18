@@ -18,7 +18,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IBody2 _OriginalBody{ get; }
 
-        public SolidworksAddinFramework.Mesh Tesselation { get; private set; }
+        public Mesh Tesselation { get; private set; }
 
         public ReactiveProperty<IMathTransform> Transform { get; }
 
@@ -28,7 +28,7 @@ namespace SolidworksAddinFramework.OpenGl
             _OriginalBody = body;
             Transform = new ReactiveProperty<IMathTransform>(math.IdentityTransform());
 
-            Tesselation = new SolidworksAddinFramework.Mesh(body);
+            Tesselation = new Mesh(body);
 
             Transform
                 .WhenAnyValue()

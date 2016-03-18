@@ -78,7 +78,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         private static bool _Setup;
 
-        public static void Render(Mesh mesh, ISldWorks app)
+        public static void Render(Mesh mesh, ISldWorks app, Color color)
         {
             DoSetup(app);
 
@@ -86,7 +86,7 @@ namespace SolidworksAddinFramework.OpenGl
             // Do it
 
             GL.ShadeModel(ShadingModel.Smooth);
-            using (SetColor(Color.Blue))
+            using (SetColor(color))
             using (SetLineWidth(2.0f))
             using (Begin(PrimitiveType.Triangles))
             {
