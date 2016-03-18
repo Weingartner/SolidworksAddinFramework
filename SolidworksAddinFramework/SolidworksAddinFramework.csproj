@@ -134,6 +134,7 @@
     <Compile Include="EventHandlers\DocumentEventHandler.cs" />
     <Compile Include="EventHandlers\DocView.cs" />
     <Compile Include="EventHandlers\DrawingEventHandler.cs" />
+    <Compile Include="EventHandlers\Mesh.cs" />
     <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="EventHandlers\PartEventHandler.cs" />
     <Compile Include="FaceExtensions.cs" />
