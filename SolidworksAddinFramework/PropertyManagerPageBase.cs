@@ -469,7 +469,7 @@ namespace SolidworksAddinFramework
                     return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1));
                 });
             var d3 = changeObs.Subscribe(x => onChange(box, x));
-            // When calling e.g. `IPropertyManagerPageNUmberbox::SetRange2` disabling the control doesn't work before the PMP is activated.
+            // When calling e.g. `IPropertyManagerPageNumberbox::SetRange2` disabling the control doesn't work before the PMP is activated.
             // That's why we wait for the PMP activation here to deactivate the control.
             var d4 = _AfterActivation.Subscribe(_ => ((IPropertyManagerPageControl) box).Enabled = enable);
             return new CompositeDisposable(d2, d3, d4);
