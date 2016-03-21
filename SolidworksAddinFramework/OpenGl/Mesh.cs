@@ -3,52 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra.Double;
-using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Wire : IRenderable
-    {
-        private IList<double[]> _Points;
-        private readonly double _Thickness;
-
-        public Wire(IEnumerable<double[]> points, double thickness)
-        {
-            _Points = points.ToList();
-            _Thickness = thickness;
-        }
-
-        public void Render(Color color)
-        {
-            using (MeshRender.Begin(PrimitiveType.LineStrip))
-            using(MeshRender.SetColor(color))
-            using(MeshRender.SetLineWidth((float)_Thickness))
-            {
-                foreach (var p in _Points)
-                {
-                    GL.Vertex3(p);
-                }
-            }
-        }
-
-        public void ApplyTransform(IMathTransform transform)
-        {
-            _Points = _Points
-                .Select(p =>
-                {
-
-                    DenseMatrix rotation;
-                    DenseVector translation;
-                    transform.ExtractTransform(out rotation, out translation);
-                    var pv = rotation*p + translation;
-                    return pv.Values;
-                }).ToList();
-        }
-    }
-
     public class Mesh : IRenderable
     {
         private IList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
@@ -95,11 +54,9 @@ namespace SolidworksAddinFramework.OpenGl
                         .Select(vId => tess.GetVertexNormal(vId).CastArray<double>())
                         .ToList();
 
+                    foreach (var i in Enumerable.Range(0, 3))
                     {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            yield return Tuple.Create(vertexs[i], normals[i]);
-                        }
+                        yield return Tuple.Create(vertexs[i], normals[i]);
                     }
                 }
             }
@@ -132,7 +89,6 @@ namespace SolidworksAddinFramework.OpenGl
                 var n = rotation * pn.Item2;
                 return Tuple.Create(p.Values, n.Values);
             }).ToList();
-
         }
     }
 }
