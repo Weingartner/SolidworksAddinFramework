@@ -45,13 +45,13 @@ namespace SolidworksAddinFramework
             return Math.Sqrt(vector.Take(2).Sum(c => Math.Pow(c, 2)));
         }
 
-        public static double AngleBetweenVectorsSigned(this IMathVector v0, IMathVector v1)
+        public static double AngleBetweenVectors(this IMathVector v0, IMathVector v1)
         {
             if (((double[])v0.ArrayData).Length==((double[])v1.ArrayData).Length)
             {
-                var sign = Math.Sign(((IMathVector) (v0.Cross(v1))).ArrayData.CastArray<double>()[2]);
-                var ret =  Math.Acos(v0.Dot(v1)/(v0.GetLength()*v1.GetLength()));
-                return sign*ret;
+                var sign = Math.Sign(((IMathVector)(v0.Cross(v1))).ArrayData.CastArray<double>()[2]);
+                var ret = Math.Acos(v0.Dot(v1) / (v0.GetLength() * v1.GetLength()));
+                return sign * ret;
             }
             throw new Exception("Vectors must have the same dimension!");
         }
