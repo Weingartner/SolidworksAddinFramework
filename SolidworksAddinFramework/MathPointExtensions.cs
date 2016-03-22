@@ -26,6 +26,7 @@ namespace SolidworksAddinFramework
         {
             return (MathVector)a.Subtract(b);
         }
+
         public static bool Equals(this IMathPoint a, IMathPoint b, double tol)
         {
             var v = a.SubtractTs(b);
@@ -64,6 +65,14 @@ namespace SolidworksAddinFramework
             var av = new DenseVector(a);
             var bv = new DenseVector(b);
             return (av - bv).L2Norm();
+        }
+
+        //returns the angle in the xy plane between 0 and 2 Pi
+        public static  double Angle2D(this IMathPoint p)
+        {
+            var pData = p.ArrayData.CastArray<double>();
+            var angle = Math.Atan2(pData[1], pData[0]);
+            return angle < 0.0 ? angle + 2*Math.PI : angle; 
         }
     }
 }
