@@ -8,7 +8,7 @@ namespace SwCSharpAddinSpecHelper
     public abstract class SolidWorksSpec : IDisposable
     {
         private readonly SwPoolFixture _Pool;
-        protected SldWorks App;
+        protected SldWorks App { get; }
 
         protected SolidWorksSpec(SwPoolFixture pool)
         {
