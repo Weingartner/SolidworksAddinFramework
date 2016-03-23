@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SolidworksAddinFramework
 {
@@ -60,6 +64,17 @@ namespace SolidworksAddinFramework
             return SubscribeDisposable(o, fn2);
         }
 
-
+        public static IObservable<TOut> SelectAsync<TIn, TOut>(this IObservable<TIn> o, Func<TIn, CancellationToken, Task<TOut>> selector)
+        {
+            return o
+                .Select(x =>
+                    Observable.DeferAsync(async ct =>
+                    {
+                        var result = await selector(x, ct);
+                        return Observable.Return(result);
+                    })
+                )
+                .Switch();
+        }
     }
 }
