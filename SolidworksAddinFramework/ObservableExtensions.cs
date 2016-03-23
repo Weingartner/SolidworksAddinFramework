@@ -70,8 +70,15 @@ namespace SolidworksAddinFramework
                 .Select(x =>
                     Observable.DeferAsync(async ct =>
                     {
-                        var result = await selector(x, ct);
-                        return Observable.Return(result);
+                        try
+                        {
+                            var result = await selector(x, ct);
+                            return Observable.Return(result);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return Observable.Empty<TOut>();
+                        }
                     })
                 )
                 .Switch();
