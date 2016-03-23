@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -32,7 +34,6 @@ namespace SolidworksAddinFramework
             return math.ComposeTransform(math.XAxis(), math.YAxis(), math.ZAxis(), translate, scale);
         }
 
-
         public static MathTransform IdentityTransform(this IMathUtility math)
         {
             return math.ComposeTransform( math.Vector(new double[] {0,0,0}));
@@ -54,5 +55,26 @@ namespace SolidworksAddinFramework
             return p.MultiplyTransformTs(transformation);
         }
 
+        public static List<List<double>> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
+        {
+            var point2Ds = pointsEnum as IList<double[]> ?? pointsEnum.ToList();
+
+            var interpolatedPoints =  point2Ds
+                .Buffer(2,1)
+                .Where(p=>p.Count==2)
+                .SelectMany(p =>
+                {
+                    var n = (int)Math.Ceiling(m.Vector(p[0],p[1]).GetLength() / stepSize);
+                    n = Math.Max(2, n);
+                    return Sequences.LinSpace(p[0].ToList(), p[1].ToList(), n, false);
+                })
+                .ToList();
+
+            interpolatedPoints.Add(point2Ds.Last().ToList());
+
+            interpolatedPoints = interpolatedPoints.Distinct().ToList();
+
+            return interpolatedPoints;
+        }
     }
 }

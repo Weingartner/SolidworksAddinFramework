@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -55,6 +56,7 @@ namespace SolidworksAddinFramework
             }
             return output;
         }
+
         public static MathPoint MultiplyTransformTs(this IMathPoint v, IMathTransform t)
         {
             return (MathPoint) v.MultiplyTransform(t);
@@ -67,12 +69,19 @@ namespace SolidworksAddinFramework
             return (av - bv).L2Norm();
         }
 
-        //returns the angle in the xy plane between 0 and 2 Pi
+        /// <summary>
+        /// Returns the angle in the xy plane between 0 and 2 Pi
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static  double Angle2D(this IMathPoint p)
         {
             var pData = p.ArrayData.CastArray<double>();
             var angle = Math.Atan2(pData[1], pData[0]);
             return angle < 0.0 ? angle + 2*Math.PI : angle; 
         }
+
+
+
     }
 }

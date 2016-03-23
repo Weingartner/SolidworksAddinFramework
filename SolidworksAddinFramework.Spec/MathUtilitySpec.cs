@@ -7,12 +7,21 @@ using SolidWorks.Interop.sldworks;
 using SwCSharpAddinSpecHelper;
 using Weingartner.Numerics;
 using Xunit;
+using Xunit.Extensions;
 
 namespace SolidworksAddinFramework.Spec
 {
     public class MathUtilitySpec : SolidWorksSpec
     {
         public IMathUtility MathUtility => (IMathUtility) App.GetMathUtility();
+
+        public static IEnumerable<object[]> TestData
+        {
+            get
+            {
+                yield return new object[] {1.0};
+            }
+        }
 
         public MathUtilitySpec(SwPoolFixture pool) : base(pool)
         {
@@ -37,8 +46,45 @@ namespace SolidworksAddinFramework.Spec
                 .ForEach(a =>
                 {
                     var newPoint = MathUtility.RotateByAngle(p, zAxis, a);
-
                     newPoint.Angle2D().Should().BeApproximately(a, 1e-5);
+                });
+        }
+
+        [Theory, MemberData(nameof(TestData))]
+        public void InterpolatePointsShouldWork(double foo)
+        {
+            var p0 = new[] {0, 0, 0.0};
+            var p1 = new[] {1, 0, 0.0};
+            var points = new[] {p0, p1};
+            var stepSize = 1e-3;
+
+            var interpolatedPoints = MathUtility.InterpolatePoints(points, stepSize);
+            interpolatedPoints.Count.Should().Be(1001);
+            interpolatedPoints
+                .Buffer(2, 1)
+                .Where(p => p.Count == 2)
+                .ForEach(p =>
+                {
+                    MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
+                });
+        }
+
+        [Fact]
+        public void InterpolatePointsShouldWork2()
+        {
+            var p0 = new[] {0, 0, 0.0};
+            var p1 = new[] {1, 1, 1.0};
+            var points = new[] {p0, p1};
+            var stepSize = 1e-3;
+
+            var interpolatedPoints = MathUtility.InterpolatePoints(points, stepSize);
+            interpolatedPoints.Count.Should().Be(1734);
+            interpolatedPoints
+                .Buffer(2, 1)
+                .Where(p => p.Count == 2)
+                .ForEach(p =>
+                {
+                    MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
                 });
 
         }
