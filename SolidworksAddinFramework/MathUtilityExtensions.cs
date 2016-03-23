@@ -55,7 +55,7 @@ namespace SolidworksAddinFramework
             return p.MultiplyTransformTs(transformation);
         }
 
-        public static List<List<double>> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
+        public static List<double[]> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
         {
             var point2Ds = pointsEnum as IList<double[]> ?? pointsEnum.ToList();
 
@@ -66,11 +66,13 @@ namespace SolidworksAddinFramework
                 {
                     var n = (int)Math.Ceiling(m.Vector(p[0],p[1]).GetLength() / stepSize);
                     n = Math.Max(2, n);
-                    return Sequences.LinSpace(p[0].ToList(), p[1].ToList(), n, false);
+                    return Sequences.LinSpace(p[0].ToList(), p[1].ToList(), n, false)
+                        .Select(l=>l.ToArray())
+                        .ToList();
                 })
                 .ToList();
 
-            interpolatedPoints.Add(point2Ds.Last().ToList());
+            interpolatedPoints.Add(point2Ds.Last());
 
             interpolatedPoints = interpolatedPoints.Distinct().ToList();
 
