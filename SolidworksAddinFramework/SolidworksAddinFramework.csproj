@@ -127,6 +127,7 @@
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
     <Compile Include="ComWangling.cs" />
+    <Compile Include="CooperativeTask.cs" />
     <Compile Include="CurveExtension.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
