@@ -64,6 +64,14 @@ namespace SolidworksAddinFramework
             return SubscribeDisposable(o, fn2);
         }
 
+        /// <summary>
+        /// Allows cancellation of a call to `selector` when the input observable produces a new value.
+        /// </summary>
+        /// <typeparam name="TIn"></typeparam>
+        /// <typeparam name="TOut"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
         public static IObservable<TOut> SelectAsync<TIn, TOut>(this IObservable<TIn> o, Func<TIn, CancellationToken, Task<TOut>> selector)
         {
             return o
