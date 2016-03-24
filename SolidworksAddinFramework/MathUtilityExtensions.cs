@@ -29,6 +29,9 @@ namespace SolidworksAddinFramework
         public static MathVector ZAxis(this IMathUtility m) => m.Vector(new double[] {0, 0, 1});
         public static MathPoint Origin(this IMathUtility m) => m.Point(new[] {0,0,0.0});
 
+        public static MathVector Mv(this IMathUtility m, double[] v) => (MathVector)m.Vector(v);
+        public static MathPoint Mp(this IMathUtility m , double[] v) => (MathPoint)m.Point(v);
+
         public static MathTransform ComposeTransform(this IMathUtility math, MathVector translate, double scale = 1.0)
         {
             return math.ComposeTransform(math.XAxis(), math.YAxis(), math.ZAxis(), translate, scale);
@@ -44,6 +47,15 @@ namespace SolidworksAddinFramework
         {
             var transformation = (IMathTransform)m.CreateTransformRotateAxis(m.Origin(), axis, angle);
             return p.MultiplyTransformTs(transformation);
+        }
+
+        public static MathTransform CreateToolTransfrom(this IMathUtility m,double x, double y, double z, double c)
+        {
+            var rotateAxis = (MathTransform) m.CreateTransformRotateAxis(m.Origin(), m.ZAxis(), c);
+            var facePos = new[] {x, y, z};
+            var translate = m.ComposeTransform(m.XAxis(), m.YAxis(), m.ZAxis(), m.Vector(facePos), 1.0);
+            var mathTransform = (MathTransform) translate.Multiply(rotateAxis);
+            return mathTransform;
         }
 
 

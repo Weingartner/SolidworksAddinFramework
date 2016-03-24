@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using FluentAssertions;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SwCSharpAddinSpecHelper;
 using Weingartner.Numerics;
@@ -19,7 +22,8 @@ namespace SolidworksAddinFramework.Spec
         {
             get
             {
-                yield return new object[] {1.0};
+                yield return new object[] {new[] {0,0,0.0}, new[] {1,0,0.0}, 1e-3, 1001};
+                yield return new object[] {new[] {0,0,0.0}, new[] {1,1,1.0}, 1e-3, 1734};
             }
         }
 
@@ -51,15 +55,12 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [Theory, MemberData(nameof(TestData))]
-        public void InterpolatePointsShouldWork(double foo)
+        public void InterpolatePointsShouldWork(double[]p0,double[]p1,double stepSize, int expectedPointCount)
         {
-            var p0 = new[] {0, 0, 0.0};
-            var p1 = new[] {1, 0, 0.0};
             var points = new[] {p0, p1};
-            var stepSize = 1e-3;
 
             var interpolatedPoints = MathUtility.InterpolatePoints(points, stepSize);
-            interpolatedPoints.Count.Should().Be(1001);
+            interpolatedPoints.Count.Should().Be(expectedPointCount);
             interpolatedPoints
                 .Buffer(2, 1)
                 .Where(p => p.Count == 2)
@@ -70,23 +71,24 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [Fact]
-        public void InterpolatePointsShouldWork2()
+        public void TransparentColorOpenGlShouldWork()
         {
-            var p0 = new[] {0, 0, 0.0};
-            var p1 = new[] {1, 1, 1.0};
-            var points = new[] {p0, p1};
-            var stepSize = 1e-3;
 
-            var interpolatedPoints = MathUtility.InterpolatePoints(points, stepSize);
-            interpolatedPoints.Count.Should().Be(1734);
-            interpolatedPoints
-                .Buffer(2, 1)
-                .Where(p => p.Count == 2)
-                .ForEach(p =>
-                {
-                    MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
-                });
-
+            App.Visible = true;
+            App.NewPart();
+            var modeler = (IModeler) App.GetModeler();
+            var modelDoc = (ModelDoc2)App.ActiveDoc;
+            var docView = new DocView(App,(ModelView)modelDoc.ActiveView);
+            docView.AttachEventHandlers();
+            var radius = 1e-2;
+            var length = 1;
+            var array = new[] {0, 0, 0, 0, 0, 1, radius, length}.ToArray();
+            var body = (Body2) modeler.CreateBodyFromCyl(array);
+            body.Display3(modelDoc, 255, 1);
+            //var newToolMesh = new Mesh(body);
+            //newToolMesh.DisplayUndoable(modelDoc, Color.FromArgb(200, Color.Yellow));
+            var foo = 6;
         }
+
     }
 }
