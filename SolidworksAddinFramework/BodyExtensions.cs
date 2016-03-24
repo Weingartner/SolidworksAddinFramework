@@ -223,5 +223,6 @@ namespace SolidworksAddinFramework
         {
             return new CompositeDisposable(bodies.Select(b=>b.HideBodyUndoable()));
         }
+
     }
 }

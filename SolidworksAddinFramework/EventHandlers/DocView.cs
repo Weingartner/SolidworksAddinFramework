@@ -15,16 +15,12 @@ namespace SolidworksAddinFramework
     public class DocView
     {
         private ISldWorks _ISwApp;
-        private SwAddinBase _UserAddin;
         private ModelView _MView;
-        private DocumentEventHandler _Parent;
 
-        public DocView(SwAddinBase addin, IModelView mv, DocumentEventHandler doc)
+        public DocView(ISldWorks app, IModelView mv)
         {
-            _UserAddin = addin;
             _MView = (ModelView)mv;
-            _ISwApp = (ISldWorks)_UserAddin.SwApp;
-            _Parent = doc;
+            _ISwApp = (ISldWorks)app;
         }
 
         public bool AttachEventHandlers()
@@ -67,7 +63,6 @@ namespace SolidworksAddinFramework
         {
             _MView.DestroyNotify2 -= OnDestroy;
             _MView.RepaintNotify -= OnRepaint;
-            _Parent.DetachModelViewEventHandler(_MView);
             return true;
         }
 

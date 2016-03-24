@@ -37,7 +37,7 @@ namespace SolidworksAddinFramework
             {
                 if (!OpenModelViews.Contains(mView))
                 {
-                    var dView = new DocView(UserAddin, mView, this);
+                    var dView = new DocView(UserAddin.SwApp, mView);
                     dView.AttachEventHandlers();
                     OpenModelViews.Add(mView, dView);
                 }
@@ -65,6 +65,7 @@ namespace SolidworksAddinFramework
             {
                 var dView = (DocView)OpenModelViews[key];
                 dView.DetachEventHandlers();
+                this.DetachModelViewEventHandler(key);
                 OpenModelViews.Remove(key);
             }
             return true;
