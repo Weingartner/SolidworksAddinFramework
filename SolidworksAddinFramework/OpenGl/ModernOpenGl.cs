@@ -33,6 +33,13 @@ namespace SolidworksAddinFramework.OpenGl
             GL.Material(materialFace, MaterialParameter.Shininess, new[] { 0f });
 
             var color = new[] { value.R / 255f, value.G / 255f, value.B / 255f, value.A / 255f };
+
+            //TODO: the standard process to set transparency is to use SrcAlpha and OneMinusSrcAlpha,
+            //but this doesn't work- no idea why??
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.Zero);
+            //GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
             GL.Material(materialFace, MaterialParameter.AmbientAndDiffuse, color);
             GL.Material(materialFace, MaterialParameter.Shininess, new [] { 100f });
             GL.Material(materialFace, MaterialParameter.Specular, new[] { 1f, 1f, 1f, 1f });
