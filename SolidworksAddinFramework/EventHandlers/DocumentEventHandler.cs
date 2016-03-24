@@ -6,12 +6,12 @@ namespace SolidworksAddinFramework
     public class DocumentEventHandler
     {
         protected ISldWorks SwApp;
-        protected ModelDoc2 Document;
+        protected IModelDoc2 Document;
         protected SwAddinBase UserAddin;
 
         protected Hashtable OpenModelViews;
 
-        public DocumentEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
+        public DocumentEventHandler(IModelDoc2 modDoc, SwAddinBase addin)
         {
             Document = modDoc;
             UserAddin = addin;

@@ -22,13 +22,11 @@ namespace SolidworksAddinFramework
         private Hashtable _OpenDocs = new Hashtable();
         private SldWorks _SwEventPtr;
 
-        public ISldWorks SwApp => ISwApp;
-
         public ICommandManager CommandManager { get; private set; }
 
         public Hashtable OpenDocs => _OpenDocs;
 
-        public ISldWorks ISwApp { set; get; }
+        public ISldWorks SwApp { get; private set; }
 
         [ComRegisterFunction]
         public static void RegisterFunction(Type t)
@@ -99,18 +97,18 @@ namespace SolidworksAddinFramework
 
         public bool ConnectToSW(object thisSw, int cookie)
         {
-            ISwApp = (ISldWorks)thisSw;
+            SwApp = ((ISldWorks)thisSw).Proxy();
             AddinId = cookie;
 
             //Setup callbacks
-            ISwApp.SetAddinCallbackInfo(0, this, AddinId);
+            SwApp.SetAddinCallbackInfo(0, this, AddinId);
 
             #region Setup the Command Manager
             Connect();
             #endregion
 
             #region Setup the Event Handlers
-            _SwEventPtr = (SldWorks)ISwApp;
+            _SwEventPtr = (SldWorks)SwApp;
             _OpenDocs = new Hashtable();
             AttachEventHandlers();
             #endregion
@@ -121,7 +119,7 @@ namespace SolidworksAddinFramework
         public void Connect()
         {
             Bmp = new BitmapHandler();
-            CommandManager = ISwApp.GetCommandManager(AddinId);
+            CommandManager = SwApp.GetCommandManager(AddinId);
             AddCommandMgr();
         }
 
@@ -179,8 +177,8 @@ namespace SolidworksAddinFramework
 
             Marshal.ReleaseComObject(CommandManager);
             CommandManager = null;
-            Marshal.ReleaseComObject(ISwApp);
-            ISwApp = null;
+            Marshal.ReleaseComObject(SwApp);
+            SwApp = null;
             //The addin _must_ call GC.Collect() here in order to retrieve all managed code pointers 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -246,18 +244,16 @@ namespace SolidworksAddinFramework
 
         public void AttachEventsToAllDocuments()
         {
-            var modDoc = (ModelDoc2)ISwApp.GetFirstDocument();
-            while (modDoc != null)
+            var modelDocs = SwApp.GetDocuments()
+                .CastArray<IModelDoc2>()
+                .Where(doc => !OpenDocs.Contains(doc));
+            foreach (var doc in modelDocs)
             {
-                if (!_OpenDocs.Contains(modDoc))
-                {
-                    AttachModelDocEventHandler(modDoc);
-                }
-                modDoc = (ModelDoc2)modDoc.GetNext();
+                AttachModelDocEventHandler(doc);
             }
         }
 
-        public bool AttachModelDocEventHandler(ModelDoc2 modDoc)
+        public bool AttachModelDocEventHandler(IModelDoc2 modDoc)
         {
             if (modDoc == null)
                 return false;
@@ -294,7 +290,7 @@ namespace SolidworksAddinFramework
             return true;
         }
 
-        public bool DetachModelEventHandler(ModelDoc2 modDoc)
+        public bool DetachModelEventHandler(IModelDoc2 modDoc)
         {
             DocumentEventHandler docHandler;
             docHandler = (DocumentEventHandler)_OpenDocs[modDoc];

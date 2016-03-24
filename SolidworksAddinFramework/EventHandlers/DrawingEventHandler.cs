@@ -6,7 +6,7 @@ namespace SolidworksAddinFramework
     {
         private DrawingDoc _Doc;
 
-        public DrawingEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
+        public DrawingEventHandler(IModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
             _Doc = (DrawingDoc)Document;

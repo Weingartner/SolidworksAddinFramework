@@ -8,7 +8,7 @@ namespace SolidworksAddinFramework
         private readonly AssemblyDoc _Doc;
         private readonly SwAddinBase _SwAddin;
 
-        public AssemblyEventHandler(ModelDoc2 modDoc, SwAddinBase addin)
+        public AssemblyEventHandler(IModelDoc2 modDoc, SwAddinBase addin)
             : base(modDoc, addin)
         {
             // ReSharper disable once SuspiciousTypeConversion.Global
