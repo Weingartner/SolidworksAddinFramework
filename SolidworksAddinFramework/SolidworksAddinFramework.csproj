@@ -139,6 +139,7 @@
     <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="EventHandlers\PartEventHandler.cs" />
     <Compile Include="FaceExtensions.cs" />
+    <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataBase.cs" />
