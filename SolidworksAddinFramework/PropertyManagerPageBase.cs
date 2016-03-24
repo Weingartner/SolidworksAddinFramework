@@ -40,7 +40,6 @@ namespace SolidworksAddinFramework
                 MacroFeature.Cancel();
             }
         }
-        
     }
 
     /// <summary>
@@ -198,8 +197,11 @@ namespace SolidworksAddinFramework
 
         public IObservable<int> OptionCheckedObservable(int id) => _OptionChecked.Where(i => i == id);
 
+        private readonly Subject<int> _ButtonPressed = new Subject<int>();
+        public IObservable<int> ButtonPressedObservable(int id) => _ButtonPressed.Where(i => i == id);
         public virtual void OnButtonPress(int id)
         {
+            _ButtonPressed.OnNext(id);
         }
 
         #region textbox
@@ -263,8 +265,11 @@ namespace SolidworksAddinFramework
         }
         #endregion
 
-        public virtual void OnSelectionboxFocusChanged(int id)
+        private readonly Subject<int> _SelectionBoxFocusChangedSubject = new Subject<int>();
+        public IObservable<Unit> SelectionBoxFocusChangedObservable(int id) => _SelectionBoxFocusChangedSubject.Where(i => id == i).Select(_=>Unit.Default);
+        public void OnSelectionboxFocusChanged(int id)
         {
+            _SelectionBoxFocusChangedSubject.OnNext(id);
         }
 
         #region selection changed observables
@@ -479,7 +484,7 @@ namespace SolidworksAddinFramework
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateLabel(@group, id, caption, tip);
-            return WrapControl(box);
+            return WrapControlAndDisposable(box);
         }
 
         protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, Func<T> get, Action<T> set, T match)
@@ -515,32 +520,34 @@ namespace SolidworksAddinFramework
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
-            Func<IPropertyManagerPageSelectionbox, IDisposable> config)
-        {
-            var id = NextId();
-            var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
-            config(box);
-            return WrapControl(box);
-        }
-
-        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
             Action<IPropertyManagerPageSelectionbox> config)
         {
+            return CreateSelectionBox(@group, tip, caption, config, () => { });
+        }
+
+        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption, Action<IPropertyManagerPageSelectionbox> config,
+            Action onFocus)
+        {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
             config(box);
-            // For the moment we don't have any callbacks / rx stuff to register.
-            return WrapControl(box);
+            var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
+            return WrapControlAndDisposable(box, d0);
+        }
+
+        protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick)
+        {
+            var id = NextId();
+            var box = PropertyManagerGroupExtensions.CreateButton(@group, id, caption, tip);
+            var d0 = ButtonPressedObservable(id).Subscribe(_ => onClick());
+            return WrapControlAndDisposable(box, d0);
         }
 
         #region control reference holding
-        private IDisposable WrapControlAndDisposable(object control, IDisposable d)
+
+        private IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
         {
-            return new  ControlHolder(control, d);
-        }
-        private IDisposable WrapControl(object control)
-        {
-            return new  ControlHolder(control, Disposable.Empty);
+            return new ControlHolder(control, d.ToCompositeDisposable());
         }
 
         /// <summary>
@@ -567,9 +574,8 @@ namespace SolidworksAddinFramework
                 Disposable.Dispose();
             }
         }
+
         #endregion
-
-
 
         private int NextId()
         {
