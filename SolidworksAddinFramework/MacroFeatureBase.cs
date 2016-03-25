@@ -23,6 +23,9 @@ namespace SolidworksAddinFramework
         where TData : MacroFeatureDataBase, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature, TData>
     {
+        // Store PMP in a field so the GC can't collect it
+        private PropertyManagerPageBase _EditPage;
+
         public IModelDoc2 ModelDoc { get; set; }
 
         public IFeature SwFeature { get; set; }
@@ -40,11 +43,19 @@ namespace SolidworksAddinFramework
 
         public ISelectionMgr SelectionMgr { get; set; }
 
+        /// <summary>
+        /// Allows an implementation to specify what property manager page to show on edit.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract PropertyManagerPageBase GetPropertyManagerPage();
+
         public object Edit(object app, object modelDoc, object feature)
         {
             Init(app, modelDoc, feature);
             LoadSelections();
-            return Edit();
+            _EditPage = GetPropertyManagerPage();
+            _EditPage.Show();
+            return true;
         }
 
         /// <summary>
@@ -115,11 +126,6 @@ namespace SolidworksAddinFramework
         }
 
 
-        /// <summary>
-        /// Implement to perform the edit function. See sample project
-        /// </summary>
-        /// <returns></returns>
-        protected abstract bool Edit();
         /// <summary>
         /// Implement to perform the security function. See sample project
         /// </summary>

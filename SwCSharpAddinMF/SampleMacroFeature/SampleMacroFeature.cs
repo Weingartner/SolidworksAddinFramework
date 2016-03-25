@@ -12,23 +12,13 @@ namespace SwCSharpAddinMF.SampleMacroFeature
     [ComDefaultInterface(typeof(ISwComFeature))]
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-        private SamplePropertyPage _Ppage = null;
-
-        public SampleMacroFeature() 
-        {
-        }
-
         public override SampleMacroFeatureDataBase Database { get; set; }
         public override string FeatureName { get; } = "Sample Feature";
         public override swMacroFeatureOptions_e FeatureOptions { get; } = 0;
         public override List<IBody2> EditBodies => SelectedBodies();
 
-        protected override bool Edit()
-        {
-            _Ppage = new SamplePropertyPage(this);
-            _Ppage.Show();
-            return true;
-        }
+        protected override PropertyManagerPageBase GetPropertyManagerPage() => new SamplePropertyPage(this);
+
         private List<IBody2> SelectedBodies()
         {
             return SelectionMgr.GetSelectedObjects((type, mark) => type == swSelectType_e.swSelSOLIDBODIES)
