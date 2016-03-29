@@ -49,15 +49,6 @@ namespace SolidworksAddinFramework
             return p.MultiplyTransformTs(transformation);
         }
 
-        public static MathTransform CreateToolTransfrom(this IMathUtility m,double x, double y, double z, double c)
-        {
-            var rotateAxis = (MathTransform) m.CreateTransformRotateAxis(m.Origin(), m.ZAxis(), c);
-            var facePos = new[] {x, y, z};
-            var translate = m.ComposeTransform(m.XAxis(), m.YAxis(), m.ZAxis(), m.Vector(facePos), 1.0);
-            var mathTransform = (MathTransform) translate.Multiply(rotateAxis);
-            return mathTransform;
-        }
-
 
         public static IMathPoint TranslateByVector(this IMathUtility m, IMathPoint p, IMathVector v)
         {
