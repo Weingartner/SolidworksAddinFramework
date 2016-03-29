@@ -70,7 +70,7 @@ namespace SolidworksAddinFramework.OpenGl
             tess.NeedVertexNormal = true;
             tess.ImprovedQuality = true;
             tess.CurveChordTolerance = 0.001 / 10;
-            tess.SurfacePlaneTolerance = 0.001 / 1;
+            tess.SurfacePlaneTolerance = 0.001 / 10;
             tess.MatchType = (int)swTesselationMatchType_e.swTesselationMatchFacetTopology;
             tess.Tessellate();
             return tess;
