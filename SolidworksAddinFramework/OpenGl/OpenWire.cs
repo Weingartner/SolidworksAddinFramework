@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework.OpenGl
         public void Render(Color color)
         {
             using (ModernOpenGl.Begin(_Mode))
-            using (ModernOpenGl.SetColor(color))
+            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(_Thickness))
             {
                 _Points.ForEach(GL.Vertex3);

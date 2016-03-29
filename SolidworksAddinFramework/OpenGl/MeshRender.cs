@@ -16,8 +16,7 @@ namespace SolidworksAddinFramework.OpenGl
     {
         public static void Render(Mesh mesh, Color color)
         {
-            GL.ShadeModel(ShadingModel.Smooth);
-            using (ModernOpenGl.SetColor(color))
+            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(2.0f))
             using (ModernOpenGl.Begin(PrimitiveType.Triangles))
             {
@@ -32,8 +31,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static void Render(IFace2[] faces, Color color, float lineWidth)
         {
-            GL.ShadeModel(ShadingModel.Smooth);
-            using (ModernOpenGl.SetColor(color))
+            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(lineWidth))
             {
                 faces
