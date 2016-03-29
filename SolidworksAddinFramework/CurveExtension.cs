@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Accord.Math.Optimization;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -26,6 +27,30 @@ namespace SolidworksAddinFramework
         public static double[] ClosestPointOnTs(this ICurve curve , double x, double y, double z)
         {
             return (double[]) curve.GetClosestPointOn(x, y, z);
+        }
+
+        public static Tuple<double[], double[], double> ClosestDistanceBetweenTwoCurves(IMathUtility m,ICurve curve0, ICurve curve1)
+        {
+            var curveDomain = curve1.Domain();
+
+            var solver = new BrentSearch
+                (t =>
+                {
+                    var pt = curve1.PointAt(t);
+                    var closestPoint = curve0.ClosestPointOnTs(pt[0], pt[1], pt[2]).Take(3).ToArray();
+                    var distance = m.Vector(pt, closestPoint).GetLength();
+                    return distance;
+                }
+                , curveDomain[0]
+                , curveDomain[1]
+                );
+
+            solver.Minimize();
+            var param = solver.Solution;
+
+            var pt1 = curve1.PointAt(param);
+            var pt0 = curve0.ClosestPointOnTs(pt1[0],pt1[1],pt1[2]).Take(3).ToArray();
+            return Tuple.Create(pt0, pt1, solver.Value);
         }
 
         /// <summary>
