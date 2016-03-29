@@ -6,9 +6,9 @@ namespace Weingartner.Numerics
 {
     public static class Sequences
     {
-        public static IEnumerable<double> Arange(double start, int count, Func<double, double> selector)
+        public static IEnumerable<double> Arange(int start, int count, Func<double, double> selector)
         {
-            return Enumerable.Range((int)start, count).Select(v => selector(v));
+            return Enumerable.Range(start, count).Select(v => selector(v));
         }
 
         public static IEnumerable<double> Power(IEnumerable<double> exponents, double baseValue = 10.0d)
