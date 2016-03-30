@@ -14,6 +14,7 @@ namespace SolidworksAddinFramework.OpenGl
             return @params;
         }
 
+
         public static IDisposable SetColor(Color value, ShadingModel shadingModel)
         {
 

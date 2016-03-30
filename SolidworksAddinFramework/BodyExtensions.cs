@@ -166,6 +166,7 @@ namespace SolidworksAddinFramework
             return a.IGetIntersectionEdgeCount((Body2)b) > 0;
         }
     }
+    
 
     public static class DisplayTransaction
     {
