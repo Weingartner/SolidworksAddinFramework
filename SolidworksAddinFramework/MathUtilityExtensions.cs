@@ -24,13 +24,20 @@ namespace SolidworksAddinFramework
             return (MathPoint)m.CreatePoint(v);
         }
 
-        public static MathVector XAxis(this IMathUtility m) => m.Vector(new double[] {1, 0, 0});
-        public static MathVector YAxis(this IMathUtility m) => m.Vector(new double[] {0, 1, 0});
-        public static MathVector ZAxis(this IMathUtility m) => m.Vector(new double[] {0, 0, 1});
-        public static MathPoint Origin(this IMathUtility m) => m.Point(new[] {0,0,0.0});
 
-        public static MathVector Mv(this IMathUtility m, double[] v) => (MathVector)m.Vector(v);
-        public static MathPoint Mp(this IMathUtility m , double[] v) => (MathPoint)m.Point(v);
+        private static MathVector _XAxis = null;
+        private static MathVector _YAxis = null;
+        private static MathVector _ZAxis = null;
+        private static MathPoint _Origin = null;
+
+
+        public static MathVector XAxis(this IMathUtility m) => _XAxis ?? (_XAxis = m.Vector(new double[] {1, 0, 0}));
+        public static MathVector YAxis(this IMathUtility m) => _YAxis ?? (_YAxis = m.Vector(new double[] {0, 1, 0}));
+        public static MathVector ZAxis(this IMathUtility m) => _ZAxis ?? (_ZAxis = m.Vector(new double[] {0, 0, 1}));
+        public static MathPoint Origin(this IMathUtility m) => _Origin ??(_Origin =  m.Point(new[] {0,0,0.0}));
+
+        public static MathVector Mv(this IMathUtility m, double[] v) => m.Vector(v);
+        public static MathPoint Mp(this IMathUtility m , double[] v) => m.Point(v);
 
         public static MathTransform ComposeTransform(this IMathUtility math, MathVector translate, double scale = 1.0)
         {
@@ -45,17 +52,27 @@ namespace SolidworksAddinFramework
 
         public static IMathPoint RotateByAngle(this IMathUtility m, IMathPoint p, IMathVector axis, double angle)
         {
-            var transformation = (IMathTransform)m.CreateTransformRotateAxis(m.Origin(), axis, angle);
+            var transformation = GetRotationFromAxisAndAngle(m, axis, angle);
             return p.MultiplyTransformTs(transformation);
+        }
+
+        public static MathTransform GetRotationFromAxisAndAngle(this IMathUtility m, IMathVector axis, double angle)
+        {
+            return (MathTransform) m.CreateTransformRotateAxis(m.Origin(), axis, angle);
         }
 
 
         public static IMathPoint TranslateByVector(this IMathUtility m, IMathPoint p, IMathVector v)
         {
+            var transformation = GetTranslationFromVector(m, v);
+            return p.MultiplyTransformTs(transformation);
+        }
+
+        public static MathTransform GetTranslationFromVector(this IMathUtility m, IMathVector v)
+        {
             var vData = v.ArrayData.CastArray<double>();
             var xForm = new[] {1, 0, 0, 0, 1, 0, 0, 0, 1, vData[0], vData[1], vData[2], 1, 0, 0, 0};
-            var transformation = (IMathTransform)m.CreateTransform(xForm);
-            return p.MultiplyTransformTs(transformation);
+            return (MathTransform) m.CreateTransform(xForm);
         }
 
         public static List<double[]> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
