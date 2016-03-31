@@ -450,7 +450,7 @@ namespace SolidworksAddinFramework
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
             Func<IPropertyManagerPageNumberbox, IDisposable> config = null)
         {
-            return CreateNumberBox<Unit>(@group, tip, caption, propObservable, config);
+            return CreateNumberBox(@group, tip, caption, propObservable, config);
         }
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
             string tip,
@@ -458,7 +458,7 @@ namespace SolidworksAddinFramework
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
             Action<IPropertyManagerPageNumberbox> config = null)
         {
-            return CreateNumberBox<Unit>(@group, tip, caption, propObservable,
+            return CreateNumberBox(@group, tip, caption, propObservable,
                 Disposify(config));
         }
 
@@ -472,7 +472,9 @@ namespace SolidworksAddinFramework
         }
 
 
-        protected IDisposable CreateNumberBox<T>(IPropertyManagerPageGroup @group,
+
+
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
             string tip,
             string caption,
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
