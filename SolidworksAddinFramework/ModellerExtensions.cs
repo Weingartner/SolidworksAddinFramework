@@ -96,12 +96,14 @@ namespace SolidworksAddinFramework
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
 
-        public static Curve InterpolatePointsToCurve
-            (this IModeler modeler, double chordTolerance, List<double[]> points, bool simplify = true)
+        public static Curve InterpolatePointsToCurve(this IModeler modeler, double chordTolerance, List<double[]> points, bool simplify = true, bool closedCurve = false)
         {
             points = FilterOutShortLines(points, 1e-5).ToList();
 
-            points.Add(points.First());
+            if (closedCurve)
+            {
+                points.Add(points.First());
+            }
 
             var lines = points
                 .Buffer(2, 1)
