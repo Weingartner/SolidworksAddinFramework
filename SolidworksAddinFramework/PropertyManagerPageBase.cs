@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -447,18 +448,35 @@ namespace SolidworksAddinFramework
             string tip,
             string caption,
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
+            Func<IPropertyManagerPageNumberbox, IDisposable> config = null)
+        {
+            return CreateNumberBox<Unit>(@group, tip, caption, propObservable, config);
+        }
+        protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
             Action<IPropertyManagerPageNumberbox> config = null)
         {
-            return CreateNumberBox(@group, tip, caption, propObservable, Observable.Never<Unit>(), (_, __) => { }, config);
+            return CreateNumberBox<Unit>(@group, tip, caption, propObservable,
+                Disposify(config));
         }
+
+        public static Func<T,IDisposable> Disposify<T>(Action<T> a)
+        {
+            return t =>
+            {
+                a(t);
+                return Disposable.Empty;
+            };
+        }
+
 
         protected IDisposable CreateNumberBox<T>(IPropertyManagerPageGroup @group,
             string tip,
             string caption,
             IObservable<Reactive.Bindings.ReactiveProperty<double>> propObservable,
-            IObservable<T> changeObs,
-            Action<IPropertyManagerPageNumberbox, T> onChange,
-            Action<IPropertyManagerPageNumberbox> config = null,
+            Func<IPropertyManagerPageNumberbox, IDisposable> config = null,
             bool enable = true)
         {
             var id = NextId();
@@ -469,15 +487,14 @@ namespace SolidworksAddinFramework
                 {
                     Action<double> set = v => prop.Value = v;
                     var d0 = prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v => box.Value = v);
-                    config?.Invoke(box);
+                    var d5 = config?.Invoke(box);
                     var d1 = NumberBoxChangedObservable(id).Subscribe(set);
-                    return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1));
+                    return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1,d5));
                 });
-            var d3 = changeObs.Subscribe(x => onChange(box, x));
             // When calling e.g. `IPropertyManagerPageNumberbox::SetRange2` disabling the control doesn't work before the PMP is activated.
             // That's why we wait for the PMP activation here to deactivate the control.
             var d4 = _AfterActivation.Subscribe(_ => ((IPropertyManagerPageControl) box).Enabled = enable);
-            return new CompositeDisposable(d2, d3, d4);
+            return new CompositeDisposable(d2, d4);
         }
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
