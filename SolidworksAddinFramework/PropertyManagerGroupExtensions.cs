@@ -118,12 +118,12 @@ namespace SolidworksAddinFramework
             CreateOption(this IPropertyManagerPageGroup group,
                 int id,
                 string caption,
-                string tip,
+                string optionGroup,
                 swPropertyManagerPageControlLeftAlign_e leftAlign = 0,
                 IEnumerable<swAddControlOptions_e> options = null
             )
         {
-            return AddControl<IPropertyManagerPageOption>(@group, id, caption, tip, leftAlign, options);
+            return AddControl<IPropertyManagerPageOption>(@group, id, caption, optionGroup, leftAlign, options);
         }
 
         public static T AddControl<T>(this IPropertyManagerPageGroup @group,

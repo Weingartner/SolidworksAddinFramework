@@ -556,12 +556,12 @@ namespace SolidworksAddinFramework
             return WrapControlAndDisposable(box);
         }
 
-        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, Func<T> get, Action<T> set, T match)
+        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup pageGroup, string tip, string caption, Func<T> get, Action<T> set, T match)
         {
             var id = NextId();
             if (match == null) throw new ArgumentNullException(nameof(match));
 
-            var option = PropertyManagerGroupExtensions.CreateOption(@group, id, tip, caption);
+            var option = PropertyManagerGroupExtensions.CreateOption(pageGroup, id, tip, caption);
             if (get().Equals(match))
             {
                 option.Checked = true;
@@ -570,13 +570,13 @@ namespace SolidworksAddinFramework
             return WrapControlAndDisposable(option, d);
         }
 
-        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup @group, string tip, string caption, ReactiveProperty<T> prop, T match)
+        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup pageGroup, string tip, string caption, ReactiveProperty<T> prop, T match)
         {
             var id = NextId();
             if (match == null) throw new ArgumentNullException(nameof(match));
 
             Action<T> set = v => prop.Value = v;
-            var option = @group.CreateOption(id, tip, caption);
+            var option = pageGroup.CreateOption(id, tip, caption);
             prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v =>
             {
                 if (v.Equals(match))
@@ -587,15 +587,15 @@ namespace SolidworksAddinFramework
             var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
             return WrapControlAndDisposable(option, d);
         }
-        protected IDisposable CreateOption<T,TOption>(IPropertyManagerPageGroup @group,
+        protected IDisposable CreateOption<T,TOption>(IPropertyManagerPageGroup pageGroup,
             string caption,
-            string tip,
+            string optionGroup,
             T source,
             Expression<Func<T,TOption>> selector,
             TOption match)
         {
             var id = NextId();
-            var box = @group.CreateOption(id, caption, tip);
+            var box = pageGroup.CreateOption(id, caption, optionGroup);
             var proxy = selector.GetProxy(source);
 
             var d5 = Disposable.Empty;
