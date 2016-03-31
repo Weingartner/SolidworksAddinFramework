@@ -8,7 +8,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using Reactive.Bindings;
+using ReactiveUI;
 using SolidworksAddinFramework.ReactiveProperty;
+using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -444,6 +446,7 @@ namespace SolidworksAddinFramework
         {
             return CreateNumberBox(@group, tip, caption, Observable.Return(prop), config);
         }
+
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
             string tip,
             string caption,
@@ -463,7 +466,62 @@ namespace SolidworksAddinFramework
             };
         }
 
+        /// <summary>
+        /// ReactiveUI version of CreateNumberBox
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="group"></param>
+        /// <param name="tip"></param>
+        /// <param name="caption"></param>
+        /// <param name="source"></param>
+        /// <param name="selector"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        protected IDisposable CreateNumberBox<T>(IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            T source,
+            Expression<Func<T,double>> selector,
+            Func<IPropertyManagerPageNumberbox, IDisposable> config = null)
+        {
+            var id = NextId();
+            var box = @group.CreateNumberBox(id, caption, tip);
+            return InitControl(box, config, c => c.Value, NumberBoxChangedObservable(id), source, selector);
+        }
 
+        protected IDisposable CreateCheckBox<T>(IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            T source,
+            Expression<Func<T,bool>> selector,
+            Func<IPropertyManagerPageCheckbox, IDisposable> config = null,
+            bool enable = true)
+        {
+            var id = NextId();
+            var box = @group.CreateCheckBox(id, caption, tip);
+            return InitControl(box, config, c => c.Checked, CheckBoxChangedObservable(id), source, selector);
+        }
+
+        private IDisposable InitControl<T, TContrl, TProp>
+            (TContrl control,
+            Func<TContrl, IDisposable> controlConfig,
+            Expression<Func<TContrl, TProp>> ctrlPropSelector,
+            IObservable<TProp> ctrlPropChangeObservable, T propParent,
+            Expression<Func<T, TProp>> propSelector)
+        {
+            var proxy = propSelector.GetProxy(propParent);
+            var ctrlProxy = ctrlPropSelector.GetProxy(control);
+
+            var d5 = controlConfig?.Invoke(control);
+
+            var d2 = propParent
+                .WhenAnyValue(propSelector)
+                .Subscribe(v => ctrlProxy.Value = v);
+
+            var d1 = ctrlPropChangeObservable.Subscribe(v => proxy.Value = v);
+
+            return WrapControlAndDisposable(control, new CompositeDisposable(d1, d2, d5));
+        }
 
 
         protected IDisposable CreateNumberBox(IPropertyManagerPageGroup @group,
@@ -475,20 +533,20 @@ namespace SolidworksAddinFramework
         {
             var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
+            var d5 = config?.Invoke(box);
 
             var d2 = propObservable
                 .SubscribeDisposable(prop =>
                 {
                     Action<double> set = v => prop.Value = v;
                     var d0 = prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v => box.Value = v);
-                    var d5 = config?.Invoke(box);
                     var d1 = NumberBoxChangedObservable(id).Subscribe(set);
-                    return WrapControlAndDisposable(box, new CompositeDisposable(d0,d1,d5));
+                    return (IDisposable) new CompositeDisposable(d0,d1);
                 });
             // When calling e.g. `IPropertyManagerPageNumberbox::SetRange2` disabling the control doesn't work before the PMP is activated.
             // That's why we wait for the PMP activation here to deactivate the control.
             var d4 = _AfterActivation.Subscribe(_ => ((IPropertyManagerPageControl) box).Enabled = enable);
-            return new CompositeDisposable(d2, d4);
+            return WrapControlAndDisposable(box, new CompositeDisposable(d2, d4, d5));
         }
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
@@ -528,6 +586,27 @@ namespace SolidworksAddinFramework
             });
             var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
             return WrapControlAndDisposable(option, d);
+        }
+        protected IDisposable CreateOption<T,TOption>(IPropertyManagerPageGroup @group,
+            string caption,
+            string tip,
+            T source,
+            Expression<Func<T,TOption>> selector,
+            TOption match)
+        {
+            var id = NextId();
+            var box = @group.CreateOption(id, caption, tip);
+            var proxy = selector.GetProxy(source);
+
+            var d5 = Disposable.Empty;
+
+            var d2 = source
+                .WhenAnyValue(selector)
+                .Subscribe(v1 => box.Checked = v1.Equals(match));
+
+            var d1 = OptionCheckedObservable(id).Subscribe(v2 => proxy.Value = match);
+
+            return WrapControlAndDisposable(box, new CompositeDisposable(d1, d2, d5));
         }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,

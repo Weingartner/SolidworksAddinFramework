@@ -167,7 +167,7 @@ namespace SolidworksAddinFramework
                     throw new ArgumentException($"Cannot handle type{typeof(T).Name}");
             }
             return (T) @group
-                .AddControl(id,
+                .AddControl2(id,
                     (short) typeE,
                     caption,
                     (short) leftAlign,

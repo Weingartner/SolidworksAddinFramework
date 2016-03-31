@@ -103,8 +103,8 @@
     <Reference Include="solidworkstools">
       <HintPath>$(SolidWorksLocation)\SOLIDWORKS\solidworkstools.dll</HintPath>
     </Reference>
-    <Reference Include="Splat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Splat.1.0.0\lib\Net45\Splat.dll</HintPath>
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -189,6 +189,7 @@
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
     <Compile Include="ReactiveProperty\ReactivePropertyExtensions.cs" />
+    <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />

@@ -57,15 +57,15 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="ReactiveProperty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReactiveProperty.DataAnnotations, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.DataAnnotations.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.DataAnnotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReactiveProperty.NET46, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.NET46.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.NET46.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">

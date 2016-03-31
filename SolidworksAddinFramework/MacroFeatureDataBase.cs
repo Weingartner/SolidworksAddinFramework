@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Reactive.Bindings;
+using ReactiveUI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -12,7 +13,7 @@ namespace SolidworksAddinFramework
     /// Base class for any macro feature parameter set. Mark an string, double, int or bool property with attribute 
     /// 'MacroFeatureDataField' and it will be automagically serialized to the macro feature macroFeatureData.
     /// </summary>
-    public class MacroFeatureDataBase
+    public class MacroFeatureDataBase : ReactiveObject
     {
         private int[] _Types;
         private string[] _Names;

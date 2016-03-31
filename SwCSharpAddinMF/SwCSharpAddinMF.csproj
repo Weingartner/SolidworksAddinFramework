@@ -66,7 +66,7 @@
     <NoWarn>
     </NoWarn>
     <Optimize>false</Optimize>
-    <RegisterForComInterop>true</RegisterForComInterop>
+    <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
@@ -121,15 +121,19 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="ReactiveProperty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReactiveProperty.DataAnnotations, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.DataAnnotations.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.DataAnnotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReactiveProperty.NET46, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.5\lib\net46\ReactiveProperty.NET46.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.NET46.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
@@ -146,6 +150,10 @@
     </Reference>
     <Reference Include="solidworkstools">
       <HintPath>$(SolidWorksLocation)\SOLIDWORKS\solidworkstools.dll</HintPath>
+    </Reference>
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -177,6 +185,10 @@
     </Reference>
     <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
