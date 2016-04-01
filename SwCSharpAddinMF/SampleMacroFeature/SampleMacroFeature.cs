@@ -49,7 +49,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
             var axisX = new double[] {1, 0, 0};
 
             // Find the point to cut the object
-            center[0] = database.Alpha.Value*box.P0[0] + (1 - database.Alpha.Value)*box.P1[0];
+            center[0] = database.Alpha*box.P0[0] + (1 - database.Alpha)*box.P1[0];
             var sheet = modeler.CreateSheet(center, axisX, box.P0, box.P1);
 
             var cutResult = body.Cut(sheet);

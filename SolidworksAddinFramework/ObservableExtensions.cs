@@ -91,5 +91,21 @@ namespace SolidworksAddinFramework
                 )
                 .Switch();
         }
+
+            /// <summary>
+            /// <para>Observe on UIDispatcherScheduler.</para>
+            /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
+            /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
+            /// </summary>
+            public static IObservable<T> ObserveOnUiDispatcher<T>(this IObservable<T> source) =>
+                source.ObserveOn(UiDispatcherScheduler.Default);
+
+            /// <summary>
+            /// <para>Subscribe on UIDispatcherScheduler.</para>
+            /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
+            /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
+            /// </summary>
+            public static IObservable<T> SubscribeOnUiDispatcher<T>(this IObservable<T> source) =>
+                source.SubscribeOn(UiDispatcherScheduler.Default);
     }
 }

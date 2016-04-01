@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Reactive.Bindings;
 using ReactiveUI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -31,18 +30,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         private void UpdateValues()
         {
-            var tmp = BindingProperties.Select(p =>
-            {
-                if (IsReactiveProperty(p.PropertyType))
-                {
-                    var reactiveProperty = p.GetValue(this, new object[0]);
-                    return
-                        reactiveProperty.GetType()
-                            .GetProperty(nameof(ReactiveProperty<object>.Value))
-                            .GetValue(reactiveProperty, new object[0]);
-                }
-                return p.GetValue(this, new object[] {});
-            }).ToList();
+            var tmp = BindingProperties.Select(p => p.GetValue(this, new object[] {})).ToList();
             tmp.CopyTo(_Values);
 
         }
@@ -92,45 +80,14 @@ namespace SolidworksAddinFramework
             {
                 var o = bindingProperty.GetValue(this,new object[] {});
                 var propertyType = bindingProperty.PropertyType;
-                if (IsReactiveProperty(propertyType))
-                {
-                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
-                    var valuePropertyInfo = o.GetType().GetProperty(valuePropertyName);
-                    var value = valuePropertyInfo.GetValue(o, new object[] {});
-                    WriteTo(macroFeatureData, valuePropertyInfo.PropertyType, bindingProperty.Name, value);
-                }
-                else
-                {
-                    WriteTo(macroFeatureData, propertyType, bindingProperty.Name, o);
-                }
+                WriteTo(macroFeatureData, propertyType, bindingProperty.Name, o);
             }
-        }
-
-        private static bool IsReactiveProperty(Type propertyType)
-        {
-            return propertyType.IsGenericType &&
-                   propertyType.GetGenericTypeDefinition() == typeof (ReactiveProperty<>);
         }
 
         private IEnumerable<swMacroFeatureParamType_e> GetTypes()
         {
             IEnumerable<PropertyInfo> bindingProperties = BindingProperties;
-            foreach (var bindingProperty in bindingProperties)
-            {
-                var o = bindingProperty.GetValue(this,new object[] {});
-                var propertyType = bindingProperty.PropertyType;
-                if (IsReactiveProperty(propertyType))
-                {
-                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
-                    var valuePropertyInfo = o.GetType().GetProperty(valuePropertyName);
-                    var value = valuePropertyInfo.GetValue(o, new object[] {});
-                    yield return Type(valuePropertyInfo);
-                }
-                else
-                {
-                    yield return Type(bindingProperty);
-                }
-            }
+            return bindingProperties.Select(Type);
         }
 
         swMacroFeatureParamType_e Type(PropertyInfo p)
@@ -189,18 +146,7 @@ namespace SolidworksAddinFramework
 
                 var paramName = bindingProperty.Name;
 
-                if (IsReactiveProperty(propertyType))
-                {
-                    var reactiveProperty = bindingProperty.GetValue(this, new object[] {});
-
-                    var valuePropertyName = nameof(ReactiveProperty<object>.Value);
-                    var valueProperty = reactiveProperty.GetType().GetProperty(valuePropertyName);
-                    ReadValue(reactiveProperty, valueProperty, macroFeatureData, paramName);
-                }else
-                {
-                    ReadValue(this, bindingProperty, macroFeatureData, paramName);
-                    
-                }
+                ReadValue(this, bindingProperty, macroFeatureData, paramName);
             }
         }
 

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
+using ReactiveUI;
 using SolidworksAddinFramework;
-using SolidworksAddinFramework.ReactiveProperty;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -51,9 +52,10 @@ namespace SwCSharpAddinMF.SampleMacroFeature
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             yield return CreateLabel(_PageGroup, "Alpha", "Alpha");
-            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", ()=>MacroFeature.Database.Alpha.Value,v=>MacroFeature.Database.Alpha.Value=v, box =>
+            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", MacroFeature.Database, p=>p.Alpha, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.1, true);
+                return Disposable.Empty;
             });
 
             yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
@@ -75,7 +77,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
             // show a temporary body with the split in it
             yield return Observable
                 .CombineLatest(
-                    MacroFeature.Database.Alpha.WhenAnyValue(),
+                    MacroFeature.Database.WhenAnyValue(p=>p.Alpha),
                     SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
                     (alpha, selection) => new { alpha, selection }
                 )

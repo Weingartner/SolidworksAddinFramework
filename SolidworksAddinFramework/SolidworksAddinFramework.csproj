@@ -72,18 +72,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ReactiveProperty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReactiveProperty.DataAnnotations, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.DataAnnotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ReactiveProperty.NET46, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ReactiveProperty.2.6.0\lib\net46\ReactiveProperty.NET46.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
@@ -188,7 +176,6 @@
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
-    <Compile Include="ReactiveProperty\ReactivePropertyExtensions.cs" />
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
@@ -196,12 +183,14 @@
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
     <Compile Include="TwoPointRange.cs" />
+    <Compile Include="UiDispatcherScheduler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
