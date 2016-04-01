@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -121,7 +122,7 @@ namespace SolidworksAddinFramework
         public static IEnumerable<double[]> FilterOutShortLines(List<double[]> points, double tol)
         {
             double[] previous = null;
-            Func<double[],double[],double> distance = (p0,p1)=>(new DenseVector(p0)-new DenseVector(p1)).L2Norm();
+            Func<double[], double[], double> distance = (p0,p1)=>(new DenseVector(p0)-new DenseVector(p1)).L2Norm();
             var result = new List<double[]>();
             foreach (var pt in points)
             {
@@ -151,6 +152,24 @@ namespace SolidworksAddinFramework
             result.Reverse();
 
             return result;
-        } 
+        }
+
+        public static ICurve CreateHelix(this IModeler modeler, double length, double radius, double lead, double zStart)
+        {
+            var rotations = length/lead;
+            var numberOfSteps =(int)(rotations*20);
+
+            var points = Sequences.LinSpace(0, rotations*2*Math.PI, numberOfSteps)
+                .Select(a =>
+                {
+                    var x = radius*Math.Cos(a);
+                    var y = radius*Math.Sin(a);
+                    var z = a*lead/(2*Math.PI) + zStart;
+                    return new[] {x, y, z};
+                })
+                .ToList();
+
+            return modeler.InterpolatePointsToCurve(1e-5, points, false, false);
+        }
     }
 }
