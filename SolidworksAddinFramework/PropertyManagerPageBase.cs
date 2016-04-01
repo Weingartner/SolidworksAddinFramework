@@ -556,6 +556,16 @@ namespace SolidworksAddinFramework
             return WrapControlAndDisposable(box);
         }
 
+        /// <summary>
+        /// Creates an options group
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TOption"></typeparam>
+        /// <param name="pageGroup">The page group the options group belongs to</param>
+        /// <param name="source">The model object</param>
+        /// <param name="selector">The binding selector for the property on the model</param>
+        /// <param name="builder">A callback which is passed the options group object. You can add options here. </param>
+        /// <returns></returns>
         protected IDisposable CreateOptionGroup<T,TOption>
             (IPropertyManagerPageGroup pageGroup,T source, Expression<Func<T,TOption>> selector, Action<OptionGroup<T,TOption>> builder)
         {
