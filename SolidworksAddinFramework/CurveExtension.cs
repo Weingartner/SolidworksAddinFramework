@@ -127,5 +127,35 @@ namespace SolidworksAddinFramework
         {
             return (ICurve)edge.GetCurve();
         }
+
+        /// <summary>
+        /// Finds the closest point on a curve to a given zPosition.
+        /// Assumes a continous curve in z, otherwise it might return a local minimum!
+        /// </summary>
+        /// <param name="curve"></param>
+        /// <param name="zPos"></param>
+        /// <returns></returns>
+        public static double[] ClosestPointToZPosition(this ICurve curve, double zPos)
+        {
+            var curveDomain = curve.Domain();
+            Func<double, double> fn = (t) =>
+            {
+                var ptZ = curve.PointAt(t)[2];
+                return (ptZ - zPos);
+            };
+
+            double par;
+            try
+            {
+                var solver = new BrentSearch(fn, curveDomain[0], curveDomain[1]);
+                solver.FindRoot();
+                par = solver.Solution;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Solver solution doesn't converge!");
+            }
+            return curve.PointAt(par).Take(3).ToArray();
+        }
     }
 }
