@@ -46,6 +46,7 @@ namespace SolidworksAddinFramework.Spec
                     new object[] { radius, length, 0, 1+radius, 1.0},
                     new object[] { radius, length, 0, -(1+radius), 1.0},
                     new object[] { radius, length, -length, 0, 0.0},
+                    new object[] { radius, length, 0, 2+radius, 2.0},
                 };
             }
         }
