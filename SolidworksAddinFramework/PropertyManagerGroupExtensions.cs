@@ -12,9 +12,16 @@ namespace SolidworksAddinFramework
             CreateGroup(this IPropertyManagerPage2 page,
                 int id,
                 string caption,
-                IEnumerable<swAddGroupBoxOptions_e> options
+                IEnumerable<swAddGroupBoxOptions_e> options = null
             )
         {
+            options = options ??
+                      new[]
+                      {
+                          swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded,
+                          swAddGroupBoxOptions_e.swGroupBoxOptions_Visible
+                      };
+
             var optionsShort = (short) CombineToInt(options, v => (short) v);
             return (IPropertyManagerPageGroup) page.AddGroupBox(id, caption, optionsShort);
         }

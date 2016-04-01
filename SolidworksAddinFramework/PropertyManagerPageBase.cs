@@ -198,7 +198,7 @@ namespace SolidworksAddinFramework
             _OptionChecked.OnNext(id);
         }
 
-        public IObservable<int> OptionCheckedObservable(int id) => _OptionChecked.Where(i => i == id);
+        public IObservable<int> OptionCheckedObservable(int id) => _OptionChecked.DistinctUntilChanged().Where(i => i == id);
 
         private readonly Subject<int> _ButtonPressed = new Subject<int>();
         public IObservable<int> ButtonPressedObservable(int id) => _ButtonPressed.Where(i => i == id);
@@ -556,58 +556,14 @@ namespace SolidworksAddinFramework
             return WrapControlAndDisposable(box);
         }
 
-        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup pageGroup, string tip, string caption, Func<T> get, Action<T> set, T match)
+        protected IDisposable CreateOptionGroup<T,TOption>
+            (IPropertyManagerPageGroup pageGroup,T source, Expression<Func<T,TOption>> selector, Action<OptionGroup<T,TOption>> builder)
         {
-            var id = NextId();
-            if (match == null) throw new ArgumentNullException(nameof(match));
-
-            var option = PropertyManagerGroupExtensions.CreateOption(pageGroup, id, tip, caption);
-            if (get().Equals(match))
-            {
-                option.Checked = true;
-            }
-            var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
-            return WrapControlAndDisposable(option, d);
+            var optionGroup = new OptionGroup<T,TOption>(this, pageGroup, source, selector);
+            builder(optionGroup);
+            return optionGroup;
         }
 
-        protected IDisposable CreateOption<T>(IPropertyManagerPageGroup pageGroup, string tip, string caption, ReactiveProperty<T> prop, T match)
-        {
-            var id = NextId();
-            if (match == null) throw new ArgumentNullException(nameof(match));
-
-            Action<T> set = v => prop.Value = v;
-            var option = pageGroup.CreateOption(id, tip, caption);
-            prop.WhenAnyValue().DistinctUntilChanged().Subscribe(v =>
-            {
-                if (v.Equals(match))
-                {
-                    option.Checked = true;
-                }
-            });
-            var d = OptionCheckedObservable(id).Subscribe(v=>set(match));
-            return WrapControlAndDisposable(option, d);
-        }
-        protected IDisposable CreateOption<T,TOption>(IPropertyManagerPageGroup pageGroup,
-            string caption,
-            string optionGroup,
-            T source,
-            Expression<Func<T,TOption>> selector,
-            TOption match)
-        {
-            var id = NextId();
-            var box = pageGroup.CreateOption(id, caption, optionGroup);
-            var proxy = selector.GetProxy(source);
-
-            var d5 = Disposable.Empty;
-
-            var d2 = source
-                .WhenAnyValue(selector)
-                .Subscribe(v1 => box.Checked = v1.Equals(match));
-
-            var d1 = OptionCheckedObservable(id).Subscribe(v2 => proxy.Value = match);
-
-            return WrapControlAndDisposable(box, new CompositeDisposable(d1, d2, d5));
-        }
 
         protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
             Action<IPropertyManagerPageSelectionbox> config)
@@ -635,7 +591,7 @@ namespace SolidworksAddinFramework
 
         #region control reference holding
 
-        private IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
+        internal IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
         {
             return new ControlHolder(control, d.ToCompositeDisposable());
         }
@@ -667,11 +623,58 @@ namespace SolidworksAddinFramework
 
         #endregion
 
-        private int NextId()
+        internal int NextId()
         {
             _NextId++;
             return _NextId;
         }
     }
 
+    public class OptionGroup<T,TOption> : IDisposable
+    {
+        private List<IPropertyManagerPageOption> _Options = new List<IPropertyManagerPageOption>(); 
+        IPropertyManagerPageGroup _PageGroup;
+        private CompositeDisposable _Disposable = new CompositeDisposable();
+
+        public void Dispose()
+        {
+            _Disposable.Dispose();
+        }
+
+        private PropertyManagerPageBase _Page;
+        private readonly T _Source;
+        private readonly Expression<Func<T,TOption>> _Selector;
+
+        public OptionGroup(PropertyManagerPageBase page, IPropertyManagerPageGroup pageGroup, T source, Expression<Func<T, TOption>> selector)
+        {
+            _Page = page;
+            _PageGroup = pageGroup;
+            _Source = source;
+            _Selector = selector;
+        }
+
+        public void CreateOption(
+            string caption,
+            TOption match)
+        {
+
+            var id = _Page.NextId();
+            var box = _PageGroup.CreateOption(id, caption, caption);
+            _Options.Add(box);
+            if (_Options.Count == 1)
+                box.Style = (int) swPropMgrPageOptionStyle_e.swPropMgrPageOptionStyle_FirstInGroup;
+
+            var proxy = _Selector.GetProxy(_Source);
+
+            var d2 = _Source
+                .WhenAnyValue(_Selector)
+                .Subscribe(v1 => box.Checked = v1.Equals(match));
+
+            var d1 = _Page.OptionCheckedObservable(id).Subscribe(v2 => proxy.Value = match);
+
+            var d = _Page.WrapControlAndDisposable(box, new CompositeDisposable(d1, d2));
+
+            _Disposable.Add(d);
+        }
+    }
 }
