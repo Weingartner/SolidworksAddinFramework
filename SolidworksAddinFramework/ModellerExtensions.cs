@@ -157,7 +157,7 @@ namespace SolidworksAddinFramework
         public static ICurve CreateHelix(this IModeler modeler, double length, double radius, double lead, double zStart)
         {
             var rotations = length/lead;
-            var numberOfSteps =(int)(rotations*20);
+            var numberOfSteps =(int)(rotations*30);
 
             var points = Sequences.LinSpace(0, rotations*2*Math.PI, numberOfSteps)
                 .Select(a =>
@@ -169,7 +169,7 @@ namespace SolidworksAddinFramework
                 })
                 .ToList();
 
-            return modeler.InterpolatePointsToCurve(1e-5, points, false, false);
+            return modeler.InterpolatePointsToCurve(5e-5, points, false, false);
         }
     }
 }
