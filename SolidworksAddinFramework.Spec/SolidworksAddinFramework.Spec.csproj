@@ -86,7 +86,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurveExtensionSpec.cs" />
     <Compile Include="MathUtilitySpec.cs" />
     <Compile Include="opengl\MeshRenderSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
