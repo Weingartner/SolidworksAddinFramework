@@ -10,7 +10,7 @@ namespace SolidworksAddinFramework.Spec.opengl
     public class MeshRenderSpec : SolidWorksSpec
     {
 
-        [Fact]
+        [SolidworksFact]
         public async Task ShouldRenderCylinder()
         {
             var t = new Thread(() =>

@@ -11,7 +11,7 @@ namespace SwCSharpAddinMF.Spec
     public class SampleMacroFeatureSpec : SolidWorksSpec
     {
 
-        [Fact]
+        [SolidworksFact]
         public void ShouldBeAbleToApplySampleMacroFeature()
         {
             var partDoc = (IPartDoc) SwApp.NewPart();
