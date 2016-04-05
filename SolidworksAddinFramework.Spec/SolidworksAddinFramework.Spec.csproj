@@ -44,6 +44,14 @@
       <HintPath>$(SolutionDir)packages\FluentAssertions.4.2.2\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Polly, Version=4.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Polly.4.1.2\lib\net45\Polly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
       <HintPath>$(SolidWorksLocation)\SOLIDWORKS\api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -61,6 +69,18 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Ix-Main.1.2.5\lib\net45\System.Interactive.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
@@ -81,7 +101,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.runner.utility.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\xunit.runner.utility.2.1.0\lib\net35\xunit.runner.utility.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="XUnitRemote, Version=1.0.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\XUnitRemote.1.0.0.6\lib\net461\XUnitRemote.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -91,10 +119,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OutOfProcessTest\XUnitRemote\XUnitRemote.csproj">
-      <Project>{21248CF4-3629-4CFA-8632-9E4468A0526E}</Project>
-      <Name>XUnitRemote</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>

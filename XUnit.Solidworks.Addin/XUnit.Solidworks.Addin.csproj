@@ -204,8 +204,16 @@
       <HintPath>$(SolutionDir)packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="xunit.runner.utility.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\xunit.runner.utility.2.1.0\lib\net35\xunit.runner.utility.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="XUnitRemote, Version=1.0.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\XUnitRemote.1.0.0.6\lib\net461\XUnitRemote.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -235,10 +243,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OutOfProcessTest\XUnitRemote\XUnitRemote.csproj">
-      <Project>{21248cf4-3629-4cfa-8632-9e4468a0526e}</Project>
-      <Name>XUnitRemote</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>
