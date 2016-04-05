@@ -1,3 +1,5 @@
+//#define UseXUnitAppDomain
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -82,12 +84,17 @@ namespace XUnit.Solidworks.Addin
                     AppDomain domain = AppDomain.CreateDomain("XUnitDomain", AppDomain.CurrentDomain.Evidence,
                         domaininfo);
 
-                    domain.SetData(SwdataKey, SwApp);
+#if UseXUnitAppDomain 
+                domain.SetData(SwdataKey, SwApp);
                     domain.DoCallBack(Callback);
-                    //MessageBox.Show("Unloading app domain");
-                    //AppDomain.Unload(domain);
-                    //GC.Collect();
-                }
+#else
+                AppDomain.CurrentDomain.SetData(SwdataKey, SwApp);
+                Callback();
+#endif
+                //MessageBox.Show("Unloading app domain");
+                //AppDomain.Unload(domain);
+                //GC.Collect();
+            }
                 catch (Exception e)
                 {
                     MessageBox.Show(e.Message);
@@ -110,11 +117,11 @@ namespace XUnit.Solidworks.Addin
             CommandManager.RemoveCommandGroup(MainCmdGroupId);
         }
 
-        #endregion
+#endregion
 
-        #region UI Callbacks
+#region UI Callbacks
 
-        #endregion
+#endregion
 
     }
 
