@@ -69,26 +69,5 @@ namespace SolidworksAddinFramework.Spec
                     MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
                 });
         }
-
-        [Fact]
-        public void TransparentColorOpenGlShouldWork()
-        {
-
-            App.Visible = true;
-            App.NewPart();
-            var modeler = (IModeler) App.GetModeler();
-            var modelDoc = (ModelDoc2)App.ActiveDoc;
-            var docView = new DocView(App,(ModelView)modelDoc.ActiveView);
-            docView.AttachEventHandlers();
-            var radius = 1e-2;
-            var length = 1;
-            var array = new[] {0, 0, 0, 0, 0, 1, radius, length}.ToArray();
-            var body = (Body2) modeler.CreateBodyFromCyl(array);
-            body.Display3(modelDoc, 255, 1);
-            //var newToolMesh = new Mesh(body);
-            //newToolMesh.DisplayUndoable(modelDoc, Color.FromArgb(200, Color.Yellow));
-            var foo = 6;
-        }
-
     }
 }
