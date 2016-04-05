@@ -5,13 +5,15 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinMF", "SwCSharpAddinMF\SwCSharpAddinMF.csproj", "{A67399BE-AAF7-433F-8F72-9B0424C5BE67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinSpecHelper", "SwCSharpAddinSpecHelper\SwCSharpAddinSpecHelper.csproj", "{D9C35464-37FE-48D9-9518-F43C57259C31}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwCSharpAddinMF.Spec", "SwCSharpAddinMF.Spec\SwCSharpAddinMF.Spec.csproj", "{117A5363-F5AF-462B-8769-C2733132EF2C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidworksAddinFramework", "SolidworksAddinFramework\SolidworksAddinFramework.csproj", "{FE89110C-7405-4070-AB58-C83C12CE6CA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidworksAddinFramework.Spec", "SolidworksAddinFramework.Spec\SolidworksAddinFramework.Spec.csproj", "{39585804-63EB-4B00-A568-4268C7BF8C40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnit.Solidworks.Addin", "XUnit.Solidworks.Addin\XUnit.Solidworks.Addin.csproj", "{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitRemote", "..\..\OutOfProcessTest\XUnitRemote\XUnitRemote.csproj", "{21248CF4-3629-4CFA-8632-9E4468A0526E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +25,6 @@ Global
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A67399BE-AAF7-433F-8F72-9B0424C5BE67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9C35464-37FE-48D9-9518-F43C57259C31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9C35464-37FE-48D9-9518-F43C57259C31}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9C35464-37FE-48D9-9518-F43C57259C31}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9C35464-37FE-48D9-9518-F43C57259C31}.Release|Any CPU.Build.0 = Release|Any CPU
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +37,14 @@ Global
 		{39585804-63EB-4B00-A568-4268C7BF8C40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39585804-63EB-4B00-A568-4268C7BF8C40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39585804-63EB-4B00-A568-4268C7BF8C40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21248CF4-3629-4CFA-8632-9E4468A0526E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21248CF4-3629-4CFA-8632-9E4468A0526E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21248CF4-3629-4CFA-8632-9E4468A0526E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21248CF4-3629-4CFA-8632-9E4468A0526E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

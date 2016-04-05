@@ -22,13 +22,11 @@ namespace SolidworksAddinFramework
         private Hashtable _OpenDocs = new Hashtable();
         private SldWorks _SwEventPtr;
 
-        public ISldWorks SwApp => ISwApp;
-
         public ICommandManager CommandManager { get; private set; }
 
         public Hashtable OpenDocs => _OpenDocs;
 
-        public ISldWorks ISwApp { set; get; }
+        public ISldWorks SwApp { set; get; }
 
         [ComRegisterFunction]
         public static void RegisterFunction(Type t)
@@ -99,18 +97,18 @@ namespace SolidworksAddinFramework
 
         public bool ConnectToSW(object thisSw, int cookie)
         {
-            ISwApp = (ISldWorks)thisSw;
+            SwApp = (ISldWorks)thisSw;
             AddinId = cookie;
 
             //Setup callbacks
-            ISwApp.SetAddinCallbackInfo(0, this, AddinId);
+            SwApp.SetAddinCallbackInfo(0, this, AddinId);
 
             #region Setup the Command Manager
             Connect();
             #endregion
 
             #region Setup the Event Handlers
-            _SwEventPtr = (SldWorks)ISwApp;
+            _SwEventPtr = (SldWorks)SwApp;
             _OpenDocs = new Hashtable();
             AttachEventHandlers();
             #endregion
@@ -121,7 +119,7 @@ namespace SolidworksAddinFramework
         public void Connect()
         {
             Bmp = new BitmapHandler();
-            CommandManager = ISwApp.GetCommandManager(AddinId);
+            CommandManager = SwApp.GetCommandManager(AddinId);
             AddCommandMgr();
         }
 
@@ -179,8 +177,8 @@ namespace SolidworksAddinFramework
 
             Marshal.ReleaseComObject(CommandManager);
             CommandManager = null;
-            Marshal.ReleaseComObject(ISwApp);
-            ISwApp = null;
+            Marshal.ReleaseComObject(SwApp);
+            SwApp = null;
             //The addin _must_ call GC.Collect() here in order to retrieve all managed code pointers 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -246,7 +244,7 @@ namespace SolidworksAddinFramework
 
         public void AttachEventsToAllDocuments()
         {
-            var modDoc = (ModelDoc2)ISwApp.GetFirstDocument();
+            var modDoc = (ModelDoc2)SwApp.GetFirstDocument();
             while (modDoc != null)
             {
                 if (!_OpenDocs.Contains(modDoc))

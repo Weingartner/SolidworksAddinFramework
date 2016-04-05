@@ -2,16 +2,13 @@
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using SolidWorks.Interop.sldworks;
-using SwCSharpAddinSpecHelper;
 using Xunit;
+using XUnit.Solidworks.Addin;
 
 namespace SolidworksAddinFramework.Spec.opengl
 {
     public class MeshRenderSpec : SolidWorksSpec
     {
-        public MeshRenderSpec(SwPoolFixture pool) : base(pool)
-        {
-        }
 
         [Fact]
         public async Task ShouldRenderCylinder()

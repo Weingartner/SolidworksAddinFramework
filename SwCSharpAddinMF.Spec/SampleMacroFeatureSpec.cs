@@ -3,20 +3,19 @@ using System.Linq;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using SwCSharpAddinSpecHelper;
 using Xunit;
+using XUnit.Solidworks.Addin;
 
 namespace SwCSharpAddinMF.Spec
 {
     public class SampleMacroFeatureSpec : SolidWorksSpec
     {
-        public SampleMacroFeatureSpec(SwPoolFixture pool) : base(pool) { }
 
         [Fact]
         public void ShouldBeAbleToApplySampleMacroFeature()
         {
-            var partDoc = (IPartDoc) App.NewPart();
-            var modelDoc = (IModelDoc2) App.ActiveDoc;
+            var partDoc = (IPartDoc) SwApp.NewPart();
+            var modelDoc = (IModelDoc2) SwApp.ActiveDoc;
             Assert.True(modelDoc.Extension.SelectByID2("Front Plane", "PLANE", 0, 0, 0, true, 0, null, 0));
             var plane1 = (RefPlane)modelDoc.FeatureManager.InsertRefPlane(8, 0.01, 0, 0, 0, 0);
             Assert.True(modelDoc.Extension.SelectByID2("Front Plane", "PLANE", 0, 0, 0, true, 0, null, 0));
@@ -37,7 +36,7 @@ namespace SwCSharpAddinMF.Spec
                 (int)swStartConditions_e.swStartSurface, 0, false);
 
             var macroFeature = new SampleMacroFeature.SampleMacroFeature();
-            macroFeature.Edit(App, modelDoc, null);
+            macroFeature.Edit(SwApp, modelDoc, null);
             Assert.True(modelDoc.Extension.SelectByID2(feature.Name, "SOLIDBODY", 0, 0, 0, false, 1, null, 0));
 
             // TODO this doesn't work

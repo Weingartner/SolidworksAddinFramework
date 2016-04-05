@@ -112,14 +112,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SampleMacroFeatureSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -130,13 +129,13 @@
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SwCSharpAddinSpecHelper\SwCSharpAddinSpecHelper.csproj">
-      <Project>{d9c35464-37fe-48d9-9518-f43c57259c31}</Project>
-      <Name>SwCSharpAddinSpecHelper</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SwCSharpAddinMF\SwCSharpAddinMF.csproj">
       <Project>{a67399be-aaf7-433f-8f72-9b0424c5be67}</Project>
       <Name>SwCSharpAddinMF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XUnit.Solidworks.Addin\XUnit.Solidworks.Addin.csproj">
+      <Project>{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}</Project>
+      <Name>XUnit.Solidworks.Addin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -81,7 +81,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -89,16 +89,19 @@
     <Compile Include="MathUtilitySpec.cs" />
     <Compile Include="opengl\MeshRenderSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwPool.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OutOfProcessTest\XUnitRemote\XUnitRemote.csproj">
+      <Project>{21248CF4-3629-4CFA-8632-9E4468A0526E}</Project>
+      <Name>XUnitRemote</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SwCSharpAddinSpecHelper\SwCSharpAddinSpecHelper.csproj">
-      <Project>{d9c35464-37fe-48d9-9518-f43c57259c31}</Project>
-      <Name>SwCSharpAddinSpecHelper</Name>
+    <ProjectReference Include="..\XUnit.Solidworks.Addin\XUnit.Solidworks.Addin.csproj">
+      <Project>{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}</Project>
+      <Name>XUnit.Solidworks.Addin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
