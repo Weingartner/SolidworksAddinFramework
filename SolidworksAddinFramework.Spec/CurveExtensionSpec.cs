@@ -7,7 +7,6 @@ using FluentAssertions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SwCSharpAddinSpecHelper;
-using WeinCadSW.Macros.ToolAligner;
 using Xunit;
 using Xunit.Extensions;
 
