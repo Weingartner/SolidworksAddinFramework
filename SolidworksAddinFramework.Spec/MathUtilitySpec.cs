@@ -53,8 +53,7 @@ namespace SolidworksAddinFramework.Spec
                 });
         }
 
-        /*
-        [Theory, MemberData(nameof(TestData))]
+        [SolidworksTheory, MemberData(nameof(TestData))]
         public void InterpolatePointsShouldWork(double[]p0,double[]p1,double stepSize, int expectedPointCount)
         {
             var points = new[] {p0, p1};
@@ -69,6 +68,5 @@ namespace SolidworksAddinFramework.Spec
                     MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
                 });
         }
-        */
     }
 }
