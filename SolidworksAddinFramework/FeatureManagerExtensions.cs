@@ -71,7 +71,15 @@ namespace SolidworksAddinFramework
         {
             var of = o as IFormattable;
             if (of == null)
-                return o.ToString();
+            {
+                if(o!=null)
+                    return o.ToString();
+                else
+                {
+                    return "";
+                }
+                
+            }
             else
             {
                 return of.ToString(null, CultureInfo.InvariantCulture);

@@ -1,4 +1,6 @@
-#define UseXUnitAppDomain
+// Keep this commented out. I have trouble loading DLL's when I 
+// create isolated app domains. It requires more work
+//#define UseXUnitAppDomain
 
 using System;
 using System.Collections.Generic;
@@ -109,7 +111,7 @@ namespace XUnit.Solidworks.Addin
         {
             var marshaller = new ThreadMarshaller();
             var data = new Dictionary<string, object> { {nameof(ISldWorks), sldWorks}};
-            XUnitService.Start(SolidworksFactDiscoverer.XUnitId, f => marshaller.Marshall(f), data);
+            XUnitService.Start(SolidworksFactDiscoverer.XUnitId,false, f => marshaller.Marshall(f), data);
         }
 
 

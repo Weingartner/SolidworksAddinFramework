@@ -14,7 +14,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
         {
         }
 
-        string _Param0;
+        string _Param0="";
         [MacroFeatureDataField]
         public string Param0 
         {
