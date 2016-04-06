@@ -105,4 +105,58 @@ parameter __alpha__ that determines the position of the split plane. See a video
 https://dl.dropboxusercontent.com/s/dwx4h2kbioamtic/2016-02-29_11-11-09.mp4?dl=0
 
 
+Solidworks API Unit Testing
+===========================
 
+Building the unit test solidworks addin engine
+----------------------------------------------
+
+We have written XUnit extensions that enable running SolidWorks tests __in process__. If you try and write normal tests by first creating an instance of __ISldWorks__ and then calling methods on it you will get bitten by the fact that COM marshelling out of process is crazy slow. 
+
+Our XUnit addin loads the tests directly into the solidworks process and ensures tests are dispatched on the main thread. Again if you dispatch code on the wrong thread it runs slow or has errors.
+
+The first thing to do is checkout this repo and then build the solution. 
+
+There is a subproject call __XUnit.Solidworks.Addin__. When built it will register a special addin with solidworks. This addin contains the service that our XUnit interprocess extensions will talk to. This project contains solidworks specialization of the generic XUnit extensions we have written for interprocess unit tests. See https://github.com/Weingartner/XUnitRemote.
+
+Writing solidworks unit tests
+-----------------------------
+
+There are tests you can look at for inspiration here.
+
+https://github.com/Weingartner/SolidworksAddinFramework/blob/master/SolidworksAddinFramework.Spec/MathUtilitySpec.cs
+
+but the basics are that instead of using
+
+__Theory__ and __Fact__
+
+you use
+
+__SolidworksTheory__ and __SolidworksFact__
+
+Anatomy of a solidworks test
+----------------------------
+
+	namespace MyTests
+	{
+	    // You should inherit from SolidWorksSpec
+	    public class SampleMacroFeatureSpec : SolidWorksSpec 
+	    {
+	
+	        // Mark a fact with the following attribute and it will be loaded into the
+	        // solidworks process. ( it won't run within VisualStudio )
+	        [SolidworksFact]
+	        public void ShouldBeAbleToApplySampleMacroFeature()
+	        {
+	            // SwApp is a member of SolidWorksSpec
+	            ISldWorks sw = SwApp;
+	            // Create a new document
+	            var partDoc = (IPartDoc) SwApp.NewPart();
+	  
+	            // Now do some solidworks stuff. It will run fast
+	            
+	        }
+	    }
+	}
+
+everything else is basically the same.
