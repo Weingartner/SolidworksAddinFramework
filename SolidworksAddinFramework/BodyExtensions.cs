@@ -182,10 +182,11 @@ namespace SolidworksAddinFramework
             var faces = body.GetFaces().CastArray<IFace2>();
 
             var bodyBox = body.GetBodyBoxTs();
-            double tLower;
-            curve.ClosestPointToZPosition(bodyBox.ZMin, out tLower);
-            double tUpper;
-            curve.ClosestPointToZPosition(bodyBox.ZMax, out tUpper);
+            double tMin;
+            curve.ClosestPointToZPosition(bodyBox.ZMin, out tMin);
+            double tMax;
+            curve.ClosestPointToZPosition(bodyBox.ZMax, out tMax);
+            var orderedTs = new[] {tMin, tMax}.OrderBy(p=>p).ToArray();
 
             var tuple = faces.Select(f =>
                 {
@@ -196,7 +197,7 @@ namespace SolidworksAddinFramework
                         return Math.Sqrt(Math.Pow(pt[0] - ptOnFace[0], 2) + Math.Pow(pt[1] - ptOnFace[1], 2) + Math.Pow(pt[2] - ptOnFace[2], 2));
                     };
 
-                    var solver = new BrentSearch(fn, tLower, tUpper);
+                    var solver = new BrentSearch(fn, orderedTs[0], orderedTs[1]);
                     solver.Minimize();
 
                     return Tuple.Create(solver.Value, solver.Solution, f);
