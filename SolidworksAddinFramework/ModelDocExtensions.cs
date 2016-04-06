@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -16,6 +17,17 @@ namespace SolidworksAddinFramework
             var objects = (object[]) part.GetBodies2((int) type, visibleOnly);
             return objects?.Cast<IBody2>().ToArray() ?? new IBody2[0];
         }
+
+        public static IDisposable CloseDisposable(this IModelDoc2 @this)
+        {
+            return Disposable.Create(@this.Close);
+        }
+
+        public static void Using(this IModelDoc2 doc, ISldWorks sldWorks, Action<IModelDoc2> run)
+        {
+            doc.Using(m => sldWorks.CloseDoc(doc.GetTitle()), run);
+        }
+
 
         /// <summary>
         /// Get all reference planes from the model

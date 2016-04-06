@@ -26,6 +26,10 @@ namespace XUnit.Solidworks.Addin
     [XunitTestCaseDiscoverer("XUnit.Solidworks.Addin.SolidworksFactDiscoverer", "XUnit.Solidworks.Addin")]
     public class SolidworksFactAttribute : FactAttribute { }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    [XunitTestCaseDiscoverer("XUnit.Solidworks.Addin.SolidworksTheoryDiscoverer", "XUnit.Solidworks.Addin")]
+    public class SolidworksTheoryAttribute : FactAttribute { }
+
 
     /// <summary>
     /// This is the xunit fact discoverer that xunit uses to replace the standard xunit runner
@@ -49,4 +53,21 @@ namespace XUnit.Solidworks.Addin
         public static string XUnitId = "SolidWorksAddin";
     }
 
+    public class SolidworksTheoryDiscoverer : XUnitRemoteTheoryDiscovererBase
+    {
+        protected override string Id { get; } = XUnitId;
+
+        /// <summary>
+        /// You can set this to specify the location of solidworks exe. Should be version 2016+
+        /// </summary>
+        public static string SolidworksPath = @"C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\sldworks.exe";
+
+        protected override string ExePath { get; } = SolidworksPath;
+
+        public SolidworksTheoryDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink)
+        {
+        }
+
+        public static string XUnitId = "SolidWorksAddin";
+    }
 }

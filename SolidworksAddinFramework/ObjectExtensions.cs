@@ -2,12 +2,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 
 namespace SolidworksAddinFramework
 {
     public static class ObjectExtensions
     {
+        public static void Using<T>(this T @this, Action<T> cleanup, Action<T> run)
+        {
+            using (Disposable.Create(() => cleanup(@this)))
+                run(@this);
+        }
+        public static R Using<T,R>(this T @this, Action<T> cleanup, Func<T,R> run)
+        {
+            using (Disposable.Create(() => cleanup(@this)))
+                return run(@this);
+        }
         public static T[] CastArray<T>(this object o)
         {
             if (o == null || o is System.DBNull)

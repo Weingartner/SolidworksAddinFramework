@@ -6,7 +6,7 @@ namespace XUnit.Solidworks.Addin
 {
     public abstract class SolidWorksSpec : IDisposable
     {
-        public static ISldWorks SwApp = SwApp ?? (ISldWorks) AppDomain.CurrentDomain.GetData(SwAddin.SwdataKey);
+        public static ISldWorks SwApp => (ISldWorks)XUnitService.Data[nameof(ISldWorks)]; 
         public void Dispose()
         {
         }

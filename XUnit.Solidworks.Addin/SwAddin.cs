@@ -1,4 +1,4 @@
-//#define UseXUnitAppDomain
+#define UseXUnitAppDomain
 
 using System;
 using System.Collections.Generic;
@@ -77,17 +77,10 @@ namespace XUnit.Solidworks.Addin
 
 
 #if UseXUnitAppDomain 
-                string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
-                var dir = Path.GetDirectoryName(path);
-                var domaininfo = AppDomain.CurrentDomain.SetupInformation;
-                domaininfo.ApplicationBase = dir;
-                AppDomain domain = AppDomain.CreateDomain("XUnitDomain", AppDomain.CurrentDomain.Evidence,
-                    domaininfo);
+                var domain = CloneDomain("XUnitDomain");
                 domain.SetData(SwdataKey, SwApp);
-                    domain.DoCallBack(Callback);
+                domain.DoCallBack(() => Callback((ISldWorks)AppDomain.CurrentDomain.GetData(SwdataKey)));
 #else
-                MessageBox.Show("Starting SW");
-                AppDomain.CurrentDomain.SetData(SwdataKey, SwApp);
                 Callback(SwApp);
 #endif
                 //MessageBox.Show("Unloading app domain");
@@ -101,15 +94,22 @@ namespace XUnit.Solidworks.Addin
 
         }
 
-
-        private static void Callback(ISldWorks sldWorks = null)
+        private static AppDomain CloneDomain(string name)
         {
-            SolidWorksSpec.SwApp = sldWorks;
+            string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
+            var dir = Path.GetDirectoryName(path);
+            var domaininfo = AppDomain.CurrentDomain.SetupInformation;
+            domaininfo.ApplicationBase = dir;
+            var domain = AppDomain.CreateDomain(name, AppDomain.CurrentDomain.Evidence, domaininfo);
+            return domain;
+        }
+
+
+        private static void Callback(ISldWorks sldWorks )
+        {
             var marshaller = new ThreadMarshaller();
-            XUnitService.Start(SolidworksFactDiscoverer.XUnitId, f =>
-            {
-                return marshaller.Marshall(f);
-            });
+            var data = new Dictionary<string, object> { {nameof(ISldWorks), sldWorks}};
+            XUnitService.Start(SolidworksFactDiscoverer.XUnitId, f => marshaller.Marshall(f), data);
         }
 
 
