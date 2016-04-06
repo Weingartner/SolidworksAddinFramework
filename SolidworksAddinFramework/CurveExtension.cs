@@ -135,7 +135,7 @@ namespace SolidworksAddinFramework
         /// <param name="curve"></param>
         /// <param name="zPos"></param>
         /// <returns></returns>
-        public static double[] ClosestPointToZPosition(this ICurve curve, double zPos)
+        public static double[] ClosestPointToZPosition(this ICurve curve, double zPos, out double par)
         {
             var curveDomain = curve.Domain();
             Func<double, double> fn = (t) =>
@@ -144,7 +144,6 @@ namespace SolidworksAddinFramework
                 return (ptZ - zPos);
             };
 
-            double par;
             try
             {
                 var solver = new BrentSearch(fn, curveDomain[0], curveDomain[1]);
