@@ -70,44 +70,46 @@ namespace XUnit.Solidworks.Addin
                 }
             }
 
-        //    SpinWait.SpinUntil(() => { return RemoteDebugger.IsDebuggerAttached(); });
+            //    SpinWait.SpinUntil(() => { return RemoteDebugger.IsDebuggerAttached(); });
 
-            //var task = Task.Run(() =>
-            //{
-                try
-                {
-                    string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
-                    var dir = Path.GetDirectoryName(path);
-                    var domaininfo = AppDomain.CurrentDomain.SetupInformation;
-                    domaininfo.ApplicationBase = dir;
+            try
+            {
 
-                    AppDomain domain = AppDomain.CreateDomain("XUnitDomain", AppDomain.CurrentDomain.Evidence,
-                        domaininfo);
 
 #if UseXUnitAppDomain 
+                string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
+                var dir = Path.GetDirectoryName(path);
+                var domaininfo = AppDomain.CurrentDomain.SetupInformation;
+                domaininfo.ApplicationBase = dir;
+                AppDomain domain = AppDomain.CreateDomain("XUnitDomain", AppDomain.CurrentDomain.Evidence,
+                    domaininfo);
                 domain.SetData(SwdataKey, SwApp);
                     domain.DoCallBack(Callback);
 #else
+                MessageBox.Show("Starting SW");
                 AppDomain.CurrentDomain.SetData(SwdataKey, SwApp);
-                Callback();
+                Callback(SwApp);
 #endif
                 //MessageBox.Show("Unloading app domain");
                 //AppDomain.Unload(domain);
                 //GC.Collect();
             }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
 
-            //}
-                //);
         }
 
 
-        private static void Callback()
+        private static void Callback(ISldWorks sldWorks = null)
         {
-            XUnitService.Start(SolidworksFactDiscoverer.XUnitId);
+            SolidWorksSpec.SwApp = sldWorks;
+            var marshaller = new ThreadMarshaller();
+            XUnitService.Start(SolidworksFactDiscoverer.XUnitId, f =>
+            {
+                return marshaller.Marshall(f);
+            });
         }
 
 
@@ -123,6 +125,77 @@ namespace XUnit.Solidworks.Addin
 
 #endregion
 
+    }
+
+
+    public  class ThreadMarshaller : Control
+    {
+        private bool _MbCallMarshalled;
+
+        public ThreadMarshaller()
+        {
+            _MbCallMarshalled = false;
+
+            // Force the Windows HWND to be created, so this Control becomes associated with this thread:
+            // - if this step is omitted Control::InvokeRequired will always return false,
+            //   as Window creation is done lazily.
+            Debug.Assert(IsHandleCreated == false);
+            // ReSharper disable once UnusedVariable
+            var pHandle = Handle;
+            Debug.Assert(IsHandleCreated == true);
+        }
+
+        protected override void OnPaint(PaintEventArgs pe)
+        {
+            // We never want to show this control, so leave empty.
+
+            base.OnPaint(pe);
+        }
+
+        public bool CallMarshalled
+        {
+            get
+            {
+                lock (this)
+                {
+                    return _MbCallMarshalled;
+                }
+            }
+
+            set
+            {
+                lock (this)
+                {
+                    _MbCallMarshalled = value;
+                }
+            }
+        }
+
+        public void Marshall(Action method)
+        {
+            Marshall(() =>
+            {
+                method();
+                return 0;
+            });
+        }
+
+        public T Marshall<T>(Func<T> method)
+        {
+            Debug.Assert(IsHandleCreated);
+
+            if (method == null) return default(T);
+            if (!InvokeRequired) return (T) method.DynamicInvoke();
+            try
+            {
+                CallMarshalled = true;
+                return (T) Invoke(method);
+            }
+            finally
+            {
+                CallMarshalled = false;
+            }
+        }
     }
 
 
