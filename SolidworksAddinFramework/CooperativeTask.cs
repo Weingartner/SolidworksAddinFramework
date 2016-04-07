@@ -6,7 +6,7 @@ namespace SolidworksAddinFramework
     /// <summary>
     /// Helper methods to implement cooperative tasks using coroutines (https://en.wikipedia.org/wiki/Coroutine)
     /// </summary>
-    public class CooperativeTask
+    public static class CooperativeTask
     {
         /// <summary>
         /// Allows an algorithm to specify a location where it may be paused or cancelled
