@@ -21,7 +21,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools;
 using XUnitRemote;
-using XUnitRemote.Remoting.Service;
+using XUnitRemote.Local;
 
 
 namespace XUnit.Solidworks.Addin
@@ -111,7 +111,7 @@ namespace XUnit.Solidworks.Addin
         {
             var marshaller = new ThreadMarshaller();
             var data = new Dictionary<string, object> { {nameof(ISldWorks), sldWorks}};
-            XUnitService.Start(SolidworksFactDiscoverer.XUnitId,false, f => marshaller.Marshall(f), data);
+            XUnitService.Start(TestSettings.Id,false, f => marshaller.Marshall(f), data);
         }
 
 

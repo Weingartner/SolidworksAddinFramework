@@ -1,15 +1,11 @@
 ﻿using System;
 using SolidWorks.Interop.sldworks;
-using XUnitRemote;
+using XUnitRemote.Local;
 
 namespace XUnit.Solidworks.Addin
 {
-    public abstract class SolidWorksSpec : IDisposable
+    public abstract class SolidWorksSpec
     {
-        public static ISldWorks SwApp => (ISldWorks)XUnitService.Data[nameof(ISldWorks)]; 
-        public void Dispose()
-        {
-        }
-
+        protected static ISldWorks SwApp => (ISldWorks)XUnitService.Data[nameof(ISldWorks)]; 
     }
 }

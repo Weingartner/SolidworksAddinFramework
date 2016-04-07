@@ -108,10 +108,6 @@
       <HintPath>$(SolutionDir)packages\xunit.runner.utility.2.1.0\lib\net35\xunit.runner.utility.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="XUnitRemote, Version=1.0.0.15, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\XUnitRemote.1.0.0.15\lib\net461\XUnitRemote.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MathUtilitySpec.cs" />
