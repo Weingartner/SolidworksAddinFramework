@@ -11,7 +11,6 @@ using Weingartner.Numerics;
 using Xunit;
 using Xunit.Extensions;
 using XUnit.Solidworks.Addin;
-using XUnitRemote;
 
 namespace SolidworksAddinFramework.Spec
 {
