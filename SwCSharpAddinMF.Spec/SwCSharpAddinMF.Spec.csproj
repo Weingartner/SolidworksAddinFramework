@@ -37,6 +37,12 @@
   <PropertyGroup>
     <SolidWorksLocation>C:\Program Files\SOLIDWORKS Corp</SolidWorksLocation>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics, Version=3.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\MathNet.Numerics.3.11.0\lib\net40\MathNet.Numerics.dll</HintPath>
@@ -135,15 +141,16 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="StrongNameKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SwCSharpAddinMF\SwCSharpAddinMF.csproj">
+    <ProjectReference Include="..\SwCSharpAddinMF\DemoMacroFeature.csproj">
       <Project>{a67399be-aaf7-433f-8f72-9b0424c5be67}</Project>
-      <Name>SwCSharpAddinMF</Name>
+      <Name>DemoMacroFeature</Name>
     </ProjectReference>
     <ProjectReference Include="..\XUnit.Solidworks.Addin\XUnit.Solidworks.Addin.csproj">
       <Project>{1C3FAA0E-34F9-4627-9B3D-833F48ED8038}</Project>
@@ -158,6 +165,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

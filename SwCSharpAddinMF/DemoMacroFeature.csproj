@@ -12,8 +12,7 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>SwCSharpAddinMF</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -101,8 +100,11 @@
   <PropertyGroup>
     <SolidWorksLocation>C:\Program Files\SOLIDWORKS Corp</SolidWorksLocation>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=3.11.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MathNet.Numerics, Version=3.11.0.0, Culture=neutral,  processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\MathNet.Numerics.3.11.0\lib\net40\MathNet.Numerics.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -139,7 +141,7 @@
     <Reference Include="solidworkstools">
       <HintPath>$(SolidWorksLocation)\SOLIDWORKS\solidworkstools.dll</HintPath>
     </Reference>
-    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral,  processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -213,6 +215,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="StrongNameKey.snk" />
+    <None Include="XUnit.Solidworks.Addin.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
@@ -222,37 +226,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-IF "$(TargetFrameworkVersion)"=="v4.0" GOTO NET40
-IF "$(TargetFrameworkVersion)"=="v3.5" GOTO NET20
-IF "$(TargetFrameworkVersion)"=="v3.0" GOTO NET20
-IF "$(TargetFrameworkVersion)"=="v2.0" GOTO NET20
-GOTO END
-
-:NET40
-set FMWK="v4.0.30319"
-GOTO REG
-
-:NET20
-set FMWK="v2.0.50727"
-GOTO REG
-
-:REG
-IF "$(PlatformName)" == "AnyCPU" GOTO ANYCPU
-IF "$(PlatformName)" == "x64" GOTO X64
-GOTO END
-
-:ANYCPU
-IF EXIST "%Windir%\Microsoft.NET\Framework64\%FMWK%\regasm.exe" "%Windir%\Microsoft.NET\Framework64\%FMWK%\regasm" /codebase "$(TargetPath)"
-GOTO END
-
-:X64
-IF EXIST "%Windir%\Microsoft.NET\Framework64\%FMWK%\regasm.exe" "%Windir%\Microsoft.NET\Framework64\%FMWK%\regasm" /codebase "$(TargetPath)"
-GOTO END
-
-:END
-    
-    </PostBuildEvent>
+    <PostBuildEvent>powershell -command $(SolutionDir)strongnamer.ps1  $(TargetDir) $(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

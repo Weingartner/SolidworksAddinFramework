@@ -35,6 +35,12 @@
   <PropertyGroup>
     <SolidWorksLocation>C:\Program Files\SOLIDWORKS Corp</SolidWorksLocation>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="FluentAssertions, Version=4.2.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\FluentAssertions.4.2.2\lib\net45\FluentAssertions.dll</HintPath>
@@ -111,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MathUtilitySpec.cs" />
+    <Compile Include="ModelDocSpecs.cs" />
     <Compile Include="opengl\MeshRenderSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -126,8 +133,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="SolidworksAddinFramework.Spec.snk" />
+    <None Include="StrongNameKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
