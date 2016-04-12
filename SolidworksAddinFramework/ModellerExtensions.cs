@@ -158,20 +158,27 @@ namespace SolidworksAddinFramework
             (this IModeler modeler
             , double length
             , double radius
-            , double lead
+            , double startLead
+            , double endLead
             , double zStart
             , double coneAngle = 0.0)
         {
-            var rotations = length/lead;
-            var numberOfSteps =(int)(rotations*30);
+            const double stepSize = 1e-4;
+            var numberOfSteps =(int)(length/stepSize);
 
-            var points = Sequences.LinSpace(0, rotations*2*Math.PI, numberOfSteps)
-                .Select(a =>
+            var deltaLead = (endLead - startLead) / length;
+
+            var thetaZ = new Func<double, double>(z=> Math.Abs(deltaLead) < 1e-8 
+                    ? z *2*Math.PI/startLead 
+                    : 2*Math.PI*Math.Log(deltaLead*z+startLead)/deltaLead); //lead(z)/(2*Pi) = dz / dTheta -->Theta = int(2*Pi*dz/(lead(z))) 
+
+            var points = Sequences.LinSpace(zStart, zStart+length, numberOfSteps,true)
+                .Select(z =>
                 {
-                    var z = a*lead/(2*Math.PI) + zStart;
+                    var theta = thetaZ(z); 
                     var coneCorrection = Math.Tan(coneAngle)*(z-zStart);
-                    var x = (radius+coneCorrection)*Math.Cos(a);
-                    var y = (radius+coneCorrection)*Math.Sin(a);
+                    var x = (radius+coneCorrection)*Math.Cos(theta);
+                    var y = (radius+coneCorrection)*Math.Sin(theta);
                     return new[] {x, y, z};
                 })
                 .ToList();
