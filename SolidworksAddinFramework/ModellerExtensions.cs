@@ -154,7 +154,13 @@ namespace SolidworksAddinFramework
             return result;
         }
 
-        public static ICurve CreateHelix(this IModeler modeler, double length, double radius, double lead, double zStart)
+        public static ICurve CreateHelix
+            (this IModeler modeler
+            , double length
+            , double radius
+            , double lead
+            , double zStart
+            , double coneAngle = 0.0)
         {
             var rotations = length/lead;
             var numberOfSteps =(int)(rotations*30);
@@ -162,9 +168,10 @@ namespace SolidworksAddinFramework
             var points = Sequences.LinSpace(0, rotations*2*Math.PI, numberOfSteps)
                 .Select(a =>
                 {
-                    var x = radius*Math.Cos(a);
-                    var y = radius*Math.Sin(a);
                     var z = a*lead/(2*Math.PI) + zStart;
+                    var coneCorrection = Math.Tan(coneAngle)*(z-zStart);
+                    var x = (radius+coneCorrection)*Math.Cos(a);
+                    var y = (radius+coneCorrection)*Math.Sin(a);
                     return new[] {x, y, z};
                 })
                 .ToList();
