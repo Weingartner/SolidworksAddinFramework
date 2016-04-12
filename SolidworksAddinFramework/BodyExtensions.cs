@@ -177,7 +177,11 @@ namespace SolidworksAddinFramework
         /// <param name="ptBody"></param>
         /// <param name="ptCurve"></param>
         /// <returns></returns>
-        public static double ClosestDistanceBetweenBodyAndCurve(this IBody2 body, ICurve curve, out double[] ptBody, out double[] ptCurve)
+        public static double ClosestDistanceBetweenBodyAndCurve
+            ( this IBody2 body
+            , ICurve curve
+            , out double[] ptBody
+            , out double[] ptCurve)
         {
             var faces = body.GetFaces().CastArray<IFace2>();
 
