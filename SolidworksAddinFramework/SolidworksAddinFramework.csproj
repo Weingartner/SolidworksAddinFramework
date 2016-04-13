@@ -41,7 +41,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
@@ -185,7 +186,6 @@
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
-    <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="TaskExtensions.cs" />
@@ -200,8 +200,6 @@
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="SolidworksAddinFrameowkr.snk" />
-    <None Include="StrongNameKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Wpf\SelectionControl.xaml">
