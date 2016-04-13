@@ -7,8 +7,8 @@
     <ProjectGuid>{117A5363-F5AF-462B-8769-C2733132EF2C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SwCSharpAddinMF.Spec</RootNamespace>
-    <AssemblyName>SwCSharpAddinMF.Spec</AssemblyName>
+    <RootNamespace>DemoMacroFeatures.Spec</RootNamespace>
+    <AssemblyName>DemoMacroFeatures.Spec</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -41,7 +41,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics, Version=3.11.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -141,7 +142,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="StrongNameKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">

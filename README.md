@@ -81,7 +81,7 @@ then send us pull requests to share with the community.
 Creating a new project
 ======================
 
-The project file for building Solidworks addins is a bit pernickity. It contains custom MSBuild steps that are fiddly to replicate by hand. The easiest way to create a new project is to create a template. __File -> ExportTemplate__ and select the demo project. Once you have this as a template project you can create another project based on it.
+The project file for building Solidworks addins is a bit persnickity. It contains custom MSBuild steps that are fiddly to replicate by hand. The easiest way to create a new project is to create a template. __File -> ExportTemplate__ and select the __DemoMacroFeature__ project. Once you have this as a template project you can create another project based on it.
 
 Then you need to change the COM guids. The sample project is defined in SwAddin.cs as 
 
@@ -95,6 +95,20 @@ Then you need to change the COM guids. The sample project is defined in SwAddin.
 Just change the GUID to another GUID. If you have Resharper just type __nguid__ and then __tab__ and you get a new guid.
 
 Then refactor rename all the class names as you wish.
+
+Strong naming and plugin robustness in the face of confliciting DLL's
+=====================================================================
+You should / must strong name your dll's if you wish to create a solidworks addin. The reason for this is that you or your client
+may install another plugin that uses different versions of the same libraries that your plugin uses. This leads to a disaster if
+solidworks can't figure out which dll to choose in the face of multiple options.
+
+The solution is to strong name every dll that the registered dll may itself reference. There is however a problem that if 
+you use nuget packages which are not strong named then your build will fail. We have solved this for you by integrating
+a [strongnamer.ps1](./strongnamer.ps1) using a library from [brutaldev](https://github.com/brutaldev/StrongNameSigner) 
+which collects all the dlls from your build project, signs them and then registers the dll that solidworks needs to know about. 
+
+strongnamer.ps1 should only be called for addin projects, not for support libraries that are not addins themselves.
+
 
 Sample project
 ==============
