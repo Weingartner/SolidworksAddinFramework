@@ -31,7 +31,6 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void ShouldBeAbleToGetCrossProduct()
         {
-            1.Should().Be(2);
             var result = MathUtility.Cross(new [] { 1.0, 2.0, 3.0 }, new [] { 4.0, 5.0, 6.0 });
             result.ShouldAllBeEquivalentTo(new[] { -3.0, 6.0, -3.0 });
         }
