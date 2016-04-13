@@ -31,7 +31,6 @@ echo $strongNameSigner
 # the main dll in the GAC
 #############################
 $outPath = "$(FixTerminatingSlash(Get-Item $inPath).FullName).Signed\"
-#$outPath = $inPath
 
 echo "InPath is $inPath"
 echo "OutPath is $outPath"
