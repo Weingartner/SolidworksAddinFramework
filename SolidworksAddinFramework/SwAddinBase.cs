@@ -44,14 +44,14 @@ namespace SolidworksAddinFramework
                 var hkcu = Registry.CurrentUser;
 
                 var keyname = "SOFTWARE\\SolidWorks\\Addins\\{" + t.GUID + "}";
-                var addinkey = hklm.CreateSubKey(keyname);
+                var addinkey = CreateSubKey(hklm, keyname);
                 addinkey.SetValue(null, 0);
 
                 addinkey.SetValue("Description", sWattr.Description);
                 addinkey.SetValue("Title", sWattr.Title);
 
                 keyname = "Software\\SolidWorks\\AddInsStartup\\{" + t.GUID + "}";
-                addinkey = hkcu.CreateSubKey(keyname);
+                addinkey = CreateSubKey(hkcu,keyname);
                 addinkey.SetValue(null, Convert.ToInt32(sWattr.LoadAtStartup), RegistryValueKind.DWord);
                 //MessageBox.Show("Registered pluging with GUID.\n\"" + t.GUID + "\"");
             }
@@ -67,6 +67,12 @@ namespace SolidworksAddinFramework
 
                 MessageBox.Show("There was a problem registering the function: \n\"" + e.Message + "\"");
             }
+        }
+
+        private static RegistryKey CreateSubKey(RegistryKey hklm, string keyname)
+        {
+            Console.WriteLine($"Registering '{keyname}' to '{hklm.Name}' ");
+            return hklm.CreateSubKey(keyname);
         }
 
         [ComUnregisterFunction]
