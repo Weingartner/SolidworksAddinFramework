@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Accord.Math.Optimization;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -75,7 +76,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="curve"></param>
         /// <returns></returns>
-        public static double[] Domain(this ICurve	 curve )
+        public static double[] Domain(this ICurve curve )
         {
             bool isPeriodic;
             double end;
@@ -127,6 +128,52 @@ namespace SolidworksAddinFramework
         {
             return (ICurve)edge.GetCurve();
         }
+
+        public static List<double[]> GetPointsByLength(this ICurve curve, double pointDistance)
+        {
+            var length = curve.Length();
+            var numberOfPoints = (int)(length/pointDistance);
+
+            var domain = curve.Domain();
+            return Sequences.LinSpace(domain[0], domain[1], numberOfPoints)
+                .Select(t => curve.PointAt(t))
+                .ToList();
+        }
+
+        public static ICurve GetExtendedHelix
+            ( this ICurve curve
+            , double pointDistance
+            , double extensionLength
+            , IMathUtility mathUtility
+            , IModeler modeler)
+        {
+            var domain = curve.Domain();
+            var startPointEval = curve.Evaluate2(domain[0], 2).CastArray<double>();
+            var endPointEval = curve.Evaluate2(domain[1], 2).CastArray<double>();
+
+            var endPoint = endPointEval.Take(3).ToArray();
+            var dEndPoint = endPointEval.Skip(3).Take(3).ToArray();
+            var startPoint = startPointEval.Take(3).ToArray();
+            var dStartPoint = startPointEval.Skip(3).Take(3).ToArray();
+            var dZ = endPoint[2] - startPoint[2];
+            var startRadius = Math.Sqrt(Math.Pow(startPoint[0], 2) + Math.Pow(startPoint[1], 2));
+            var endRadius = Math.Sqrt(Math.Pow(endPoint[0], 2) + Math.Pow(endPoint[1], 2));
+            var dArcLength = Math.Sqrt(Math.Pow(dStartPoint[0], 2) + Math.Pow(dStartPoint[1], 2));
+            var dPhi = Math.Atan2(dArcLength, startRadius);
+            var approxLead = 2*Math.PI*dStartPoint[2]/dPhi;
+            var approxConeAngle = Math.Atan2(endRadius - startRadius, dZ);
+
+            var startExtension = modeler.CreateHelix
+                ( -extensionLength
+                , startRadius
+                , approxLead
+                , approxLead
+                , 0
+                , approxConeAngle);  
+
+            var curves = new[] {startExtension};
+            return modeler.MergeCurves(curves);
+        } 
 
         /// <summary>
         /// Finds the closest point on a curve to a given zPosition.
