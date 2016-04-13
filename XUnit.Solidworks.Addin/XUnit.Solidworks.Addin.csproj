@@ -12,7 +12,8 @@
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>XUnit.Solidworks.Addin</AssemblyName>
-    <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -246,7 +247,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="StrongNameKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
@@ -256,7 +256,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>powershell -command $(SolutionDir)strongnamer.ps1  $(TargetDir) $(TargetFileName)</PostBuildEvent>
+    <PostBuildEvent>powershell -command $(ProjectDir)\..\strongnamer.ps1  $(TargetDir) $(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
