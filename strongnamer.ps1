@@ -8,6 +8,16 @@ function FixTerminatingSlash ($root) {
     return $root.TrimEnd($trimChars)    
 }
 
+#################################################################
+# Key generation tool. We generate a new key every time. Why not?
+# All we care about is that each addin has a different identity. We
+# are not really caring exactly what that identity is.
+#################################################################
+$keyFile = "$outPath\StrongName.snk"
+$netfxpath = "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools"
+$sn = "$netfxpath\sn.exe"
+&sn -k 2048 $keyFile
+
 #############################
 # Setup tools
 #############################
@@ -18,8 +28,6 @@ $fmwk="v4.0.30319"
 $regasm = "$env:windir\Microsoft.NET\Framework64\$fmwk\regasm"
 # Strong name assembly signing tool stored in nuget package 
 $strongNameSigner = "$(gci $PSScriptRoot\packages\Brutal.Dev.StrongNameSigner.*)\tools\StrongNameSigner.Console.exe"
-# Get the keyfile
-$keyFile = "$PSScriptRoot\StrongNameKey.snk"
 
 echo $strongNameSigner
 
