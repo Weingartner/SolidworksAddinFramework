@@ -154,14 +154,18 @@ namespace SolidworksAddinFramework
             return result;
         }
 
-        public static ICurve CreateHelix
+        public static IBody2 CreateBox
             (this IModeler modeler
+            , double [] center 
+            , double [] axis
+            , double width
             , double length
-            , double radius
-            , double startLead
-            , double endLead
-            , double zStart
-            , double coneAngle = 0.0)
+            , double height
+            )
+        {
+            var array = new List<double>();
+            array.AddRange(center);
+            array.AddRange(axis);
             array.Add(width);
             array.Add(length);
             array.Add(height);
