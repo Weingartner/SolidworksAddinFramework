@@ -185,11 +185,16 @@
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
+    <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
+    <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
     <Compile Include="TwoPointRange.cs" />
     <Compile Include="UiDispatcherScheduler.cs" />
+    <Compile Include="Wpf\SelectionControl.xaml.cs">
+      <DependentUpon>SelectionControl.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

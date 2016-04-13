@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -29,6 +30,10 @@ namespace XUnit.Solidworks.Addin
         protected void CreatePartDoc(Action<IModelDoc2> action)
         {
             CreatePartDoc().Using(SwApp, action);
+        }
+        protected Task CreatePartDoc(Func<IModelDoc2,Task> action)
+        {
+            return CreatePartDoc().Using(SwApp, action);
         }
 
         /// <summary>

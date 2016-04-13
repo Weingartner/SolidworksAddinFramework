@@ -162,6 +162,31 @@ namespace SolidworksAddinFramework
             , double endLead
             , double zStart
             , double coneAngle = 0.0)
+            array.Add(width);
+            array.Add(length);
+            array.Add(height);
+            return modeler.CreateBodyFromBox3(array.ToArray());
+        }
+
+        public static IBody2 CreateBox(this IModeler modeler,
+            double width,
+            double length,
+            double height) => modeler.CreateBox
+                (new double[] {0, 0, 0},
+                    new double[] {0, 0, 1},
+                    width,
+                    length,
+                    height);
+
+
+        public static ICurve CreateHelix
+            (this IModeler modeler
+            , double length
+            , double radius
+            , double startLead
+            , double endLead
+            , double zStart
+            , double coneAngle = 0.0)
         {
             const double stepSize = 1e-4;
             var numberOfSteps =(int)(length/stepSize);

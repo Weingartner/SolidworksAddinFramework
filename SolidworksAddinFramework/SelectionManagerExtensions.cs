@@ -47,11 +47,12 @@ namespace SolidworksAddinFramework
         /// <param name="selMgr"></param>
         /// <param name="filter">(type,mark)=>bool</param>
         /// <returns></returns>
-        public static IEnumerable<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
+        public static IReadOnlyList<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
             return GetSelectedObjectProperties(selMgr)
                 .Where(o => filter(o.Type, o.Mark))
-                .Select(o => selMgr.GetSelectedObject6(o.Index, AnyMark));
+                .Select(o => selMgr.GetSelectedObject6(o.Index, AnyMark))
+                .ToList();
         }
 
         public static void DeselectAll(this ISelectionMgr selMgr)

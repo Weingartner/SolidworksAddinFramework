@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -42,7 +44,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IEnumerable<IDisposable>> fn)
         {
-            return SubscribeDisposable<T>(o, v =>(IDisposable) new CompositeDisposable(fn(v)));
+            return SubscribeDisposable(o, v =>(IDisposable) new CompositeDisposable(fn(v)));
         }
 
         /// <summary>
@@ -107,5 +109,37 @@ namespace SolidworksAddinFramework
             /// </summary>
             public static IObservable<T> SubscribeOnUiDispatcher<T>(this IObservable<T> source) =>
                 source.SubscribeOn(UiDispatcherScheduler.Default);
+
+        /// <summary>
+        /// A helper for attaching observables to solidworks events with delegates that have <![CDATA[Func<T>]]> type signitures.
+        /// </summary>
+        /// <typeparam name="TDelegate">The delegate type you want to use</typeparam>
+        /// <param name="add"></param>
+        /// <param name="remove"></param>
+        /// <param name="delegateCreator">This should be able to create the delegate from an action</param>
+        /// <returns></returns>
+        public static IObservable<Unit> FromEvent<TDelegate>(Action<TDelegate> add, Action<TDelegate> remove, Func<Func<int>, TDelegate> delegateCreator )
+        {
+            Debug.Assert(typeof(Delegate).IsAssignableFrom(typeof(TDelegate)));
+
+            return Observable.Create<Unit>(observer =>
+            {
+
+                Func<int> callback =  () =>
+                {
+                    observer.OnNext(Unit.Default);
+                    return 0;
+                };
+
+                var setup = add;
+                var teardown = remove;
+
+                var convertedCallback = delegateCreator(callback);
+                setup(convertedCallback);
+                return Disposable.Create(() => teardown(convertedCallback)) ;
+
+            });
+
+        }
     }
 }
