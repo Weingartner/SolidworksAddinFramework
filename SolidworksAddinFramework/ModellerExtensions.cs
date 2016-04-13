@@ -181,59 +181,5 @@ namespace SolidworksAddinFramework
                     width,
                     length,
                     height);
-
-
-        public static ICurve CreateHelix
-            (this IModeler modeler
-            , double length
-            , double radius
-            , double startLead
-            , double endLead
-            , double zStart
-            , double coneAngle = 0.0)
-        {
-            var points = CreateHelixPoints
-                ( length
-                , radius
-                , startLead
-                , endLead
-                , zStart
-                , coneAngle);
-
-            return modeler.InterpolatePointsToCurve(5e-5, points, false, false);
-        }
-
-        private static List<double[]> CreateHelixPoints
-            ( double length
-            , double radius
-            , double startLead
-            , double endLead
-            , double zStart
-            , double coneAngle)
-        {
-            const double stepSize = 1e-4;
-            var numberOfSteps = (int) (Math.Abs(length)/stepSize);
-
-            var deltaLead = (endLead - startLead)/length;
-
-            var thetaZ = new Func<double, double>(z => Math.Abs(deltaLead) < 1e-8
-                ? z*2*Math.PI/startLead
-                : 2*Math.PI*Math.Log(deltaLead*z + startLead)/deltaLead);
-                //lead(z)/(2*Pi) = dz / dTheta -->Theta = int(2*Pi*dz/(lead(z))) 
-
-            //var orderedLimits = new[] {zStart, zStart + length}.OrderBy(p => p).ToArray();
-
-            //return Sequences.LinSpace(orderedLimits[0], orderedLimits[1], numberOfSteps, true)
-            return Sequences.LinSpace(zStart, zStart+length, numberOfSteps, true)
-                .Select(z =>
-                {
-                    var theta = thetaZ(z);
-                    var coneCorrection = Math.Tan(coneAngle)*(z - zStart);
-                    var x = (radius + coneCorrection)*Math.Cos(theta);
-                    var y = (radius + coneCorrection)*Math.Sin(theta);
-                    return new[] {x, y, z};
-                })
-                .ToList();
-        }
     }
 }

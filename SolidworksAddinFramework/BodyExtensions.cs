@@ -166,54 +166,6 @@ namespace SolidworksAddinFramework
             var result = a.Intersect(b);
             return a.IGetIntersectionEdgeCount((Body2)b) > 0;
         }
-
-        /// <summary>
-        /// Returns the closest distance between a body and a curve.
-        /// Additionally it outputs the connection (closest) points on the body and the curve.
-        /// If there is more than one point tuple, seperated by the closest distance, it returns the first it finds.
-        /// </summary>
-        /// <param name="body"></param>
-        /// <param name="curve"></param>
-        /// <param name="ptBody"></param>
-        /// <param name="ptCurve"></param>
-        /// <returns></returns>
-        public static double ClosestDistanceBetweenBodyAndCurve
-            ( this IBody2 body
-            , ICurve curve
-            , out double[] ptBody
-            , out double[] ptCurve)
-        {
-            var faces = body.GetFaces().CastArray<IFace2>();
-
-            var bodyBox = body.GetBodyBoxTs();
-            double tMin;
-            curve.ClosestPointToZPosition(bodyBox.ZMin, out tMin);
-            double tMax;
-            curve.ClosestPointToZPosition(bodyBox.ZMax, out tMax);
-            var orderedTs = new[] {tMin, tMax}.OrderBy(p=>p).ToArray();
-
-            var tuple = faces.Select(f =>
-                {
-                    Func<double, double> fn = t =>
-                    {
-                        var pt = curve.PointAt(t);
-                        var ptOnFace = f.GetClosestPointOn(pt[0], pt[1], pt[2]).CastArray<double>().Take(3).ToArray();
-                        return Math.Sqrt(Math.Pow(pt[0] - ptOnFace[0], 2) + Math.Pow(pt[1] - ptOnFace[1], 2) + Math.Pow(pt[2] - ptOnFace[2], 2));
-                    };
-
-                    var solver = new BrentSearch(fn, orderedTs[0], orderedTs[1]);
-                    solver.Minimize();
-
-                    return Tuple.Create(solver.Value, solver.Solution, f);
-                })
-                .MinBy(p=>p.Item1)
-                .First();
-
-            ptCurve = curve.PointAt(tuple.Item2);
-            ptBody = tuple.Item3.GetClosestPointOn(ptCurve[0], ptCurve[1], ptCurve[2]).CastArray<double>().Take(3).ToArray();
-
-            return tuple.Item1;
-        }
     }
     
 

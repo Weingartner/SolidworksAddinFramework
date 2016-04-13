@@ -98,26 +98,5 @@ namespace SolidworksAddinFramework
 
             return interpolatedPoints;
         }
-
-        /// <summary>
-        /// Gets the normal to a curve for a given zPosition, perpendicular to the curve tangent 
-        /// and to the connection between the curvepoint and its projection to the z axis.
-        /// </summary>
-        /// <param name="mathUtility"></param>
-        /// <param name="curve"></param>
-        /// <param name="zPosition"></param>
-        /// <returns></returns>
-        public static MathVector GetUnitNormal(this IMathUtility mathUtility, ICurve curve, double zPosition)
-        {
-            double curveT;
-            var curvePt = curve.ClosestPointToZPosition(zPosition, out curveT);
-
-            var crv = curve.Evaluate2(curveT, 1).CastArray<double>();
-            var curvePointDerivative = crv.Skip(3).Take(3).ToArray();
-            var pointOnAxis = new[] {0, 0, crv[2]};
-            var v0 = mathUtility.Vector(curvePointDerivative);
-            var v1 = mathUtility.Vector(curvePt, pointOnAxis);
-            return v0.CrossTs(v1).Normalise();
-        }
     }
 }
