@@ -148,7 +148,7 @@
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SwCSharpAddinMF\DemoMacroFeature.csproj">
+    <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">
       <Project>{a67399be-aaf7-433f-8f72-9b0424c5be67}</Project>
       <Name>DemoMacroFeature</Name>
     </ProjectReference>
