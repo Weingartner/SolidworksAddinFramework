@@ -56,11 +56,6 @@ private class CodeGen: Microsoft.VisualStudio.TextTemplating.TextTransformation{
 		return Bracket();
     }
 
-	public IDisposable Namespace(string name){
-		WriteLine($"namespace {name}");
-		return Bracket();
-    }
-
 	public void ROProp(string name, Type type){
 		WriteLine($"public {type.FullName} {name} {{ get; }}");
     }
@@ -77,6 +72,10 @@ private class CodeGen: Microsoft.VisualStudio.TextTemplating.TextTransformation{
 	public string Signiture(IEnumerable<Argument> args){
 		var list = args.Select(p=>$"{p.Type.FullName} {p.Name}").ToList();
 		return string.Join(", ", list);
+    }
+
+	public string Arguments(string source, IEnumerable<Argument> args){
+		return string.Join(",", args.Select(p=>$"{source}.{p.Name}"));
     }
 
 	public override string TransformText(){
@@ -110,7 +109,7 @@ private class Record : CodeGen
 	public string FullName => $"{Namespace}.{Name}";
 	public List<CodeGen.Argument> Properties { get; } = new List<Argument>();
 
-	public string Args(string source) => string.Join(",", Properties.Select(p=>$"{source}.{p.Name}"));
+	public string Args(string source) => Arguments(source, Properties);
 
 	public string ConstructorSignature => Signiture(Properties);
 
