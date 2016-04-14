@@ -15,6 +15,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="curve"></param>
         /// <param name="t"></param>
+        /// <param name="derivatives"></param>
         /// <returns></returns>
         public static double[] PointAt(this ICurve curve, double t, int derivatives = 0)
         {
