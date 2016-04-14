@@ -36,67 +36,69 @@ using System.Reactive.Disposables;
 <#+
 
 private class CodeGen: Microsoft.VisualStudio.TextTemplating.TextTransformation{
-	private IDisposable D(Action a){
-		return Disposable.Create(a);
+    private IDisposable D(Action a){
+        return Disposable.Create(a);
     }
-	string WhiteSpace(int n) => string.Join(" ", Enumerable.Range(0, n).Select(i=>""));
+    string WhiteSpace(int n) => string.Join(" ", Enumerable.Range(0, n+1).Select(i=>""));
 
-	public void PushIndent(int n)=>PushIndent(WhiteSpace(n));
+    public void PushIndent(int n)=>PushIndent(WhiteSpace(n));
 
-	private IDisposable Indent(int? n = null){
-		n = n ?? 3;
-		PushIndent(n.Value);
-		return D(()=>PopIndent());
-    }
-
-	private string _ClassName = null;
-	public IDisposable Class(string name){
-		_ClassName = name;
-		WriteLine($"public class {name}");
-		return Bracket();
+    public IDisposable Indent(int? n = null){
+        n = n ?? 1;
+        PushIndent(n.Value * 4);
+        return D(()=>PopIndent());
     }
 
-	public void ROProp(string name, Type type){
-		WriteLine($"public {type.FullName} {name} {{ get; }}");
+    private string _ClassName = null;
+    public IDisposable Class(string name){
+        _ClassName = name;
+        WriteLine($"public class {name}");
+        return Bracket();
     }
 
-	public class Argument {
-		public string Name {get;}
-		public Type Type {get;}
-		public Argument(string name,Type type){
-			Name=name;
-			Type=type;
+    public void ROProp(string name, Type type){
+        WriteLine($"public {type.FullName} {name} {{ get; }}");
+    }
+
+    public class Argument {
+        public string Name {get;}
+        public Type Type {get;}
+        public Argument(string name,Type type){
+            Name=name;
+            Type=type;
         }
     }
 
-	public string Signiture(IEnumerable<Argument> args){
-		var list = args.Select(p=>$"{p.Type.FullName} {p.Name}").ToList();
-		return string.Join(", ", list);
+    public string Signiture(IEnumerable<Argument> args){
+        var list = args.Select(p=>$"{p.Type.FullName} {p.Name}").ToList();
+        return string.Join(", ", list);
     }
 
-	public string Arguments(string source, IEnumerable<Argument> args){
-		return string.Join(",", args.Select(p=>$"{source}.{p.Name}"));
+    public string Arguments(string source, IEnumerable<Argument> args){
+        return string.Join(",", args.Select(p=>$"{source}.{p.Name}"));
     }
 
-	public override string TransformText(){
-		 return GenerationEnvironment.ToString();
+    public string DelegateArgsCall(IEnumerable<Argument> args) => string.Join(", ", args.Select(p=>p.Name));
+
+    public override string TransformText(){
+         return GenerationEnvironment.ToString();
     }
 
-	public IDisposable Bracket(){
-		WriteLine("{");
-		var d0 = Indent();
-		return Disposable.Create(()=>{
-			d0.Dispose();
-			WriteLine("}");
+    public IDisposable Bracket(){
+        WriteLine("{");
+        var d0 = Indent();
+        return Disposable.Create(()=>{
+            d0.Dispose();
+            WriteLine("}");
         });
     }
-	public void Constructor(List<Argument> args){
-		var argsStringList = args.Select(arg=>$"{arg.Type.FullName} {arg.Name}").ToList();
-		var argsString = string.Join(", ", argsStringList);
-		WriteLine($"public {_ClassName} ({argsString})");
-		using(Bracket()){
-			foreach(var arg in args){
-				WriteLine($"this.{arg.Name} = {arg.Name};"); 
+    public void Constructor(List<Argument> args){
+        var argsStringList = args.Select(arg=>$"{arg.Type.FullName} {arg.Name}").ToList();
+        var argsString = string.Join(", ", argsStringList);
+        WriteLine($"public {_ClassName} ({argsString})");
+        using(Bracket()){
+            foreach(var arg in args){
+                WriteLine($"this.{arg.Name} = {arg.Name};"); 
             }
         }
     }
@@ -104,128 +106,132 @@ private class CodeGen: Microsoft.VisualStudio.TextTemplating.TextTransformation{
 
 private class Record : CodeGen 
 {
-	public string Name { get; }
-	public string Namespace { get; }
-	public string FullName => $"{Namespace}.{Name}";
-	public List<CodeGen.Argument> Properties { get; } = new List<Argument>();
+    public string Name { get; }
+    public string Namespace { get; }
+    public string FullName => $"{Namespace}.{Name}";
+    public List<CodeGen.Argument> Properties { get; } = new List<Argument>();
 
-	public string Args(string source) => Arguments(source, Properties);
+    public string Args(string source) => Arguments(source, Properties);
 
-	public string ConstructorSignature => Signiture(Properties);
+    public string ConstructorSignature => Signiture(Properties);
 
-	public void AddProperty(string name, Type type) => Properties.Add(new CodeGen.Argument(name, type));
+    public void AddProperty(string name, Type type) => Properties.Add(new CodeGen.Argument(name, type));
 
-	public Record(string @namespace, string name)
+    public string DelegateArgsCall() => DelegateArgsCall(Properties);
+
+    public string ConstructorCallWithArgs(string source) => $"new {Name}({Args("source")});";
+
+    public Record(string @namespace, string name)
     {
-		Namespace = @namespace;
-		Name = name;
+        Namespace = @namespace;
+        Name = name;
     }
 
-	public override string TransformText()
-	{
-		base.TransformText();
-		using(Class(Name))
+    public override string TransformText()
+    {
+        base.TransformText();
+        using(Indent(2))
+        using(Class(Name))
         {
-			Constructor(Properties);
-			foreach(var p in Properties){
-				ROProp(p.Name,p.Type);
+            Constructor(Properties);
+            foreach(var p in Properties){
+                ROProp(p.Name,p.Type);
             }
         }
-		return GenerationEnvironment.ToString();
+        return GenerationEnvironment.ToString();
     }
 }
 
 private class EventRecord : Record
 {
-	public EventInfo EventInfo { get; }
+    public EventInfo EventInfo { get; }
 
-	public string DelegateArgsCall => string.Join(", ", Properties.Select(p=>p.Name));
 
-	public EventRecord(string @namespace, string name, EventInfo eventInfo, bool generateObservable = true)
-		: base(@namespace, name)
+    public EventRecord(string @namespace, string name, EventInfo eventInfo, bool generateObservable = true)
+        : base(@namespace, name)
     {
-		EventInfo = eventInfo;
-		_GenerateObservable = generateObservable;
+        EventInfo = eventInfo;
+        _GenerateObservable = generateObservable;
 
-		var parameters = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
-		foreach (var p in parameters)
+        var parameters = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
+        foreach (var p in parameters)
         {
-			AddProperty(p.Name, p.ParameterType);
+            AddProperty(p.Name, p.ParameterType);
         }
     }
 
-	private bool _GenerateObservable = false;
-	public static EventRecord FromEventInfo(string @namespace, EventInfo eventInfo, bool generateObservable)
+    private bool _GenerateObservable = false;
+    public static EventRecord FromEventInfo(string @namespace, EventInfo eventInfo, bool generateObservable)
     {
-		var parameters = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
-		if (parameters.Any(p => p.ParameterType.IsByRef)) {
-			return null;
+        var parameters = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
+        if (parameters.Any(p => p.ParameterType.IsByRef)) {
+            return null;
         }
 
-		var name = $"{eventInfo.Name}EventArgs";
-		return new EventRecord(@namespace, name, eventInfo, generateObservable);
+        var name = $"{eventInfo.Name}EventArgs";
+        return new EventRecord(@namespace, name, eventInfo, generateObservable);
     }
 
-	public static IEnumerable<EventRecord> FromEventInfos(string @namespace, IEnumerable<EventInfo> eventInfos, bool generateObservable=true) =>
-		eventInfos
-			.Select(e => EventRecord.FromEventInfo(@namespace, e, generateObservable))
-			.Where(r => r != null);
+    public static IEnumerable<EventRecord> FromEventInfos(string @namespace, IEnumerable<EventInfo> eventInfos, bool generateObservable=true) =>
+        eventInfos
+            .Select(e => EventRecord.FromEventInfo(@namespace, e, generateObservable))
+            .Where(r => r != null);
 
-	public override string TransformText()
+    public override string TransformText()
     {
-		base.TransformText();
-		if(!_GenerateObservable)
-			return GenerationEnvironment.ToString();
+        base.TransformText();
+        if(!_GenerateObservable)
+            return GenerationEnvironment.ToString();
 
-		var delegateTypeName = EventInfo.EventHandlerType.FullName;
-		var method = EventInfo.EventHandlerType.GetMethod("Invoke");
+        var delegateTypeName = EventInfo.EventHandlerType.FullName;
+        var method = EventInfo.EventHandlerType.GetMethod("Invoke");
 #>
-		/// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~<#=delegateTypeName#>.html
-		public static IObservable<<#=Name#>> <#=EventInfo.Name#>Observable(this <#= EventInfo.DeclaringType.FullName #> eventSource)
-		{
-			return Observable.Create<<#=Name#>>
-			( observer => 
-				{
-					<#= delegateTypeName #> callback = 
-						(<#=ConstructorSignature#>)=>{
-							var ea = new <#=Name#>(<#=DelegateArgsCall#>);
-							observer.OnNext(ea);
-							return default(<#=method.ReturnType#>);
-						}; 
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~<#=delegateTypeName#>.html
+        public static IObservable<<#=Name#>> <#=EventInfo.Name#>Observable(this <#= EventInfo.DeclaringType.FullName #> eventSource)
+        {
+            return Observable.Create<<#=Name#>>
+            ( observer => 
+                {
+                    <#= delegateTypeName #> callback = 
+                        (<#=ConstructorSignature#>)=>{
+                            var ea = new <#=Name#>(<#=DelegateArgsCall()#>);
+                            observer.OnNext(ea);
+                            return default(<#=method.ReturnType#>);
+                        }; 
 
-					eventSource.<#=EventInfo.Name#> += callback;
-					return Disposable.Create(()=> eventSource.<#=EventInfo.Name #>-= callback);
-					
-				}
-			);
-		}
+                    eventSource.<#=EventInfo.Name#> += callback;
+                    return Disposable.Create(()=> eventSource.<#=EventInfo.Name #>-= callback);
+                    
+                }
+            );
+        }
 <#+
-		return GenerationEnvironment.ToString();
+        return GenerationEnvironment.ToString();
     }
 }
 
 private List<EventInfo> GetEvents(Type type){
 
-	var myBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;  
-	var events = type.GetEvents(myBindingFlags);
-	return events.ToList();
+    var myBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;  
+    var events = type.GetEvents(myBindingFlags);
+    return events.ToList();
 }
 
 private void OutputEventType<TEventClass, TDoc>(){
 
-	var type = typeof(TEventClass);
-	var events = GetEvents(type);
+    var type = typeof(TEventClass);
+    var events = GetEvents(type);
 
 #>
 
 namespace SolidworksAddinFramework.Events {
-	public static class <#= type.Name #> {
+    public static class <#= type.Name #> {
 
 <#+ foreach(var r in EventRecord.FromEventInfos("SolidworksAddinFramework.Events",events)) { 
-		Write(r.TransformText()); 
-	}
+        Write(r.TransformText()); 
+    }
 #>
-	}
+    }
 }
 
 
@@ -234,14 +240,14 @@ namespace SolidworksAddinFramework.Events {
 
 private string GetEventId(EventRecord r)
 {
-	var e = r.EventInfo;
+    var e = r.EventInfo;
     var delegateType = e.EventHandlerType; 
-	var fullName = delegateType.FullName.Remove(0, delegateType.FullName.IndexOf("_") + 1);
-	var method = delegateType.GetMethod("Invoke");
-	var returnType = method.ReturnType.FullName;
-	var argsList = method.GetParameters().Select(p => $"{p.ParameterType.FullName} {p.Name}").ToList();
-	var argsString = string.Join(", ", argsList);
-	return $"{returnType} {fullName} ({argsString})";
+    var fullName = delegateType.FullName.Remove(0, delegateType.FullName.IndexOf("_") + 1);
+    var method = delegateType.GetMethod("Invoke");
+    var returnType = method.ReturnType.FullName;
+    var argsList = method.GetParameters().Select(p => $"{p.ParameterType.FullName} {p.Name}").ToList();
+    var argsString = string.Join(", ", argsList);
+    return $"{returnType} {fullName} ({argsString})";
 }
 
 private void OutputCommonEvents(params Type[] types)
@@ -251,23 +257,23 @@ namespace SolidworksAddinFramework.Events {
 public static class ModelDoc2Events
 {
 <#+
-	var eventLookup = types
-		.SelectMany(type => EventRecord.FromEventInfos($"SolidworksAddinFramework.Events.{type.Name}", GetEvents(type), false))
-		.ToLookup(e => GetEventId(e), e => e)
-		.Where(e => e.Count() == 3).ToList()
-		.ToList();
+    var eventLookup = types
+        .SelectMany(type => EventRecord.FromEventInfos($"SolidworksAddinFramework.Events.{type.Name}", GetEvents(type), false))
+        .ToLookup(e => GetEventId(e), e => e)
+        .Where(e => e.Count() == 3).ToList()
+        .ToList();
 
-	foreach (var g in eventLookup)
+    foreach (var g in eventLookup)
     {
-	
-		var record = g.First();
-		var eventName = record.EventInfo.Name;
-		var recordFullName = record.FullName;
-		var recordName = record.Name;
-		var methodName = $"{eventName}Observable";
-		Write(g.First().TransformText());
+    
+        var record = g.First();
+        var eventName = record.EventInfo.Name;
+        var recordFullName = record.FullName;
+        var recordName = record.Name;
+        var methodName = $"{eventName}Observable";
+        Write(g.First().TransformText());
 #>
-		public static IObservable<<#=recordName#>> <#=methodName#>(this IModelDoc2 modelDoc)
+        public static IObservable<<#=recordName#>> <#=methodName#>(this IModelDoc2 modelDoc)
         {
             return
             (modelDoc as PartDoc)?.<#=methodName#>().Select(v=>Convert(v))
@@ -279,9 +285,9 @@ public static class ModelDoc2Events
         }
 
 <#+ foreach (var e in g ) { #>
-		static <#= recordName #> Convert(<#= e.FullName #> source ){
-			return new <#= recordName #>(<#= record.Args("source") #>);
-		}
+        static <#= recordName #> Convert(<#= e.FullName #> source ){
+            return <#= record.ConstructorCallWithArgs("source") #>;
+        }
 <#+ } #>
 
 <#+ } #>
