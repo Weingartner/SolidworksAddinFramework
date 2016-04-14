@@ -14,6 +14,7 @@ using SolidWorks.Interop.swconst;
 using Xunit;
 using XUnit;
 using XUnit.Solidworks.Addin;
+using SolidworksAddinFramework.Events;
 
 namespace SolidworksAddinFramework.Spec
 {
@@ -33,11 +34,7 @@ namespace SolidworksAddinFramework.Spec
                 var part = (PartDoc) doc;
                 part.CreateFeatureFromBody3(box, false, 0);
 
-                //var o = await doc.SelectionObservable((selectTypeE, mark) => true).FirstAsync();
-
-
-                await doc.SelectionObservable((selectTypeE, mark) => true).Do(s=>MessageBox.Show("X")).FirstAsync();
-                await Task.Delay(TimeSpan.FromDays(1));
+                await doc.SelectionObservable((selectTypeE, mark) => true).FirstAsync();
             });
         }
 
