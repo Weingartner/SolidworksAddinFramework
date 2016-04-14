@@ -34,7 +34,7 @@ namespace SolidworksAddinFramework.Spec
                 var part = (PartDoc) doc;
                 part.CreateFeatureFromBody3(box, false, 0);
 
-                await doc.SelectionObservable((selectTypeE, mark) => true).FirstAsync();
+                await doc.SelectionObservable((selectTypeE, mark) => true).FirstAsync().Timeout(TimeSpan.FromSeconds(5));
             });
         }
 
