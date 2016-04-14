@@ -45,10 +45,13 @@ namespace SolidworksAddinFramework
         /// Get selected objects filtered by type and mark
         /// </summary>
         /// <param name="selMgr"></param>
-        /// <param name="filter">(type,mark)=>bool</param>
+        /// <param name="filter"> <![CDATA[(type,mark)=>bool]]> if null then the default is true </param>
         /// <returns></returns>
         public static IReadOnlyList<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
+
+            filter = filter ?? ((type,mark)=> true);
+
             return GetSelectedObjectProperties(selMgr)
                 .Where(o => filter(o.Type, o.Mark))
                 .Select(o => selMgr.GetSelectedObject6(o.Index, AnyMark))

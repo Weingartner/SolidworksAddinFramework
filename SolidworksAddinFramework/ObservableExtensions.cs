@@ -118,28 +118,108 @@ namespace SolidworksAddinFramework
         /// <param name="remove"></param>
         /// <param name="delegateCreator">This should be able to create the delegate from an action</param>
         /// <returns></returns>
-        public static IObservable<Unit> FromEvent<TDelegate>(Action<TDelegate> add, Action<TDelegate> remove, Func<Func<int>, TDelegate> delegateCreator )
+        public static IObservable<Unit> FromEvent(Action<Func<int>> add, Action<Func<int>> remove)
         {
-            Debug.Assert(typeof(Delegate).IsAssignableFrom(typeof(TDelegate)));
-
-            return Observable.Create<Unit>(observer =>
+            Func<Action<Unit>, Func<int>> conversion = action =>
             {
-
-                Func<int> callback =  () =>
+                return () =>
                 {
-                    observer.OnNext(Unit.Default);
+                    action(Unit.Default);
                     return 0;
                 };
-
-                var setup = add;
-                var teardown = remove;
-
-                var convertedCallback = delegateCreator(callback);
-                setup(convertedCallback);
-                return Disposable.Create(() => teardown(convertedCallback)) ;
-
-            });
-
+            };
+            return Observable.FromEvent(conversion, add, remove);
         }
+
+        public static IObservable<Unit> FromEvent<T>(Action<Func<T>> add, Action<Func<T>> remove)
+        {
+            Func<Action<Unit>, Func<T>> conversion = action =>
+            {
+                return () =>
+                {
+                    action(Unit.Default);
+                    return default(T);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+
+        public static IObservable<TA> FromEvent<T,TA>(Action<Func<TA,T>> add, Action<Func<TA,T>> remove)
+        {
+            Func<Action<TA>, Func<TA,T>> conversion = action =>
+            {
+                return arg =>
+                {
+                    action(arg);
+                    return default(T);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+
+        /*
+        public static IObservable<Tuple<T0,T1>> FromEvent<T0,T1,TA>(Action<Func<T0,T1,TA>> add, Action<Func<T0,T1,TA>> remove)
+        {
+            Func<Action<Tuple<T0,T1>>, Func<T0,T1, TA>> conversion = action =>
+            {
+                return (t0,t1)=>
+                {
+                    action(Tuple.Create(t0,t1));
+                    return default(TA);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+
+        public static IObservable<Tuple<T0,T1,T2>> FromEvent<T0,T1,T2,TA>(Action<Func<T0,T1,T2,TA>> add, Action<Func<T0,T1,T2,TA>> remove)
+        {
+            Func<Action<Tuple<T0,T1,T2>>, Func<T0,T1,T2, TA>> conversion = action =>
+            {
+                return (t0,t1,t2)=>
+                {
+                    action(Tuple.Create(t0,t1,t2));
+                    return default(TA);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+
+        public static IObservable<Tuple<T0,T1,T2, T3>> FromEvent<T0,T1,T2, T3,TA>(Action<Func<T0,T1,T2, T3,TA>> add, Action<Func<T0,T1,T2, T3,TA>> remove)
+        {
+            Func<Action<Tuple<T0,T1,T2, T3>>, Func<T0,T1,T2, T3, TA>> conversion = action =>
+            {
+                return (t0,t1,t2,t3)=>
+                {
+                    action(Tuple.Create(t0,t1,t2,t3));
+                    return default(TA);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+        public static IObservable<Tuple<T0,T1,T2, T3, T4>> FromEvent<T0,T1,T2, T3, T4,TA>(Action<Func<T0,T1,T2, T3, T4,TA>> add, Action<Func<T0,T1,T2, T3, T4,TA>> remove)
+        {
+            Func<Action<Tuple<T0,T1,T2, T3, T4>>, Func<T0,T1,T2, T3, T4, TA>> conversion = action =>
+            {
+                return (t0,t1,t2,t3,t4)=>
+                {
+                    action(Tuple.Create(t0,t1,t2,t3,t4));
+                    return default(TA);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+        public static IObservable<Tuple<T0,T1,T2, T3, T4, T5>> FromEvent<T0,T1,T2, T3, T4, T5,TA>(Action<Func<T0,T1,T2, T3, T4, T5,TA>> add, Action<Func<T0,T1,T2, T3, T4, T5,TA>> remove)
+        {
+            Func<Action<Tuple<T0,T1,T2, T3, T4, T5>>, Func<T0,T1,T2, T3, T4, T5, TA>> conversion = action =>
+            {
+                return (t0,t1,t2,t3,t4,t5)=>
+                {
+                    action(Tuple.Create(t0,t1,t2,t3,t4,t5));
+                    return default(TA);
+                };
+            };
+            return Observable.FromEvent(conversion, add, remove);
+        }
+        */
     }
 }

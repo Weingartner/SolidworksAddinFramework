@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,6 +30,12 @@ namespace SolidworksAddinFramework
         {
             using (Disposable.Create(() => cleanup(@this)))
                 return run(@this);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TR DirectCast<TR>(this object u)
+        {
+            return (TR) u ;
         }
 
         public static T[] CastArray<T>(this object o)

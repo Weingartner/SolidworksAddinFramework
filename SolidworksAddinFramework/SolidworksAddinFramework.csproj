@@ -168,6 +168,11 @@
     <Compile Include="MathTransformExtensions.cs" />
     <Compile Include="MathUtilityExtensions.cs" />
     <Compile Include="MathVectorExtensions.cs" />
+    <Compile Include="ModelDocEvents.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelDocEvents.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDocExtensions.cs" />
     <Compile Include="ModellerExtensions.cs" />
     <Compile Include="ModelViewExtensions.cs" />
@@ -206,6 +211,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ModelDocEvents.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ModelDocEvents.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />

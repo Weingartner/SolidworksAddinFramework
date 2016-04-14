@@ -1,0 +1,105 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.swconst.dll" #>
+<#@ assembly name="C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.swpublished.dll" #>
+<#@ assembly name="C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.sldworks.dll" #>
+<#@ assembly name="C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\solidworkstools.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="SolidWorks.Interop.sldworks" #>
+<#@ import namespace="SolidWorks.Interop.swconst" #>
+<#@ import namespace="System.Reflection" #>
+<#@ output extension=".cs" #>
+
+// ReSharper disable All
+
+using System;
+using System.Reactive;
+using System.Reactive.Linq;
+using SolidWorks.Interop.swconst;
+using SolidWorks.Interop.swpublished;
+using SolidWorks.Interop.sldworks;
+using System.Collections.Generic;
+using SolidworksAddinFramework;
+using System.Reactive.Disposables;
+
+<# OutputEventType<DPartDocEvents_Event,PartDoc>();#>
+
+<#+ private void OutputEventType<TEventClass, TDoc>(){
+
+	var type = typeof(TEventClass);
+	var myBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;  
+	var events = type.GetEvents(myBindingFlags);
+
+#>
+
+namespace SolidworksAddinFramework.Events {
+	public static class <#= type.Name #>Observables {
+
+<#+ foreach(var e in events){ 
+
+    var delegateType = e.EventHandlerType; 
+	var delegateTypeName = delegateType.FullName;
+	var method = delegateType.GetMethod("Invoke");
+	var types = method.GetParameters()
+		   .Select(p=>p.ParameterType.FullName)
+		   .ToList();
+	var typesString = string.Join(", ", types);
+
+	// Can't handle callbacks with reference objects
+	if(typesString.Contains("&"))
+		continue;
+
+	var sigList = method.GetParameters()
+		   .Select(p=>$"{p.ParameterType.FullName} {p.Name}")
+		   .ToList();
+
+	var delegateArgsSigniture = string.Join(", ", sigList);
+	var delegateArgsCall = string.Join(", ",  method.GetParameters().Select(p=>p.Name));
+	var eventArgsType = $"{e.Name}EventArgs";
+
+
+#>
+
+		public class <#= eventArgsType #> {
+		<#+foreach(var pType in method.GetParameters()){#>
+			public <#=pType.ParameterType.Name#> <#=pType.Name#> {get;}
+		<#+}#>
+			public <#=eventArgsType#>(<#=delegateArgsSigniture#>){
+		<#+foreach(var pType in method.GetParameters()){#>
+			this.<#=pType.Name#>=<#=pType.Name#>;
+		<#+}#>
+			}
+		}
+
+		/// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~<#=delegateTypeName#>.html
+		public static IObservable<<#=eventArgsType#>> <#=e.Name#>Observable(this PartDoc partDoc)
+		{
+			return Observable.Create<<#=eventArgsType#>>
+			( observer => 
+				{
+					<#= delegateTypeName #> callback = 
+						(<#=delegateArgsSigniture#>)=>{
+							var ea = new <#=eventArgsType#>(<#=delegateArgsCall#>);
+							observer.OnNext(ea);
+							return default(<#=method.ReturnType#>);
+						}; 
+
+					partDoc.<#=e.Name#> += callback;
+					return Disposable.Create(()=> partDoc.<#=e.Name #>-= callback);
+					
+				}
+			);
+		}
+
+<#+}#>
+	}
+}
+
+
+<#+} #>
+
+
+
+

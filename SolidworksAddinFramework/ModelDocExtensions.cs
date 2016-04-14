@@ -64,45 +64,48 @@ namespace SolidworksAddinFramework
         }
 
 
+
         #region Convet modeldoc / partdoc events to observables
 
         public static IObservable<IReadOnlyList<object>> SelectionObservable(this PartDoc partDoc, 
             Func<swSelectType_e, int, bool> filter = null)
         {
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            var modelDoc = (IModelDoc2) partDoc;
-            var sm = (ISelectionMgr) modelDoc.SelectionManager;
-            filter = filter ?? ((type,mark)=> true);
+            var sm = partDoc
+                .DirectCast<IModelDoc2>()
+                .SelectionManager.DirectCast<ISelectionMgr>();
 
             return ObservableExtensions.FromEvent
-                (h => partDoc.UserSelectionPostNotify += h,
-                    h => partDoc.UserSelectionPostNotify -= h,
-                    d => new DPartDocEvents_UserSelectionPostNotifyEventHandler(d))
+                (h => partDoc.UserSelectionPostNotify += h.Invoke,
+                    h => partDoc.UserSelectionPostNotify -= h.Invoke
+                    )
                 .Select(u => sm.GetSelectedObjects(filter));
+
         }
 
         public static IObservable<IReadOnlyList<object>> SelectionObservable(this DrawingDoc drawingDoc, 
             Func<swSelectType_e, int, bool> filter = null)
         {
-            var modelDoc = (IModelDoc2) drawingDoc;
-            var sm = (ISelectionMgr) modelDoc.SelectionManager;
-            filter = filter ?? ((type,mark)=> true);
+            var sm = drawingDoc
+                .DirectCast<IModelDoc2>()
+                .SelectionManager.DirectCast<ISelectionMgr>();
 
             return ObservableExtensions.FromEvent
-                (h => drawingDoc.UserSelectionPostNotify += h,
-                h => drawingDoc.UserSelectionPostNotify -= h,
-                d => new DDrawingDocEvents_UserSelectionPostNotifyEventHandler(d) )
+                (h => drawingDoc.UserSelectionPostNotify += h.Invoke,
+                h => drawingDoc.UserSelectionPostNotify -= h.Invoke
+                )
                 .Select(u => sm.GetSelectedObjects(filter));
         }
         public static IObservable<IReadOnlyList<object>> SelectionObservable(this AssemblyDoc assemblyDoc, 
             Func<swSelectType_e, int, bool> filter)
         {
-            var modelDoc = (IModelDoc2) assemblyDoc;
-            var sm = (ISelectionMgr) modelDoc.SelectionManager;
+            var sm = assemblyDoc
+                .DirectCast<IModelDoc2>()
+                .SelectionManager.DirectCast<ISelectionMgr>();
+
             return ObservableExtensions.FromEvent
-                (h => assemblyDoc.UserSelectionPostNotify += h,
-                h => assemblyDoc.UserSelectionPostNotify -= h,
-                d => new DAssemblyDocEvents_UserSelectionPostNotifyEventHandler(d) )
+                (h => assemblyDoc.UserSelectionPostNotify += h.Invoke,
+                h => assemblyDoc.UserSelectionPostNotify -= h.Invoke
+                )
                 .Select(u => sm.GetSelectedObjects(filter));
         }
 
