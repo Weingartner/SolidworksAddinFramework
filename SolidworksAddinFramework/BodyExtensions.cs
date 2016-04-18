@@ -203,6 +203,16 @@ namespace SolidworksAddinFramework
         {
             return DocView.DisplayUndoable(renderable, c, doc);
         }
+
+        /// <summary>
+        /// Uses Display3 to render the object. This is slow for animation. Better to create a Mesh and then render it. This
+        /// will use OpenGL directly.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="doc"></param>
+        /// <param name="c"></param>
+        /// <param name="opt"></param>
+        /// <returns></returns>
         public static IDisposable DisplayUndoable(this IBody2 body, IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
             body.DisplayTs(doc, c, opt);
