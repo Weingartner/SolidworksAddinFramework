@@ -18,15 +18,6 @@ namespace SolidworksAddinFramework.OpenGl
             TriangleVertices = triangleVertices;
         }
 
-        //public Mesh(IFace2 face)
-        //{
-        //    var pts = face.GetTessTriangles(true).CastArray<double>().Buffer(9,9).Where(p=>p.Count==9);
-        //    var norms = face.GetTessNorms().CastArray<double>().Buffer(9,9).Where(p=>p.Count==9);
-        //    var tris = pts.Zip(norms, (a, b) => Tuple.Create(a, b));
-        //    TriangleVertices = tris;
-        //    _OriginalTriangleVerticies = TriangleVertices;
-        //}
-
         public Mesh(IBody2 body)
         {
             var faceList = body.GetFaces().CastArray<IFace2>();

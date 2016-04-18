@@ -1,6 +1,10 @@
-﻿using System.Threading;
+﻿using System.Drawing;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Xunit;
 using XUnit.Solidworks.Addin;
@@ -9,6 +13,10 @@ namespace SolidworksAddinFramework.Spec.opengl
 {
     public class MeshRenderSpec : SolidWorksSpec
     {
+        private static IModeler Modeler => (IModeler)SwApp.GetModeler();
+
+        private static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
+
 
         [SolidworksFact]
         public async Task ShouldRenderCylinder()
@@ -99,6 +107,26 @@ namespace SolidworksAddinFramework.Spec.opengl
             t.SetApartmentState(ApartmentState.STA);
             t.Start();
             t.Join();
+        }
+
+        [SolidworksFact]
+        public void RenderFaceShouldWork()
+        {
+            CreatePartDoc(true, modelDoc =>
+            {
+                var body = Modeler.CreateBox(1, 1, 1);
+
+                //var face = (ISurface)Modeler.CreateToroidalSurface(new[] {0, 0, 0.0}, new[] {0, 1, 0.0}, new[] {0, 0, 1.0}, 1, 0.5);
+                var face = body.GetFaces().CastArray<IFace2>().First();
+                //var clonedFace = (IFace2) face.
+                //var clonedSurface = (ISurface) clonedFace.Copy();
+                var faceBody = (IBody2)face.GetBody();
+                var faceMesh = new Mesh(faceBody);
+                var d1 = faceMesh.DisplayUndoable(modelDoc, Color.Green);
+
+                //return new CompositeDisposable(d, d1);
+                return new CompositeDisposable(d1);
+            });
         }
     }
 }

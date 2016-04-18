@@ -198,8 +198,11 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static IDisposable DisplayUndoable(this IRenderable renderable, IModelDoc2 doc, System.Drawing.Color? c = null,
-            swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        public static IDisposable DisplayUndoable
+            ( this IRenderable renderable
+            , IModelDoc2 doc
+            , Color? c = null
+            , swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
             return DocView.DisplayUndoable(renderable, c, doc);
         }
