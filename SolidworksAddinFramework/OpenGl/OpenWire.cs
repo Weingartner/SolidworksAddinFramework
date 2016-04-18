@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -20,15 +21,17 @@ namespace SolidworksAddinFramework.OpenGl
             _Mode = mode;
         }
 
-        public void Render(Color color)
+        public void Render(DateTime time)
         {
             using (ModernOpenGl.Begin(_Mode))
-            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
+            using (ModernOpenGl.SetColor(this.Color, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(_Thickness))
             {
                 _Points.ForEach(GL.Vertex3);
             }
         }
+
+        public Color Color { get; set; } = System.Drawing.Color.Blue;
 
         public void ApplyTransform(IMathTransform transform)
         {

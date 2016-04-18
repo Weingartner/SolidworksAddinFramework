@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using SolidWorks.Interop.sldworks;
 
@@ -28,6 +29,13 @@ namespace SolidworksAddinFramework
         public static MathVector ScaleTs(this IMathVector a, double b)
         {
             return (MathVector) a.Scale(b);
+        }
+
+        public static MathVector AlphaBend(this IMathVector a, IMathVector b, double alpha)
+        {
+            Debug.Assert(alpha>=0);
+            Debug.Assert(alpha<=1);
+            return (MathVector) a.ScaleTs(alpha).Add(b.ScaleTs(1 - alpha));
         }
 
         public static MathVector CrossTs(this IMathVector a, IMathVector b)

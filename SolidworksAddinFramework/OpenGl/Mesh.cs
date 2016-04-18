@@ -28,10 +28,12 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
-        public void Render(Color color)
+        public void Render(DateTime time)
         {
-            MeshRender.Render(this, color);
+            MeshRender.Render(this, Color);
         }
+
+        public Color Color { get; set; } = Color.Red;
 
         public static IEnumerable<Tuple<double[], double[]>> Tesselate(IFace2[] faceList, ITessellation tess)
         {

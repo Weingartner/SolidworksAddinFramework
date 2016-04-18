@@ -14,9 +14,5 @@ namespace SolidworksAddinFramework
         public IRenderable Renderable { get; }
         public Color Color { get; }
 
-        public void Render()
-        {
-            Renderable.Render(Color);
-        }
     }
 }

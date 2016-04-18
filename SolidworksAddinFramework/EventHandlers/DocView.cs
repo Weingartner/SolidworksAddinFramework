@@ -31,16 +31,16 @@ namespace SolidworksAddinFramework
             return true;
         }
 
-        public static ConcurrentDictionary<IRenderable, ColorRenderable> BodiesToRender = 
-            new ConcurrentDictionary<IRenderable, ColorRenderable>();
+        public static ConcurrentDictionary<IRenderable, IRenderable> BodiesToRender = 
+            new ConcurrentDictionary<IRenderable, IRenderable>();
 
         public static IDisposable DisplayUndoable(IRenderable body, Color? color, IModelDoc2 doc)
         {
-            BodiesToRender[body]= new ColorRenderable(body, color ?? Color.Yellow);
+            BodiesToRender[body] = body;
             ((IModelView)doc.ActiveView).GraphicsRedraw(null);
             return Disposable.Create(() =>
             {
-                ColorRenderable dummy;
+                IRenderable dummy;
                 BodiesToRender.TryRemove(body, out dummy);
             });
         }
@@ -48,11 +48,14 @@ namespace SolidworksAddinFramework
         private int OnBufferSwapNotify()
         {
 
+            var time = DateTime.Now;
             DoSetup(_ISwApp);
             foreach (var o in BodiesToRender.Values)
             {
-                o.Render();
+                o.Render(time);
             }
+
+            ((IModelView) ModelDoc.ActiveView).GraphicsRedraw(null);
 
             return 0;
         }
