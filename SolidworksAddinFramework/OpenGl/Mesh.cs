@@ -11,9 +11,9 @@ namespace SolidworksAddinFramework.OpenGl
 
     public class Mesh : IRenderable
     {
-        private IList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
+        private readonly IReadOnlyList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
 
-        public Mesh(IList<Tuple<double[], double[]>> triangleVertices)
+        public Mesh(IReadOnlyList<Tuple<double[], double[]>> triangleVertices)
         {
             TriangleVertices = triangleVertices;
         }
@@ -27,7 +27,7 @@ namespace SolidworksAddinFramework.OpenGl
             _OriginalTriangleVerticies = TriangleVertices;
         }
 
-        public IList<Tuple<double[], double[]>> TriangleVertices { get; set; }
+        public IReadOnlyList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
         public void Render(DateTime time)
         {

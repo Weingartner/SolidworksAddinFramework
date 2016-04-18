@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reactive;
@@ -8,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using MathNet.Numerics.Interpolation;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -25,48 +27,35 @@ namespace SolidworksAddinFramework.OpenGl
         IMathTransform Transform(IMathUtility math, TimeSpan deltaTime);
     }
 
-    public class LinearAnimation : ReactiveObject, IAnimationSection
+    public class LinearAnimation<T> : ReactiveObject, IAnimationSection
+        where T : IInterpolatable<T>
     {
-        public MathVector FromTrans { get; }
-        public MathVector ToTrans { get; set; }
-        public MathVector RotationAxis { get; }
-
-        public MathPoint Origin { get; }
+        private readonly IMathUtility _Math;
+        public T From { get; } 
+        public T To { get; } 
         public TimeSpan Duration { get; }
-        public double FromRotationAngle { get; }
-        public double ToRotationAngle { get; }
-
 
         public LinearAnimation
-            (TimeSpan duration
-            , MathVector fromTrans
-            , MathVector toTrans
-            , MathPoint origin
-            , MathVector rotationAxis
-            , double fromRotationAngle
-            , double toRotationAngle)
+            (TimeSpan duration, T @from, T to, IMathUtility math)  
         {
             Duration = duration;
-            FromTrans = fromTrans;
-            ToTrans = toTrans;
-            Origin = origin;
-            RotationAxis = rotationAxis;
-            FromRotationAngle = fromRotationAngle;
-            ToRotationAngle = toRotationAngle;
+            From = @from;
+            To = to;
+            _Math = math;
         }
-
-
 
         public IMathTransform Transform(IMathUtility math, TimeSpan deltaTime)
         {
-            var alpha = deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
+            var beta = deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
 
-            var trans = math.ComposeTransform(math.XAxis(), math.YAxis(), math.ZAxis(), FromTrans.AlphaBend(ToTrans, alpha),1);
-            var rot = (IMathTransform) math.CreateTransformRotateAxis(Origin, RotationAxis, alpha * ToRotationAngle + ( 1-alpha) * FromRotationAngle);
-
-            return (IMathTransform) trans.Multiply(rot);
+            return BlendTransform(beta);
         }
 
+        public MathTransform BlendTransform(double beta)
+        {
+            Debug.Assert(beta>=0 && beta<=1);
+            return From.Interpolate(To, beta).Transform(_Math);
+        }
     }
 
 
@@ -120,20 +109,9 @@ namespace SolidworksAddinFramework.OpenGl
 
             var currentTransform = currentSection.section.Transform(_Math, t - startTime);
 
-            var transform = _Math.IdentityTransform();
-
-            os
-                .Where(o => o.endTime < t)
-                .Select(o => o.section.Transform(_Math, o.section.Duration))
-                .ForEach(trans =>
-                {
-                    transform = (MathTransform)transform.Multiply(trans);
-                });
-
-            var tr = (MathTransform)transform.Multiply(currentTransform);
             foreach (var child in _Children)
             {
-                child.ApplyTransform(tr);
+                child.ApplyTransform(currentTransform);
                 child.Render(t);
             }
         }
