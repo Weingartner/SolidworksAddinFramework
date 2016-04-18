@@ -8,6 +8,7 @@ using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
+
     public class Mesh : IRenderable
     {
         private IList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
@@ -16,6 +17,15 @@ namespace SolidworksAddinFramework.OpenGl
         {
             TriangleVertices = triangleVertices;
         }
+
+        //public Mesh(IFace2 face)
+        //{
+        //    var pts = face.GetTessTriangles(true).CastArray<double>().Buffer(9,9).Where(p=>p.Count==9);
+        //    var norms = face.GetTessNorms().CastArray<double>().Buffer(9,9).Where(p=>p.Count==9);
+        //    var tris = pts.Zip(norms, (a, b) => Tuple.Create(a, b));
+        //    TriangleVertices = tris;
+        //    _OriginalTriangleVerticies = TriangleVertices;
+        //}
 
         public Mesh(IBody2 body)
         {
@@ -79,6 +89,11 @@ namespace SolidworksAddinFramework.OpenGl
 
         }
 
+        /// <summary>
+        /// Apply the transform to the ORIGINAL mesh that was created. Multiple
+        /// calls are NOT cumulative.
+        /// </summary>
+        /// <param name="transform"></param>
         public void ApplyTransform(IMathTransform transform)
         {
             DenseMatrix rotation;
