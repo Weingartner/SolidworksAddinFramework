@@ -1,11 +1,15 @@
 ﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
@@ -69,16 +73,29 @@ namespace SolidworksAddinFramework.OpenGl
     public class Animator : IRenderable
     {
         public IReadOnlyList<IAnimationSection> AnimationSections { get; }
-        public DateTime StartTime { get; }
+        public DateTime StartTime { get; private set; }
         private readonly IReadOnlyList<IRenderable> _Children;
         private IMathUtility _Math;
 
-        public Animator(IReadOnlyList<IAnimationSection> animationSections, IReadOnlyList<IRenderable> children, IMathUtility math, DateTime startTime)
+        public Animator(IReadOnlyList<IAnimationSection> animationSections, IReadOnlyList<IRenderable> children, IMathUtility math)
         {
             AnimationSections = animationSections;
-            StartTime = startTime;
             _Children = children;
             _Math = math;
+        }
+        public IDisposable Animate(IModelDoc2 doc, TimeSpan? startDelay = null , int framerate = 60, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        {
+            StartTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
+            var d = DocView.DisplayUndoable(this, c, doc);
+            var interval = 1.0/framerate;
+            var d2 = Observable.Interval(TimeSpan.FromSeconds(interval))
+                .ObserveOnUiDispatcher()
+                .Subscribe(l =>
+                {
+                    doc.GraphicsRedraw2();
+                });
+
+            return new CompositeDisposable(d,d2);
         }
 
         public void Render(DateTime t)

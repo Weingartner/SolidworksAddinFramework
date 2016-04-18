@@ -55,8 +55,6 @@ namespace SolidworksAddinFramework
                 o.Render(time);
             }
 
-            ((IModelView) ModelDoc.ActiveView).GraphicsRedraw(null);
-
             return 0;
         }
 
