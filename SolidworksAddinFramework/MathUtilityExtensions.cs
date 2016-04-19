@@ -31,10 +31,22 @@ namespace SolidworksAddinFramework
         private static MathPoint _Origin = null;
 
 
-        public static MathVector XAxis(this IMathUtility m) => _XAxis ?? (_XAxis = m.Vector(new double[] {1, 0, 0}));
-        public static MathVector YAxis(this IMathUtility m) => _YAxis ?? (_YAxis = m.Vector(new double[] {0, 1, 0}));
-        public static MathVector ZAxis(this IMathUtility m) => _ZAxis ?? (_ZAxis = m.Vector(new double[] {0, 0, 1}));
-        public static MathPoint Origin(this IMathUtility m) => _Origin ??(_Origin =  m.Point(new[] {0,0,0.0}));
+
+        private static readonly double[] _XAxisArray = {1, 0, 0};
+        private static readonly double[] _YAxisArray = {0, 1, 0};
+        private static readonly double[] _ZAxisArray = {0, 0, 1};
+        private static readonly double[] _OriginArray = {0, 0, 0};
+
+        public static double [] XAxisArray(this IMathUtility m) => _XAxisArray;
+        public static double [] YAxisArray(this IMathUtility m) => _YAxisArray;
+        public static double [] ZAxisArray(this IMathUtility m) => _ZAxisArray;
+        public static double [] OriginArray(this IMathUtility m) => _OriginArray;
+
+
+        public static MathVector XAxis(this IMathUtility m) => _XAxis ?? (_XAxis = m.Vector(_XAxisArray));
+        public static MathVector YAxis(this IMathUtility m) => _YAxis ?? (_YAxis = m.Vector(_YAxisArray));
+        public static MathVector ZAxis(this IMathUtility m) => _ZAxis ?? (_ZAxis = m.Vector(_ZAxisArray));
+        public static MathPoint Origin(this IMathUtility m) => _Origin ??(_Origin =  m.Point(_OriginArray));
 
         public static MathVector Mv(this IMathUtility m, double[] v) => m.Vector(v);
         public static MathPoint Mp(this IMathUtility m , double[] v) => m.Point(v);
