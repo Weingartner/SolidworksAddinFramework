@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -14,8 +15,17 @@ using SolidWorksTools.File;
 
 namespace SolidworksAddinFramework
 {
+
+    public interface ISolidworksAddin
+    {
+        ISldWorks SwApp { set; get; }
+        IModeler Modeler { get; }
+        MathUtility Math { get; }
+    }
+
+
     [ComVisible(true)]
-    public abstract class SwAddinBase : ISwAddin
+    public abstract class SwAddinBase : ISwAddin, ISolidworksAddin
     {
         public int AddinId { get; private set; }
         protected BitmapHandler Bmp;
@@ -26,7 +36,15 @@ namespace SolidworksAddinFramework
 
         public Hashtable OpenDocs => _OpenDocs;
 
+        #region ISolidworksAddin
         public ISldWorks SwApp { set; get; }
+
+        public MathUtility Math => (MathUtility) SwApp.GetMathUtility();
+
+        public IModeler Modeler => (IModeler) SwApp.GetModeler();
+        #endregion
+
+        public static ISolidworksAddin Active { get; set; }
 
         [ComRegisterFunction]
         public static void RegisterFunction(Type t)
@@ -105,6 +123,8 @@ namespace SolidworksAddinFramework
         {
             SwApp = (ISldWorks)thisSw;
             AddinId = cookie;
+
+            Active = this;
 
             //Setup callbacks
             SwApp.SetAddinCallbackInfo(0, this, AddinId);
