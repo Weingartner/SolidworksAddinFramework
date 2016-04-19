@@ -154,6 +154,27 @@ namespace SolidworksAddinFramework
             return result;
         }
 
+        public static IBody2 CreateSphereBody(this IModeler modeler, double []center, double radius)
+        {
+            var axis = new double[] {0, 0, 1};
+            var refaxis = new double[] {0, 1, 0};
+            var sphere = (ISurface)modeler.CreateSphericalSurface2(center, axis, refaxis, radius);
+
+            var swSurfPara = sphere.Parameterization2();
+
+            var uvrange = new double[]
+            {
+                swSurfPara.UMin,
+                swSurfPara.UMax,
+                swSurfPara.VMin,
+                swSurfPara.VMax
+            };
+
+
+            var sphereBody = (IBody2) modeler.CreateSheetFromSurface(sphere, uvrange);
+            return sphereBody;
+        }
+
         public static IBody2 CreateBox
             (this IModeler modeler
             , double [] center 
