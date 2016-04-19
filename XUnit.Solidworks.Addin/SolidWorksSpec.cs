@@ -55,5 +55,16 @@ namespace XUnit.Solidworks.Addin
                 CreatePartDoc().Using(SwApp, m => action(m).Dispose());
             }
         }
+        protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)
+        {
+            CreatePartDoc(keep, doc =>
+            {
+                var comp = new CompositeDisposable();
+                Action<IDisposable> yielder = d => comp.Add(d);
+                action(doc, yielder);
+                return comp;
+
+            });
+        }
     }
 }
