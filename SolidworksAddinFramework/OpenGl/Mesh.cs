@@ -29,6 +29,13 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IReadOnlyList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
+        public IReadOnlyList<IReadOnlyList<double[]>> Triangles =>
+            TriangleVertices
+                .Buffer(3, 3)
+                .Select(b => b.Select(i => i.Item1).ToList())
+                .ToList();
+
+
         public void Render(DateTime time)
         {
             MeshRender.Render(this, Color);
