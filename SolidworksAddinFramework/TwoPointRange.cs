@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xaml.Schema;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
@@ -11,28 +12,28 @@ namespace SolidworksAddinFramework
 {
     public class TwoPointRange 
     {
-        public double[] P0 { get; }
+        public DenseVector P0 { get; }
 
-        public double[] P1 { get; }
+        public DenseVector P1 { get; }
 
-        public double[] Center => new double[]
+        public DenseVector Center => new[]
         {
             (P0[0]+P1[0])/2,
             (P0[1]+P1[1])/2,
             (P0[2]+P1[2])/2
         };
 
-        public TwoPointRange(double[] p0, double[] p1)
+        public TwoPointRange(DenseVector p0, DenseVector p1)
         {
             P0 = p0;
             P1 = p1;
         }
 
-        public IEnumerable<double[]> Extremities => 
+        public IEnumerable<DenseVector> Extremities => 
             from x in XRange
             from y in YRange
             from z in ZRange
-            select new[] { x, y, z };
+            select new DenseVector(new[] { x, y, z });
 
         public double XMin => Math.Min(P0[0], P1[0]);
         public double XMax => Math.Max(P0[0], P1[0]);
@@ -85,11 +86,11 @@ namespace SolidworksAddinFramework
         public IEnumerable<IReadOnlyList<double[]>> Triangles()
         {
             var _ = new double[2,2,2][];
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
-                for (int j = 0; j < 2; j++)
+                for (var j = 0; j < 2; j++)
                 {
-                    for (int k = 0; k < 2; k++)
+                    for (var k = 0; k < 2; k++)
                     {
                         _[i,j,k] = new double[]
                         {
@@ -103,7 +104,7 @@ namespace SolidworksAddinFramework
                 }
             }
 
-            for (int faceId = 0; faceId < 6; faceId++)
+            for (var faceId = 0; faceId < 6; faceId++)
             {
                 switch (faceId)
                 {
@@ -139,30 +140,37 @@ namespace SolidworksAddinFramework
             }
             
         }
-
-        public static TwoPointRange FromVertices(IEnumerable<double[]>  vertices)
+        public static TwoPointRange FromVertices(IReadOnlyList<DenseVector>  vertices)
         {
-            double xmin = Double.MaxValue;
-            double ymin = Double.MaxValue;
-            double zmin = Double.MaxValue;
+            var xmin = double.MaxValue;
+            var ymin = double.MaxValue;
+            var zmin = double.MaxValue;
 
-            double xmax = Double.MinValue;
-            double ymax = Double.MinValue;
-            double zmax = Double.MinValue;
+            var xmax = double.MinValue;
+            var ymax = double.MinValue;
+            var zmax = double.MinValue;
 
-            foreach (var vertex in vertices)
+            // performance optimization. Avoid LINQ
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int i = 0; i < vertices.Count; i++)
             {
-                xmin = Math.Min(xmin, vertex[0]);
-                xmax = Math.Max(xmax, vertex[0]);
 
-                ymin = Math.Min(ymin, vertex[1]);
-                ymax = Math.Max(ymax, vertex[1]);
+                var vertex = vertices[i];
+                var v0 = vertex[0];
+                var v1 = vertex[1];
+                var v2 = vertex[2];
 
-                zmin = Math.Min(zmin, vertex[2]);
-                zmax = Math.Max(zmax, vertex[2]);
+                xmin = Math.Min(xmin, v0);
+                xmax = Math.Max(xmax, v0);
+
+                ymin = Math.Min(ymin, v1);
+                ymax = Math.Max(ymax, v1);
+
+                zmin = Math.Min(zmin, v2);
+                zmax = Math.Max(zmax, v2);
             }
 
-            return new TwoPointRange(new[] {xmin,ymin,zmin}, new[] {xmax, ymax, zmax});
+            return new TwoPointRange(new DenseVector(new[] {xmin,ymin,zmin}), new DenseVector(new[] {xmax, ymax, zmax}));
 
         }
 
@@ -195,9 +203,5 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static TwoPointRange FromVertices(IReadOnlyList<Vector<double>> triangle)
-        {
-            return FromVertices(triangle.Select(v=>v.ToArray()));
-        }
     }
 }

@@ -62,11 +62,9 @@ namespace SolidworksAddinFramework
             return (MathPoint) v.MultiplyTransform(t);
         }
 
-        public static double Distance(this double[] a, double[] b)
+        public static double Distance(this DenseVector a, DenseVector b)
         {
-            var av = new DenseVector(a);
-            var bv = new DenseVector(b);
-            return (av - bv).L2Norm();
+            return (a - b).L2Norm();
         }
 
         /// <summary>

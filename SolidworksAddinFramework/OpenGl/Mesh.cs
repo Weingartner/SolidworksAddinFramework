@@ -51,6 +51,12 @@ namespace SolidworksAddinFramework.OpenGl
                 .Select(b => b.Select(i => i.Item1).ToList())
                 .ToList();
 
+        public IReadOnlyList<IReadOnlyList<DenseVector>> DenseTriangles => 
+            TriangleVertices
+                .Buffer(3, 3)
+                .Select(b => b.Select(i => (DenseVector) i.Item1).ToList())
+                .ToList();
+
 
         public void Render(DateTime time)
         {

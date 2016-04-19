@@ -28,14 +28,14 @@ namespace SolidworksAddinFramework
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static Vector<double> Cross(this Vector<double> left, Vector<double> right)
+        public static DLA.DenseVector Cross(this DLA.DenseVector left, DLA.DenseVector right)
         {
             if ((left.Count != 3 || right.Count != 3))
             {
                 string message = "Vectors must have a length of 3.";
                 throw new Exception(message);
             }
-            DLA.Vector result = new DLA.DenseVector(3);
+            var result = new DLA.DenseVector(3);
             result[0] = left[1] * right[2] - left[2] * right[1];
             result[1] = -left[0] * right[2] + left[2] * right[0];
             result[2] = left[0] * right[1] - left[1] * right[0];

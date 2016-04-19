@@ -44,7 +44,7 @@ namespace SolidworksAddinFramework
         /// <param name="surface"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static PointUv GetClosestPointOnTs(this ISurface surface, double[] p)
+        public static PointUv GetClosestPointOnTs(this ISurface surface, DenseVector p)
         {
             var x = p[0];
             var y = p[1];
