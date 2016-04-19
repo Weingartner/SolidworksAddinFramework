@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reactive.Disposables;
 using OpenTK.Graphics.OpenGL;
@@ -69,10 +70,29 @@ namespace SolidworksAddinFramework.OpenGl
             return Disposable.Create(() => GL.LineWidth(currentLineWidth));
         }
 
+
+        public static int BeginCount = 0;
+        public static PrimitiveType? BeginType = null; 
+
         public static IDisposable Begin(PrimitiveType mode)
         {
-            GL.Begin(mode);
-            return Disposable.Create(GL.End);
+            BeginCount++;
+            if(BeginCount==1)
+            {
+                GL.Begin(mode);
+                BeginType = mode;
+            }else 
+                Debug.Assert(BeginType != null && mode == BeginType.Value);
+
+            return Disposable.Create(() =>
+            {
+                BeginCount --;
+                if (BeginCount == 0)
+                {
+                    GL.End();
+                    BeginType = null;
+                }
+            });
         }
     }
 }
