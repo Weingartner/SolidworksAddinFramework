@@ -23,10 +23,23 @@ namespace SolidworksAddinFramework.OpenGl
                 var tris = mesh.TriangleVertices;
                 foreach (var tri in tris)
                 {
-                    GL.Normal3(tri.Item2);
+                    if(tri.Item2!=null)
+                        GL.Normal3(tri.Item2);
                     GL.Vertex3(tri.Item1);
                 }
             }
+            var faces = mesh.FaceEdges;
+            if (faces == null) return;
+            using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth))
+            using (ModernOpenGl.SetLineWidth(2.0f))
+                foreach (var face in faces)
+                    using (ModernOpenGl.Begin(PrimitiveType.LineStrip))
+                    {
+                        foreach (var v in face)
+                        {
+                            GL.Vertex3(v);
+                        }
+                    }
         }
 
         public static void Render(IFace2[] faces, Color color, float lineWidth)

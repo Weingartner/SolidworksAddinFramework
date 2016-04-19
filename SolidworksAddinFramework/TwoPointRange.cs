@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Xaml.Schema;
+using MathNet.Numerics.LinearAlgebra;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -23,6 +27,12 @@ namespace SolidworksAddinFramework
             P0 = p0;
             P1 = p1;
         }
+
+        public IEnumerable<double[]> Extremities => 
+            from x in XRange
+            from y in YRange
+            from z in ZRange
+            select new[] { x, y, z };
 
         public double XMin => Math.Min(P0[0], P1[0]);
         public double XMax => Math.Max(P0[0], P1[0]);
@@ -63,7 +73,71 @@ namespace SolidworksAddinFramework
             var math = SwAddinBase.Active.Math;
             var center = new double[] {XMid, YMid, ZMin};
             var box = modeler.CreateBox(center, math.ZAxisArray(), this.Dx, this.Dy, this.Dz);
+            Debug.Assert(box!=null);
             return box;
+        }
+
+        public Mesh ToMesh()
+        {
+            return new Mesh(Triangles().ToList());
+        }
+
+        public IEnumerable<IReadOnlyList<double[]>> Triangles()
+        {
+            var _ = new double[2,2,2][];
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    for (int k = 0; k < 2; k++)
+                    {
+                        _[i,j,k] = new double[]
+                        {
+                            i == 0?XMin:XMax,
+                            j == 0?YMin:YMax,
+                            k == 0?ZMin:ZMax,
+                        };
+                        
+                    }
+                    
+                }
+            }
+
+            for (int faceId = 0; faceId < 6; faceId++)
+            {
+                switch (faceId)
+                {
+                    case 0: // front
+                        yield return new[] {_[0, 0, 0], _[1, 0, 0], _[0, 1, 0] }.Reverse().ToArray();
+                        yield return new[] {_[1, 1, 0], _[0, 1, 0], _[1, 0, 0] }.Reverse().ToArray();
+                        break;
+                    case 1: // back
+                        yield return new[] {_[0, 0, 1], _[1, 0, 1], _[0, 1, 1] };
+                        yield return new[] {_[1, 1, 1], _[0, 1, 1], _[1, 0, 1] };
+                        break;
+                    case 2: // left
+                        yield return new[] {_[0, 0, 0], _[0, 1, 0], _[0, 0, 1] }.Reverse().ToArray();
+                        yield return new[] {_[0, 0, 1], _[0, 1, 0], _[0, 1, 1] }.Reverse().ToArray();
+                        break;
+                    case 3: // right
+                        yield return new[] {_[1, 0, 0], _[1, 1, 0], _[1, 0, 1] };
+                        yield return new[] {_[1, 0, 1], _[1, 1, 0], _[1, 1, 1] };
+                        break;
+                    case 4: // top
+                        yield return new[] {_[0, 1, 0], _[1, 1, 1], _[1, 1, 0] };
+                        yield return new[] {_[0, 1, 0], _[0, 1, 1], _[1, 1, 1] };
+                        break;
+                    case 5: // bottom
+                        yield return new[] {_[0, 0, 0], _[1, 0, 1], _[1, 0, 0] }.Reverse().ToArray();
+                        yield return new[] {_[0, 0, 0], _[0, 0, 1], _[1, 0, 1] }.Reverse().ToArray();
+                        break;
+                    default:
+                        throw new Exception("Out of range value");
+                }
+
+                
+            }
+            
         }
 
         public static TwoPointRange FromVertices(IEnumerable<double[]>  vertices)
@@ -99,6 +173,31 @@ namespace SolidworksAddinFramework
             var sy = Dy*s;
             var sz = Dz*s;
             return new TwoPointRange(new[] {XMin-sx,YMin-sy,ZMin-sz}, new[] {XMax+sx, YMax+sy, ZMax+sz});
+        }
+
+        public bool Intersects(TwoPointRange other)
+        {
+            if (XMax < other.XMin)
+                return false;
+            if (YMax < other.YMin)
+                return false;
+            if (ZMax < other.ZMin)
+                return false;
+
+            if (XMin > other.XMax)
+                return false;
+            if (YMin > other.YMax)
+                return false;
+            if (ZMin > other.ZMax)
+                return false;
+
+            return true;
+
+        }
+
+        public static TwoPointRange FromVertices(IReadOnlyList<Vector<double>> triangle)
+        {
+            return FromVertices(triangle.Select(v=>v.ToArray()));
         }
     }
 }

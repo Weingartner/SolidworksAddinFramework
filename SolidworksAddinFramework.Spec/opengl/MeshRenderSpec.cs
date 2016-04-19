@@ -114,7 +114,8 @@ namespace SolidworksAddinFramework.Spec.opengl
         {
             CreatePartDoc(true, modelDoc =>
             {
-                var body = Modeler.CreateBox(1, 1, 1);
+                var modeller = SwAddinBase.Active.Modeler;
+                var body = modeller.CreateBox(1, 1, 1);
 
                 //var face = (ISurface)Modeler.CreateToroidalSurface(new[] {0, 0, 0.0}, new[] {0, 1, 0.0}, new[] {0, 0, 1.0}, 1, 0.5);
                 var face = body.GetFaces().CastArray<IFace2>().First();

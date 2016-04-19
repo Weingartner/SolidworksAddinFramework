@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
 using SolidWorks.Interop.sldworks;
+using DLA = MathNet.Numerics.LinearAlgebra.Double;
 
 namespace SolidworksAddinFramework
 {
@@ -16,6 +18,29 @@ namespace SolidworksAddinFramework
         public static double Project(this IMathVector a, IMathVector b)
         {
             return a.Dot(b)/(b.Dot(b));
+        }
+
+
+        /// <summary>
+        /// Cross product for 3D vectors
+        /// http://stackoverflow.com/a/20015626/158285
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static Vector<double> Cross(this Vector<double> left, Vector<double> right)
+        {
+            if ((left.Count != 3 || right.Count != 3))
+            {
+                string message = "Vectors must have a length of 3.";
+                throw new Exception(message);
+            }
+            DLA.Vector result = new DLA.DenseVector(3);
+            result[0] = left[1] * right[2] - left[2] * right[1];
+            result[1] = -left[0] * right[2] + left[2] * right[0];
+            result[2] = left[0] * right[1] - left[1] * right[0];
+
+            return result;
         }
 
         public static double[] Cross(this IMathUtility math, double[] a, double[] b)

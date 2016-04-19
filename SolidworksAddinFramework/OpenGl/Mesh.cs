@@ -12,20 +12,36 @@ namespace SolidworksAddinFramework.OpenGl
     public class Mesh : IRenderable
     {
         private readonly IReadOnlyList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
+        private List<IReadOnlyList<double[]>> _OriginalEdgeVertices;
 
         public Mesh(IReadOnlyList<Tuple<double[], double[]>> triangleVertices)
         {
             TriangleVertices = triangleVertices;
         }
+        public Mesh(IReadOnlyList<IReadOnlyList<Tuple<double[], double[]>>> triangleVertices)
+        {
+            TriangleVertices = triangleVertices.SelectMany(p=>p).ToList();
+        }
+        public Mesh(IReadOnlyList<IReadOnlyList<double[]>> triangleVertices)
+        {
+            TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,(double[])null))).ToList();
+        }
 
         public Mesh(IBody2 body)
         {
+            if (body == null) throw new ArgumentNullException(nameof(body));
+
             var faceList = body.GetFaces().CastArray<IFace2>();
             var tess = GetTess(body, faceList);
             var tris = Tesselate(faceList, tess);
+            var edges = Edges(faceList, tess);
+            FaceEdges = edges.ToList();
             TriangleVertices = tris.ToList();
             _OriginalTriangleVerticies = TriangleVertices;
+            _OriginalEdgeVertices = FaceEdges;
         }
+
+        public List<IReadOnlyList<double[]>> FaceEdges { get; private set; }
 
         public IReadOnlyList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
@@ -43,10 +59,28 @@ namespace SolidworksAddinFramework.OpenGl
 
         public Color Color { get; set; } = Color.Red;
 
+        public static IEnumerable<IReadOnlyList<double[]>> Edges(IFace2[] faceList, ITessellation tess)
+        {
+            return faceList
+                .Select(face => face
+                    .GetEdges()
+                    .CastArray<IEdge>()
+                    .Select(edge => tess.GetEdgeFins(edge).CastArray<int>())
+                    .Distinct()
+                    .ToList()
+                    .SelectMany(f=>f
+                        .SelectMany(finId => tess.GetFinVertices(finId).CastArray<int>())
+                        .DistinctUntilChanged()
+                        .Select(vId => tess.GetVertexPoint(vId).CastArray<double>())
+                        .ToList()
+                    ).ToList());
+        }
+
         public static IEnumerable<Tuple<double[], double[]>> Tesselate(IFace2[] faceList, ITessellation tess)
         {
             foreach (var face in faceList)
             {
+
                 foreach (var facet in tess.GetFaceFacets(face).CastArray<int>())
                 {
                     var finIds = tess.GetFacetFins(facet).CastArray<int>();
@@ -79,6 +113,7 @@ namespace SolidworksAddinFramework.OpenGl
             tess.NeedVertexParams = true;
             tess.NeedVertexNormal = true;
             tess.ImprovedQuality = true;
+            tess.NeedEdgeFinMap = true;
             tess.CurveChordTolerance = 0.001 / 10;
             tess.SurfacePlaneTolerance = 0.001 / 10;
             tess.MatchType = (int)swTesselationMatchType_e.swTesselationMatchFacetTopology;
@@ -104,6 +139,14 @@ namespace SolidworksAddinFramework.OpenGl
                 var n = rotation * pn.Item2;
                 return Tuple.Create(p.Values, n.Values);
             }).ToList();
+
+            FaceEdges = _OriginalEdgeVertices.Select(pn =>
+            {
+                return pn
+                .Select(p => (rotation*p + translation).Values)
+                .ToList() as IReadOnlyList<double[]>;
+            }).ToList();
+
         }
     }
 }
