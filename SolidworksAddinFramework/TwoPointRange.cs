@@ -83,8 +83,9 @@ namespace SolidworksAddinFramework
             return new Mesh(Triangles().ToList());
         }
 
-        public IEnumerable<IReadOnlyList<double[]>> Triangles()
+        public List<IReadOnlyList<double[]>> Triangles()
         {
+
             var _ = new double[2,2,2][];
             for (var i = 0; i < 2; i++)
             {
@@ -104,41 +105,28 @@ namespace SolidworksAddinFramework
                 }
             }
 
-            for (var faceId = 0; faceId < 6; faceId++)
-            {
-                switch (faceId)
-                {
-                    case 0: // front
-                        yield return new[] {_[0, 0, 0], _[1, 0, 0], _[0, 1, 0] }.Reverse().ToArray();
-                        yield return new[] {_[1, 1, 0], _[0, 1, 0], _[1, 0, 0] }.Reverse().ToArray();
-                        break;
-                    case 1: // back
-                        yield return new[] {_[0, 0, 1], _[1, 0, 1], _[0, 1, 1] };
-                        yield return new[] {_[1, 1, 1], _[0, 1, 1], _[1, 0, 1] };
-                        break;
-                    case 2: // left
-                        yield return new[] {_[0, 0, 0], _[0, 1, 0], _[0, 0, 1] }.Reverse().ToArray();
-                        yield return new[] {_[0, 0, 1], _[0, 1, 0], _[0, 1, 1] }.Reverse().ToArray();
-                        break;
-                    case 3: // right
-                        yield return new[] {_[1, 0, 0], _[1, 1, 0], _[1, 0, 1] };
-                        yield return new[] {_[1, 0, 1], _[1, 1, 0], _[1, 1, 1] };
-                        break;
-                    case 4: // top
-                        yield return new[] {_[0, 1, 0], _[1, 1, 1], _[1, 1, 0] };
-                        yield return new[] {_[0, 1, 0], _[0, 1, 1], _[1, 1, 1] };
-                        break;
-                    case 5: // bottom
-                        yield return new[] {_[0, 0, 0], _[1, 0, 1], _[1, 0, 0] }.Reverse().ToArray();
-                        yield return new[] {_[0, 0, 0], _[0, 0, 1], _[1, 0, 1] }.Reverse().ToArray();
-                        break;
-                    default:
-                        throw new Exception("Out of range value");
-                }
+            var list = new List<IReadOnlyList<double[]>>(12);
+            // front
+            list.Add(new[] {_[0, 1, 0], _[1, 0, 0],  _[0, 0, 0] });
+            list.Add(new[] {_[1, 0, 0], _[0, 1, 0],  _[1, 1, 0] });
+            // back
+            list.Add(new[] { _[0, 0, 1], _[1, 0, 1], _[0, 1, 1] });
+            list.Add(new[] { _[1, 1, 1], _[0, 1, 1], _[1, 0, 1] });
+            // left
+            list.Add(new[] {_[0, 0, 1], _[0, 1, 0],  _[0, 0, 0] });
+            list.Add(new[] {_[0, 1, 1], _[0, 1, 0],  _[0, 0, 1] });
+            // right
+            list.Add(new[] { _[1, 0, 0], _[1, 1, 0], _[1, 0, 1] });
+            list.Add(new[] { _[1, 0, 1], _[1, 1, 0], _[1, 1, 1] });
+            // top
+            list.Add(new[] { _[0, 1, 0], _[1, 1, 1], _[1, 1, 0] });
+            list.Add(new[] { _[0, 1, 0], _[0, 1, 1], _[1, 1, 1] });
+            // bottom
+            list.Add(new[] {_[1, 0, 0], _[1, 0, 1],  _[0, 0, 0] });
+            list.Add(new[] {_[1, 0, 1], _[0, 0, 1],  _[0, 0, 0] });
 
-                
-            }
-            
+            return list;
+
         }
         public static TwoPointRange FromVertices(IReadOnlyList<DenseVector>  vertices)
         {
