@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet;
@@ -44,13 +45,13 @@ namespace SolidworksAddinFramework
         /// <param name="surface"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static PointUv GetClosestPointOnTs(this ISurface surface, DenseVector p)
+        public static PointUv GetClosestPointOnTs(this ISurface surface, Vector3 p)
         {
-            var x = p[0];
-            var y = p[1];
-            var z = p[2];
-
-            return ClosestPointOnTs(surface, x, y, z);
+            return ClosestPointOnTs(surface, p.X, p.Y, p.Z);
+        }
+        public static PointUv GetClosestPointOnTs(this ISurface surface, double [] p)
+        {
+            return ClosestPointOnTs(surface, p[0], p[1], p[2]);
         }
 
         /// <summary>

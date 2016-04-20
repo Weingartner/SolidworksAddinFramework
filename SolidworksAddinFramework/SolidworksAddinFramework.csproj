@@ -162,9 +162,12 @@
     <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="EventHandlers\PartEventHandler.cs" />
     <Compile Include="FaceExtensions.cs" />
-    <Compile Include="FastRange3d.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
+    <Compile Include="Geometry\FastRange3d.cs" />
+    <Compile Include="Geometry\Point3Normal3.cs" />
+    <Compile Include="Geometry\Triangle.cs" />
+    <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataBase.cs" />
@@ -208,7 +211,6 @@
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
-    <Compile Include="TwoPointRange.cs" />
     <Compile Include="UiDispatcherScheduler.cs" />
     <Compile Include="Wpf\LogEntry.cs" />
     <Compile Include="Wpf\ScrollOnNewItem.cs" />
@@ -247,6 +249,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

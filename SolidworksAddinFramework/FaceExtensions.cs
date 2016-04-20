@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
     public static class FaceExtensions
     {
-        public static TwoPointRange GetBoxTs(this IFace2 face)
+        public static FastRange3D GetBoxTs(this IFace2 face)
         {
             var box = (double[]) face.GetBox();
-            return new TwoPointRange(
-                new[] {box[0], box[1], box[2]}, 
-                new[] {box[3], box[4], box[5]});
+            return new FastRange3D(
+                (float) box[0], (float) box[1], (float) box[2], 
+                (float) box[3], (float) box[4], (float) box[5]);
         }
 
         public static bool GetDistance(this IFace2 entity0, IFace2 entity1, out double[] posacast, out double[] posbcast)

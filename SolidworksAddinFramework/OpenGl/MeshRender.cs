@@ -20,21 +20,20 @@ namespace SolidworksAddinFramework.OpenGl
             using (ModernOpenGl.SetLineWidth(2.0f))
             using (ModernOpenGl.Begin(PrimitiveType.Triangles))
             {
-                var tris = mesh.TriangleVertices;
+                var tris = mesh.TrianglesWithNormals;
                 foreach (var tri in tris)
                 {
-                    if(tri.Item2.Equals(default(System.Numerics.Vector3)))
-                        tri.Item2.GLNormal3();
-                    tri.Item1.GLVertex3();
+                    tri.GLVertexAndNormal();
                 }
             }
             if (mesh.Edges == null) return;
             using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(2.0f))
             using (ModernOpenGl.Begin(PrimitiveType.Lines))
-                foreach (var v in mesh.Edges.SelectMany(line => line))
+                foreach (var v in mesh.Edges)
                 {
-                    v.GLVertex3();
+                    v.A.GLVertex3();
+                    v.B.GLVertex3();
                 }
         }
 

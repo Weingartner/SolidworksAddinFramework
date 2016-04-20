@@ -10,6 +10,7 @@ using System.Text;
 using System.Xml;
 using Accord.Math.Optimization;
 using MathNet.Numerics.LinearAlgebra.Double;
+using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -115,12 +116,12 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        public static TwoPointRange GetBodyBoxTs(this IBody2 body)
+        public static FastRange3D GetBodyBoxTs(this IBody2 body)
         {
             var box = (double[]) body.GetBodyBox();
-            return new TwoPointRange(
-                new[] {box[0], box[1], box[2]}, 
-                new[] {box[3], box[4], box[5]});
+            return new FastRange3D(
+                new Vector3((float) box[0], (float) box[1], (float) box[2]), 
+                new Vector3((float) box[3], (float) box[4], (float) box[5]));
         }
 
         public static bool GetDistance(this IBody2 body0, IBody2 body1, out double[] p0, out double []p1)

@@ -5,30 +5,18 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using MathNet.Numerics.LinearAlgebra.Double;
+using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Edge = SolidworksAddinFramework.Geometry.Edge;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-
     public class Mesh : IRenderable
     {
-        private readonly IReadOnlyList<Tuple<Vector3, Vector3>> _OriginalTriangleVerticies;
-        private IReadOnlyList<IReadOnlyList<Vector3>> _OriginalEdgeVertices;
+        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
+        private IReadOnlyList<Edge> _OriginalEdgeVertices;
 
-        public Mesh(IReadOnlyList<Tuple<Vector3, Vector3>> triangleVertices)
-        {
-            TriangleVertices = triangleVertices;
-        }
-        public Mesh(IReadOnlyList<IReadOnlyList<Tuple<Vector3, Vector3>>> triangleVertices)
-        {
-            TriangleVertices = triangleVertices.SelectMany(p=>p).ToList();
-        }
-        public Mesh(IReadOnlyList<IReadOnlyList<Vector3>> triangleVertices, IReadOnlyList<IReadOnlyList<Vector3>> edges )
-        {
-            Edges = edges;
-            TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,default(Vector3)))).ToList();
-        }
 
         public Mesh(IBody2 body, Color? c = null)
         {
@@ -36,11 +24,12 @@ namespace SolidworksAddinFramework.OpenGl
 
             var faceList = body.GetFaces().CastArray<IFace2>();
             var tess = GetTess(body, faceList);
-            var tris = Tesselate(faceList, tess);
-            var edges = EdgesFromTesselation(faceList, tess);
-            Edges = edges.ToList();
-            TriangleVertices = tris.ToList();
-            _OriginalTriangleVerticies = TriangleVertices;
+            var tris = Tesselate(faceList, tess)
+                .Buffer(3,3)
+                .Select(b=>new TriangleWithNormals(b[0],b[1],b[2])).ToList();
+            Edges = new List<Edge>();
+            TrianglesWithNormals = tris.ToList();
+            _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
             if (c!=null)
             {
@@ -48,20 +37,25 @@ namespace SolidworksAddinFramework.OpenGl
             }
         }
 
-        public IReadOnlyList<IReadOnlyList<Vector3>> Edges { get; private set; }
+        public Mesh(IEnumerable<Triangle> enumerable,IReadOnlyList<Edge> edges = null)
+        {
+            TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
+            Edges = edges;
+        }
+        public Mesh(IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge> edges = null)
+        {
+            TrianglesWithNormals = enumerable.ToList();
+            Edges = edges ?? new List<Edge>();
+        }
 
-        public IReadOnlyList<Tuple<Vector3, Vector3>> TriangleVertices { get; set; }
 
-        public IReadOnlyList<IReadOnlyList<Vector3>> Triangles =>
-            TriangleVertices
-                .Buffer(3, 3)
-                .Select(b => b.Select(i => i.Item1).ToList())
-                .ToList();
+        public IReadOnlyList<Edge> Edges { get; private set; }
 
-        public IReadOnlyList<IReadOnlyList<Vector3>> DenseTriangles => 
-            TriangleVertices
-                .Buffer(3, 3)
-                .Select(b => b.Select(i =>  i.Item1).ToList())
+        public IReadOnlyList<TriangleWithNormals> TrianglesWithNormals { get; set; }
+
+        public IReadOnlyList<Triangle> Triangles => 
+            TrianglesWithNormals
+                .Select(b => (Triangle) b )
                 .ToList();
 
 
@@ -72,28 +66,14 @@ namespace SolidworksAddinFramework.OpenGl
 
         public Color Color { get; set; } = Color.Red;
 
-        public static IEnumerable<IReadOnlyList<Vector3>> EdgesFromTesselation(IFace2[] faceList, ITessellation tess)
+        public static List<Point3Normal3> Tesselate(IFace2[] faceList, ITessellation tess)
         {
-            return faceList
-                .Select(face => face
-                    .GetEdges()
-                    .CastArray<IEdge>()
-                    .Select(edge => tess.GetEdgeFins(edge).CastArray<int>())
-                    .Distinct()
-                    .ToList()
-                    .SelectMany(f=>f
-                        .SelectMany(finId => tess.GetFinVertices(finId).CastArray<int>())
-                        .DistinctUntilChanged()
-                        .Select(vId => tess.GetVertexPoint(vId).CastArray<double>().ToVector3D())
-                        .ToList()
-                    ).ToList());
-        }
-
-        public static IEnumerable<Tuple<Vector3, Vector3>> Tesselate(IFace2[] faceList, ITessellation tess)
-        {
-            foreach (var face in faceList)
+            var r = new List<Point3Normal3>();
+            // performance improvement
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int index = 0; index < faceList.Length; index++)
             {
-
+                var face = faceList[index];
                 foreach (var facet in tess.GetFaceFacets(face).CastArray<int>())
                 {
                     var finIds = tess.GetFacetFins(facet).CastArray<int>();
@@ -111,12 +91,14 @@ namespace SolidworksAddinFramework.OpenGl
                         .Select(vId => tess.GetVertexNormal(vId).CastArray<double>())
                         .ToList();
 
-                    foreach (var i in Enumerable.Range(0, 3))
-                    {
-                        yield return Tuple.Create(Vector3Extensions.ToVector3D(vertexs[i]), Vector3Extensions.ToVector3D(normals[i]));
-                    }
+                    // Unroll loop for performance
+                    r.Add(new Point3Normal3(vertexs[0].ToVector3D(), normals[0].ToVector3D()));
+                    r.Add(new Point3Normal3(vertexs[1].ToVector3D(), normals[1].ToVector3D()));
+                    r.Add(new Point3Normal3(vertexs[2].ToVector3D(), normals[2].ToVector3D()));
                 }
             }
+
+            return r;
         }
 
         public static ITessellation GetTess(IBody2 body, IFace2[] faceList)
@@ -147,19 +129,13 @@ namespace SolidworksAddinFramework.OpenGl
             Vector3 translation;
             Matrix4x4.Decompose(transform, out scale, out rotation, out translation);
 
-            TriangleVertices = _OriginalTriangleVerticies.Select(pn =>
-            {
-                var p = Vector3.Transform(pn.Item1,transform);
-                var n = Vector3.Transform(pn.Item2, rotation);
-                return Tuple.Create(p, n);
-            }).ToList();
-
-            Edges = _OriginalEdgeVertices.Select(pn =>
-            {
-                return pn
-                .Select(p => Vector3.Transform(p, transform))
+            TrianglesWithNormals = _OriginalTriangleVerticies
+                .Select(pn => pn.ApplyTransform(transform, rotation))
                 .ToList();
-            }).ToList();
+
+            Edges = _OriginalEdgeVertices
+                .Select(pn => pn.ApplyTransform(transform))
+                .ToList();
 
         }
     }
