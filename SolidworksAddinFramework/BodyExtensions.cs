@@ -162,8 +162,6 @@ namespace SolidworksAddinFramework
         {
             a = (IBody2)a.Copy();
             b = (IBody2)b.Copy();
-            var length = (object[]) a.GetIntersectionEdges(b);
-            var result = a.Intersect(b);
             return a.IGetIntersectionEdgeCount((Body2)b) > 0;
         }
     }
