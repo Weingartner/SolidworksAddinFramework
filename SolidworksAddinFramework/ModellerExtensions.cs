@@ -154,6 +154,21 @@ namespace SolidworksAddinFramework
             return result;
         }
 
+        public static IBody2 CreateSurfaceBody(this IModeler modeler, ISurface surface)
+        {
+            var swSurfPara = surface.Parameterization2();
+
+            var uvrange = new double[]
+            {
+                swSurfPara.UMin,
+                swSurfPara.UMax,
+                swSurfPara.VMin,
+                swSurfPara.VMax
+            };
+
+            return (IBody2) modeler.CreateSheetFromSurface(surface, uvrange);
+        }
+
         public static IBody2 CreateSphereBody(this IModeler modeler, double []center, double radius)
         {
             var axis = new double[] {0, 0, 1};
