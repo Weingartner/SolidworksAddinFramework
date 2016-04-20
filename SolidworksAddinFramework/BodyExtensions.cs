@@ -164,12 +164,9 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static bool DoesIntersection(this IBody2 a, IBody2 b)
-        {
-            a = (IBody2)a.Copy();
-            b = (IBody2)b.Copy();
-            return a.IGetIntersectionEdgeCount((Body2)b) > 0;
-        }
+
+
+
     }
     
 
