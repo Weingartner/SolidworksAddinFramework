@@ -12,7 +12,7 @@ namespace SolidworksAddinFramework.OpenGl
     public class Mesh : IRenderable
     {
         private readonly IReadOnlyList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
-        private List<IReadOnlyList<double[]>> _OriginalEdgeVertices;
+        private IReadOnlyList<IReadOnlyList<double[]>> _OriginalEdgeVertices;
 
         public Mesh(IReadOnlyList<Tuple<double[], double[]>> triangleVertices)
         {
@@ -22,8 +22,9 @@ namespace SolidworksAddinFramework.OpenGl
         {
             TriangleVertices = triangleVertices.SelectMany(p=>p).ToList();
         }
-        public Mesh(IReadOnlyList<IReadOnlyList<double[]>> triangleVertices)
+        public Mesh(IReadOnlyList<IReadOnlyList<double[]>> triangleVertices, IReadOnlyList<IReadOnlyList<double[]>> edges )
         {
+            Edges = edges;
             TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,(double[])null))).ToList();
         }
 
@@ -34,14 +35,14 @@ namespace SolidworksAddinFramework.OpenGl
             var faceList = body.GetFaces().CastArray<IFace2>();
             var tess = GetTess(body, faceList);
             var tris = Tesselate(faceList, tess);
-            var edges = Edges(faceList, tess);
-            FaceEdges = edges.ToList();
+            var edges = EdgesFromTesselation(faceList, tess);
+            Edges = edges.ToList();
             TriangleVertices = tris.ToList();
             _OriginalTriangleVerticies = TriangleVertices;
-            _OriginalEdgeVertices = FaceEdges;
+            _OriginalEdgeVertices = Edges;
         }
 
-        public List<IReadOnlyList<double[]>> FaceEdges { get; private set; }
+        public IReadOnlyList<IReadOnlyList<double[]>> Edges { get; private set; }
 
         public IReadOnlyList<Tuple<double[], double[]>> TriangleVertices { get; set; }
 
@@ -65,7 +66,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public Color Color { get; set; } = Color.Red;
 
-        public static IEnumerable<IReadOnlyList<double[]>> Edges(IFace2[] faceList, ITessellation tess)
+        public static IEnumerable<IReadOnlyList<double[]>> EdgesFromTesselation(IFace2[] faceList, ITessellation tess)
         {
             return faceList
                 .Select(face => face
@@ -146,7 +147,7 @@ namespace SolidworksAddinFramework.OpenGl
                 return Tuple.Create(p.Values, n.Values);
             }).ToList();
 
-            FaceEdges = _OriginalEdgeVertices.Select(pn =>
+            Edges = _OriginalEdgeVertices.Select(pn =>
             {
                 return pn
                 .Select(p => (rotation*p + translation).Values)

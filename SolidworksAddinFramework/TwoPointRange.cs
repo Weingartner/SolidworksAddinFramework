@@ -80,30 +80,42 @@ namespace SolidworksAddinFramework
 
         public Mesh ToMesh()
         {
-            return new Mesh(Triangles().ToList());
+            return new Mesh(Triangles(),Edges());
+        }
+
+
+        public List<IReadOnlyList<double[]>> Edges()
+        {
+            var list = new List<IReadOnlyList<double[]>>(12);
+
+            var _ = Vertices;
+
+            // Bottom square
+            list.Add(new [] { _[0,0,0], _[1,0,0] });
+            list.Add(new [] { _[1,0,0], _[1,0,1] });
+            list.Add(new [] { _[1,0,1], _[0,0,1] });
+            list.Add(new [] { _[0,0,1], _[0,0,0] });
+
+            // Top square
+            list.Add(new [] { _[0,1,0], _[1,1,0] });
+            list.Add(new [] { _[1,1,0], _[1,1,1] });
+            list.Add(new [] { _[1,1,1], _[0,1,1] });
+            list.Add(new [] { _[0,1,1], _[0,1,0] });
+
+            // Connecting top and bottom lines
+            list.Add(new [] { _[0,0,0], _[0,1,0] });
+            list.Add(new [] { _[1,0,0], _[1,1,0] });
+            list.Add(new [] { _[1,0,1], _[1,1,1] });
+            list.Add(new [] { _[0,0,1], _[0,1,1] });
+
+            return list;
+
         }
 
         public List<IReadOnlyList<double[]>> Triangles()
         {
 
-            var _ = new double[2,2,2][];
-            for (var i = 0; i < 2; i++)
-            {
-                for (var j = 0; j < 2; j++)
-                {
-                    for (var k = 0; k < 2; k++)
-                    {
-                        _[i,j,k] = new double[]
-                        {
-                            i == 0?XMin:XMax,
-                            j == 0?YMin:YMax,
-                            k == 0?ZMin:ZMax,
-                        };
-                        
-                    }
-                    
-                }
-            }
+            var _ = Vertices;
 
             var list = new List<IReadOnlyList<double[]>>(12);
             // front
@@ -128,6 +140,31 @@ namespace SolidworksAddinFramework
             return list;
 
         }
+
+        private double[,,][] Vertices
+        {
+            get
+            {
+                var _ = new double[2, 2, 2][];
+                for (var i = 0; i < 2; i++)
+                {
+                    for (var j = 0; j < 2; j++)
+                    {
+                        for (var k = 0; k < 2; k++)
+                        {
+                            _[i, j, k] = new double[]
+                            {
+                                i == 0 ? XMin : XMax,
+                                j == 0 ? YMin : YMax,
+                                k == 0 ? ZMin : ZMax,
+                            };
+                        }
+                    }
+                }
+                return _;
+            }
+        }
+
         public static TwoPointRange FromVertices(IReadOnlyList<DenseVector>  vertices)
         {
             var xmin = double.MaxValue;

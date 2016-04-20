@@ -28,18 +28,14 @@ namespace SolidworksAddinFramework.OpenGl
                     GL.Vertex3(tri.Item1);
                 }
             }
-            var faces = mesh.FaceEdges;
-            if (faces == null) return;
+            if (mesh.Edges == null) return;
             using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(2.0f))
-                foreach (var face in faces)
-                    using (ModernOpenGl.Begin(PrimitiveType.LineStrip))
-                    {
-                        foreach (var v in face)
-                        {
-                            GL.Vertex3(v);
-                        }
-                    }
+            using (ModernOpenGl.Begin(PrimitiveType.Lines))
+                foreach (var v in mesh.Edges.SelectMany(line => line))
+                {
+                    GL.Vertex3(v);
+                }
         }
 
         public static void Render(IFace2[] faces, Color color, float lineWidth)

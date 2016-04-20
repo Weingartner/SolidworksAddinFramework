@@ -41,9 +41,14 @@ namespace SolidworksAddinFramework.OpenGl
                 GL.Disable(EnableCap.Lighting);
             }
 
+            var enableCull = false;
             if (value.A<255)
             {
                 GL.DepthMask(false);
+
+                enableCull = GL.IsEnabled(EnableCap.CullFace);
+                GL.Disable(EnableCap.CullFace);
+
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
@@ -57,6 +62,8 @@ namespace SolidworksAddinFramework.OpenGl
             {
                 if(value.A<255)
                 {
+                    if(enableCull)
+                        GL.Enable(EnableCap.CullFace);
                     GL.Disable(EnableCap.Blend);
                     GL.DepthMask(true);
                 }
