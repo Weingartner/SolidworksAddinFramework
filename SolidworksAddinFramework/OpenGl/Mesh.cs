@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -11,21 +13,21 @@ namespace SolidworksAddinFramework.OpenGl
 
     public class Mesh : IRenderable
     {
-        private readonly IReadOnlyList<Tuple<double[], double[]>> _OriginalTriangleVerticies;
-        private IReadOnlyList<IReadOnlyList<double[]>> _OriginalEdgeVertices;
+        private readonly IReadOnlyList<Tuple<Vector3, Vector3>> _OriginalTriangleVerticies;
+        private IReadOnlyList<IReadOnlyList<Vector3>> _OriginalEdgeVertices;
 
-        public Mesh(IReadOnlyList<Tuple<double[], double[]>> triangleVertices)
+        public Mesh(IReadOnlyList<Tuple<Vector3, Vector3>> triangleVertices)
         {
             TriangleVertices = triangleVertices;
         }
-        public Mesh(IReadOnlyList<IReadOnlyList<Tuple<double[], double[]>>> triangleVertices)
+        public Mesh(IReadOnlyList<IReadOnlyList<Tuple<Vector3, Vector3>>> triangleVertices)
         {
             TriangleVertices = triangleVertices.SelectMany(p=>p).ToList();
         }
-        public Mesh(IReadOnlyList<IReadOnlyList<double[]>> triangleVertices, IReadOnlyList<IReadOnlyList<double[]>> edges )
+        public Mesh(IReadOnlyList<IReadOnlyList<Vector3>> triangleVertices, IReadOnlyList<IReadOnlyList<Vector3>> edges )
         {
             Edges = edges;
-            TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,(double[])null))).ToList();
+            TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,default(Vector3)))).ToList();
         }
 
         public Mesh(IBody2 body)
@@ -42,20 +44,20 @@ namespace SolidworksAddinFramework.OpenGl
             _OriginalEdgeVertices = Edges;
         }
 
-        public IReadOnlyList<IReadOnlyList<double[]>> Edges { get; private set; }
+        public IReadOnlyList<IReadOnlyList<Vector3>> Edges { get; private set; }
 
-        public IReadOnlyList<Tuple<double[], double[]>> TriangleVertices { get; set; }
+        public IReadOnlyList<Tuple<Vector3, Vector3>> TriangleVertices { get; set; }
 
-        public IReadOnlyList<IReadOnlyList<double[]>> Triangles =>
+        public IReadOnlyList<IReadOnlyList<Vector3>> Triangles =>
             TriangleVertices
                 .Buffer(3, 3)
                 .Select(b => b.Select(i => i.Item1).ToList())
                 .ToList();
 
-        public IReadOnlyList<IReadOnlyList<DenseVector>> DenseTriangles => 
+        public IReadOnlyList<IReadOnlyList<Vector3>> DenseTriangles => 
             TriangleVertices
                 .Buffer(3, 3)
-                .Select(b => b.Select(i => (DenseVector) i.Item1).ToList())
+                .Select(b => b.Select(i =>  i.Item1).ToList())
                 .ToList();
 
 
@@ -66,7 +68,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public Color Color { get; set; } = Color.Red;
 
-        public static IEnumerable<IReadOnlyList<double[]>> EdgesFromTesselation(IFace2[] faceList, ITessellation tess)
+        public static IEnumerable<IReadOnlyList<Vector3>> EdgesFromTesselation(IFace2[] faceList, ITessellation tess)
         {
             return faceList
                 .Select(face => face
@@ -78,12 +80,12 @@ namespace SolidworksAddinFramework.OpenGl
                     .SelectMany(f=>f
                         .SelectMany(finId => tess.GetFinVertices(finId).CastArray<int>())
                         .DistinctUntilChanged()
-                        .Select(vId => tess.GetVertexPoint(vId).CastArray<double>())
+                        .Select(vId => tess.GetVertexPoint(vId).CastArray<double>().ToVector3D())
                         .ToList()
                     ).ToList());
         }
 
-        public static IEnumerable<Tuple<double[], double[]>> Tesselate(IFace2[] faceList, ITessellation tess)
+        public static IEnumerable<Tuple<Vector3, Vector3>> Tesselate(IFace2[] faceList, ITessellation tess)
         {
             foreach (var face in faceList)
             {
@@ -107,7 +109,7 @@ namespace SolidworksAddinFramework.OpenGl
 
                     foreach (var i in Enumerable.Range(0, 3))
                     {
-                        yield return Tuple.Create(vertexs[i], normals[i]);
+                        yield return Tuple.Create(Vector3Extensions.ToVector3D(vertexs[i]), Vector3Extensions.ToVector3D(normals[i]));
                     }
                 }
             }
@@ -134,24 +136,25 @@ namespace SolidworksAddinFramework.OpenGl
         /// calls are NOT cumulative.
         /// </summary>
         /// <param name="transform"></param>
-        public void ApplyTransform(IMathTransform transform)
+        public void ApplyTransform(Matrix4x4 transform)
         {
-            DenseMatrix rotation;
-            DenseVector translation;
-            transform.ExtractTransform(out rotation, out translation);
+            Vector3 scale;
+            Quaternion rotation;
+            Vector3 translation;
+            Matrix4x4.Decompose(transform, out scale, out rotation, out translation);
 
             TriangleVertices = _OriginalTriangleVerticies.Select(pn =>
             {
-                var p = rotation * pn.Item1 + translation;
-                var n = rotation * pn.Item2;
-                return Tuple.Create(p.Values, n.Values);
+                var p = Vector3.Transform(pn.Item1,transform);
+                var n = Vector3.Transform(pn.Item2, rotation);
+                return Tuple.Create(p, n);
             }).ToList();
 
             Edges = _OriginalEdgeVertices.Select(pn =>
             {
                 return pn
-                .Select(p => (rotation*p + translation).Values)
-                .ToList() as IReadOnlyList<double[]>;
+                .Select(p => Vector3.Transform(p, transform))
+                .ToList();
             }).ToList();
 
         }

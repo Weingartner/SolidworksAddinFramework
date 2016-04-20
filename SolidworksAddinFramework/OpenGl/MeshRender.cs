@@ -23,9 +23,9 @@ namespace SolidworksAddinFramework.OpenGl
                 var tris = mesh.TriangleVertices;
                 foreach (var tri in tris)
                 {
-                    if(tri.Item2!=null)
-                        GL.Normal3(tri.Item2);
-                    GL.Vertex3(tri.Item1);
+                    if(tri.Item2.Equals(default(System.Numerics.Vector3)))
+                        tri.Item2.GLNormal3();
+                    tri.Item1.GLVertex3();
                 }
             }
             if (mesh.Edges == null) return;
@@ -34,7 +34,7 @@ namespace SolidworksAddinFramework.OpenGl
             using (ModernOpenGl.Begin(PrimitiveType.Lines))
                 foreach (var v in mesh.Edges.SelectMany(line => line))
                 {
-                    GL.Vertex3(v);
+                    v.GLVertex3();
                 }
         }
 

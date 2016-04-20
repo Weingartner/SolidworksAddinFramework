@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
@@ -86,6 +87,84 @@ namespace SolidworksAddinFramework
             var xForm = new[] {1, 0, 0, 0, 1, 0, 0, 0, 1, vData[0], vData[1], vData[2], 1, 0, 0, 0};
             return (MathTransform) m.CreateTransform(xForm);
         }
+
+        /// <summary>
+        ///  Transformation matrix data:
+        ///
+        ///    |a b c.n |
+        ///    |d e f.o |
+        ///    |g h i.p |
+        ///    |j k l.m |
+        ///
+        /// The SOLIDWORKS transformation matrix is stored as a homogeneous matrix of 16 elements, ordered as shown.The first 9 elements(a to i) are elements of a 3x3 rotational sub-matrix, the next 3 elements(j, k, l) define a translation vector, and the next 1 element(m) is a scaling factor.The last 3 elements(n, o, p) are unused in this context.
+        ///
+        /// The 3x3 rotational sub-matrix represents 3 axis sets:
+        ///
+        /// row 1 for x-axis components of rotation
+        /// row 2 for y-axis components of rotation
+        /// row 3 for z-axis components of rotation
+        /// The 3 axes are constrained to be orthogonal and unified so that they
+        /// produce a pure rotational transformation.Reflections can also be added
+        /// to these axes by setting the components to negative.The rotation sub-matrix
+        /// coupled with the lower-left translation vector and the lower-right corner scaling
+        /// factor creates an affine transformation, which is a transformation that preserves lines
+        /// and parallelism; i.e., maps parallel lines to parallel lines.
+        ///
+        /// If the 3 axis sets of the 3x3 rotational sub-matrix are not orthogonal or unified,
+        /// then they are automatically corrected according to the following rules:
+        ///
+        ///
+        /// If any axis is 0, or any two axes are parallel, or all axes are coplanar, then an identity matrix replaces the rotational sub-matrix.
+        ///
+        /// All axes are corrected to be of unit length.
+        ///
+        /// The axes are built to be orthogonal to each other in the prioritized order of Z, X, Y (X is orthogonal to Z, Y is orthogonal to Z and X).
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
+        public static MathTransform ToSwMatrix(this IMathUtility math , Matrix4x4 matrix)
+        {
+            var _ = matrix;
+            double a = _.M11, b = _.M12, c = _.M13, n = _.M14;
+            double d = _.M21, e = _.M22, f = _.M23, o = _.M24;
+            double g = _.M31, h = _.M32, i = _.M33, p = _.M34;
+            double j = _.M41, k = _.M42, l = _.M43, m = _.M44;
+
+            double[] data = new[] {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p};
+
+            return (MathTransform) math.CreateTransform(data);
+        }
+
+        public static Matrix4x4 ToMatrix4X4(this IMathTransform transform)
+        {
+            var _ =  new Matrix4x4();
+            var array = transform.ArrayData.CastArray<float>();
+            var a = array[0];
+            var b = array[1];
+            var c = array[2];
+            var d = array[3];
+            var e = array[4];
+            var f = array[5];
+            var g = array[6];
+            var h = array[7];
+            var i = array[8];
+            var j = array[9];
+            var k = array[10];
+            var l = array[11];
+            var m = array[12];
+            var n = array[13];
+            var o = array[14];
+            var p = array[15];
+
+            _.M11 = a; _.M12 = b; _.M13 = c; _.M14 = n;
+            _.M21 = d; _.M22 = e; _.M23 = f; _.M24 = o;
+            _.M31 = g; _.M32 = h; _.M33 = i; _.M34 = p;
+            _.M41 = j; _.M42 = k; _.M43 = l; _.M44 = m;
+
+            return _;
+        }
+
 
         public static List<double[]> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
         {

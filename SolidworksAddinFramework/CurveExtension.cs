@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Accord.Math.Optimization;
 using SolidWorks.Interop.sldworks;
@@ -29,6 +30,11 @@ namespace SolidworksAddinFramework
         public static double[] ClosestPointOnTs(this ICurve curve , double x, double y, double z)
         {
             return (double[]) curve.GetClosestPointOn(x, y, z);
+        }
+        public static void ApplyTransform(this ICurve body, Matrix4x4 t)
+        {
+            var transform = SwAddinBase.Active.Math.ToSwMatrix(t);
+            body.ApplyTransform(transform);
         }
 
         public static Tuple<double[], double[], double> ClosestDistanceBetweenTwoCurves(IMathUtility m,ICurve curve0, ICurve curve1)

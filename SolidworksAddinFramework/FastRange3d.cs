@@ -3,68 +3,63 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Xaml.Schema;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
-    public class TwoPointRange 
+    public struct FastRange3D 
     {
-        public DenseVector P0 { get; }
+        public Vector3 P0 { get; }
 
-        public DenseVector P1 { get; }
+        public Vector3 P1 { get; }
 
-        public DenseVector Center => new[]
-        {
-            (P0[0]+P1[0])/2,
-            (P0[1]+P1[1])/2,
-            (P0[2]+P1[2])/2
-        };
+        public Vector3 Center => (P0 + P1)/2;
 
-        public TwoPointRange(DenseVector p0, DenseVector p1)
+        public FastRange3D(Vector3 p0, Vector3 p1)
         {
             P0 = p0;
             P1 = p1;
         }
 
-        public IEnumerable<DenseVector> Extremities => 
-            from x in XRange
-            from y in YRange
-            from z in ZRange
-            select new DenseVector(new[] { x, y, z });
-
-        public double XMin => Math.Min(P0[0], P1[0]);
-        public double XMax => Math.Max(P0[0], P1[0]);
-        public double XMid => (XMin + XMax)/2; 
-
-        public double YMin => Math.Min(P0[1], P1[1]);
-        public double YMax => Math.Max(P0[1], P1[1]);
-        public double YMid => (YMin + YMax)/2; 
-
-        public double ZMin => Math.Min(P0[2], P1[2]);
-        public double ZMax => Math.Max(P0[2], P1[2]);
-        public double ZMid => (ZMin + ZMax)/2; 
-
-        public RangeDouble XRange => new RangeDouble(XMin,XMax); 
-        public RangeDouble YRange => new RangeDouble(YMin, YMax);
-        public RangeDouble ZRange => new RangeDouble(ZMin, ZMax);
-
-        public double Dx => XMax - XMin;
-        public double Dy => YMax - YMin;
-        public double Dz => ZMax - ZMin;
-
-        public bool Inside(double[] p)
+        public IEnumerable<Vector3> Extremities
         {
-            var x = p[0];
-            var y = p[1];
-            var z = p[2];
-            return (Between(x, XMin, XMax)&&Between(y,YMin,YMax)&& Between(z, ZMin, ZMax));
+            get
+            {
+                var @this = this;
+                return from x in XRange
+                    from y in @this.YRange
+                    from z in @this.ZRange
+                    select new Vector3(x, y, z);
+            }
         }
 
-        private bool Between(double v, double lower, double upper)
+        public float XMin => Math.Min(P0.X, P1.X);
+        public float XMax => Math.Max(P0.X, P1.X);
+        public float XMid => (XMin + XMax)/2; 
+
+        public float YMin => Math.Min(P0.Y, P1.Y);
+        public float YMax => Math.Max(P0.Y, P1.Y);
+        public float YMid => (YMin + YMax)/2; 
+
+        public float ZMin => Math.Min(P0.Z, P1.Z);
+        public float ZMax => Math.Max(P0.Z, P1.Z);
+        public float ZMid => (ZMin + ZMax)/2; 
+
+        public RangeSingle XRange => new RangeSingle(XMin,XMax); 
+        public RangeSingle YRange => new RangeSingle(YMin, YMax);
+        public RangeSingle ZRange => new RangeSingle(ZMin, ZMax);
+
+        public float Dx => XMax - XMin;
+        public float Dy => YMax - YMin;
+        public float Dz => ZMax - ZMin;
+
+        public bool Inside(Vector3 p)
+        {
+            return Between(p.X, XMin, XMax)&&Between(p.Y,YMin,YMax)&& Between(p.Z, ZMin, ZMax);
+        }
+
+        private bool Between(float v, float lower, float upper)
         {
             return v >= lower && v < upper;
         }
@@ -89,7 +84,7 @@ namespace SolidworksAddinFramework
         {
             var list = new List<IReadOnlyList<Vector3>>(12);
 
-            var _ = VerticesAsVector3;
+            var _ = Vertices;
 
             // Bottom square
             list.Add(new [] { _[0,0,0], _[1,0,0] });
@@ -113,12 +108,10 @@ namespace SolidworksAddinFramework
 
         }
 
-
-
         public List<IReadOnlyList<Vector3>> Triangles()
         {
 
-            var _ = VerticesAsVector3;
+            var _ = Vertices;
 
             var list = new List<IReadOnlyList<Vector3>>(12)
             {
@@ -146,44 +139,23 @@ namespace SolidworksAddinFramework
 
         }
 
-
-        
-        private double[,,][] Vertices
+        private Vector3[,,] Vertices
         {
             get
             {
-                var _ = new double[2, 2, 2][];
+                var _ = new Vector3[2, 2, 2];
                 for (var i = 0; i < 2; i++)
                 {
                     for (var j = 0; j < 2; j++)
                     {
                         for (var k = 0; k < 2; k++)
                         {
-                            _[i, j, k] = new double[]
-                            {
+                            _[i, j, k] = new Vector3
+                            (
                                 i == 0 ? XMin : XMax,
                                 j == 0 ? YMin : YMax,
-                                k == 0 ? ZMin : ZMax,
-                            };
-                        }
-                    }
-                }
-                return _;
-            }
-        }
-        private Vector3[,,] VerticesAsVector3
-        {
-            get
-            {
-                var __ = Vertices;
-                var _ = new Vector3[2,2,2];
-                for (var i = 0; i < 2; i++)
-                {
-                    for (var j = 0; j < 2; j++)
-                    {
-                        for (var k = 0; k < 2; k++)
-                        {
-                            _[i, j, k] = __[i, j, k].ToVector3D();
+                                k == 0 ? ZMin : ZMax
+                            );
                         }
                     }
                 }
@@ -191,15 +163,15 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static TwoPointRange FromVertices(IReadOnlyList<DenseVector>  vertices)
+        public static FastRange3D FromVertices(IReadOnlyList<Vector3>  vertices)
         {
-            var xmin = double.MaxValue;
-            var ymin = double.MaxValue;
-            var zmin = double.MaxValue;
+            var xmin = float.MaxValue;
+            var ymin = float.MaxValue;
+            var zmin = float.MaxValue;
 
-            var xmax = double.MinValue;
-            var ymax = double.MinValue;
-            var zmax = double.MinValue;
+            var xmax = float.MinValue;
+            var ymax = float.MinValue;
+            var zmax = float.MinValue;
 
             // performance optimization. Avoid LINQ
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -207,9 +179,9 @@ namespace SolidworksAddinFramework
             {
 
                 var vertex = vertices[i];
-                var v0 = vertex[0];
-                var v1 = vertex[1];
-                var v2 = vertex[2];
+                var v0 = vertex.X;
+                var v1 = vertex.Y;
+                var v2 = vertex.Z;
 
                 xmin = Math.Min(xmin, v0);
                 xmax = Math.Max(xmax, v0);
@@ -221,20 +193,20 @@ namespace SolidworksAddinFramework
                 zmax = Math.Max(zmax, v2);
             }
 
-            return new TwoPointRange(new DenseVector(new[] {xmin,ymin,zmin}), new DenseVector(new[] {xmax, ymax, zmax}));
+            return new FastRange3D(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
 
         }
 
-        public TwoPointRange Scale(double s)
+        public FastRange3D Scale(float s)
         {
             s = (s - 1)/2;
             var sx = Dx*s;
             var sy = Dy*s;
             var sz = Dz*s;
-            return new TwoPointRange(new[] {XMin-sx,YMin-sy,ZMin-sz}, new[] {XMax+sx, YMax+sy, ZMax+sz});
+            return new FastRange3D(new Vector3(XMin-sx,YMin-sy,ZMin-sz), new Vector3(XMax+sx, YMax+sy, ZMax+sz));
         }
 
-        public bool Intersects(TwoPointRange other)
+        public bool Intersects(FastRange3D other)
         {
             if (XMax < other.XMin)
                 return false;
@@ -254,14 +226,14 @@ namespace SolidworksAddinFramework
 
         }
 
-        public TwoPointRange Intersect(TwoPointRange other)
+        public FastRange3D Intersect(FastRange3D other)
         {
             var xrange = XRange.Intersect(other.XRange);
             var yrange = YRange.Intersect(other.YRange);
             var zrange = ZRange.Intersect(other.ZRange);
-            return new TwoPointRange
-                (new [] {xrange.Min, yrange.Min, zrange.Min},
-                new[] {xrange.Max, yrange.Max, zrange.Max});
+            return new FastRange3D
+                (new Vector3(xrange.Min, yrange.Min, zrange.Min),
+                 new Vector3(xrange.Max, yrange.Max, zrange.Max));
 
         }
 

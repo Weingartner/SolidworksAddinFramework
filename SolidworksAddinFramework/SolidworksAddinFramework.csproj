@@ -112,6 +112,10 @@
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\System.Numerics.Vectors.4.1.1-beta-23516\lib\net46\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
       <Private>True</Private>
@@ -158,6 +162,7 @@
     <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="EventHandlers\PartEventHandler.cs" />
     <Compile Include="FaceExtensions.cs" />
+    <Compile Include="FastRange3d.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="IInterpolatable.cs" />
@@ -167,7 +172,6 @@
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
     <Compile Include="ManipulatorHandler.cs" />
     <Compile Include="MathPointExtensions.cs" />
-    <Compile Include="MathTransformExtensions.cs" />
     <Compile Include="MathUtilityExtensions.cs" />
     <Compile Include="MathVectorExtensions.cs" />
     <Compile Include="ModelDocEvents.cs">
@@ -187,11 +191,16 @@
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\ModernOpenGl.cs" />
     <Compile Include="OpenGl\OpenWire.cs" />
+    <Compile Include="OpenGl\Vector3Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
-    <Compile Include="Range.cs" />
+    <Compile Include="Range1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Range.tt</DependentUpon>
+    </Compile>
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
@@ -229,6 +238,10 @@
     <Content Include="ModelDocEvents.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ModelDocEvents.cs</LastGenOutput>
+    </Content>
+    <Content Include="Range.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Range1.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

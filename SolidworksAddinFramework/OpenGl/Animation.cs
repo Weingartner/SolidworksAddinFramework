@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -18,13 +19,13 @@ namespace SolidworksAddinFramework.OpenGl
     public interface IAnimationSection
     {
         TimeSpan Duration { get; }
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="math"></param>
         /// <param name="deltaTime">time from the begining of the start of this section</param>
         /// <returns></returns>
-        IMathTransform Transform(IMathUtility math, TimeSpan deltaTime);
+        Matrix4x4 Transform(TimeSpan deltaTime);
     }
 
     public class LinearAnimation<T> : ReactiveObject, IAnimationSection
@@ -44,14 +45,14 @@ namespace SolidworksAddinFramework.OpenGl
             _Math = math;
         }
 
-        public IMathTransform Transform(IMathUtility math, TimeSpan deltaTime)
+        public Matrix4x4 Transform( TimeSpan deltaTime)
         {
             var beta = deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
 
             return BlendTransform(beta);
         }
 
-        public MathTransform BlendTransform(double beta)
+        public Matrix4x4 BlendTransform(double beta)
         {
             Debug.Assert(beta>=0 && beta<=1);
             return From.Interpolate(To, beta).Transform(_Math);
@@ -107,7 +108,7 @@ namespace SolidworksAddinFramework.OpenGl
 
             var startTime = currentSection.endTime - currentSection.section.Duration;
 
-            var currentTransform = currentSection.section.Transform(_Math, t - startTime);
+            var currentTransform = currentSection.section.Transform(t - startTime);
 
             foreach (var child in _Children)
             {
@@ -117,7 +118,7 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
 
-        public void ApplyTransform(IMathTransform transform)
+        public void ApplyTransform(Matrix4x4 transform)
         {
         }
     }

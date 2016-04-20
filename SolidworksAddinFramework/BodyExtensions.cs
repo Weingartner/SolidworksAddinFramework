@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
@@ -101,8 +102,13 @@ namespace SolidworksAddinFramework
             {
                 body.DisplayTs(doc, c, opt);
             }
-        } 
+        }
 
+        public static bool ApplyTransform(this IBody2 body, Matrix4x4 t)
+        {
+            var transform = SwAddinBase.Active.Math.ToSwMatrix(t);
+            return body.ApplyTransform(transform);
+        }
 
         /// <summary>
         /// Return the bounding box of the solid renderable.
