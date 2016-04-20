@@ -23,6 +23,16 @@ namespace XUnit.Solidworks.Addin
             return (IModelDoc2)SwApp.NewDocument(partTemplateName, 0, 0, 0);
         }
 
+        protected IModelDoc2 CreatePartDoc(string path)
+        {
+            var type = (int) swDocumentTypes_e.swDocPART;
+            int options = (int) swOpenDocOptions_e.swOpenDocOptions_LoadModel;
+            var configuration = "";
+            int errors = 0;
+            int warnings = 0;
+            return SwApp.OpenDoc6(path, type, options, configuration, ref errors, ref warnings);
+        }
+
         /// <summary>
         /// Create a part doc which will be deleted after the action even if the test fails
         /// </summary>
@@ -53,6 +63,19 @@ namespace XUnit.Solidworks.Addin
             else
             {
                 CreatePartDoc().Using(SwApp, m => action(m).Dispose());
+            }
+        }
+
+        protected void CreatePartDoc(bool keep, string path, Func<IModelDoc2, IDisposable> action)
+        {
+            if (keep)
+            {
+                var doc =CreatePartDoc(path);
+                _keptStuff.Add(action(doc));
+            }
+            else
+            {
+                CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
             }
         }
         protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)
