@@ -47,9 +47,9 @@ namespace SolidworksAddinFramework
         public double ZMax => Math.Max(P0[2], P1[2]);
         public double ZMid => (ZMin + ZMax)/2; 
 
-        public double[] XRange => new[] {XMin, XMax};
-        public double[] YRange => new[] {YMin, YMax};
-        public double[] ZRange => new[] {ZMin, ZMax};
+        public Range XRange => new Range(XMin,XMax); 
+        public Range YRange => new Range(YMin, YMax);
+        public Range ZRange => new Range(ZMin, ZMax);
 
         public double Dx => XMax - XMin;
         public double Dy => YMax - YMin;
@@ -225,6 +225,17 @@ namespace SolidworksAddinFramework
                 return false;
 
             return true;
+
+        }
+
+        public TwoPointRange Intersect(TwoPointRange other)
+        {
+            var xrange = XRange.Intersect(other.XRange);
+            var yrange = YRange.Intersect(other.YRange);
+            var zrange = ZRange.Intersect(other.ZRange);
+            return new TwoPointRange
+                (new [] {xrange.Min, yrange.Min, zrange.Min},
+                new[] {xrange.Max, yrange.Max, zrange.Max});
 
         }
 

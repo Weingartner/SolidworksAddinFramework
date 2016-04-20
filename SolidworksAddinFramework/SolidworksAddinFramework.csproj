@@ -191,6 +191,7 @@
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
+    <Compile Include="Range.cs" />
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
