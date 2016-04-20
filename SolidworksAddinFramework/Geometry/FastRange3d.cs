@@ -30,9 +30,9 @@ namespace SolidworksAddinFramework.Geometry
             YMin = Math.Min(p0.Y, p1.Y);
             ZMin = Math.Min(p0.Z, p1.Z);
 
-            XMax = Math.Min(p0.X, p1.X);
-            YMax = Math.Min(p0.Y, p1.Y);
-            ZMax = Math.Min(p0.Z, p1.Z);
+            XMax = Math.Min(p1.X, p1.X);
+            YMax = Math.Min(p1.Y, p1.Y);
+            ZMax = Math.Min(p1.Z, p1.Z);
 
             P0 = new Vector3(XMin,YMin,ZMin);
             P1 = new Vector3(XMax,YMax,ZMax);
