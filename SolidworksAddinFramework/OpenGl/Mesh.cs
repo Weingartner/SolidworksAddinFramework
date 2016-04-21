@@ -30,7 +30,7 @@ namespace SolidworksAddinFramework.OpenGl
             TriangleVertices = triangleVertices.SelectMany(ps=>ps.Select(p=>Tuple.Create(p,default(Vector3)))).ToList();
         }
 
-        public Mesh(IBody2 body)
+        public Mesh(IBody2 body, Color? c = null)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
@@ -42,6 +42,10 @@ namespace SolidworksAddinFramework.OpenGl
             TriangleVertices = tris.ToList();
             _OriginalTriangleVerticies = TriangleVertices;
             _OriginalEdgeVertices = Edges;
+            if (c!=null)
+            {
+                Color = c.Value;
+            }
         }
 
         public IReadOnlyList<IReadOnlyList<Vector3>> Edges { get; private set; }
