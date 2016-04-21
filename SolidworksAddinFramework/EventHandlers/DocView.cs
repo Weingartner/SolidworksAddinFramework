@@ -31,13 +31,14 @@ namespace SolidworksAddinFramework
             return true;
         }
 
-        public static ConcurrentDictionary<IRenderable, IRenderable> BodiesToRender = 
-            new ConcurrentDictionary<IRenderable, IRenderable>();
+        public static ConcurrentDictionary<IRenderable, IRenderable> BodiesToRender = new ConcurrentDictionary<IRenderable, IRenderable>();
 
         public static IDisposable DisplayUndoable(IRenderable body, Color? color, IModelDoc2 doc)
         {
             BodiesToRender[body] = body;
-            ((IModelView)doc.ActiveView).GraphicsRedraw(null);
+            var activeView = ((IModelView)doc.ActiveView);
+            activeView.GraphicsRedraw(null);
+            
             return Disposable.Create(() =>
             {
                 IRenderable dummy;
