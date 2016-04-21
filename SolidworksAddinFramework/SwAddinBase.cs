@@ -127,7 +127,7 @@ namespace SolidworksAddinFramework
             Active = this;
 
             //Setup callbacks
-            SwApp.SetAddinCallbackInfo(0, this, AddinId);
+            SwApp.SetAddinCallbackInfo2(0, this, AddinId);
 
             #region Setup the Command Manager
             Connect();
