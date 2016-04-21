@@ -348,30 +348,30 @@ namespace SolidworksAddinFramework
             return true;
         }
 
-        public int OnDocChange()
+        protected virtual int OnDocChange()
         {
 
             return 1;
         }
 
-        public int OnDocLoad(string docTitle, string docPath)
+        protected virtual int OnDocLoad(string docTitle, string docPath)
         {
             return 0;
         }
 
-        private int FileOpenPostNotify(string fileName)
-        {
-            AttachEventsToAllDocuments();
-            return 0;
-        }
-
-        public int OnFileNew(object newDoc, int docType, string templateName)
+        protected virtual int FileOpenPostNotify(string fileName)
         {
             AttachEventsToAllDocuments();
             return 0;
         }
 
-        public int OnModelChange()
+        protected virtual int OnFileNew(object newDoc, int docType, string templateName)
+        {
+            AttachEventsToAllDocuments();
+            return 0;
+        }
+
+        protected virtual int OnModelChange()
         {
             return 0;
         }
