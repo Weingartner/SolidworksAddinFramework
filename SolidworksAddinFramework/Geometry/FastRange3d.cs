@@ -21,6 +21,9 @@ namespace SolidworksAddinFramework.Geometry
         {
         }
 
+        public override string ToString() => $"{XMin}:{XMax}, {YMin}:{YMax}, {ZMin}:{ZMax}";
+
+
         public FastRange3D(Vector3 p0, Vector3 p1)
         {
             P0 = p0;
