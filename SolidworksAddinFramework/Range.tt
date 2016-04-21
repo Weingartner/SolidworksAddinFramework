@@ -50,15 +50,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static <#=className#> MaxRange()
-        {
-            return new <#=className#>(<#=tName#>.MinValue, <#=tName#>.MaxValue);
-        }
-
 
         public <#=className#>(<#=tName#> min, <#=tName#> max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public <#=className#>(<#=tName#> min, <#=tName#> max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -95,6 +99,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public <#=className#> Extend(<#= tName#> value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new <#=className#>(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(<#=tName#> value)
         {
             return value > _Min && value < _Max;
@@ -110,6 +123,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static <#=className#> MaxRange =>
+            new <#=className#>(<#=tName#>.MinValue, <#=tName#>.MaxValue);
+		public static <#=className#> MaxRangeInverted => 
+			new <#= className #>(<#= tName #>.MaxValue, <#= tName#>.MinValue, false);
     }
 
 

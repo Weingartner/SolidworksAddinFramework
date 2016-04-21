@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
@@ -42,28 +43,40 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
-        public IEnumerable<Vector3> Extremities
+
+
+        public delegate void VertexProcessor(Vector3 v);
+        public void ProcessVertices(VertexProcessor action)
         {
-            get
-            {
-                var @this = this;
-                return from x in XRange
-                    from y in @this.YRange
-                    from z in @this.ZRange
-                    select new Vector3(x, y, z);
-            }
+            var v = new Vector3(XMin, YMin, ZMin);
+            action(v);
+            v = new Vector3(XMax, YMin, ZMin);
+            action(v);
+            v = new Vector3(XMin, YMax, ZMin);
+            action(v);
+            v = new Vector3(XMax, YMax, ZMin);
+            action(v);
+            v = new Vector3(XMin, YMin, ZMax);
+            action(v);
+            v = new Vector3(XMax, YMin, ZMax);
+            action(v);
+            v = new Vector3(XMin, YMax, ZMax);
+            action(v);
+            v = new Vector3(XMax, YMax, ZMax);
+            action(v);
         }
 
-        public float XMin;
-        public float XMax;
+
+        public readonly float XMin;
+        public readonly float XMax;
         public float XMid => (XMin + XMax)/2;
 
-        public float YMin;
-        public float YMax;
+        public readonly float YMin;
+        public readonly float YMax;
         public float YMid => (YMin + YMax)/2;
 
-        public float ZMin;
-        public float ZMax;
+        public readonly float ZMin;
+        public readonly float ZMax;
         public float ZMid => (ZMin + ZMax)/2; 
 
         public RangeSingle XRange => new RangeSingle(XMin,XMax); 
@@ -219,6 +232,7 @@ namespace SolidworksAddinFramework.Geometry
             
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Adjust(Vector3 vertex, ref float xmin, ref float xmax, ref float ymin, ref float ymax, ref float zmin,
             ref float zmax)
         {

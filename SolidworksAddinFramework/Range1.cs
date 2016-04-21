@@ -38,15 +38,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeSingle MaxRange()
-        {
-            return new RangeSingle(Single.MinValue, Single.MaxValue);
-        }
-
 
         public RangeSingle(Single min, Single max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeSingle(Single min, Single max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -83,6 +87,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeSingle Extend(Single value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeSingle(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Single value)
         {
             return value > _Min && value < _Max;
@@ -98,6 +111,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeSingle MaxRange =>
+            new RangeSingle(Single.MinValue, Single.MaxValue);
+		public static RangeSingle MaxRangeInverted => 
+			new RangeSingle(Single.MaxValue, Single.MinValue, false);
     }
 
 
@@ -132,15 +150,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeDouble MaxRange()
-        {
-            return new RangeDouble(Double.MinValue, Double.MaxValue);
-        }
-
 
         public RangeDouble(Double min, Double max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeDouble(Double min, Double max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -177,6 +199,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeDouble Extend(Double value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeDouble(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Double value)
         {
             return value > _Min && value < _Max;
@@ -192,6 +223,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeDouble MaxRange =>
+            new RangeDouble(Double.MinValue, Double.MaxValue);
+		public static RangeDouble MaxRangeInverted => 
+			new RangeDouble(Double.MaxValue, Double.MinValue, false);
     }
 
 
@@ -226,15 +262,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeInt64 MaxRange()
-        {
-            return new RangeInt64(Int64.MinValue, Int64.MaxValue);
-        }
-
 
         public RangeInt64(Int64 min, Int64 max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeInt64(Int64 min, Int64 max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -271,6 +311,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeInt64 Extend(Int64 value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeInt64(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(Int64 value)
         {
             return value > _Min && value < _Max;
@@ -286,6 +335,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeInt64 MaxRange =>
+            new RangeInt64(Int64.MinValue, Int64.MaxValue);
+		public static RangeInt64 MaxRangeInverted => 
+			new RangeInt64(Int64.MaxValue, Int64.MinValue, false);
     }
 
 
@@ -320,15 +374,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeUInt16 MaxRange()
-        {
-            return new RangeUInt16(UInt16.MinValue, UInt16.MaxValue);
-        }
-
 
         public RangeUInt16(UInt16 min, UInt16 max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeUInt16(UInt16 min, UInt16 max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -365,6 +423,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeUInt16 Extend(UInt16 value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeUInt16(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(UInt16 value)
         {
             return value > _Min && value < _Max;
@@ -380,6 +447,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeUInt16 MaxRange =>
+            new RangeUInt16(UInt16.MinValue, UInt16.MaxValue);
+		public static RangeUInt16 MaxRangeInverted => 
+			new RangeUInt16(UInt16.MaxValue, UInt16.MinValue, false);
     }
 
 
@@ -414,15 +486,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeUInt32 MaxRange()
-        {
-            return new RangeUInt32(UInt32.MinValue, UInt32.MaxValue);
-        }
-
 
         public RangeUInt32(UInt32 min, UInt32 max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeUInt32(UInt32 min, UInt32 max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -459,6 +535,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeUInt32 Extend(UInt32 value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeUInt32(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(UInt32 value)
         {
             return value > _Min && value < _Max;
@@ -474,6 +559,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeUInt32 MaxRange =>
+            new RangeUInt32(UInt32.MinValue, UInt32.MaxValue);
+		public static RangeUInt32 MaxRangeInverted => 
+			new RangeUInt32(UInt32.MaxValue, UInt32.MinValue, false);
     }
 
 
@@ -508,15 +598,19 @@ namespace SolidworksAddinFramework {
             get { return _Max; }
         }
 
-        public static RangeUInt64 MaxRange()
-        {
-            return new RangeUInt64(UInt64.MinValue, UInt64.MaxValue);
-        }
-
 
         public RangeUInt64(UInt64 min, UInt64 max)
         {
-            Debug.Assert(min <= max);
+			Debug.Assert(min <= max);
+            _Min = min;
+            _Max = max;
+
+        }
+
+        public RangeUInt64(UInt64 min, UInt64 max, bool checkBounds)
+        {
+			if(checkBounds)
+				Debug.Assert(min <= max);
             _Min = min;
             _Max = max;
 
@@ -553,6 +647,15 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RangeUInt64 Extend(UInt64 value)
+        {
+            var min = value < _Min ? value : _Min;
+            var max = value > _Max ? value : _Max;
+
+            return new RangeUInt64(min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(UInt64 value)
         {
             return value > _Min && value < _Max;
@@ -568,6 +671,11 @@ namespace SolidworksAddinFramework {
         {
             return GetEnumerator();
         }
+
+        public static RangeUInt64 MaxRange =>
+            new RangeUInt64(UInt64.MinValue, UInt64.MaxValue);
+		public static RangeUInt64 MaxRangeInverted => 
+			new RangeUInt64(UInt64.MaxValue, UInt64.MinValue, false);
     }
 
 
