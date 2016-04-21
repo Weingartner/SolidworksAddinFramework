@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace SolidworksAddinFramework.Wpf
@@ -34,6 +35,14 @@ namespace SolidworksAddinFramework.Wpf
         }
 
         private static int CurrentIndex = 0;
+
+        public static void LogWithIndent(int i, string message)
+        {
+            var hack = new ScrollOnNewItem();
+            Log(new string(' ',i*4) + message);
+
+            
+        }
         public static void Log(string message)
         {
             try
