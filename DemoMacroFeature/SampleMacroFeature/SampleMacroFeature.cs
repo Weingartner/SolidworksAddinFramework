@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
@@ -46,10 +47,10 @@ namespace DemoMacroFeatures.SampleMacroFeature
         {
             var box = body.GetBodyBoxTs();
             var center = box.Center;
-            var axisX = new double[] {1, 0, 0};
+            var axisX = Vector3.UnitX;
 
             // Find the point to cut the object
-            center[0] = database.Alpha*box.P0[0] + (1 - database.Alpha)*box.P1[0];
+            center.X = database.Alpha*box.P0.X + (1 - database.Alpha)*box.P1.X;
             var sheet = modeler.CreateSheet(center, axisX, box.P0, box.P1);
 
             var cutResult = body.Cut(sheet);

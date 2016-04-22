@@ -22,9 +22,9 @@ namespace DemoMacroFeatures.SampleMacroFeature
             set { this.RaiseAndSetIfChanged(ref _Param0, value); }
         }
 
-        double _Alpha;
+        float _Alpha;
         [MacroFeatureDataField]
-        public double Alpha 
+        public float Alpha 
         {
             get { return _Alpha; }
             set { this.RaiseAndSetIfChanged(ref _Alpha, value); }
