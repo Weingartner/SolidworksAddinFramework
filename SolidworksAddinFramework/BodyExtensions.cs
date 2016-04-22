@@ -116,10 +116,10 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        public static FastRange3D GetBodyBoxTs(this IBody2 body)
+        public static Range3Single GetBodyBoxTs(this IBody2 body)
         {
             var box = (double[]) body.GetBodyBox();
-            return new FastRange3D(
+            return new Range3Single(
                 new Vector3((float) box[0], (float) box[1], (float) box[2]), 
                 new Vector3((float) box[3], (float) box[4], (float) box[5]));
         }

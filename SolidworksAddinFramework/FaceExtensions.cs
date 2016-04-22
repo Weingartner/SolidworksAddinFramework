@@ -9,10 +9,10 @@ namespace SolidworksAddinFramework
 {
     public static class FaceExtensions
     {
-        public static FastRange3D GetBoxTs(this IFace2 face)
+        public static Range3Single GetBoxTs(this IFace2 face)
         {
             var box = (double[]) face.GetBox();
-            return new FastRange3D(
+            return new Range3Single(
                 (float) box[0], (float) box[1], (float) box[2], 
                 (float) box[3], (float) box[4], (float) box[5]);
         }

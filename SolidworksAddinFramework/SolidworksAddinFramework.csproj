@@ -182,7 +182,7 @@
     <Compile Include="FaceExtensions.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
-    <Compile Include="Geometry\FastRange3d.cs" />
+    <Compile Include="Geometry\Range3Single.cs" />
     <Compile Include="Geometry\Point3Normal3.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangleWithNormals.cs" />

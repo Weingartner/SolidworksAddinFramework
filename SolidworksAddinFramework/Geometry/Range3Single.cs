@@ -9,7 +9,12 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
 {
-    public struct FastRange3D 
+    /// <summary>
+    /// A fast 3D range object. Models an axis aligned box between
+    /// two points. Because it uses single precision in can using
+    /// System.Numerics.Vectors Vector3 class which is very fast.
+    /// </summary>
+    public struct Range3Single 
     {
         public Vector3 P0 { get; }
 
@@ -17,7 +22,7 @@ namespace SolidworksAddinFramework.Geometry
 
         public Vector3 Center => (P0 + P1)/2;
 
-        public FastRange3D(float x0, float y0, float z0, float x1, float y1, float z1):this
+        public Range3Single(float x0, float y0, float z0, float x1, float y1, float z1):this
             (new Vector3(x0,y0,z0), new Vector3(x1,y1,z1) )
         {
         }
@@ -25,7 +30,7 @@ namespace SolidworksAddinFramework.Geometry
         public override string ToString() => $"{XMin}:{XMax}, {YMin}:{YMax}, {ZMin}:{ZMax}";
 
 
-        public FastRange3D(Vector3 p0, Vector3 p1)
+        public Range3Single(Vector3 p0, Vector3 p1)
         {
             P0 = p0;
             P1 = p1;
@@ -45,8 +50,13 @@ namespace SolidworksAddinFramework.Geometry
 
 
 
-        public delegate void VertexProcessor(Vector3 v);
-        public void ProcessVertices(VertexProcessor action)
+        /// <summary>
+        /// Passes every vertex to the action. This method avoids
+        /// creating an array of vertices on the heap and incurring
+        /// the garbage collection and iteration costs.
+        /// </summary>
+        /// <param name="action"></param>
+        public void ProcessVertices(Action<Vector3> action)
         {
             var v = new Vector3(XMin, YMin, ZMin);
             action(v);
@@ -112,7 +122,7 @@ namespace SolidworksAddinFramework.Geometry
             return new Mesh(Triangles(),Edges());
         }
 
-        public static Mesh ToMesh(IEnumerable<FastRange3D> voxels)
+        public static Mesh ToMesh(IEnumerable<Range3Single> voxels)
         {
             return new Mesh(voxels.SelectMany(p=>p.Triangles()));
         }
@@ -206,7 +216,7 @@ namespace SolidworksAddinFramework.Geometry
                 );
         }
 
-        public static FastRange3D FromVertices(IReadOnlyList<IReadOnlyList<Vector3>> polygons)
+        public static Range3Single FromVertices(IReadOnlyList<IReadOnlyList<Vector3>> polygons)
         {
             var xmin = float.MaxValue;
             var ymin = float.MaxValue;
@@ -228,7 +238,7 @@ namespace SolidworksAddinFramework.Geometry
                 }
             }
 
-            return new FastRange3D(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
+            return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
             
         }
 
@@ -246,12 +256,12 @@ namespace SolidworksAddinFramework.Geometry
             zmax = Math.Max(zmax, vertex.Z);
         }
 
-        public static FastRange3D FromVertices(IReadOnlyList<Vector3>  vertices)
+        public static Range3Single FromVertices(IReadOnlyList<Vector3>  vertices)
         {
             return FromVertices(new List<IReadOnlyList<Vector3>> {vertices});
         }
 
-        public static FastRange3D FromTriangle(Triangle triangle)
+        public static Range3Single FromTriangle(Triangle triangle)
         {
             var xmin = float.MaxValue;
             var ymin = float.MaxValue;
@@ -265,10 +275,10 @@ namespace SolidworksAddinFramework.Geometry
             Adjust(triangle.B, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
             Adjust(triangle.C, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
 
-            return new FastRange3D(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
+            return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
             
         }
-        public static FastRange3D FromTriangle(IReadOnlyList<Triangle> triangles)
+        public static Range3Single FromTriangle(IReadOnlyList<Triangle> triangles)
         {
             var xmin = float.MaxValue;
             var ymin = float.MaxValue;
@@ -286,19 +296,19 @@ namespace SolidworksAddinFramework.Geometry
                 Adjust(polygon.C, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
             }
 
-            return new FastRange3D(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
+            return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
         }
 
-        public FastRange3D Scale(float s)
+        public Range3Single Scale(float s)
         {
             s = (s - 1)/2;
             var sx = Dx*s;
             var sy = Dy*s;
             var sz = Dz*s;
-            return new FastRange3D(new Vector3(XMin-sx,YMin-sy,ZMin-sz), new Vector3(XMax+sx, YMax+sy, ZMax+sz));
+            return new Range3Single(new Vector3(XMin-sx,YMin-sy,ZMin-sz), new Vector3(XMax+sx, YMax+sy, ZMax+sz));
         }
 
-        public bool Intersects(FastRange3D other)
+        public bool Intersects(Range3Single other)
         {
             if (XMax < other.XMin)
                 return false;
@@ -318,12 +328,12 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
-        public FastRange3D Intersect(FastRange3D other)
+        public Range3Single Intersect(Range3Single other)
         {
             var xrange = XRange.Intersect(other.XRange);
             var yrange = YRange.Intersect(other.YRange);
             var zrange = ZRange.Intersect(other.ZRange);
-            return new FastRange3D
+            return new Range3Single
                 (new Vector3(xrange.Min, yrange.Min, zrange.Min),
                  new Vector3(xrange.Max, yrange.Max, zrange.Max));
 
