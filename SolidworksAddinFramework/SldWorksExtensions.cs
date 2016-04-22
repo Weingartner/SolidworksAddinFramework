@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,17 @@ namespace SolidworksAddinFramework
                 })
                 .Switch()
                 .Subscribe(disposable => disposable.Dispose());
-        } 
+        }
+
+        public static IDisposable DoWithOpenDoc(this SldWorks swApp, Action<IModelDoc2, Action<IDisposable>> action)
+        {
+            Func<IModelDoc2, IDisposable> func = doc =>
+            {
+                var disposables = new CompositeDisposable();
+                action(doc, disposables.Add);
+                return disposables;
+            };
+            return swApp.DoWithOpenDoc(func);
+        }
     }
 }
