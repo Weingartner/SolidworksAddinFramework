@@ -15,10 +15,14 @@ namespace SolidworksAddinFramework.OpenGl
     public class Mesh : IRenderable
     {
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
-        private IReadOnlyList<Edge> _OriginalEdgeVertices;
+        private readonly IReadOnlyList<Edge> _OriginalEdgeVertices;
+        private readonly Color _Color;
 
 
-        public Mesh(IBody2 body, Color? c = null)
+
+
+
+        public Mesh(IBody2 body, Color color)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
@@ -31,21 +35,20 @@ namespace SolidworksAddinFramework.OpenGl
             TrianglesWithNormals = tris.ToList();
             _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
-            if (c!=null)
-            {
-                Color = c.Value;
-            }
+            _Color = color;
         }
 
-        public Mesh(IEnumerable<Triangle> enumerable,IReadOnlyList<Edge> edges = null)
+        public Mesh(Color color, IEnumerable<Triangle> enumerable,IReadOnlyList<Edge> edges = null)
         {
             TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
             Edges = edges;
+            _Color = color;
         }
-        public Mesh(IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge> edges = null)
+        public Mesh(Color color, IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge> edges = null)
         {
             TrianglesWithNormals = enumerable.ToList();
             Edges = edges ?? new List<Edge>();
+            _Color = color;
         }
 
 
@@ -61,10 +64,8 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void Render(DateTime time)
         {
-            MeshRender.Render(this, Color);
+            MeshRender.Render(this, _Color);
         }
-
-        public Color Color { get; set; } = Color.Red;
 
         public static List<Point3Normal3> Tesselate(IFace2[] faceList, ITessellation tess)
         {

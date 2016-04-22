@@ -202,11 +202,9 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DisplayUndoable
             ( this IRenderable renderable
-            , IModelDoc2 doc
-            , Color? c = null
-            , swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+            , IModelDoc2 doc)
         {
-            return DocView.DisplayUndoable(renderable, c, doc);
+            return OpenGlRenderer.DisplayUndoable(renderable, doc);
         }
 
         /// <summary>

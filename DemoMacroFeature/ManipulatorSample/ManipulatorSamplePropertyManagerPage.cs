@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Text;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
-namespace SwCSharpAddinMF.ManipulatorSample
+namespace DemoMacroFeatures.ManipulatorSample
 {
     /// <summary>
     /// This page allows a user to select a body in the model and then move a copy of it around with
@@ -24,7 +19,7 @@ namespace SwCSharpAddinMF.ManipulatorSample
         private IPropertyManagerPageGroup _PageGroup;
         private int Group1Id = 1;
 
-        static List<swPropertyManagerPageOptions_e> options = new List<swPropertyManagerPageOptions_e>()
+        static List<swPropertyManagerPageOptions_e> options = new List<swPropertyManagerPageOptions_e>
         {
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton,
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton

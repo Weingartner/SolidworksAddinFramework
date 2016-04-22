@@ -2,7 +2,7 @@ using ReactiveUI;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 
-namespace SwCSharpAddinMF.SampleMacroFeature
+namespace DemoMacroFeatures.SampleMacroFeature
 {
     public class SampleMacroFeatureDataBase : MacroFeatureDataBase
     {

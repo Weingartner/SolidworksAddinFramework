@@ -5619,6 +5619,1230 @@ namespace SolidworksAddinFramework.Events {
 }
 
 
+
+namespace SolidworksAddinFramework.Events {
+    public static class DSldWorksEvents_Event {
+
+        public class FileOpenNotifyEventArgs
+        {
+            public FileOpenNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenNotifyEventHandler.html
+        public static IObservable<FileOpenNotifyEventArgs> FileOpenNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileOpenNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new FileOpenNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileOpenNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileOpenNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileNewNotifyEventArgs
+        {
+            public FileNewNotifyEventArgs (System.Object NewDoc, System.Int32 DocType)
+            {
+                this.NewDoc = NewDoc;
+                this.DocType = DocType;
+            }
+            public System.Object NewDoc { get; }
+            public System.Int32 DocType { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewNotifyEventHandler.html
+        public static IObservable<FileNewNotifyEventArgs> FileNewNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileNewNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewNotifyEventHandler callback = 
+                        (System.Object NewDoc, System.Int32 DocType)=>{
+                            var ea = new FileNewNotifyEventArgs(NewDoc, DocType);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileNewNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileNewNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DestroyNotifyEventArgs
+        {
+            public DestroyNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_DestroyNotifyEventHandler.html
+        public static IObservable<DestroyNotifyEventArgs> DestroyNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<DestroyNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_DestroyNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new DestroyNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DestroyNotify += callback;
+                    return Disposable.Create(()=> eventSource.DestroyNotify-= callback);
+                    
+                }
+            );
+        }
+        public class ActiveDocChangeNotifyEventArgs
+        {
+            public ActiveDocChangeNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_ActiveDocChangeNotifyEventHandler.html
+        public static IObservable<ActiveDocChangeNotifyEventArgs> ActiveDocChangeNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<ActiveDocChangeNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_ActiveDocChangeNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new ActiveDocChangeNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.ActiveDocChangeNotify += callback;
+                    return Disposable.Create(()=> eventSource.ActiveDocChangeNotify-= callback);
+                    
+                }
+            );
+        }
+        public class ActiveModelDocChangeNotifyEventArgs
+        {
+            public ActiveModelDocChangeNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_ActiveModelDocChangeNotifyEventHandler.html
+        public static IObservable<ActiveModelDocChangeNotifyEventArgs> ActiveModelDocChangeNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<ActiveModelDocChangeNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_ActiveModelDocChangeNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new ActiveModelDocChangeNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.ActiveModelDocChangeNotify += callback;
+                    return Disposable.Create(()=> eventSource.ActiveModelDocChangeNotify-= callback);
+                    
+                }
+            );
+        }
+        public class PropertySheetCreateNotifyEventArgs
+        {
+            public PropertySheetCreateNotifyEventArgs (System.Object Sheet, System.Int32 sheetType)
+            {
+                this.Sheet = Sheet;
+                this.sheetType = sheetType;
+            }
+            public System.Object Sheet { get; }
+            public System.Int32 sheetType { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_PropertySheetCreateNotifyEventHandler.html
+        public static IObservable<PropertySheetCreateNotifyEventArgs> PropertySheetCreateNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<PropertySheetCreateNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_PropertySheetCreateNotifyEventHandler callback = 
+                        (System.Object Sheet, System.Int32 sheetType)=>{
+                            var ea = new PropertySheetCreateNotifyEventArgs(Sheet, sheetType);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.PropertySheetCreateNotify += callback;
+                    return Disposable.Create(()=> eventSource.PropertySheetCreateNotify-= callback);
+                    
+                }
+            );
+        }
+        public class NonNativeFileOpenNotifyEventArgs
+        {
+            public NonNativeFileOpenNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_NonNativeFileOpenNotifyEventHandler.html
+        public static IObservable<NonNativeFileOpenNotifyEventArgs> NonNativeFileOpenNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<NonNativeFileOpenNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_NonNativeFileOpenNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new NonNativeFileOpenNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.NonNativeFileOpenNotify += callback;
+                    return Disposable.Create(()=> eventSource.NonNativeFileOpenNotify-= callback);
+                    
+                }
+            );
+        }
+        public class LightSheetCreateNotifyEventArgs
+        {
+            public LightSheetCreateNotifyEventArgs (System.Object NewSheet, System.Int32 sheetType, System.Int32 LightId)
+            {
+                this.NewSheet = NewSheet;
+                this.sheetType = sheetType;
+                this.LightId = LightId;
+            }
+            public System.Object NewSheet { get; }
+            public System.Int32 sheetType { get; }
+            public System.Int32 LightId { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_LightSheetCreateNotifyEventHandler.html
+        public static IObservable<LightSheetCreateNotifyEventArgs> LightSheetCreateNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<LightSheetCreateNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_LightSheetCreateNotifyEventHandler callback = 
+                        (System.Object NewSheet, System.Int32 sheetType, System.Int32 LightId)=>{
+                            var ea = new LightSheetCreateNotifyEventArgs(NewSheet, sheetType, LightId);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.LightSheetCreateNotify += callback;
+                    return Disposable.Create(()=> eventSource.LightSheetCreateNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DocumentConversionNotifyEventArgs
+        {
+            public DocumentConversionNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentConversionNotifyEventHandler.html
+        public static IObservable<DocumentConversionNotifyEventArgs> DocumentConversionNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<DocumentConversionNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentConversionNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new DocumentConversionNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DocumentConversionNotify += callback;
+                    return Disposable.Create(()=> eventSource.DocumentConversionNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DocumentLoadNotifyEventArgs
+        {
+            public DocumentLoadNotifyEventArgs (System.String docTitle, System.String docPath)
+            {
+                this.docTitle = docTitle;
+                this.docPath = docPath;
+            }
+            public System.String docTitle { get; }
+            public System.String docPath { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentLoadNotifyEventHandler.html
+        public static IObservable<DocumentLoadNotifyEventArgs> DocumentLoadNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<DocumentLoadNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentLoadNotifyEventHandler callback = 
+                        (System.String docTitle, System.String docPath)=>{
+                            var ea = new DocumentLoadNotifyEventArgs(docTitle, docPath);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DocumentLoadNotify += callback;
+                    return Disposable.Create(()=> eventSource.DocumentLoadNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileNewNotify2EventArgs
+        {
+            public FileNewNotify2EventArgs (System.Object NewDoc, System.Int32 DocType, System.String TemplateName)
+            {
+                this.NewDoc = NewDoc;
+                this.DocType = DocType;
+                this.TemplateName = TemplateName;
+            }
+            public System.Object NewDoc { get; }
+            public System.Int32 DocType { get; }
+            public System.String TemplateName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewNotify2EventHandler.html
+        public static IObservable<FileNewNotify2EventArgs> FileNewNotify2Observable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileNewNotify2EventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewNotify2EventHandler callback = 
+                        (System.Object NewDoc, System.Int32 DocType, System.String TemplateName)=>{
+                            var ea = new FileNewNotify2EventArgs(NewDoc, DocType, TemplateName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileNewNotify2 += callback;
+                    return Disposable.Create(()=> eventSource.FileNewNotify2-= callback);
+                    
+                }
+            );
+        }
+        public class FileOpenNotify2EventArgs
+        {
+            public FileOpenNotify2EventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenNotify2EventHandler.html
+        public static IObservable<FileOpenNotify2EventArgs> FileOpenNotify2Observable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileOpenNotify2EventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenNotify2EventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new FileOpenNotify2EventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileOpenNotify2 += callback;
+                    return Disposable.Create(()=> eventSource.FileOpenNotify2-= callback);
+                    
+                }
+            );
+        }
+        public class ReferenceNotFoundNotifyEventArgs
+        {
+            public ReferenceNotFoundNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_ReferenceNotFoundNotifyEventHandler.html
+        public static IObservable<ReferenceNotFoundNotifyEventArgs> ReferenceNotFoundNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<ReferenceNotFoundNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_ReferenceNotFoundNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new ReferenceNotFoundNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.ReferenceNotFoundNotify += callback;
+                    return Disposable.Create(()=> eventSource.ReferenceNotFoundNotify-= callback);
+                    
+                }
+            );
+        }
+        public class PromptForFilenameNotifyEventArgs
+        {
+            public PromptForFilenameNotifyEventArgs (System.Int32 openOrSave, System.String suggestedFileName, System.Int32 DocType, System.Int32 cause)
+            {
+                this.openOrSave = openOrSave;
+                this.suggestedFileName = suggestedFileName;
+                this.DocType = DocType;
+                this.cause = cause;
+            }
+            public System.Int32 openOrSave { get; }
+            public System.String suggestedFileName { get; }
+            public System.Int32 DocType { get; }
+            public System.Int32 cause { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_PromptForFilenameNotifyEventHandler.html
+        public static IObservable<PromptForFilenameNotifyEventArgs> PromptForFilenameNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<PromptForFilenameNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_PromptForFilenameNotifyEventHandler callback = 
+                        (System.Int32 openOrSave, System.String suggestedFileName, System.Int32 DocType, System.Int32 cause)=>{
+                            var ea = new PromptForFilenameNotifyEventArgs(openOrSave, suggestedFileName, DocType, cause);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.PromptForFilenameNotify += callback;
+                    return Disposable.Create(()=> eventSource.PromptForFilenameNotify-= callback);
+                    
+                }
+            );
+        }
+        public class BeginTranslationNotifyEventArgs
+        {
+            public BeginTranslationNotifyEventArgs (System.String FileName, System.Int32 Options)
+            {
+                this.FileName = FileName;
+                this.Options = Options;
+            }
+            public System.String FileName { get; }
+            public System.Int32 Options { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_BeginTranslationNotifyEventHandler.html
+        public static IObservable<BeginTranslationNotifyEventArgs> BeginTranslationNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<BeginTranslationNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_BeginTranslationNotifyEventHandler callback = 
+                        (System.String FileName, System.Int32 Options)=>{
+                            var ea = new BeginTranslationNotifyEventArgs(FileName, Options);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.BeginTranslationNotify += callback;
+                    return Disposable.Create(()=> eventSource.BeginTranslationNotify-= callback);
+                    
+                }
+            );
+        }
+        public class EndTranslationNotifyEventArgs
+        {
+            public EndTranslationNotifyEventArgs (System.String FileName, System.Int32 Options)
+            {
+                this.FileName = FileName;
+                this.Options = Options;
+            }
+            public System.String FileName { get; }
+            public System.Int32 Options { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_EndTranslationNotifyEventHandler.html
+        public static IObservable<EndTranslationNotifyEventArgs> EndTranslationNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<EndTranslationNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_EndTranslationNotifyEventHandler callback = 
+                        (System.String FileName, System.Int32 Options)=>{
+                            var ea = new EndTranslationNotifyEventArgs(FileName, Options);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.EndTranslationNotify += callback;
+                    return Disposable.Create(()=> eventSource.EndTranslationNotify-= callback);
+                    
+                }
+            );
+        }
+        public class OnIdleNotifyEventArgs
+        {
+            public OnIdleNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_OnIdleNotifyEventHandler.html
+        public static IObservable<OnIdleNotifyEventArgs> OnIdleNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<OnIdleNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_OnIdleNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new OnIdleNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.OnIdleNotify += callback;
+                    return Disposable.Create(()=> eventSource.OnIdleNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileOpenPreNotifyEventArgs
+        {
+            public FileOpenPreNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenPreNotifyEventHandler.html
+        public static IObservable<FileOpenPreNotifyEventArgs> FileOpenPreNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileOpenPreNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenPreNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new FileOpenPreNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileOpenPreNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileOpenPreNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileOpenPostNotifyEventArgs
+        {
+            public FileOpenPostNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenPostNotifyEventHandler.html
+        public static IObservable<FileOpenPostNotifyEventArgs> FileOpenPostNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileOpenPostNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileOpenPostNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new FileOpenPostNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileOpenPostNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileOpenPostNotify-= callback);
+                    
+                }
+            );
+        }
+        public class ReferencedFilePreNotifyEventArgs
+        {
+            public ReferencedFilePreNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_ReferencedFilePreNotifyEventHandler.html
+        public static IObservable<ReferencedFilePreNotifyEventArgs> ReferencedFilePreNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<ReferencedFilePreNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_ReferencedFilePreNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new ReferencedFilePreNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.ReferencedFilePreNotify += callback;
+                    return Disposable.Create(()=> eventSource.ReferencedFilePreNotify-= callback);
+                    
+                }
+            );
+        }
+        public class BeginRecordNotifyEventArgs
+        {
+            public BeginRecordNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_BeginRecordNotifyEventHandler.html
+        public static IObservable<BeginRecordNotifyEventArgs> BeginRecordNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<BeginRecordNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_BeginRecordNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new BeginRecordNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.BeginRecordNotify += callback;
+                    return Disposable.Create(()=> eventSource.BeginRecordNotify-= callback);
+                    
+                }
+            );
+        }
+        public class EndRecordNotifyEventArgs
+        {
+            public EndRecordNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_EndRecordNotifyEventHandler.html
+        public static IObservable<EndRecordNotifyEventArgs> EndRecordNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<EndRecordNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_EndRecordNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new EndRecordNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.EndRecordNotify += callback;
+                    return Disposable.Create(()=> eventSource.EndRecordNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileNewPreNotifyEventArgs
+        {
+            public FileNewPreNotifyEventArgs (System.Int32 DocType, System.String TemplateName)
+            {
+                this.DocType = DocType;
+                this.TemplateName = TemplateName;
+            }
+            public System.Int32 DocType { get; }
+            public System.String TemplateName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewPreNotifyEventHandler.html
+        public static IObservable<FileNewPreNotifyEventArgs> FileNewPreNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileNewPreNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileNewPreNotifyEventHandler callback = 
+                        (System.Int32 DocType, System.String TemplateName)=>{
+                            var ea = new FileNewPreNotifyEventArgs(DocType, TemplateName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileNewPreNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileNewPreNotify-= callback);
+                    
+                }
+            );
+        }
+        public class JournalWriteNotifyEventArgs
+        {
+            public JournalWriteNotifyEventArgs (System.String journalFile, System.Int32 lineCount)
+            {
+                this.journalFile = journalFile;
+                this.lineCount = lineCount;
+            }
+            public System.String journalFile { get; }
+            public System.Int32 lineCount { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_JournalWriteNotifyEventHandler.html
+        public static IObservable<JournalWriteNotifyEventArgs> JournalWriteNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<JournalWriteNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_JournalWriteNotifyEventHandler callback = 
+                        (System.String journalFile, System.Int32 lineCount)=>{
+                            var ea = new JournalWriteNotifyEventArgs(journalFile, lineCount);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.JournalWriteNotify += callback;
+                    return Disposable.Create(()=> eventSource.JournalWriteNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DocumentLoadNotify2EventArgs
+        {
+            public DocumentLoadNotify2EventArgs (System.String docTitle, System.String docPath)
+            {
+                this.docTitle = docTitle;
+                this.docPath = docPath;
+            }
+            public System.String docTitle { get; }
+            public System.String docPath { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentLoadNotify2EventHandler.html
+        public static IObservable<DocumentLoadNotify2EventArgs> DocumentLoadNotify2Observable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<DocumentLoadNotify2EventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_DocumentLoadNotify2EventHandler callback = 
+                        (System.String docTitle, System.String docPath)=>{
+                            var ea = new DocumentLoadNotify2EventArgs(docTitle, docPath);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DocumentLoadNotify2 += callback;
+                    return Disposable.Create(()=> eventSource.DocumentLoadNotify2-= callback);
+                    
+                }
+            );
+        }
+        public class CommandCloseNotifyEventArgs
+        {
+            public CommandCloseNotifyEventArgs (System.Int32 Command, System.Int32 reason)
+            {
+                this.Command = Command;
+                this.reason = reason;
+            }
+            public System.Int32 Command { get; }
+            public System.Int32 reason { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_CommandCloseNotifyEventHandler.html
+        public static IObservable<CommandCloseNotifyEventArgs> CommandCloseNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<CommandCloseNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_CommandCloseNotifyEventHandler callback = 
+                        (System.Int32 Command, System.Int32 reason)=>{
+                            var ea = new CommandCloseNotifyEventArgs(Command, reason);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.CommandCloseNotify += callback;
+                    return Disposable.Create(()=> eventSource.CommandCloseNotify-= callback);
+                    
+                }
+            );
+        }
+        public class CommandOpenPreNotifyEventArgs
+        {
+            public CommandOpenPreNotifyEventArgs (System.Int32 Command, System.Int32 UserCommand)
+            {
+                this.Command = Command;
+                this.UserCommand = UserCommand;
+            }
+            public System.Int32 Command { get; }
+            public System.Int32 UserCommand { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_CommandOpenPreNotifyEventHandler.html
+        public static IObservable<CommandOpenPreNotifyEventArgs> CommandOpenPreNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<CommandOpenPreNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_CommandOpenPreNotifyEventHandler callback = 
+                        (System.Int32 Command, System.Int32 UserCommand)=>{
+                            var ea = new CommandOpenPreNotifyEventArgs(Command, UserCommand);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.CommandOpenPreNotify += callback;
+                    return Disposable.Create(()=> eventSource.CommandOpenPreNotify-= callback);
+                    
+                }
+            );
+        }
+        public class FileCloseNotifyEventArgs
+        {
+            public FileCloseNotifyEventArgs (System.String FileName, System.Int32 reason)
+            {
+                this.FileName = FileName;
+                this.reason = reason;
+            }
+            public System.String FileName { get; }
+            public System.Int32 reason { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_FileCloseNotifyEventHandler.html
+        public static IObservable<FileCloseNotifyEventArgs> FileCloseNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<FileCloseNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_FileCloseNotifyEventHandler callback = 
+                        (System.String FileName, System.Int32 reason)=>{
+                            var ea = new FileCloseNotifyEventArgs(FileName, reason);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.FileCloseNotify += callback;
+                    return Disposable.Create(()=> eventSource.FileCloseNotify-= callback);
+                    
+                }
+            );
+        }
+        public class BackgroundProcessingStartNotifyEventArgs
+        {
+            public BackgroundProcessingStartNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_BackgroundProcessingStartNotifyEventHandler.html
+        public static IObservable<BackgroundProcessingStartNotifyEventArgs> BackgroundProcessingStartNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<BackgroundProcessingStartNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_BackgroundProcessingStartNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new BackgroundProcessingStartNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.BackgroundProcessingStartNotify += callback;
+                    return Disposable.Create(()=> eventSource.BackgroundProcessingStartNotify-= callback);
+                    
+                }
+            );
+        }
+        public class BackgroundProcessingEndNotifyEventArgs
+        {
+            public BackgroundProcessingEndNotifyEventArgs (System.String FileName)
+            {
+                this.FileName = FileName;
+            }
+            public System.String FileName { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DSldWorksEvents_BackgroundProcessingEndNotifyEventHandler.html
+        public static IObservable<BackgroundProcessingEndNotifyEventArgs> BackgroundProcessingEndNotifyObservable(this SolidWorks.Interop.sldworks.DSldWorksEvents_Event eventSource)
+        {
+            return Observable.Create<BackgroundProcessingEndNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DSldWorksEvents_BackgroundProcessingEndNotifyEventHandler callback = 
+                        (System.String FileName)=>{
+                            var ea = new BackgroundProcessingEndNotifyEventArgs(FileName);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.BackgroundProcessingEndNotify += callback;
+                    return Disposable.Create(()=> eventSource.BackgroundProcessingEndNotify-= callback);
+                    
+                }
+            );
+        }
+    }
+}
+
+
+
+namespace SolidworksAddinFramework.Events {
+    public static class DModelViewEvents_Event {
+
+        public class RepaintNotifyEventArgs
+        {
+            public RepaintNotifyEventArgs (System.Int32 paintType)
+            {
+                this.paintType = paintType;
+            }
+            public System.Int32 paintType { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_RepaintNotifyEventHandler.html
+        public static IObservable<RepaintNotifyEventArgs> RepaintNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<RepaintNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_RepaintNotifyEventHandler callback = 
+                        (System.Int32 paintType)=>{
+                            var ea = new RepaintNotifyEventArgs(paintType);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.RepaintNotify += callback;
+                    return Disposable.Create(()=> eventSource.RepaintNotify-= callback);
+                    
+                }
+            );
+        }
+        public class ViewChangeNotifyEventArgs
+        {
+            public ViewChangeNotifyEventArgs (System.Object View)
+            {
+                this.View = View;
+            }
+            public System.Object View { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_ViewChangeNotifyEventHandler.html
+        public static IObservable<ViewChangeNotifyEventArgs> ViewChangeNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<ViewChangeNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_ViewChangeNotifyEventHandler callback = 
+                        (System.Object View)=>{
+                            var ea = new ViewChangeNotifyEventArgs(View);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.ViewChangeNotify += callback;
+                    return Disposable.Create(()=> eventSource.ViewChangeNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DestroyNotifyEventArgs
+        {
+            public DestroyNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_DestroyNotifyEventHandler.html
+        public static IObservable<DestroyNotifyEventArgs> DestroyNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<DestroyNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_DestroyNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new DestroyNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DestroyNotify += callback;
+                    return Disposable.Create(()=> eventSource.DestroyNotify-= callback);
+                    
+                }
+            );
+        }
+        public class RepaintPostNotifyEventArgs
+        {
+            public RepaintPostNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_RepaintPostNotifyEventHandler.html
+        public static IObservable<RepaintPostNotifyEventArgs> RepaintPostNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<RepaintPostNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_RepaintPostNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new RepaintPostNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.RepaintPostNotify += callback;
+                    return Disposable.Create(()=> eventSource.RepaintPostNotify-= callback);
+                    
+                }
+            );
+        }
+        public class BufferSwapNotifyEventArgs
+        {
+            public BufferSwapNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_BufferSwapNotifyEventHandler.html
+        public static IObservable<BufferSwapNotifyEventArgs> BufferSwapNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<BufferSwapNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_BufferSwapNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new BufferSwapNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.BufferSwapNotify += callback;
+                    return Disposable.Create(()=> eventSource.BufferSwapNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DestroyNotify2EventArgs
+        {
+            public DestroyNotify2EventArgs (System.Int32 DestroyType)
+            {
+                this.DestroyType = DestroyType;
+            }
+            public System.Int32 DestroyType { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_DestroyNotify2EventHandler.html
+        public static IObservable<DestroyNotify2EventArgs> DestroyNotify2Observable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<DestroyNotify2EventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_DestroyNotify2EventHandler callback = 
+                        (System.Int32 DestroyType)=>{
+                            var ea = new DestroyNotify2EventArgs(DestroyType);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DestroyNotify2 += callback;
+                    return Disposable.Create(()=> eventSource.DestroyNotify2-= callback);
+                    
+                }
+            );
+        }
+        public class PerspectiveViewNotifyEventArgs
+        {
+            public PerspectiveViewNotifyEventArgs (System.Double Left, System.Double Right, System.Double bottom, System.Double Top, System.Double zNear, System.Double zFar)
+            {
+                this.Left = Left;
+                this.Right = Right;
+                this.bottom = bottom;
+                this.Top = Top;
+                this.zNear = zNear;
+                this.zFar = zFar;
+            }
+            public System.Double Left { get; }
+            public System.Double Right { get; }
+            public System.Double bottom { get; }
+            public System.Double Top { get; }
+            public System.Double zNear { get; }
+            public System.Double zFar { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_PerspectiveViewNotifyEventHandler.html
+        public static IObservable<PerspectiveViewNotifyEventArgs> PerspectiveViewNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<PerspectiveViewNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_PerspectiveViewNotifyEventHandler callback = 
+                        (System.Double Left, System.Double Right, System.Double bottom, System.Double Top, System.Double zNear, System.Double zFar)=>{
+                            var ea = new PerspectiveViewNotifyEventArgs(Left, Right, bottom, Top, zNear, zFar);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.PerspectiveViewNotify += callback;
+                    return Disposable.Create(()=> eventSource.PerspectiveViewNotify-= callback);
+                    
+                }
+            );
+        }
+        public class RenderLayer0NotifyEventArgs
+        {
+            public RenderLayer0NotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_RenderLayer0NotifyEventHandler.html
+        public static IObservable<RenderLayer0NotifyEventArgs> RenderLayer0NotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<RenderLayer0NotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_RenderLayer0NotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new RenderLayer0NotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.RenderLayer0Notify += callback;
+                    return Disposable.Create(()=> eventSource.RenderLayer0Notify-= callback);
+                    
+                }
+            );
+        }
+        public class UserClearSelectionsNotifyEventArgs
+        {
+            public UserClearSelectionsNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_UserClearSelectionsNotifyEventHandler.html
+        public static IObservable<UserClearSelectionsNotifyEventArgs> UserClearSelectionsNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<UserClearSelectionsNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_UserClearSelectionsNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new UserClearSelectionsNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.UserClearSelectionsNotify += callback;
+                    return Disposable.Create(()=> eventSource.UserClearSelectionsNotify-= callback);
+                    
+                }
+            );
+        }
+        public class PrintNotifyEventArgs
+        {
+            public PrintNotifyEventArgs (System.Int64 pDC)
+            {
+                this.pDC = pDC;
+            }
+            public System.Int64 pDC { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_PrintNotifyEventHandler.html
+        public static IObservable<PrintNotifyEventArgs> PrintNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<PrintNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_PrintNotifyEventHandler callback = 
+                        (System.Int64 pDC)=>{
+                            var ea = new PrintNotifyEventArgs(pDC);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.PrintNotify += callback;
+                    return Disposable.Create(()=> eventSource.PrintNotify-= callback);
+                    
+                }
+            );
+        }
+        public class GraphicsRenderPostNotifyEventArgs
+        {
+            public GraphicsRenderPostNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_GraphicsRenderPostNotifyEventHandler.html
+        public static IObservable<GraphicsRenderPostNotifyEventArgs> GraphicsRenderPostNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<GraphicsRenderPostNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_GraphicsRenderPostNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new GraphicsRenderPostNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.GraphicsRenderPostNotify += callback;
+                    return Disposable.Create(()=> eventSource.GraphicsRenderPostNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DisplayModeChangePreNotifyEventArgs
+        {
+            public DisplayModeChangePreNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_DisplayModeChangePreNotifyEventHandler.html
+        public static IObservable<DisplayModeChangePreNotifyEventArgs> DisplayModeChangePreNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<DisplayModeChangePreNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_DisplayModeChangePreNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new DisplayModeChangePreNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DisplayModeChangePreNotify += callback;
+                    return Disposable.Create(()=> eventSource.DisplayModeChangePreNotify-= callback);
+                    
+                }
+            );
+        }
+        public class DisplayModeChangePostNotifyEventArgs
+        {
+            public DisplayModeChangePostNotifyEventArgs ()
+            {
+            }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_DisplayModeChangePostNotifyEventHandler.html
+        public static IObservable<DisplayModeChangePostNotifyEventArgs> DisplayModeChangePostNotifyObservable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<DisplayModeChangePostNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_DisplayModeChangePostNotifyEventHandler callback = 
+                        ()=>{
+                            var ea = new DisplayModeChangePostNotifyEventArgs();
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.DisplayModeChangePostNotify += callback;
+                    return Disposable.Create(()=> eventSource.DisplayModeChangePostNotify-= callback);
+                    
+                }
+            );
+        }
+        public class PrintNotify2EventArgs
+        {
+            public PrintNotify2EventArgs (System.Int64 pDC, System.Boolean bPreview)
+            {
+                this.pDC = pDC;
+                this.bPreview = bPreview;
+            }
+            public System.Int64 pDC { get; }
+            public System.Boolean bPreview { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DModelViewEvents_PrintNotify2EventHandler.html
+        public static IObservable<PrintNotify2EventArgs> PrintNotify2Observable(this SolidWorks.Interop.sldworks.DModelViewEvents_Event eventSource)
+        {
+            return Observable.Create<PrintNotify2EventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DModelViewEvents_PrintNotify2EventHandler callback = 
+                        (System.Int64 pDC, System.Boolean bPreview)=>{
+                            var ea = new PrintNotify2EventArgs(pDC, bPreview);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.PrintNotify2 += callback;
+                    return Disposable.Create(()=> eventSource.PrintNotify2-= callback);
+                    
+                }
+            );
+        }
+    }
+}
+
+
 namespace SolidworksAddinFramework.Events {
 public static class ModelDoc2Events
 {

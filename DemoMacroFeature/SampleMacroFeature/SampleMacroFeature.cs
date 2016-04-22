@@ -6,7 +6,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF.SampleMacroFeature
+namespace DemoMacroFeatures.SampleMacroFeature
 {
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(ISwComFeature))]

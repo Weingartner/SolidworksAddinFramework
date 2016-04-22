@@ -1,13 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
+using DemoMacroFeatures.ManipulatorSample;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorksTools;
-using SwCSharpAddinMF.ManipulatorSample;
 
-
-namespace SwCSharpAddinMF
+namespace DemoMacroFeatures
 {
     /// <summary>
     /// Summary description for SwCSharpAddinMF.
@@ -20,50 +22,53 @@ namespace SwCSharpAddinMF
         )]
     public class SwAddin : SwAddinBase
     {
-        #region Local Variables
-
-        public const int MainCmdGroupId = 5;
-        public const int MainItemId1 = 0;
-        public const int MainItemId2 = 1;
-        public const int MainItemId3 = 2;
-
-        #endregion
-
-
         #region UI Methods
-        public override void AddCommandMgr()
+
+        protected override IEnumerable<IDisposable> Setup()
         {
+            yield return AddCommands();
+        }
+
+        private IDisposable AddCommands()
+        {
+            const int mainCmdGroupId = 5;
+            const int mainItemId1 = 0;
+            const int mainItemId2 = 1;
+
             const string title = "C# Addin";
             const string toolTip = "C# Addin";
 
-            int[] docTypes = { (int)swDocumentTypes_e.swDocPART};
+            int[] docTypes = {(int) swDocumentTypes_e.swDocPART};
 
             var cmdGroupErr = 0;
             var ignorePrevious = false;
 
             object registryIDs;
             //get the ID information stored in the registry
-            var getDataResult = CommandManager.GetGroupDataFromRegistry(MainCmdGroupId, out registryIDs);
+            var getDataResult = CommandManager.GetGroupDataFromRegistry(mainCmdGroupId, out registryIDs);
 
-            int[] knownIDs = { MainItemId1, MainItemId2 };
+            int[] knownIDs = {mainItemId1, mainItemId2};
 
             if (getDataResult)
             {
-                if (!CompareIDs((int[])registryIDs, knownIDs)) //if the IDs don't match, reset the commandGroup
+                if (!CompareIDs((int[]) registryIDs, knownIDs)) //if the IDs don't match, reset the commandGroup
                 {
                     ignorePrevious = true;
                 }
             }
 
-            ICommandGroup cmdGroup = CommandManager.CreateCommandGroup2(MainCmdGroupId, title, toolTip, "", -1, ignorePrevious, ref cmdGroupErr);
+            ICommandGroup cmdGroup = CommandManager.CreateCommandGroup2(mainCmdGroupId, title, toolTip, "", -1, ignorePrevious,
+                ref cmdGroupErr);
             cmdGroup.LargeIconList = GetBitMap("SwCSharpAddinMF.Icons.ToolbarLarge.bmp");
             cmdGroup.SmallIconList = GetBitMap("SwCSharpAddinMF.Icons.ToolbarSmall.bmp");
             cmdGroup.LargeMainIcon = GetBitMap("SwCSharpAddinMF.Icons.MainIconLarge.bmp");
             cmdGroup.SmallMainIcon = GetBitMap("SwCSharpAddinMF.Icons.MainIconSmall.bmp");
 
-            var menuToolbarOption = (int)swCommandItemType_e.swToolbarItem | (int)swCommandItemType_e.swMenuItem;
-            var cmdIndex0 = cmdGroup.AddCommandItem2(nameof(CreateSampleMacroFeature), -1, "Alpha Split", "Alpha Split", 0, nameof(CreateSampleMacroFeature), "", MainItemId1, menuToolbarOption);
-            var cmdIndex1 = cmdGroup.AddCommandItem2(nameof(CreateManipulatorSample), -1, "Manipulator", "Manipulator", 0, nameof(CreateManipulatorSample), "", MainItemId1, menuToolbarOption);
+            var menuToolbarOption = (int) swCommandItemType_e.swToolbarItem | (int) swCommandItemType_e.swMenuItem;
+            var cmdIndex0 = cmdGroup.AddCommandItem2(nameof(CreateSampleMacroFeature), -1, "Alpha Split", "Alpha Split", 0,
+                nameof(CreateSampleMacroFeature), "", mainItemId1, menuToolbarOption);
+            var cmdIndex1 = cmdGroup.AddCommandItem2(nameof(CreateManipulatorSample), -1, "Manipulator", "Manipulator", 0,
+                nameof(CreateManipulatorSample), "", mainItemId1, menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
@@ -97,28 +102,24 @@ namespace SwCSharpAddinMF
                         .Select(id => (int) swCommandTabButtonTextDisplay_e.swCommandTabButton_TextHorizontal)
                         .ToArray();
 
-                        
+
                     cmdBox.AddCommands(cmdIDs, textType);
-
                 }
-
             }
-        }
 
-        public override void RemoveCommandMgr()
-        {
-            CommandManager.RemoveCommandGroup(MainCmdGroupId);
+            return Disposable.Create(() => CommandManager.RemoveCommandGroup(mainCmdGroupId));
         }
 
         #endregion
 
         #region UI Callbacks
-        public void CreateSampleMacroFeature()
+
+        private void CreateSampleMacroFeature()
         {
             SampleMacroFeature.SampleMacroFeature.AddMacroFeature(SwApp);
         }
 
-        public void CreateManipulatorSample()
+        private void CreateManipulatorSample()
         {
             var sldWorks = SwApp;
             var page = ManipulatorSamplePropertyManagerPage.Create(sldWorks);

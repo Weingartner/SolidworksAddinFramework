@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -117,14 +118,14 @@ namespace SolidworksAddinFramework.Geometry
             return box;
         }
 
-        public Mesh ToMesh()
+        public Mesh ToMesh(Color color)
         {
-            return new Mesh(Triangles(),Edges());
+            return new Mesh(color, Triangles(),Edges());
         }
 
-        public static Mesh ToMesh(IEnumerable<Range3Single> voxels)
+        public static Mesh ToMesh(IEnumerable<Range3Single> voxels, Color color)
         {
-            return new Mesh(voxels.SelectMany(p=>p.Triangles()));
+            return new Mesh(color, voxels.SelectMany(p=>p.Triangles()));
         }
 
 

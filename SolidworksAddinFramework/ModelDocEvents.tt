@@ -31,6 +31,8 @@ using System.Reactive.Disposables;
 <# OutputEventType<DPartDocEvents_Event,PartDoc>();#>
 <# OutputEventType<DAssemblyDocEvents_Event,AssemblyDoc>();#>
 <# OutputEventType<DDrawingDocEvents_Event,DrawingDoc>();#>
+<# OutputEventType<DSldWorksEvents_Event,SldWorks>();#>
+<# OutputEventType<DModelViewEvents_Event,ModelView>();#>
 <# OutputCommonEvents(typeof(DPartDocEvents_Event), typeof(DAssemblyDocEvents_Event), typeof(DDrawingDocEvents_Event)); #>
 
 <#+

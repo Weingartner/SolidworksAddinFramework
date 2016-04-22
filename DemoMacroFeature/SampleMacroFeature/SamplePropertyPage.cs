@@ -10,7 +10,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 
-namespace SwCSharpAddinMF.SampleMacroFeature
+namespace DemoMacroFeatures.SampleMacroFeature
 {
     [ClassInterface(ClassInterfaceType.None)]
     [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
@@ -31,7 +31,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SwCSharpAddinMF.SampleMacroFeature.SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
+        public SamplePropertyPage(SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
         {
             var body = MacroFeature.SelectionMgr.GetSelectedObject(1) as IBody2;
             if (body==null)
@@ -60,7 +60,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
 
             yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
             yield return CreateSelectionBox(_PageGroup, "Sample Selection", "Displays features selected in main view",
-                (selectionBox) =>
+                selectionBox =>
                 {
                     if (selectionBox != null)
                     {
@@ -75,10 +75,8 @@ namespace SwCSharpAddinMF.SampleMacroFeature
 
             // When the alpha value or the selection changes we want to 
             // show a temporary body with the split in it
-            yield return Observable
-                .CombineLatest(
-                    MacroFeature.Database.WhenAnyValue(p=>p.Alpha),
-                    SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
+            yield return MacroFeature.Database.WhenAnyValue(p=>p.Alpha)
+                .CombineLatest(SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
                     (alpha, selection) => new { alpha, selection }
                 )
                 .Select(o =>
@@ -89,7 +87,7 @@ namespace SwCSharpAddinMF.SampleMacroFeature
                     if (newBody == null)
                         return null;
 
-                    var splits = SwCSharpAddinMF.SampleMacroFeature.SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
+                    var splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
                         MacroFeature.Database);
 
                     return splits == null ? null : new { body, splits = splits.ToList() };

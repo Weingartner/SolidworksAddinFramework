@@ -172,13 +172,9 @@
     <Compile Include="CurveExtension.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
-    <Compile Include="EventHandlers\AssemblyEventHandler.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
-    <Compile Include="EventHandlers\DocumentEventHandler.cs" />
-    <Compile Include="EventHandlers\DocView.cs" />
-    <Compile Include="EventHandlers\DrawingEventHandler.cs" />
+    <Compile Include="EventHandlers\OpenGlRenderer.cs" />
     <Compile Include="EventHandlers\OpenGL.cs" />
-    <Compile Include="EventHandlers\PartEventHandler.cs" />
     <Compile Include="FaceExtensions.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
@@ -225,6 +221,7 @@
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
+    <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="TaskExtensions.cs" />

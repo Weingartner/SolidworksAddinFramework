@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Reactive;
@@ -12,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using MathNet.Numerics.Interpolation;
 using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
@@ -73,10 +71,10 @@ namespace SolidworksAddinFramework.OpenGl
             _Children = children;
             _Math = math;
         }
-        public IDisposable Animate(IModelDoc2 doc, TimeSpan? startDelay = null , int framerate = 60, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        public IDisposable Animate(IModelDoc2 doc, TimeSpan? startDelay = null , int framerate = 60)
         {
             StartTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
-            var d = DocView.DisplayUndoable(this, c, doc);
+            var d = OpenGlRenderer.DisplayUndoable(this, doc);
             var interval = 1.0/framerate;
             var d2 = Observable.Interval(TimeSpan.FromSeconds(interval))
                 .ObserveOnUiDispatcher()

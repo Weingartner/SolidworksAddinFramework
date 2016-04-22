@@ -41,7 +41,7 @@ namespace SwCSharpAddinMF.Spec
                     false, 0.0174532925199433, 0.0174532925199433, false, false, false, false, true, true, true,
                     (int) swStartConditions_e.swStartSurface, 0, false);
 
-                var macroFeature = new SampleMacroFeature.SampleMacroFeature();
+                var macroFeature = new DemoMacroFeatures.SampleMacroFeature.SampleMacroFeature();
                 macroFeature.Edit(SwApp, modelDoc, null);
                 Assert.True(modelDoc.Extension.SelectByID2(feature.Name, "SOLIDBODY", 0, 0, 0, false, 1, null, 0));
 
