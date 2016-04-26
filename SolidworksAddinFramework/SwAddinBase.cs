@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
@@ -103,9 +105,26 @@ namespace SolidworksAddinFramework
             _Bmp = new BitmapHandler();
             var d0 = OpenGlRenderer.Setup((SldWorks) SwApp);
             var d1 = new CompositeDisposable(Setup());
-            _Disposable = new CompositeDisposable(_Bmp, d0, d1);
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
+            var d2 = Disposable.Create(() => AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssembly);
+            _Disposable = new CompositeDisposable(_Bmp, d0, d1, d2);
 
             return true;
+        }
+
+        private static Assembly ResolveAssembly(object s, ResolveEventArgs e)
+        {
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var asmName = new AssemblyName(e.Name);
+            var asmPath = Path.Combine(dir, asmName.Name + ".dll");
+            try
+            {
+                return Assembly.LoadFrom(asmPath);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>

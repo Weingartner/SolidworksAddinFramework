@@ -38,7 +38,6 @@ namespace SolidworksAddinFramework.Wpf
 
         public static void LogWithIndent(int i, string message)
         {
-            var hack = new ScrollOnNewItem();
             Log(new string(' ',i*4) + message);
 
             
