@@ -33,7 +33,7 @@ namespace SolidworksAddinFramework
         {
             doc.Using(m => sldWorks.CloseDoc(doc.GetTitle()), run);
         }
-        public static Task Using(this IModelDoc2 doc, ISldWorks sldWorks, Func<IModelDoc2,Task> run)
+        public static Task Using(this IModelDoc2 doc, ISldWorks sldWorks, Func<IModelDoc2, Task> run)
         {
             return doc.Using(m => sldWorks.CloseDoc(doc.GetTitle()), run);
         }
@@ -70,5 +70,22 @@ namespace SolidworksAddinFramework
         #region Convet modeldoc / partdoc events to observables
 
         #endregion
+
+        public static void RestoreSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selectionDataList)
+        {
+            foreach (var selectionData in selectionDataList)
+            {
+                doc.Extension.SelectByID2(
+                    selectionData.ObjectName,
+                    selectionData.TypeName,
+                    selectionData.X,
+                    selectionData.Y,
+                    selectionData.Z,
+                    true,
+                    selectionData.Mark,
+                    null,
+                    (int) swSelectOption_e.swSelectOptionDefault);
+            }
+        }
     }
 }

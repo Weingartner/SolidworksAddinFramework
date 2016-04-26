@@ -66,24 +66,32 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DeselectAllUndoable(this ISelectionMgr selMgr)
         {
-            var selectedObjects = GetSelectedObjectProperties(selMgr)
-                .Select(props => new
+            selMgr.SuspendSelectionList();
+            return Disposable.Create(selMgr.ResumeSelectionList);
+        }
+
+        public static IEnumerable<SelectionData> SerializeSelections(this ISelectionMgr selectionMgr)
+        {
+            return Enumerable
+                .Range(1, selectionMgr.GetSelectedObjectCount2(-1))
+                .Select(i =>
                 {
-                    props,
-                    obj = selMgr.GetSelectedObject6(props.Index, AnyMark)
-                })
-                .ToList();
-            selMgr.DeselectAll();
-            return Disposable.Create(() =>
-            {
-                selectedObjects
-                    .ForEach(o =>
-                    {
-                        var selectData = (ISelectData) selMgr.CreateSelectData();
-                        selectData.Mark = o.props.Mark;
-                        selMgr.AddSelectionListObject(o.obj, selectData);
-                    });
-            });
+                    string selectByString;
+                    string objectType;
+                    int type;
+                    double x;
+                    double y;
+                    double z;
+                    var result = selectionMgr.GetSelectionSpecification(
+                        i,
+                        out selectByString,
+                        out objectType,
+                        out type,
+                        out x,
+                        out y, out z);
+                    var mark = selectionMgr.GetSelectedObjectMark(i);
+                    return new SelectionData(selectByString, objectType, x, y, z, mark);
+                });
         }
     }
 }

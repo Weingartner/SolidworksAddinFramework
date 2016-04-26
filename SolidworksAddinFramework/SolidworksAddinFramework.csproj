@@ -220,6 +220,7 @@
     </Compile>
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
+    <Compile Include="SelectionData.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
