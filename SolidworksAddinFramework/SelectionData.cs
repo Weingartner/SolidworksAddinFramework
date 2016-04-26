@@ -1,10 +1,9 @@
 using System.Runtime.Serialization;
-using ReactiveUI;
 
 namespace SolidworksAddinFramework
 {
     [DataContract]
-    public class SelectionData : ReactiveObject
+    public class SelectionData
     {
         [DataMember]
         public string ObjectName { get; private set; }
