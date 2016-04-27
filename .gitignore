@@ -237,3 +237,4 @@ _Pvt_Extensions
 .fake/
 *.swp
 *.orig
+_.sw*
