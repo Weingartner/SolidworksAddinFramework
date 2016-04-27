@@ -71,6 +71,9 @@ namespace SolidworksAddinFramework.OpenGl
         /// <returns></returns>
         public static Vector2 To2D(this Vector3 v) => new Vector2(v.X, v.Y);
 
+        public static bool Equals(this Vector3 a, Vector3 other, double tol) => 
+            (a - other).LengthSquared() < tol*tol;
+
         public static Vector3 XComponent(this Vector3 v)=> new Vector3(v.X);
         public static Vector3 YComponent(this Vector3 v)=> new Vector3(v.Y);
         public static Vector3 ZComponent(this Vector3 v)=> new Vector3(v.Z);

@@ -30,7 +30,7 @@ namespace SolidworksAddinFramework.Geometry
             Direction = direction;
         }
 
-        public static implicit operator PointDirection3(Vector3 point)
+        public static explicit operator PointDirection3(Vector3 point)
         {
             return new PointDirection3(point, default(Vector3));
         }

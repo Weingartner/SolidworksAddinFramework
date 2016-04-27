@@ -16,6 +16,12 @@ namespace SolidworksAddinFramework.Geometry
             B = b;
             C = c;
         }
+        public TriangleWithNormals(Vector3 a, Vector3 b, Vector3 c)
+        {
+            A = new PointDirection3( a, default(Vector3));
+            B = new PointDirection3(b, default(Vector3) );
+            C = new PointDirection3(c, default(Vector3) );
+        }
 
         public static implicit operator TriangleWithNormals(Triangle tri)
         {
