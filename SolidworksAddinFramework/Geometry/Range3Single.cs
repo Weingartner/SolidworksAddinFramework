@@ -112,8 +112,8 @@ namespace SolidworksAddinFramework.Geometry
         {
             var modeler = SwAddinBase.Active.Modeler;
             var math = SwAddinBase.Active.Math;
-            var center = new double[] {XMid, YMid, ZMin};
-            var box = modeler.CreateBox(center, math.ZAxisArray(), this.Dx, this.Dy, this.Dz);
+            var center = new Vector3(XMid, YMid, ZMin);
+            var box = modeler.CreateBox(center, Vector3.UnitZ, this.Dx, this.Dy, this.Dz);
             Debug.Assert(box!=null);
             return box;
         }
@@ -129,29 +129,29 @@ namespace SolidworksAddinFramework.Geometry
         }
 
 
-        public List<Edge> Edges()
+        public List<Edge3> Edges()
         {
-            var list = new List<Edge>(12);
+            var list = new List<Edge3>(12);
 
             Func<int,int,int, Vector3> _ = GetAt;
 
             // Bottom square
-            list.Add(new Edge( _(0,0,0), _(1,0,0) ));
-            list.Add(new Edge( _(1,0,0), _(1,0,1) ));
-            list.Add(new Edge(_(1,0,1), _(0,0,1) ));
-            list.Add(new Edge(_(0,0,1), _(0,0,0) ));
+            list.Add(new Edge3( _(0,0,0), _(1,0,0) ));
+            list.Add(new Edge3( _(1,0,0), _(1,0,1) ));
+            list.Add(new Edge3(_(1,0,1), _(0,0,1) ));
+            list.Add(new Edge3(_(0,0,1), _(0,0,0) ));
 
             // Top square
-            list.Add(new Edge(_(0,1,0), _(1,1,0) ));
-            list.Add(new Edge(_(1,1,0), _(1,1,1) ));
-            list.Add(new Edge(_(1,1,1), _(0,1,1) ));
-            list.Add(new Edge(_(0,1,1), _(0,1,0) ));
+            list.Add(new Edge3(_(0,1,0), _(1,1,0) ));
+            list.Add(new Edge3(_(1,1,0), _(1,1,1) ));
+            list.Add(new Edge3(_(1,1,1), _(0,1,1) ));
+            list.Add(new Edge3(_(0,1,1), _(0,1,0) ));
 
             // Connecting top and bottom lines
-            list.Add(new Edge(_(0,0,0), _(0,1,0) ));
-            list.Add(new Edge(_(1,0,0), _(1,1,0) ));
-            list.Add(new Edge(_(1,0,1), _(1,1,1) ));
-            list.Add(new Edge(_(0,0,1), _(0,1,1) ));
+            list.Add(new Edge3(_(0,0,0), _(0,1,0) ));
+            list.Add(new Edge3(_(1,0,0), _(1,1,0) ));
+            list.Add(new Edge3(_(1,0,1), _(1,1,1) ));
+            list.Add(new Edge3(_(0,0,1), _(0,1,1) ));
 
             return list;
 

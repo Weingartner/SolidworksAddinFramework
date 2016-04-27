@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
@@ -37,6 +38,10 @@ namespace SolidworksAddinFramework
         {
             var v = a.SubtractTs(b);
             return v.GetLength() < tol;
+        }
+        public static bool Equals(this Vector3 a, Vector3 b, double tol)
+        {
+            return (a - b).LengthSquared() < tol*tol;
         }
 
         public static MathPoint AddTs(this IMathPoint a, IMathVector b)

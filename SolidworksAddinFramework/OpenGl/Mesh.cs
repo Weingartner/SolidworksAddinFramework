@@ -8,14 +8,13 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using Edge = SolidworksAddinFramework.Geometry.Edge;
 
 namespace SolidworksAddinFramework.OpenGl
 {
     public class Mesh : IRenderable
     {
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
-        private readonly IReadOnlyList<Edge> _OriginalEdgeVertices;
+        private IReadOnlyList<Edge3> _OriginalEdgeVertices;
         private readonly Color _Color;
 
 
@@ -31,28 +30,28 @@ namespace SolidworksAddinFramework.OpenGl
             var tris = Tesselate(faceList, tess)
                 .Buffer(3,3)
                 .Select(b=>new TriangleWithNormals(b[0],b[1],b[2])).ToList();
-            Edges = new List<Edge>();
+            Edges = new List<Edge3>();
             TrianglesWithNormals = tris.ToList();
             _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
             _Color = color;
         }
 
-        public Mesh(Color color, IEnumerable<Triangle> enumerable,IReadOnlyList<Edge> edges = null)
+        public Mesh(Color color, IEnumerable<Triangle> enumerable,IReadOnlyList<Edge3> edges = null)
         {
             TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
             Edges = edges;
             _Color = color;
         }
-        public Mesh(Color color, IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge> edges = null)
+        public Mesh(Color color,IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge3> edges = null)
         {
             TrianglesWithNormals = enumerable.ToList();
-            Edges = edges ?? new List<Edge>();
+            Edges = edges ?? new List<Edge3>();
             _Color = color;
         }
 
 
-        public IReadOnlyList<Edge> Edges { get; private set; }
+        public IReadOnlyList<Edge3> Edges { get; private set; }
 
         public IReadOnlyList<TriangleWithNormals> TrianglesWithNormals { get; set; }
 
@@ -67,9 +66,9 @@ namespace SolidworksAddinFramework.OpenGl
             MeshRender.Render(this, _Color);
         }
 
-        public static List<Point3Normal3> Tesselate(IFace2[] faceList, ITessellation tess)
+        public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
         {
-            var r = new List<Point3Normal3>();
+            var r = new List<PointDirection3>();
             // performance improvement
             // ReSharper disable once ForCanBeConvertedToForeach
             for (int index = 0; index < faceList.Length; index++)
@@ -93,9 +92,9 @@ namespace SolidworksAddinFramework.OpenGl
                         .ToList();
 
                     // Unroll loop for performance
-                    r.Add(new Point3Normal3(vertexs[0].ToVector3D(), normals[0].ToVector3D()));
-                    r.Add(new Point3Normal3(vertexs[1].ToVector3D(), normals[1].ToVector3D()));
-                    r.Add(new Point3Normal3(vertexs[2].ToVector3D(), normals[2].ToVector3D()));
+                    r.Add(new PointDirection3(vertexs[0].ToVector3D(), normals[0].ToVector3D()));
+                    r.Add(new PointDirection3(vertexs[1].ToVector3D(), normals[1].ToVector3D()));
+                    r.Add(new PointDirection3(vertexs[2].ToVector3D(), normals[2].ToVector3D()));
                 }
             }
 

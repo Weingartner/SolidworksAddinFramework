@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -66,6 +67,14 @@ namespace SolidworksAddinFramework
         {
             var r = (double[]) surface.GetClosestPointOn(x, y, z);
             return new PointUv(r[0], r[1], r[2], r[3], r[4]);
+        }
+
+        public static Vector3 GetClosestPointOnTs(IFace2 f, Vector3 curvePoint)
+        {
+            var pt = f.GetClosestPointOn(curvePoint.X, curvePoint.Y, curvePoint.Z)
+                .CastArray<double>()
+                .ToVector3();
+            return pt;
         }
     }
 

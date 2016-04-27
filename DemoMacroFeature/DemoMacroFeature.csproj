@@ -225,7 +225,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>powershell -command $(SolutionDir)strongnamer.ps1  $(TargetDir) $(TargetFileName)</PostBuildEvent>
+    <PostBuildEvent>powershell $(ProjectDir)..\regaddin.ps1 "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

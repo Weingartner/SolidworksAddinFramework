@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using FluentAssertions;
@@ -22,8 +23,8 @@ namespace SolidworksAddinFramework.Spec
         {
             get
             {
-                yield return new object[] {new[] {0,0,0.0}, new[] {1,0,0.0}, 1e-3, 1001};
-                yield return new object[] {new[] {0,0,0.0}, new[] {1,1,1.0}, 1e-3, 1734};
+                yield return new object[] { Vector3.Zero, Vector3.UnitX, 1e-3, 1001};
+                yield return new object[] {Vector3.Zero, new Vector3(1,1,1), 1e-3, 1734};
             }
         }
 
@@ -52,7 +53,7 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [SolidworksTheory, MemberData(nameof(TestData))]
-        public void InterpolatePointsShouldWork(double[]p0,double[]p1,double stepSize, int expectedPointCount)
+        public void InterpolatePointsShouldWork(Vector3 p0,Vector3 p1,double stepSize, int expectedPointCount)
         {
             var points = new[] {p0, p1};
 
@@ -63,7 +64,8 @@ namespace SolidworksAddinFramework.Spec
                 .Where(p => p.Count == 2)
                 .ForEach(p =>
                 {
-                    MathUtility.Vector(p[0].ToArray(), p[1].ToArray()).GetLength().Should().BeApproximately(stepSize,1e-5);
+                    (p[1] - p[0]).Length().DirectCast<double>()
+                    .Should().BeApproximately(stepSize, 1e-5);
                 });
         }
     }

@@ -172,6 +172,7 @@
     <Compile Include="CurveExtension.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
+    <Compile Include="EdgeDistance.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
     <Compile Include="EventHandlers\OpenGlRenderer.cs" />
     <Compile Include="EventHandlers\OpenGL.cs" />
@@ -179,7 +180,7 @@
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="Geometry\Range3Single.cs" />
-    <Compile Include="Geometry\Point3Normal3.cs" />
+    <Compile Include="Geometry\PointDirection3.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
@@ -274,12 +275,14 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets'))" />
     <Error Condition="!Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)packages\MSBuild.Extension.Pack.1.8.0\build\net40\MSBuild.Extension.Pack.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\MSBuild.Extension.Pack.1.8.0\build\net40\MSBuild.Extension.Pack.targets'))" />
   </Target>
   <Import Project="$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('$(SolutionDir)packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)packages\MSBuild.Extension.Pack.1.8.0\build\net40\MSBuild.Extension.Pack.targets" Condition="Exists('$(SolutionDir)packages\MSBuild.Extension.Pack.1.8.0\build\net40\MSBuild.Extension.Pack.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

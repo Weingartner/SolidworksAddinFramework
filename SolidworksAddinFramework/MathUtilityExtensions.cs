@@ -166,19 +166,18 @@ namespace SolidworksAddinFramework
         }
 
 
-        public static List<double[]> InterpolatePoints(this IMathUtility m, IEnumerable<double[]> pointsEnum, double stepSize)
+        public static List<Vector3> InterpolatePoints(this IMathUtility m, IEnumerable<Vector3> pointsEnum, double stepSize)
         {
-            var point2Ds = pointsEnum as IList<double[]> ?? pointsEnum.ToList();
+            var point2Ds = pointsEnum as IList<Vector3> ?? pointsEnum.ToList();
 
             var interpolatedPoints =  point2Ds
                 .Buffer(2,1)
                 .Where(p=>p.Count==2)
                 .SelectMany(p =>
                 {
-                    var n = (int)Math.Ceiling(m.Vector(p[0],p[1]).GetLength() / stepSize);
+                    var n = (int)Math.Ceiling(p.Count / stepSize);
                     n = Math.Max(2, n);
-                    return Sequences.LinSpace(p[0].ToList(), p[1].ToList(), n, false)
-                        .Select(l=>l.ToArray())
+                    return Sequences.LinSpace(p[0], p[1], n, false)
                         .ToList();
                 })
                 .ToList();

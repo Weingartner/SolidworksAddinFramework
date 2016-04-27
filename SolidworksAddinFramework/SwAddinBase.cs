@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Win32;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
@@ -50,6 +51,12 @@ namespace SolidworksAddinFramework
                 {
                     throw new NullReferenceException($"Type {t.FullName} doesn't have {nameof(SwAddinAttribute)}.");
                 }
+        /*
+                var publicKey = t.Assembly.GetName().GetPublicKeyToken();
+                if (publicKey.Length == 0)
+                    throw new Exception(
+                        "I think you forgot to strongly name your addin. Please See https://github.com/Weingartner/SolidworksAddinFramework#strong-naming-and-plugin-robustness-in-the-face-of-confliciting-dlls");
+                        */
                 var hklm = Registry.LocalMachine;
                 var hkcu = Registry.CurrentUser;
 
@@ -65,6 +72,8 @@ namespace SolidworksAddinFramework
             catch (Exception e)
             {
                 Console.WriteLine($"There was a problem registering this dll: {e}");
+                //MessageBox.Show("There was a problem registering the function: \n\"" + e.Message + "\"");
+                throw;
             }
         }
 
@@ -97,7 +106,6 @@ namespace SolidworksAddinFramework
 
             Active = this;
 
-            //Setup callbacks (i.e. when adding commands the callback name points to a method on this type)
             SwApp.SetAddinCallbackInfo2(0, this, cookie);
 
             CommandManager = SwApp.GetCommandManager(cookie);

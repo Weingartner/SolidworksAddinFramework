@@ -5,6 +5,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
+using SolidworksAddinFramework.Geometry;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 
@@ -19,41 +21,38 @@ namespace SolidworksAddinFramework
         /// <param name="p0"></param>
         /// <param name="p1"></param>
         /// <returns></returns>
-        public static ICurve CreateTrimmedLine(this IModeler modeler, double[] p0, double[] p1)
+        public static ICurve CreateTrimmedLine(this IModeler modeler, Edge3 edge)
         {
-            Debug.Assert(p0.Length==p1.Length);
-            var p0v = new DenseVector(p0);
-            var p1v = new DenseVector(p1);
-
-            Debug.Assert(!p0v.Equals(p1v));
-
-            var dir = (p1v - p0v).Normalize(2);
-            var line = (ICurve)modeler.CreateLine(p0, new[] {dir[0], dir[1], dir[2] });
+            Debug.Assert(edge.Delta.Length() > float.Epsilon);
+            var dir = edge.Delta.Unit();
+            var line = (ICurve)modeler.CreateLine(edge.A.ToDoubles(), dir.ToDoubles());
             Debug.Assert(line != null, "line != null");
-            if(p1.Length==3)
-            {
-                line = line.CreateTrimmedCurve2(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2]);
-            }else
-            if (p1.Length==2)
-            {
-                line = line.CreateTrimmedCurve2(p0[0], p0[1], 0, p1[0], p1[1], 0);
-            }else
-                throw new Exception("End points must have 2 or 3 elements");
-
+            line = line.CreateTrimmedCurve2(edge.A.X, edge.A.Y, edge.A.Z, edge.B.X, edge.B.Y, edge.B.Z);
             Debug.Assert(line != null, "line != null");
             return line;
+            
+        }
+        public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3  p1)
+        {
+            return CreateTrimmedLine(modeler, new Edge3(p0, p1));
+
         }
 
-        public static IBody2 CreateBodyFromCylTs(this IModeler modeler, double[] xyz, double[]axis, double radius, double length)
+        public static IBody2 CreateBodyFromCylTs(this IModeler modeler, Vector3  xyz, Vector3 axis, double radius, double length)
         {
-            var array = xyz.Concat(axis).Concat(new[] {radius, length}).ToArray();
+            var array = xyz
+                .ToDoubles()
+                .Concat(axis.ToDoubles())
+                .Concat(new[] {radius, length})
+                .ToArray();
+
             return (IBody2)modeler.CreateBodyFromCyl(array);
         }
 
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
         {
-            return CreateTrimmedLine(modeler, (double[])p0.ArrayData, (double[])p1.ArrayData);
+            return CreateTrimmedLine(modeler, (Vector3 )p0.ArrayData, (Vector3 )p1.ArrayData);
         }
 
 
@@ -79,7 +78,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="modeler"></param>
         /// <param name="center">Center of the surface</param>
-        /// <param name="vNormal">Normal of the surface</param>
+        /// <param name="vNormal">Direction of the surface</param>
         /// <param name="p0">Point to project onto surface to find UV bounds</param>
         /// <param name="p1">Point to project onto surface to find UV bounds</param>
         /// <returns></returns>
@@ -93,12 +92,12 @@ namespace SolidworksAddinFramework
 
         public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf, IMathPoint p0, IMathPoint p1)
         {
-            var uvLow = surf.GetClosestPointOnTs((double[])p0.ArrayData);
-            var uvHigh = surf.GetClosestPointOnTs((double[])p1.ArrayData);
+            var uvLow = surf.GetClosestPointOnTs((Vector3 )p0.ArrayData);
+            var uvHigh = surf.GetClosestPointOnTs((Vector3 )p1.ArrayData);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
 
-        public static Curve InterpolatePointsToCurve(this IModeler modeler, double chordTolerance, List<double[]> points, bool simplify = true, bool closedCurve = false)
+        public static Curve InterpolatePointsToCurve(this IModeler modeler, double chordTolerance, List<Vector3> points, bool simplify = true, bool closedCurve = false)
         {
             points = FilterOutShortLines(points, 1e-5).ToList();
 
@@ -120,14 +119,14 @@ namespace SolidworksAddinFramework
             return curve;
         }
 
-        public static IEnumerable<double[]> FilterOutShortLines(List<double[]> points, double tol)
+        public static IEnumerable<Vector3 > FilterOutShortLines(List<Vector3 > points, double tol)
         {
-            double[] previous = null;
-            Func<double[], double[], double> distance = (p0,p1)=>(new DenseVector(p0)-new DenseVector(p1)).L2Norm();
-            var result = new List<double[]>();
+            Vector3?  previous = null;
+            Func<Vector3 , Vector3 , double> distance = (p0,p1)=>(p0-p1).Length();
+            var result = new List<Vector3 >();
             foreach (var pt in points)
             {
-                if (previous == null || distance(pt, previous) > tol)
+                if (previous == null || distance(pt, previous.Value) > tol)
                 {
                     result.Add(pt);
                     previous = pt;
@@ -138,11 +137,11 @@ namespace SolidworksAddinFramework
 
             result.Reverse();
             points = result;
-            result = new List<double[]>();
+            result = new List<Vector3 >();
             previous = null;
             foreach (var pt in points)
             {
-                if (previous == null || distance(pt, previous) > tol)
+                if (previous == null || distance(pt, previous.Value) > tol)
                 {
                     result.Add(pt);
                     previous = pt;
@@ -172,8 +171,8 @@ namespace SolidworksAddinFramework
 
         public static IBody2 CreateSphereBody(this IModeler modeler, double []center, double radius)
         {
-            var axis = new double[] {0, 0, 1};
-            var refaxis = new double[] {0, 1, 0};
+            var axis = Vector3.UnitZ;
+            var refaxis = Vector3.UnitY;
             var sphere = (ISurface)modeler.CreateSphericalSurface2(center, axis, refaxis, radius);
 
             var swSurfPara = sphere.Parameterization2();
@@ -193,16 +192,16 @@ namespace SolidworksAddinFramework
 
         public static IBody2 CreateBox
             (this IModeler modeler
-            , double [] center 
-            , double [] axis
+            , Vector3 center 
+            , Vector3 axis
             , double width
             , double length
             , double height
             )
         {
             var array = new List<double>();
-            array.AddRange(center);
-            array.AddRange(axis);
+            array.AddRange(center.ToDoubles());
+            array.AddRange(axis.ToDoubles());
             array.Add(width);
             array.Add(length);
             array.Add(height);
@@ -213,8 +212,8 @@ namespace SolidworksAddinFramework
             double width,
             double length,
             double height) => modeler.CreateBox
-                (new double[] {0, 0, 0},
-                    new double[] {0, 0, 1},
+                ( Vector3.Zero,
+                    Vector3.UnitZ,
                     width,
                     length,
                     height);

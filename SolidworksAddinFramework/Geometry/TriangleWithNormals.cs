@@ -6,11 +6,11 @@ namespace SolidworksAddinFramework.Geometry
 {
     public struct TriangleWithNormals
     {
-        public Point3Normal3 A;
-        public Point3Normal3 B;
-        public Point3Normal3 C;
+        public PointDirection3 A;
+        public PointDirection3 B;
+        public PointDirection3 C;
 
-        public TriangleWithNormals(Point3Normal3 a, Point3Normal3 b, Point3Normal3 c)
+        public TriangleWithNormals(PointDirection3 a, PointDirection3 b, PointDirection3 c)
         {
             A = a;
             B = b;

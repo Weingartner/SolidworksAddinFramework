@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace Weingartner.Numerics
 {
@@ -15,6 +16,11 @@ namespace Weingartner.Numerics
         {
             return exponents.Select(v => Math.Pow(baseValue, v));
         }
+
+        public static IEnumerable<Vector3> LinSpace(Vector3 start, Vector3 stop, int num, bool endpoint = true)
+        {
+            return LinSpace(0, 1, num, endpoint).Select(i => Vector3.Lerp(start, stop, (float) i));
+        } 
 
         public static List<List<double>> LinSpace(List<double> start, List<double> stop, int num, bool endpoint = true)
         {

@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using SolidworksAddinFramework.OpenGl;
+
+namespace SolidworksAddinFramework.Geometry
+{
+    public struct PointDirection3
+    {
+        public readonly Vector3 Point;
+        public readonly Vector3 Direction;
+
+        /// <summary>
+        /// Apply a tranformation to the poin and a rotation to the Direction. The
+        /// rotation should be consistent with the matrix. 
+        /// </summary>
+        /// <param name="matrix"></param>
+        /// <returns></returns>
+        public PointDirection3 ApplyTransform(Matrix4x4 matrix)
+        {
+            return new PointDirection3
+                ( Vector3.Transform(Point, matrix)
+                    , Vector3.TransformNormal(Direction, matrix));
+        }
+
+        public PointDirection3(Vector3 point, Vector3 direction)
+        {
+            Point = point;
+            Direction = direction;
+        }
+
+        public static implicit operator PointDirection3(Vector3 point)
+        {
+            return new PointDirection3(point, default(Vector3));
+        }
+        public static explicit operator Vector3(PointDirection3 point)
+        {
+            return point.Point;
+        }
+        public void GLVertex3AndNormal3()
+        {
+            if(!Direction.Equals(default(System.Numerics.Vector3)))
+                Direction.GLNormal3();
+            Point.GLVertex3();
+            
+        }
+
+
+    }
+
+    public static class PointDirection3Extensions
+    {
+        public static PointDirection3 ToPointDirection3(this IEnumerable<Vector3> source)
+        {
+            var s = source.ToList();
+            if(s.Count!=2)
+                throw new ArgumentException("should be of length 2", nameof(source));
+            return new PointDirection3(s[0],s[1]);
+        }
+        
+    }
+}
