@@ -65,27 +65,28 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
-
-
-        #region Convet modeldoc / partdoc events to observables
-
-        #endregion
-
         public static void RestoreSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selectionDataList)
         {
+            var selectionMgr = (ISelectionMgr) doc.SelectionManager;
             foreach (var selectionData in selectionDataList)
             {
-                doc.Extension.SelectByID2(
-                    selectionData.ObjectName,
-                    selectionData.TypeName,
-                    selectionData.X,
-                    selectionData.Y,
-                    selectionData.Z,
-                    true,
-                    selectionData.Mark,
-                    null,
-                    (int) swSelectOption_e.swSelectOptionDefault);
+                int error;
+                var obj = doc.Extension.GetObjectByPersistReference3(selectionData.ObjectId, out error);
+                var selectData = selectionMgr.CreateSelectData();
+                selectData.Mark = selectionData.Mark;
+                selectionMgr.AddSelectionListObject(obj, selectData);
             }
+        }
+
+        public static IEnumerable<SelectionData> SerializeSelections(this IModelDoc2 doc)
+        {
+            var selectionMgr = (ISelectionMgr)doc.SelectionManager;
+            return selectionMgr.GetObjectSelections()
+                .Select(selection =>
+                {
+                    var objId = doc.Extension.GetPersistReference3(selection.Object).CastArray<byte>();
+                    return new SelectionData(objId, selection.Mark);
+                });
         }
     }
 }

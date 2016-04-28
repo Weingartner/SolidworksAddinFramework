@@ -6,25 +6,13 @@ namespace SolidworksAddinFramework
     public class SelectionData
     {
         [DataMember]
-        public string ObjectName { get; private set; }
-        [DataMember]
-        public string TypeName { get; private set; }
-        [DataMember]
-        public double X { get; private set; }
-        [DataMember]
-        public double Y { get; private set; }
-        [DataMember]
-        public double Z { get; private set; }
+        public byte[] ObjectId { get; private set; }
         [DataMember]
         public int Mark { get; private set; }
 
-        public SelectionData(string objectName, string typeName, double x, double y, double z, int mark)
+        public SelectionData(byte[] objectId, int mark)
         {
-            ObjectName = objectName;
-            TypeName = typeName;
-            X = x;
-            Y = y;
-            Z = z;
+            ObjectId = objectId;
             Mark = mark;
         }
     }

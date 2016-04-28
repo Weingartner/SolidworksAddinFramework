@@ -8,36 +8,39 @@ using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework
 {
-    public static class SelectionManagerExtensions
+    public class ObjectSelection
     {
-        private class ObjectProperties
+        public ObjectSelection(object @object, swSelectType_e type, int mark, int index)
         {
-            public ObjectProperties(int index, swSelectType_e type, int mark)
-            {
-                Index = index;
-                Type = type;
-                Mark = mark;
-            }
-
-            public int Index { get; }
-            public swSelectType_e Type { get; }
-            public int Mark { get; }
+            Object = @object;
+            Index = index;
+            Type = type;
+            Mark = mark;
         }
 
+        public object Object { get; set; }
+        public int Index { get; }
+        public swSelectType_e Type { get; }
+        public int Mark { get; }
+    }
+
+    public static class SelectionManagerExtensions
+    {
         private const int AnyMark = -1;
         private const int NoMark = 0;
 
         private const int StartIndex = 1;
 
-        private static IEnumerable<ObjectProperties> GetSelectedObjectProperties(ISelectionMgr selMgr)
+        public static IEnumerable<ObjectSelection> GetObjectSelections(this ISelectionMgr selMgr)
         {
-            var count = selMgr.GetSelectedObjectCount();
+            var count = selMgr.GetSelectedObjectCount2(AnyMark);
             return Enumerable.Range(StartIndex, count)
-                .Select(i =>
+                .Select(index =>
                 {
-                    var type = (swSelectType_e)selMgr.GetSelectedObjectType3(i, AnyMark);
-                    var mark = selMgr.GetSelectedObjectMark(i);
-                    return new ObjectProperties(i, type, mark);
+                    var type = (swSelectType_e)selMgr.GetSelectedObjectType3(index, AnyMark);
+                    var mark = selMgr.GetSelectedObjectMark(index);
+                    var obj = selMgr.GetSelectedObject6(index, mark);
+                    return new ObjectSelection(obj, type, mark, index);
                 });
         }
 
@@ -49,12 +52,11 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IReadOnlyList<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
-
             filter = filter ?? ((type,mark)=> true);
 
-            return GetSelectedObjectProperties(selMgr)
+            return selMgr.GetObjectSelections()
                 .Where(o => filter(o.Type, o.Mark))
-                .Select(o => selMgr.GetSelectedObject6(o.Index, AnyMark))
+                .Select(o => o.Object)
                 .ToList();
         }
 
@@ -68,30 +70,6 @@ namespace SolidworksAddinFramework
         {
             selMgr.SuspendSelectionList();
             return Disposable.Create(selMgr.ResumeSelectionList);
-        }
-
-        public static IEnumerable<SelectionData> SerializeSelections(this ISelectionMgr selectionMgr)
-        {
-            return Enumerable
-                .Range(1, selectionMgr.GetSelectedObjectCount2(-1))
-                .Select(i =>
-                {
-                    string selectByString;
-                    string objectType;
-                    int type;
-                    double x;
-                    double y;
-                    double z;
-                    var result = selectionMgr.GetSelectionSpecification(
-                        i,
-                        out selectByString,
-                        out objectType,
-                        out type,
-                        out x,
-                        out y, out z);
-                    var mark = selectionMgr.GetSelectedObjectMark(i);
-                    return new SelectionData(selectByString, objectType, x, y, z, mark);
-                });
         }
     }
 }
