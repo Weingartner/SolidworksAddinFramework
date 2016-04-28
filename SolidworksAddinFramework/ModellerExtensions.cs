@@ -169,11 +169,11 @@ namespace SolidworksAddinFramework
             return (IBody2) modeler.CreateSheetFromSurface(surface, uvrange);
         }
 
-        public static IBody2 CreateSphereBody(this IModeler modeler, double []center, double radius)
+        public static IBody2 CreateSphereBody(this IModeler modeler, Vector3 center, double radius)
         {
             var axis = Vector3.UnitZ;
             var refaxis = Vector3.UnitY;
-            var sphere = (ISurface)modeler.CreateSphericalSurface2(center, axis, refaxis, radius);
+            var sphere = (ISurface)modeler.CreateSphericalSurface2(center.ToDoubles(), axis.ToDoubles(), refaxis.ToDoubles(), radius);
 
             var swSurfPara = sphere.Parameterization2();
 
