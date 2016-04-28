@@ -74,9 +74,9 @@ namespace SolidworksAddinFramework.OpenGl
         public static bool Equals(this Vector3 a, Vector3 other, double tol) => 
             (a - other).LengthSquared() < tol*tol;
 
-        public static Vector3 XComponent(this Vector3 v)=> new Vector3(v.X);
-        public static Vector3 YComponent(this Vector3 v)=> new Vector3(v.Y);
-        public static Vector3 ZComponent(this Vector3 v)=> new Vector3(v.Z);
+        public static Vector3 XComponent(this Vector3 v)=> new Vector3(v.X,0,0);
+        public static Vector3 YComponent(this Vector3 v)=> new Vector3(0,v.Y,0);
+        public static Vector3 ZComponent(this Vector3 v)=> new Vector3(0,0,v.Z);
 
         public static MathPoint ToSwMathPoint(this Vector3 v, IMathUtility m) => m.Point(new double[] {v.X, v.Y, v.Z});
         public static MathVector ToSWVector(this Vector3 v, IMathUtility m) => m.Vector(new double[] {v.X, v.Y, v.Z});
