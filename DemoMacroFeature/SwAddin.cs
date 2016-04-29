@@ -122,9 +122,7 @@ namespace DemoMacroFeatures
 
         public void CreateManipulatorSample()
         {
-            var sldWorks = SwApp;
-            var page = ManipulatorSamplePropertyManagerPage.Create(sldWorks);
-            page.Show();
+            ManipulatorSamplePropertyManagerPage.Create(SwApp).Show();
         }
 
         // ReSharper restore MemberCanBePrivate.Global
