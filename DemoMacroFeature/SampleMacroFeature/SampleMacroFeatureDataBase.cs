@@ -1,7 +1,6 @@
 using System.Runtime.Serialization;
 using ReactiveUI;
 using SolidworksAddinFramework;
-using SolidWorks.Interop.sldworks;
 
 namespace DemoMacroFeatures.SampleMacroFeature
 {
@@ -25,6 +24,5 @@ namespace DemoMacroFeatures.SampleMacroFeature
             get { return _Body; }
             set { this.RaiseAndSetIfChanged(ref _Body, value); }
         }
-
     }
 }
