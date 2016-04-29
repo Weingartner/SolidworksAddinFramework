@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
-using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -52,7 +49,7 @@ namespace SolidworksAddinFramework
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
         {
-            return CreateTrimmedLine(modeler, (Vector3 )p0.ArrayData, (Vector3 )p1.ArrayData);
+            return CreateTrimmedLine(modeler, p0.ArrayData.CastArray<double>().ToVector3(), p1.ArrayData.CastArray<double>().ToVector3());
         }
 
 
@@ -84,7 +81,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IBody2 CreateSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, Vector3 p0, Vector3 p1)
         {
-            var surf = (Surface) modeler.CreatePlanarSurface(center, vNormal);
+            var surf = (Surface) modeler.CreatePlanarSurface(center.ToDoubles(), vNormal.ToDoubles());
             var uvLow = surf.GetClosestPointOnTs(p0);
             var uvHigh = surf.GetClosestPointOnTs(p1);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
@@ -92,8 +89,8 @@ namespace SolidworksAddinFramework
 
         public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf, IMathPoint p0, IMathPoint p1)
         {
-            var uvLow = surf.GetClosestPointOnTs((Vector3 )p0.ArrayData);
-            var uvHigh = surf.GetClosestPointOnTs((Vector3 )p1.ArrayData);
+            var uvLow = surf.GetClosestPointOnTs(p0.ArrayData.CastArray<double>().ToVector3());
+            var uvHigh = surf.GetClosestPointOnTs(p1.ArrayData.CastArray<double>().ToVector3());
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
 

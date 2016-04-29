@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
-using ReactiveUI;
 using SolidworksAddinFramework.Events;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -65,28 +62,40 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
-        public static void RestoreSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selectionDataList)
+        public static IDisposable PushSelections(this IModelDoc2 doc, object model)
         {
+            var selectionManager = (ISelectionMgr)doc.SelectionManager;
+            var revert = selectionManager.DeselectAllUndoable();
+
+            var selections = SelectionDataExtensions.GetSelectionsFromModel(model);
+
             var selectionMgr = (ISelectionMgr) doc.SelectionManager;
-            foreach (var selectionData in selectionDataList)
+            foreach (var selectionData in selections)
             {
-                int error;
-                var obj = doc.Extension.GetObjectByPersistReference3(selectionData.ObjectId, out error);
-                var selectData = selectionMgr.CreateSelectData();
-                selectData.Mark = selectionData.Mark;
-                selectionMgr.AddSelectionListObject(obj, selectData);
+                foreach (var obj in selectionData.GetObjects(doc))
+                {
+                    var selectData = selectionMgr.CreateSelectData();
+                    selectData.Mark = selectionData.Mark;
+                    // TODO use `AddSelectionListObjects` if possible
+                    selectionMgr.AddSelectionListObject(obj, selectData);
+                }
             }
+
+            return revert;
         }
 
-        public static IEnumerable<SelectionData> SerializeSelections(this IModelDoc2 doc)
+        public static IEnumerable<object> GetSelectedObjectsFromModel(this IModelDoc2 doc, object model)
         {
-            var selectionMgr = (ISelectionMgr)doc.SelectionManager;
-            return selectionMgr.GetObjectSelections()
-                .Select(selection =>
-                {
-                    var objId = doc.Extension.GetPersistReference3(selection.Object).CastArray<byte>();
-                    return new SelectionData(objId, selection.Mark);
-                });
+            return SelectionDataExtensions.GetSelectionsFromModel(model)
+                .SelectMany(data => data.GetObjects(doc));
+        }
+
+        public static Tuple<object[], int[]> GetMacroFeatureDataSelectionInfo(this IModelDoc2 doc, object model)
+        {
+            var selections = SelectionDataExtensions.GetSelectionsFromModel(model).ToList();
+            var selectedObjects = selections.SelectMany(s => s.GetObjects(doc)).ToArray();
+            var marks = selections.SelectMany(s => Enumerable.Repeat(s.Mark, s.ObjectIds.Count)).ToArray();
+            return Tuple.Create(selectedObjects, marks);
         }
     }
 }

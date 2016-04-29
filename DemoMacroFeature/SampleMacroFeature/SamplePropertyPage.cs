@@ -31,11 +31,9 @@ namespace DemoMacroFeatures.SampleMacroFeature
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
         };
 
-        public SamplePropertyPage(SampleMacroFeature macroFeature) : base("Sample PMP", Options, macroFeature)
+        public SamplePropertyPage(SampleMacroFeature macroFeature)
+            : base("Sample PMP", Options, macroFeature)
         {
-            var body = MacroFeature.SelectionMgr.GetSelectedObject(1) as IBody2;
-            if (body==null)
-                MacroFeature.ModelDoc.ClearSelection2(true);
         }
 
         #region PMPHandlerBase
@@ -46,6 +44,8 @@ namespace DemoMacroFeatures.SampleMacroFeature
         //in which they are added to the object.
         protected override  IEnumerable<IDisposable> AddControlsImpl()
         {
+            ModelDoc.PushSelections(MacroFeature.Database);
+
             //Add the groups
 
             _PageGroup = Page.CreateGroup(Group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
@@ -59,17 +59,17 @@ namespace DemoMacroFeatures.SampleMacroFeature
             });
 
             yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
-            yield return CreateSelectionBox(_PageGroup, "Sample Selection", "Displays features selected in main view",
-                selectionBox =>
+            yield return CreateSelectionBox(
+                _PageGroup,
+                "Sample Selection",
+                "Displays features selected in main view",
+                swSelectType_e.swSelSOLIDBODIES,
+                MacroFeature.Database,
+                p => p.Body,
+                config =>
                 {
-                    if (selectionBox != null)
-                    {
-                        int[] filter = { (int)swSelectType_e.swSelSOLIDBODIES};
-                        selectionBox.Height = 40;
-                        selectionBox.SetSelectionFilters(filter);
-                        selectionBox.SingleEntityOnly = true;
-                    }
-
+                    config.Height = 40;
+                    config.SingleEntityOnly = true;
                 });
 
 

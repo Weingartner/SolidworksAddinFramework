@@ -60,12 +60,6 @@ namespace SolidworksAddinFramework
                 .ToList();
         }
 
-        public static void DeselectAll(this ISelectionMgr selMgr)
-        {
-            Enumerable.Repeat(Unit.Default, selMgr.GetSelectedObjectCount())
-                .ForEach(o => selMgr.DeSelect2(StartIndex, AnyMark));
-        }
-
         public static IDisposable DeselectAllUndoable(this ISelectionMgr selMgr)
         {
             selMgr.SuspendSelectionList();

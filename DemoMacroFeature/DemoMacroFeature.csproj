@@ -194,6 +194,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ManipulatorSample\ManipulatorSampleModel.cs" />
     <Compile Include="ManipulatorSample\ManipulatorSamplePropertyManagerPage.cs" />
     <Compile Include="SampleMacroFeature\SampleMacroFeature.cs" />
     <Compile Include="SampleMacroFeature\SampleMacroFeatureDataBase.cs" />

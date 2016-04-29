@@ -17,7 +17,7 @@ namespace SolidworksAddinFramework
 {
 
     public abstract class MacroFeaturePropertyManagerPageBase<TMacroFeature, TData> : PropertyManagerPageBase
-        where TData : MacroFeatureDataBase, new()
+        where TData : ReactiveObject, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
         protected MacroFeaturePropertyManagerPageBase( string name, IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
@@ -515,20 +515,47 @@ namespace SolidworksAddinFramework
         }
 
 
-        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption,
+        protected IDisposable CreateSelectionBox<TModel>(
+            IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            swSelectType_e selectType,
+            TModel model,
+            Expression<Func<TModel, SelectionData>> propertyExpr,
             Action<IPropertyManagerPageSelectionbox> config)
         {
-            return CreateSelectionBox(@group, tip, caption, config, () => { });
+            return CreateSelectionBox(@group, tip, caption, selectType, model, propertyExpr, config, () => { });
         }
 
-        protected IDisposable CreateSelectionBox(IPropertyManagerPageGroup @group, string tip, string caption, Action<IPropertyManagerPageSelectionbox> config,
+        protected IDisposable CreateSelectionBox<TModel>(
+            IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            swSelectType_e selectType,
+            TModel model,
+            Expression<Func<TModel, SelectionData>> propertyExpr,
+            Action<IPropertyManagerPageSelectionbox> config,
             Action onFocus)
         {
             var id = NextId();
-            var box = PropertyManagerGroupExtensions.CreateSelectionBox(@group, id, caption, tip);
+            var box = @group.CreateSelectionBox(id, caption, tip);
             config(box);
+            box.SetSelectionFilters(new[] { selectType });
             var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
-            return WrapControlAndDisposable(box, d0);
+            var d1 = SelectionChangedObservable(id).Subscribe(_ => SetSelection(box, selectType, model, propertyExpr));
+            return WrapControlAndDisposable(box, d0, d1);
+        }
+
+        private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
+        {
+            var selectionManager = (ISelectionMgr)ModelDoc.SelectionManager;
+
+            var selectedItems = selectionManager
+                .GetSelectedObjects((type, mark) => type == selectType && box.Mark == mark);
+            var expressionChain = ReactiveUI.Reflection.Rewrite(propertyExpr.Body).GetExpressionChain().ToList();
+            var newSelection = new SelectionData(Enumerable.Empty<byte[]>(), box.Mark)
+                .SetObjects(selectedItems, ModelDoc);
+            ReactiveUI.Reflection.TrySetValueToPropertyChain(model, expressionChain, newSelection);
         }
 
         protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick)

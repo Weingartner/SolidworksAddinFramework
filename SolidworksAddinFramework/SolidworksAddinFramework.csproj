@@ -87,6 +87,10 @@
       <HintPath>$(SolutionDir)packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -185,7 +189,6 @@
     <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
     <Compile Include="MacroFeatureBase.cs" />
-    <Compile Include="MacroFeatureDataBase.cs" />
     <Compile Include="MacroFeatureDataExtensions.cs" />
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
     <Compile Include="ManipulatorHandler.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionData.cs" />
+    <Compile Include="SelectionException.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />

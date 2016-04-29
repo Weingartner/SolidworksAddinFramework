@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
@@ -13,34 +11,28 @@ namespace DemoMacroFeatures.SampleMacroFeature
     [ComDefaultInterface(typeof(ISwComFeature))]
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-        public override SampleMacroFeatureDataBase Database { get; set; }
-        public override string FeatureName { get; } = "Sample Feature";
-        public override swMacroFeatureOptions_e FeatureOptions { get; } = 0;
-        public override List<IBody2> EditBodies => SelectedBodies();
+        public override string FeatureName { get; } = "Alpha Split";
+        protected override swMacroFeatureOptions_e FeatureOptions { get; } = swMacroFeatureOptions_e.swMacroFeatureByDefault;
 
         protected override PropertyManagerPageBase GetPropertyManagerPage() => new SamplePropertyPage(this);
 
-        private List<IBody2> SelectedBodies()
-        {
-            return SelectionMgr.GetSelectedObjects((type, mark) => type == swSelectType_e.swSelSOLIDBODIES)
-                .Select(v => (IBody2) v)
-                .ToList();
-        }
-
         protected override object Regenerate(IModeler modeler)
         {
-            if (SwFeatureData.EditBody == null)
+            var body = (IBody2)Database.Body.GetSingleObject(ModelDoc);
+            if (body == null)
                 return null;
-            // Get the body to edit
-            var body = (IBody2) SwFeatureData.EditBody.Copy();
+
+            body = (IBody2)body.Copy();
             SwFeatureData.EnableMultiBodyConsume = true;
             var splitBodies = SplitBodies(modeler, body, Database);
-            if(splitBodies!=null)
-            foreach (var body1 in splitBodies)
+            if (splitBodies == null) return "There was some error";
+
+            foreach (var splitBody in splitBodies)
             {
-                SwFeatureData.AddIdsToBody(body1);
+                SwFeatureData.AddIdsToBody(splitBody);
             }
-            return (object)splitBodies ?? "There was some error";
+
+            return splitBodies;
         }
 
         public static IBody2[] SplitBodies(IModeler modeler, IBody2 body, SampleMacroFeatureDataBase database)

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using ReactiveUI;
 using SolidworksAddinFramework;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -17,9 +19,10 @@ namespace DemoMacroFeatures.ManipulatorSample
     public class ManipulatorSamplePropertyManagerPage : PropertyManagerPageBase
     {
         private IPropertyManagerPageGroup _PageGroup;
-        private int Group1Id = 1;
 
-        static List<swPropertyManagerPageOptions_e> options = new List<swPropertyManagerPageOptions_e>
+        private readonly ManipulatorSampleModel _Model = new ManipulatorSampleModel();
+
+        private static readonly List<swPropertyManagerPageOptions_e> Options = new List<swPropertyManagerPageOptions_e>
         {
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton,
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_CancelButton
@@ -27,36 +30,43 @@ namespace DemoMacroFeatures.ManipulatorSample
 
 
         public ManipulatorSamplePropertyManagerPage(ISldWorks swApp, IModelDoc2 modelDoc) 
-            : base("Maniuplator Sample", options, swApp, modelDoc)
+            : base("Manipulator Sample", Options, swApp, modelDoc)
         {
         }
 
         protected override IEnumerable<IDisposable> AddControlsImpl()
         {
-            _PageGroup = Page.CreateGroup(Group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            ModelDoc.PushSelections(_Model);
+
+            const int group1Id = 1;
+            _PageGroup = Page.CreateGroup(group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             yield return CreateLabel(_PageGroup, "Select object", "Select object");
 
-            yield return CreateSelectionBox(_PageGroup, "Select object", "Select object", config =>
-            {
-                config.SingleEntityOnly = true;
-                config.SetSelectionFilters(new [] {swSelectType_e.swSelSOLIDBODIES});
-                config.AllowMultipleSelectOfSameEntity = false;
-            });
+            yield return CreateSelectionBox(
+                _PageGroup,
+                "Select object",
+                "Select object",
+                swSelectType_e.swSelSOLIDBODIES,
+                _Model,
+                p => p.Body,
+                config =>
+                {
+                    config.SingleEntityOnly = true;
+                    config.AllowMultipleSelectOfSameEntity = false;
+                });
 
-            yield return SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES)
-                .Finally(()=>Console.WriteLine("Finally"))
+            yield return _Model.WhenAnyValue(p => p.Body)
+                .Where(p => !p.IsEmpty)
+                .Select(p => p.GetSingleObject(ModelDoc).DirectCast<IBody2>())
                 .SubscribeDisposable((body, yield) =>
                 {
                     // The code here execute every time a new selection is made.
                     // 'yield' is an action that you pass disposable to. These disposables
-                    // will get run before the next time this callback is activated. Thus
+                    // will be disposed before the next time this callback is activated. Thus
                     // you can use it to "unselect" or destroy any resources made by
                     // the previous selection.
-
-                    if (body == null)
-                        return;
 
                     // Copy the selected body so we can transform it
                     var newbody = (IBody2) body.Copy();
@@ -119,20 +129,13 @@ namespace DemoMacroFeatures.ManipulatorSample
         public static void SetManipulatorPositionToBodyCenter(ISldWorks sldWorks, TriadManipulatorTs manipulator, IBody2 body, IModelDoc2 model)
         {
             var box = body.GetBodyBoxTs();
-            manipulator.Origin = (MathPoint) ((IMathUtility) sldWorks.GetMathUtility()).CreatePoint(box.Center);
+            manipulator.Origin = (MathPoint) ((IMathUtility) sldWorks.GetMathUtility()).CreatePoint(box.Center.ToDoubles());
             manipulator.UpdatePosition();
         }
 
-        private static ManipulatorSamplePropertyManagerPage _ManipulatorSamplePropertyManagerPage;
         public static ManipulatorSamplePropertyManagerPage Create(ISldWorks sldWorks)
         {
-            _ManipulatorSamplePropertyManagerPage = new ManipulatorSamplePropertyManagerPage(sldWorks, (IModelDoc2) sldWorks.ActiveDoc);
-            return _ManipulatorSamplePropertyManagerPage;
+            return new ManipulatorSamplePropertyManagerPage(sldWorks, (IModelDoc2) sldWorks.ActiveDoc);
         }
-    }
-
-
-    public class ManipulatorSampleDatabase : MacroFeatureDataBase
-    {
     }
 }

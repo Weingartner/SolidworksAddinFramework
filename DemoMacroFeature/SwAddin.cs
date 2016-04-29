@@ -113,19 +113,21 @@ namespace DemoMacroFeatures
         #endregion
 
         #region UI Callbacks
+        // ReSharper disable MemberCanBePrivate.Global
 
-        private void CreateSampleMacroFeature()
+        public void CreateSampleMacroFeature()
         {
             SampleMacroFeature.SampleMacroFeature.AddMacroFeature(SwApp);
         }
 
-        private void CreateManipulatorSample()
+        public void CreateManipulatorSample()
         {
             var sldWorks = SwApp;
             var page = ManipulatorSamplePropertyManagerPage.Create(sldWorks);
             page.Show();
         }
 
+        // ReSharper restore MemberCanBePrivate.Global
         #endregion
 
 

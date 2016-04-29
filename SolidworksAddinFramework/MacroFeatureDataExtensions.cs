@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -70,5 +71,24 @@ namespace SolidworksAddinFramework
                 }
             }
         }
+
+        private const string FeatureDataKey = "Main";
+
+        public static T Read<T>(this IMacroFeatureData macroFeatureData)
+        {
+            string data;
+            macroFeatureData.GetStringByName(FeatureDataKey, out data);
+            var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+            return JsonConvert.DeserializeObject<T>(data, serializerSettings);
+        }
+
+        public static void Write(this IMacroFeatureData macroFeatureData, object data)
+        {
+            macroFeatureData.SetStringByName(FeatureDataKey, JsonConvert.SerializeObject(data));
+        }
+
+        public static string[] GetFeatureDataNames() => new[] { FeatureDataKey };
+        public static int[] GetFeatureDataTypes() => new[] { (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString };
+        public static string[] GetFeatureDataValues(object data) => new[] { JsonConvert.SerializeObject(data) };
     }
 }
