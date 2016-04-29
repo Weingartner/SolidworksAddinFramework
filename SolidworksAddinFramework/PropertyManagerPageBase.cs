@@ -20,8 +20,8 @@ namespace SolidworksAddinFramework
         where TData : ReactiveObject, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
-        protected MacroFeaturePropertyManagerPageBase( string name, IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
-            : base(name, options, macroFeature.SwApp, macroFeature.ModelDoc)
+        protected MacroFeaturePropertyManagerPageBase(IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
+            : base(macroFeature.FeatureName, options, macroFeature.SwApp, macroFeature.ModelDoc)
         {
             MacroFeature = macroFeature;
         }

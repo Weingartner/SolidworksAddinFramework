@@ -32,7 +32,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
         };
 
         public SamplePropertyPage(SampleMacroFeature macroFeature)
-            : base("Sample PMP", Options, macroFeature)
+            : base(Options, macroFeature)
         {
         }
 
