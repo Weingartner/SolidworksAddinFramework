@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework
                 {
                     var type = (swSelectType_e)selMgr.GetSelectedObjectType3(index, AnyMark);
                     var mark = selMgr.GetSelectedObjectMark(index);
-                    var obj = selMgr.GetSelectedObject6(index, mark);
+                    var obj = selMgr.GetSelectedObject6(index, AnyMark);
                     return new ObjectSelection(obj, type, mark, index);
                 });
         }
