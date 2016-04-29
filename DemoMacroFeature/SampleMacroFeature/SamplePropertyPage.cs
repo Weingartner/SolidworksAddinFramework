@@ -76,12 +76,12 @@ namespace DemoMacroFeatures.SampleMacroFeature
             // When the alpha value or the selection changes we want to 
             // show a temporary body with the split in it
             yield return MacroFeature.Database.WhenAnyValue(p=>p.Alpha)
-                .CombineLatest(SingleSelectionChangedObservable<IBody2>((type,mark)=>type==swSelectType_e.swSelSOLIDBODIES),
+                .CombineLatest(MacroFeature.Database.WhenAnyValue(p => p.Body),
                     (alpha, selection) => new { alpha, selection }
                 )
                 .Select(o =>
                 {
-                    var body = o.selection;
+                    var body = o.selection.GetSingleObject(ModelDoc).DirectCast<IBody2>();
 
                     var newBody = (IBody2)body?.Copy();
                     if (newBody == null)
