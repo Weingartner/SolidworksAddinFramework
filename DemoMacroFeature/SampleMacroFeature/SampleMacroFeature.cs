@@ -56,13 +56,11 @@ namespace DemoMacroFeatures.SampleMacroFeature
             return null;
         }
 
-        public static bool AddMacroFeature(ISldWorks app) 
-
+        public static void AddMacroFeature(ISldWorks app) 
         {
             var moddoc = (IModelDoc2) app.ActiveDoc;
             var macroFeature = new SampleMacroFeature();
             macroFeature.Edit(app, moddoc, null);
-            return true;
         }
     }
 }
