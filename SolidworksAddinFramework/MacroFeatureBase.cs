@@ -132,7 +132,7 @@ namespace SolidworksAddinFramework
         {
             var t = ModelDoc.GetMacroFeatureDataSelectionInfo(Database);
 
-            SwFeatureData.SetSelections(ComWangling.ObjectArrayToDispatchWrapper(t.Item1), t.Item2);
+            SwFeatureData.SetSelections2(ComWangling.ObjectArrayToDispatchWrapper(t.Item1), t.Item2, t.Item3);
             Debug.Assert(SwFeatureData.GetSelectionCount() == t.Item1.Length);
         }
 

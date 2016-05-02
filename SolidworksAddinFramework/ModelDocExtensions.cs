@@ -90,12 +90,15 @@ namespace SolidworksAddinFramework
                 .SelectMany(data => data.GetObjects(doc));
         }
 
-        public static Tuple<object[], int[]> GetMacroFeatureDataSelectionInfo(this IModelDoc2 doc, object model)
+        public static Tuple<object[], int[], IView[]> GetMacroFeatureDataSelectionInfo(this IModelDoc2 doc, object model)
         {
+            var view = (IView) (doc as IDrawingDoc)?.GetFirstView();
+
             var selections = SelectionDataExtensions.GetSelectionsFromModel(model).ToList();
             var selectedObjects = selections.SelectMany(s => s.GetObjects(doc)).ToArray();
             var marks = selections.SelectMany(s => Enumerable.Repeat(s.Mark, s.ObjectIds.Count)).ToArray();
-            return Tuple.Create(selectedObjects, marks);
+            var views = selections.SelectMany(s => Enumerable.Repeat(view, s.ObjectIds.Count)).ToArray();
+            return Tuple.Create(selectedObjects, marks, views);
         }
     }
 }
