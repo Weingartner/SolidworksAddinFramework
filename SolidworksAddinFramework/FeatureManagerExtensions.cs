@@ -37,7 +37,7 @@ namespace SolidworksAddinFramework
         {
             if (type.GetConstructor(Type.EmptyTypes) == null)
             {
-                return $"Type {type.FullName} doesn't have a public, parameter-less constructor.";
+                return $"Type {type.FullName} doesn't have a public, parameterless constructor.";
             }
             if (parameterNames.Length != parameterTypes.Length || parameterNames.Length != parameterValues.Length)
             {
