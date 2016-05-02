@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -70,16 +71,17 @@ namespace SolidworksAddinFramework
             var selections = SelectionDataExtensions.GetSelectionsFromModel(model);
 
             var selectionMgr = (ISelectionMgr) doc.SelectionManager;
-            foreach (var selectionData in selections)
-            {
-                foreach (var obj in selectionData.GetObjects(doc))
+            selections
+                .GroupBy(p => p.Mark)
+                .Select(p => new { Mark = p.Key, Objects = p.SelectMany(selectionData => selectionData.GetObjects(doc)).ToArray() })
+                .Where(p => p.Objects.Length > 0)
+                .ForEach(o =>
                 {
                     var selectData = selectionMgr.CreateSelectData();
-                    selectData.Mark = selectionData.Mark;
-                    // TODO use `AddSelectionListObjects` if possible
-                    selectionMgr.AddSelectionListObject(obj, selectData);
-                }
-            }
+                    selectData.Mark = o.Mark;
+
+                    var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), true, selectData);
+                });
 
             return revert;
         }
