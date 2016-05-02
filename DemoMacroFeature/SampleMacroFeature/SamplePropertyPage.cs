@@ -75,8 +75,11 @@ namespace DemoMacroFeatures.SampleMacroFeature
 
             // When the alpha value or the selection changes we want to 
             // show a temporary body with the split in it
-            yield return MacroFeature.Database.WhenAnyValue(p=>p.Alpha)
-                .CombineLatest(MacroFeature.Database.WhenAnyValue(p => p.Body),
+            yield return Observable
+                .CombineLatest
+                (
+                    MacroFeature.Database.WhenAnyValue(p=>p.Alpha),
+                    MacroFeature.Database.WhenAnyValue(p => p.Body).Where(p => !p.IsEmpty),
                     (alpha, selection) => new { alpha, selection }
                 )
                 .Select(o =>
