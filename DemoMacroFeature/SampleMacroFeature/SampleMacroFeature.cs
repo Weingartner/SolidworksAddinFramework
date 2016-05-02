@@ -11,7 +11,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
     [ComDefaultInterface(typeof(ISwComFeature))]
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-        private SampleMacroFeature()
+        public SampleMacroFeature()
             : base("Alpha Split", swMacroFeatureOptions_e.swMacroFeatureByDefault)
         {
         }
