@@ -22,8 +22,6 @@ namespace SolidworksAddinFramework
         where TData : ReactiveObject, new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature, TData>
     {
-        public string FeatureName { get; }
-        private readonly swMacroFeatureOptions_e _FeatureOptions;
         // Store PMP in a field so the GC can't collect it
         private PropertyManagerPageBase _EditPage;
 
@@ -36,11 +34,9 @@ namespace SolidworksAddinFramework
         public ISldWorks SwApp { get; private set; }
         public TData Database { get; private set; }
 
-        protected MacroFeatureBase(string featureName, swMacroFeatureOptions_e featureOptions)
-        {
-            FeatureName = featureName;
-            _FeatureOptions = featureOptions;
-        }
+        public abstract string FeatureName { get; }
+
+        protected abstract swMacroFeatureOptions_e FeatureOptions { get; }
 
         /// <summary>
         /// Allows an implementation to specify what property manager page to show on edit.
@@ -162,7 +158,7 @@ namespace SolidworksAddinFramework
             if (State==StateEnum.Insert)
             {
                 var editBodies = ModelDoc.GetSelectedObjectsFromModel(Database).OfType<IBody2>();
-                ModelDoc.FeatureManager.InsertMacroFeature<TMacroFeature>(FeatureName, _FeatureOptions, Database, editBodies);
+                ModelDoc.FeatureManager.InsertMacroFeature<TMacroFeature>(FeatureName, FeatureOptions, Database, editBodies);
             }
             else
             {

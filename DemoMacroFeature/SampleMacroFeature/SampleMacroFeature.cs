@@ -11,10 +11,8 @@ namespace DemoMacroFeatures.SampleMacroFeature
     [ComDefaultInterface(typeof(ISwComFeature))]
     public class SampleMacroFeature : MacroFeatureBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-        public SampleMacroFeature()
-            : base("Alpha Split", swMacroFeatureOptions_e.swMacroFeatureByDefault)
-        {
-        }
+        public override string FeatureName { get; } = "Alpha Split";
+        protected override swMacroFeatureOptions_e FeatureOptions { get; } = swMacroFeatureOptions_e.swMacroFeatureByDefault;
 
         protected override PropertyManagerPageBase GetPropertyManagerPage() => new SamplePropertyPage(this);
 
