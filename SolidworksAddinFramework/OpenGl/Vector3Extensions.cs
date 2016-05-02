@@ -33,7 +33,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static Vector3 Unit(this Vector3 v) => v/v.Length();
 
-        public static double[] ToDoubles(this Vector3 v) => new double[] {v.X, v.Y, v.Z};
+        public static double[] ToDoubles(this Vector3 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z};
         public static float[] ToSingles(this Vector3 v) => new float[] {v.X, v.Y, v.Z};
 
         public static Vector3 ToVector3(this IReadOnlyList<double> value)
