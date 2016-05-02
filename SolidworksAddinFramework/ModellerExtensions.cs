@@ -15,24 +15,26 @@ namespace SolidworksAddinFramework
         /// Create a line from p0 to p1. 
         /// </summary>
         /// <param name="modeler"></param>
-        /// <param name="p0"></param>
-        /// <param name="p1"></param>
+        /// <param name="edge"></param>
         /// <returns></returns>
         public static ICurve CreateTrimmedLine(this IModeler modeler, Edge3 edge)
         {
             Debug.Assert(edge.Delta.Length() > float.Epsilon);
+            var startPoint = new[] {(double)edge.A.X, (double)edge.A.Y,(double)edge.A.Z};
             var dir = edge.Delta.Unit();
-            var line = (ICurve)modeler.CreateLine(edge.A.ToDoubles(), dir.ToDoubles());
+            var direction = new[] {(double)dir.X,(double)dir.Y,(double)dir.Z};
+            var line = (ICurve)modeler.CreateLine(startPoint, direction);
             Debug.Assert(line != null, "line != null");
-            line = line.CreateTrimmedCurve2(edge.A.X, edge.A.Y, edge.A.Z, edge.B.X, edge.B.Y, edge.B.Z);
+            var pp0 = line.GetClosestPointOn(edge.A.X, edge.A.Y, edge.A.Z).CastArray<double>();
+            var pp1 = line.GetClosestPointOn(edge.B.X, edge.B.Y, edge.B.Z).CastArray<double>();
+            line = line.CreateTrimmedCurve2(pp0[0], pp0[1], pp0[2], pp1[0], pp1[1], pp1[2]);
             Debug.Assert(line != null, "line != null");
             return line;
-            
         }
+
         public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3  p1)
         {
             return CreateTrimmedLine(modeler, new Edge3(p0, p1));
-
         }
 
         public static IBody2 CreateBodyFromCylTs(this IModeler modeler, Vector3  xyz, Vector3 axis, double radius, double length)
@@ -49,7 +51,7 @@ namespace SolidworksAddinFramework
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
         {
-            return CreateTrimmedLine(modeler, p0.ArrayData.CastArray<double>().ToVector3(), p1.ArrayData.CastArray<double>().ToVector3());
+            return CreateTrimmedLine( modeler, (Vector3)p0.ArrayData, (Vector3)p1.ArrayData);
         }
 
 
