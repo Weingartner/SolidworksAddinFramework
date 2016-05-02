@@ -157,7 +157,10 @@ namespace SolidworksAddinFramework
         {
             if (State==StateEnum.Insert)
             {
-                var editBodies = ModelDoc.GetSelectedObjectsFromModel(Database).OfType<IBody2>();
+                var editBodies = ModelDoc
+                    .GetSelectedObjectsFromModel(Database)
+                    .OfType<IBody2>()
+                    .ToArray();
                 ModelDoc.FeatureManager.InsertMacroFeature<TMacroFeature>(FeatureName, FeatureOptions, Database, editBodies);
             }
             else
