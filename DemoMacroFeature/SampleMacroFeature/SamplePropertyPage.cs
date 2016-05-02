@@ -44,7 +44,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
         //in which they are added to the object.
         protected override  IEnumerable<IDisposable> AddControlsImpl()
         {
-            ModelDoc.PushSelections(MacroFeature.Database);
+            yield return ModelDoc.PushSelections(MacroFeature.Database);
 
             //Add the groups
 

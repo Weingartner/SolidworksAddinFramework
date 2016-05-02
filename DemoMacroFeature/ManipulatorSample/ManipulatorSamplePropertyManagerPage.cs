@@ -36,7 +36,7 @@ namespace DemoMacroFeatures.ManipulatorSample
 
         protected override IEnumerable<IDisposable> AddControlsImpl()
         {
-            ModelDoc.PushSelections(_Model);
+            yield return ModelDoc.PushSelections(_Model);
 
             const int group1Id = 1;
             _PageGroup = Page.CreateGroup(group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
