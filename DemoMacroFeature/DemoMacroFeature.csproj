@@ -194,6 +194,8 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DummyMacroFeature.cs" />
+    <Compile Include="DummyMacroFeatureData.cs" />
     <Compile Include="ManipulatorSample\ManipulatorSampleModel.cs" />
     <Compile Include="ManipulatorSample\ManipulatorSamplePropertyManagerPage.cs" />
     <Compile Include="SampleMacroFeature\SampleMacroFeature.cs" />

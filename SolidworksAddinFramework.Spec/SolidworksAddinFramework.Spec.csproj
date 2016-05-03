@@ -144,12 +144,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateTrimmedLineSpec.cs" />
+    <Compile Include="MacroFeatureDataSpec.cs" />
     <Compile Include="MathUtilitySpec.cs" />
     <Compile Include="ModelDocSpecs.cs" />
     <Compile Include="opengl\MeshRenderSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">
+      <Project>{A67399BE-AAF7-433F-8F72-9B0424C5BE67}</Project>
+      <Name>DemoMacroFeature</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>

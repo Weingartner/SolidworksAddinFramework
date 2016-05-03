@@ -19,7 +19,7 @@ namespace SolidworksAddinFramework
     /// <typeparam name="TData"></typeparam>
     [ComVisible(false)]
     public abstract class MacroFeatureBase<TMacroFeature,TData> : ISwComFeature
-        where TData : ReactiveObject, new()
+        where TData : new()
         where TMacroFeature : MacroFeatureBase<TMacroFeature, TData>
     {
         // Store PMP in a field so the GC can't collect it
@@ -27,7 +27,7 @@ namespace SolidworksAddinFramework
 
         public IModelDoc2 ModelDoc { get; private set; }
 
-        private IFeature _SwFeature;
+        public IFeature SwFeature { get; private set; }
 
         protected IMacroFeatureData SwFeatureData { get; private set; }
 
@@ -44,13 +44,40 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         protected abstract PropertyManagerPageBase GetPropertyManagerPage();
 
+        /// <summary>
+        /// Don't call this as it is for SolidWorks only")]
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="modelDoc"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
         public object Edit(object app, object modelDoc, object feature)
         {
+            //if (feature == null) throw new ArgumentNullException(nameof(feature));
+
             Init(app, modelDoc, feature);
             LoadSelections();
             _EditPage = GetPropertyManagerPage();
-            _EditPage.Show();
+            _EditPage?.Show();
             return true;
+        }
+
+        /// <summary>
+        /// Insert the macrofeature using this call
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="modelDoc"></param>
+        public void Insert(ISldWorks app, IModelDoc2 modelDoc)
+        {
+            Edit(app, modelDoc, null);
+        }
+
+        public void Insert(ISldWorks app, IModelDoc2 modelDoc, TData data)
+        {
+            Init(app, modelDoc, null);
+            LoadSelections();
+            Database = data;
+            Commit();
         }
 
         /// <summary>
@@ -69,8 +96,8 @@ namespace SolidworksAddinFramework
             SwApp = (ISldWorks) app;
             if (feature != null)
             {
-                _SwFeature = (IFeature) feature;
-                SwFeatureData = (IMacroFeatureData) _SwFeature.GetDefinition();
+                SwFeature = (IFeature) feature;
+                SwFeatureData = (IMacroFeatureData) SwFeature.GetDefinition();
                 Database = SwFeatureData.Read<TData>();
             }
             else
@@ -89,7 +116,7 @@ namespace SolidworksAddinFramework
         {
             SaveSelections();
             SwFeatureData.Write(Database);
-            _SwFeature.ModifyDefinition(SwFeatureData, ModelDoc, null);
+            SwFeature.ModifyDefinition(SwFeatureData, ModelDoc, null);
         }
 
         /// <summary>
@@ -161,7 +188,7 @@ namespace SolidworksAddinFramework
                     .GetSelectedObjectsFromModel(Database)
                     .OfType<IBody2>()
                     .ToArray();
-                ModelDoc.FeatureManager.InsertMacroFeature<TMacroFeature>(FeatureName, FeatureOptions, Database, editBodies);
+                SwFeature = ModelDoc.FeatureManager.InsertMacroFeature<TMacroFeature>(FeatureName, FeatureOptions, Database, editBodies);
             }
             else
             {

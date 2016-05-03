@@ -7,7 +7,7 @@ namespace SolidworksAddinFramework
 {
     public static class FeatureManagerExtensions
     {
-        private static void InsertMacroFeature<T>(this IFeatureManager featMgr, string featureName, string[] parameterNames, int[] parameterTypes, string[] parameterValues, swMacroFeatureOptions_e opts, IBody2[] editBodies)
+        private static Feature InsertMacroFeature<T>(this IFeatureManager featMgr, string featureName, string[] parameterNames, int[] parameterTypes, string[] parameterValues, swMacroFeatureOptions_e opts, IBody2[] editBodies)
         {
             var macroFeature = featMgr.InsertMacroFeature3(
                 featureName,
@@ -29,8 +29,9 @@ namespace SolidworksAddinFramework
 #else
                 var message = "";
 #endif
-                MessageBox.Show($"Unable to create feature. {message}");
+                MessageBox.Show($"Unable to create feature {typeof(T).FullName}. {message}");
             }
+            return macroFeature;
         }
 
         private static object GetFeatureInsertError(Type type, string[] parameterNames, int[] parameterTypes, string[] parameterValues)
@@ -50,9 +51,9 @@ namespace SolidworksAddinFramework
             return $"Unknown reason. If you can fix it, please add a hint in {typeof(FeatureManagerExtensions).FullName}::{nameof(GetFeatureInsertError)}.";
         }
 
-        public static void InsertMacroFeature<TFeature>(this IFeatureManager featMgr, string featureName, swMacroFeatureOptions_e opts, object data, IBody2[] editBodies)
+        public static Feature InsertMacroFeature<TFeature>(this IFeatureManager featMgr, string featureName, swMacroFeatureOptions_e opts, object data, IBody2[] editBodies)
         {
-            featMgr.InsertMacroFeature<TFeature>(featureName,
+            return featMgr.InsertMacroFeature<TFeature>(featureName,
                 MacroFeatureDataExtensions.GetFeatureDataNames(),
                 MacroFeatureDataExtensions.GetFeatureDataTypes(),
                 MacroFeatureDataExtensions.GetFeatureDataValues(data),
