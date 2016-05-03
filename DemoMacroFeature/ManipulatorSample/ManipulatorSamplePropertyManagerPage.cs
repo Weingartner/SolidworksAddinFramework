@@ -126,6 +126,10 @@ namespace DemoMacroFeatures.ManipulatorSample
                 });
         }
 
+        protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        {
+        }
+
         public static void SetManipulatorPositionToBodyCenter(ISldWorks sldWorks, TriadManipulatorTs manipulator, IBody2 body, IModelDoc2 model)
         {
             var box = body.GetBodyBoxTs();

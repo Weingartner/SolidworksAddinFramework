@@ -188,9 +188,11 @@
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
+    <Compile Include="Json.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataExtensions.cs" />
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
+    <Compile Include="MacroFeaturePropertyManagerPageBase.cs" />
     <Compile Include="ManipulatorHandler.cs" />
     <Compile Include="MathPointExtensions.cs" />
     <Compile Include="MathUtilityExtensions.cs" />
@@ -222,6 +224,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Range.tt</DependentUpon>
     </Compile>
+    <Compile Include="ReactiveObjectPropertyManagerPage.cs" />
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionData.cs" />

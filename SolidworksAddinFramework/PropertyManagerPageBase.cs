@@ -15,34 +15,6 @@ using SolidWorks.Interop.swpublished;
 
 namespace SolidworksAddinFramework
 {
-
-    public abstract class MacroFeaturePropertyManagerPageBase<TMacroFeature, TData> : PropertyManagerPageBase
-        where TData : ReactiveObject, new()
-        where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
-    {
-        protected MacroFeaturePropertyManagerPageBase(IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
-            : base(macroFeature.FeatureName, options, macroFeature.SwApp, macroFeature.ModelDoc)
-        {
-            MacroFeature = macroFeature;
-        }
-
-        public TMacroFeature MacroFeature { get; private set; }
-        protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
-        {
-            base.OnClose(reason);
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-
-            if (reason ==  swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)
-            {
-                MacroFeature.Commit();
-            }else if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel)
-            {
-                MacroFeature.Cancel();
-            }
-        }
-    }
-
     /// <summary>
     /// Base class for all property manager pages. See sample for more info
     /// </summary>
@@ -116,16 +88,11 @@ namespace SolidworksAddinFramework
 
         public void OnClose(int reason)
         {
+            _Disposables?.ForEach(d=>d.Dispose());
             OnClose((swPropertyManagerPageCloseReasons_e)reason);
         }
 
-        protected virtual void OnClose(swPropertyManagerPageCloseReasons_e reason)
-        {
-            //This function must contain code, even if it does nothing, to prevent the
-            //.NET runtime environment from doing garbage collection at the wrong time.
-
-            _Disposables?.ForEach(d=>d.Dispose());
-        }
+        protected abstract void OnClose(swPropertyManagerPageCloseReasons_e reason);
 
         public void AfterClose()
         {
@@ -527,7 +494,7 @@ namespace SolidworksAddinFramework
 
         #region control reference holding
 
-        internal IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
+        protected internal IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
         {
             return new ControlHolder(control, d.ToCompositeDisposable());
         }
