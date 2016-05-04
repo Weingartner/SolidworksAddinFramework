@@ -18,8 +18,6 @@ namespace DemoMacroFeatures.ManipulatorSample
     /// </summary>
     public class ManipulatorSamplePropertyManagerPage : PropertyManagerPageBase
     {
-        private IPropertyManagerPageGroup _PageGroup;
-
         private readonly ManipulatorSampleModel _Model = new ManipulatorSampleModel();
 
         private static readonly List<swPropertyManagerPageOptions_e> Options = new List<swPropertyManagerPageOptions_e>
@@ -39,13 +37,13 @@ namespace DemoMacroFeatures.ManipulatorSample
             yield return ModelDoc.PushSelections(_Model);
 
             const int group1Id = 1;
-            _PageGroup = Page.CreateGroup(group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            var group = Page.CreateGroup(group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            yield return CreateLabel(_PageGroup, "Select object", "Select object");
+            yield return CreateLabel(group, "Select object", "Select object");
 
             yield return CreateSelectionBox(
-                _PageGroup,
+                group,
                 "Select object",
                 "Select object",
                 swSelectType_e.swSelSOLIDBODIES,

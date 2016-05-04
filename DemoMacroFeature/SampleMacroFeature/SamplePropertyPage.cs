@@ -16,15 +16,6 @@ namespace DemoMacroFeatures.SampleMacroFeature
     [ComDefaultInterface(typeof(IPropertyManagerPage2Handler9))]
     public class SamplePropertyPage : MacroFeaturePropertyManagerPageBase<SampleMacroFeature,SampleMacroFeatureDataBase>
     {
-
-        #region Property Manager Page Controls
-        //Groups
-        private IPropertyManagerPageGroup _PageGroup;
-
-        //Control IDs
-        public const int Group1Id = 0;
-        #endregion
-
         private static IEnumerable<swPropertyManagerPageOptions_e> Options => new[]
         {
             swPropertyManagerPageOptions_e.swPropertyManagerOptions_OkayButton,
@@ -46,21 +37,19 @@ namespace DemoMacroFeatures.SampleMacroFeature
         {
             yield return ModelDoc.PushSelections(MacroFeature.Database);
 
-            //Add the groups
-
-            _PageGroup = Page.CreateGroup(Group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            var group = Page.CreateGroup(1, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
-            yield return CreateLabel(_PageGroup, "Alpha", "Alpha");
-            yield return CreateNumberBox(_PageGroup, "Alpha", "Alpha", MacroFeature.Database, p=>p.Alpha, box =>
+            yield return CreateLabel(group, "Alpha", "Alpha");
+            yield return CreateNumberBox(group, "Alpha", "Alpha", MacroFeature.Database, p=>p.Alpha, box =>
             {
                 box.SetRange((int)swNumberboxUnitType_e.swNumberBox_UnitlessDouble, 0.0, 1.0, 0.1, true);
                 return Disposable.Empty;
             });
 
-            yield return CreateLabel(_PageGroup, "Select solid to split", "Select solid to split");
+            yield return CreateLabel(group, "Select solid to split", "Select solid to split");
             yield return CreateSelectionBox(
-                _PageGroup,
+                group,
                 "Sample Selection",
                 "Displays features selected in main view",
                 swSelectType_e.swSelSOLIDBODIES,
