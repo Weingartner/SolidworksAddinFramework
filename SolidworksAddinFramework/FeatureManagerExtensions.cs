@@ -48,7 +48,7 @@ namespace SolidworksAddinFramework
                 return $"`parameterNames`() {parameterNamesString}, `parameterTypes`({parameterTypesString}) and " +
                        $"`parameterValues`({parameterValuesString}) don't have the same length.";
             }
-            return $"Unknown reason. If you can fix it, please add a hint in {typeof(FeatureManagerExtensions).FullName}::{nameof(GetFeatureInsertError)}.";
+            return $"Unknown reason. Ensure {type.FullName} lives in the addin dll. If you can fix it and there was another reason, please add a hint in {typeof(FeatureManagerExtensions).FullName}::{nameof(GetFeatureInsertError)}.";
         }
 
         public static Feature InsertMacroFeature<TFeature>(this IFeatureManager featMgr, string featureName, swMacroFeatureOptions_e opts, object data, IBody2[] editBodies)
