@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.LinearAlgebra.Double;
-using Microsoft.Runtime.CompilerServices;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 

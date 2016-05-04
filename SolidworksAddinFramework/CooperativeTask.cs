@@ -16,7 +16,8 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static async Task Yield(CancellationToken ct)
         {
-            await TaskEx.Delay(1, ct);
+            await Task.Yield();
+            ct.ThrowIfCancellationRequested();
         }
     }
 }
