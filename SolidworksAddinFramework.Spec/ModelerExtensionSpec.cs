@@ -11,13 +11,14 @@ using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Numerics;
 using Xunit;
 using XUnit.Solidworks.Addin;
 
 
 namespace SolidworksAddinFramework.Spec
 {
-    public class CreateTrimmedLineSpec : SolidWorksSpec
+    public class ModelerExtensionSpec : SolidWorksSpec
     {
         private static IModeler Modeler => (IModeler)SwApp.GetModeler();
         private static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
@@ -61,6 +62,56 @@ namespace SolidworksAddinFramework.Spec
             });
         }
 
+        [SolidworksFact]
+        public void InterpolateCurveShouldWork()
+        {
+            CreatePartDoc(true, modelDoc =>
+            {
+                var points = new[]
+                {
+                    new Vector3(1.306213E-17f, -0.02393888f, -0.03204574f),
+                    new Vector3(0f, 3.469447E-18f, 0.04f),
+                    new Vector3(0.4619068f, 0.03750812f, 0.01389752f),
+                    new Vector3(0.5f, 0.0386182f, -0.01042281f),
+                    new Vector3(1f, 0.03395086f, -0.0211504f),
+                    new Vector3(1f, -0.01454161f, 0.03726314f),
+                    new Vector3(0.4766606f, 0.03750812f, 0.01389752f),
+                }
+                .ToList();
+                var curve = Modeler.InterpolatePointsToCurve(points, 1e-2, true, false);
+                var wB = curve.CreateWireBody();
+                var d = wB.DisplayUndoable(modelDoc, Color.Blue);
 
+                return new CompositeDisposable(d);
+            });
+        }
+
+        [SolidworksFact]
+        public void LinspaceForVector3ShouldWork()
+        {
+            CreatePartDoc(true, modelDoc =>
+            {
+                var v0 = new Vector3(0, 0, 0);
+                var v1 = new Vector3(1, 0, 0);
+
+                var intV = Sequences.LinSpace(v0, v1, 5).ToList();
+
+                var interpolated = intV
+                    .Buffer(2, 1)
+                    .Where(p => p.Count == 2)
+                    .Select(ps =>
+                    {
+                        var edge = new Edge3(ps[0], ps[1]);
+                        var limitedLine = Modeler.CreateTrimmedLine(edge);
+                        var wB = limitedLine.CreateWireBody();
+                        return wB.DisplayUndoable(modelDoc, Color.Blue);
+                    })
+                    .ToCompositeDisposable();
+
+                return new CompositeDisposable(interpolated);
+            });
+        }
+
+        
     }
 }
