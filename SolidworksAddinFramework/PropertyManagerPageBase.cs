@@ -324,7 +324,7 @@ namespace SolidworksAddinFramework
             config(list);
             list.CurrentSelection = (short) get();
             var d = ListBoxSelectionObservable(id).Subscribe(set);
-            return WrapControlAndDisposable(list, d);
+            return ControlHolder.Create(@group, list, d);
         }
         protected IDisposable CreateComboBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageCombobox> config)
         {
@@ -333,7 +333,7 @@ namespace SolidworksAddinFramework
             config(comboBox);
             comboBox.CurrentSelection = (short) get();
             var d = ComboBoxSelectionObservable(id).Subscribe(set);
-            return WrapControlAndDisposable(comboBox, d);
+            return ControlHolder.Create(@group, comboBox, d);
         }
 
 
@@ -343,7 +343,7 @@ namespace SolidworksAddinFramework
             var text = PropertyManagerGroupExtensions.CreateTextBox(@group, id, caption, tip);
             text.Text = get();
             var d = TextBoxChangedObservable(id).Subscribe(set);
-            return WrapControlAndDisposable(text, d);
+            return ControlHolder.Create(@group, text, d);
         }
 
 
@@ -377,7 +377,7 @@ namespace SolidworksAddinFramework
         {
             var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
-            return InitControl(box, config, c => c.Value, NumberBoxChangedObservable(id), source, selector);
+            return InitControl(@group, box, config, c => c.Value, NumberBoxChangedObservable(id), source, selector);
         }
 
         protected IDisposable CreateCheckBox<T>(IPropertyManagerPageGroup @group,
@@ -390,15 +390,11 @@ namespace SolidworksAddinFramework
         {
             var id = NextId();
             var box = @group.CreateCheckBox(id, caption, tip);
-            return InitControl(box, config, c => c.Checked, CheckBoxChangedObservable(id), source, selector);
+            return InitControl(@group, box, config, c => c.Checked, CheckBoxChangedObservable(id), source, selector);
         }
 
-        private IDisposable InitControl<T, TContrl, TProp>
-            (TContrl control,
-            Func<TContrl, IDisposable> controlConfig,
-            Expression<Func<TContrl, TProp>> ctrlPropSelector,
-            IObservable<TProp> ctrlPropChangeObservable, T propParent,
-            Expression<Func<T, TProp>> propSelector)
+        private static IDisposable InitControl<T, TContrl, TProp>
+            (IPropertyManagerPageGroup @group, TContrl control, Func<TContrl, IDisposable> controlConfig, Expression<Func<TContrl, TProp>> ctrlPropSelector, IObservable<TProp> ctrlPropChangeObservable, T propParent, Expression<Func<T, TProp>> propSelector)
         {
             var proxy = propSelector.GetProxy(propParent);
             var ctrlProxy = ctrlPropSelector.GetProxy(control);
@@ -411,7 +407,7 @@ namespace SolidworksAddinFramework
 
             var d1 = ctrlPropChangeObservable.Subscribe(v => proxy.Value = v);
 
-            return WrapControlAndDisposable(control, new CompositeDisposable(d1, d2, d5));
+            return ControlHolder.Create(@group, control, d1, d2, d5);
         }
 
 
@@ -419,7 +415,7 @@ namespace SolidworksAddinFramework
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateLabel(@group, id, caption, tip);
-            return WrapControlAndDisposable(box);
+            return ControlHolder.Create(@group, box);
         }
 
         /// <summary>
@@ -469,7 +465,7 @@ namespace SolidworksAddinFramework
             box.SetSelectionFilters(new[] { selectType });
             var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
             var d1 = SelectionChangedObservable(id).Subscribe(_ => SetSelection(box, selectType, model, propertyExpr));
-            return WrapControlAndDisposable(box, d0, d1);
+            return ControlHolder.Create(@group, box, d0, d1);
         }
 
         private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
@@ -489,42 +485,9 @@ namespace SolidworksAddinFramework
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateButton(@group, id, caption, tip);
             var d0 = ButtonPressedObservable(id).Subscribe(_ => onClick());
-            return WrapControlAndDisposable(box, d0);
+            return ControlHolder.Create(@group, box, d0);
         }
 
-        #region control reference holding
-
-        protected internal IDisposable WrapControlAndDisposable(object control, params IDisposable[] d)
-        {
-            return new ControlHolder(control, d.ToCompositeDisposable());
-        }
-
-        /// <summary>
-        /// It is neccessary to keep reference to the property manager page controls. If you
-        /// lose the reference then the garbage collector may call the finalize method on the
-        /// control. The finalize method then will detach all callback or possibly remove
-        /// the control completely from the page. 
-        /// 
-        /// This object just allows the control to be help along with another IDisposable
-        /// which will get disposed when the dispose method on this class is called. 
-        /// </summary>
-        internal class ControlHolder : IDisposable
-        {
-            public ControlHolder(object control, IDisposable disposable)
-            {
-                Control = control;
-                Disposable = disposable;
-            }
-
-            public object Control { get; }
-            public IDisposable Disposable { get; }
-            public void Dispose()
-            {
-                Disposable.Dispose();
-            }
-        }
-
-        #endregion
 
         internal int NextId()
         {
@@ -532,6 +495,43 @@ namespace SolidworksAddinFramework
             return _NextId;
         }
     }
+
+    #region control reference holding
+
+    /// <summary>
+    /// It is neccessary to keep reference to the property manager page controls. If you
+    /// lose the reference then the garbage collector may call the finalize method on the
+    /// control. The finalize method then will detach all callback or possibly remove
+    /// the control completely from the page. 
+    /// 
+    /// This object just allows the control to be help along with another IDisposable
+    /// which will get disposed when the dispose method on this class is called. 
+    /// </summary>
+    internal class ControlHolder : IDisposable
+    {
+        private readonly IPropertyManagerPageGroup _Group;
+        private readonly object _Control;
+        private readonly IDisposable _Disposable;
+
+        public ControlHolder(IPropertyManagerPageGroup @group, object control, IDisposable disposable)
+        {
+            _Group = @group;
+            _Control = control;
+            _Disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            _Disposable.Dispose();
+        }
+
+        public static IDisposable Create(IPropertyManagerPageGroup @group, object control, params IDisposable[] d)
+        {
+            return new ControlHolder(group, control, d.ToCompositeDisposable());
+        }
+    }
+
+    #endregion
 
     public class OptionGroup<T,TOption> : IDisposable
     {
@@ -575,7 +575,7 @@ namespace SolidworksAddinFramework
 
             var d1 = _Page.OptionCheckedObservable(id).Subscribe(v2 => proxy.Value = match);
 
-            var d = _Page.WrapControlAndDisposable(box, new CompositeDisposable(d1, d2));
+            var d = ControlHolder.Create(_PageGroup, box, d1, d2);
 
             _Disposable.Add(d);
         }
