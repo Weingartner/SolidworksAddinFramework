@@ -32,12 +32,14 @@ namespace DemoMacroFeatures.ManipulatorSample
         {
         }
 
+        protected override IDisposable PushSelections()
+        {
+            return ModelDoc.PushSelections(_Model);
+        }
+
         protected override IEnumerable<IDisposable> AddControlsImpl()
         {
-            yield return ModelDoc.PushSelections(_Model);
-
-            const int group1Id = 1;
-            var group = Page.CreateGroup(group1Id, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+            var group = Page.CreateGroup(1, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 
             yield return CreateLabel(group, "Select object", "Select object");

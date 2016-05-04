@@ -25,7 +25,7 @@ namespace SolidworksAddinFramework
         public readonly ISldWorks SwApp;
         private readonly string _Name;
         private readonly IEnumerable<swPropertyManagerPageOptions_e> _OptionsE;
-
+        private CompositeDisposable _Disposable = new CompositeDisposable();
 
         protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
         {
@@ -58,11 +58,15 @@ namespace SolidworksAddinFramework
             AddControls();
 
             Page?.Show();
+
+            _Disposable.Add(PushSelections());
         }
+
+        protected abstract IDisposable PushSelections();
 
         private void AddControls()
         {
-            _Disposables = AddControlsImpl().ToList();
+            _Disposable.Add(AddControlsImpl().ToCompositeDisposable());
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace SolidworksAddinFramework
 
         public void OnClose(int reason)
         {
-            _Disposables?.ForEach(d=>d.Dispose());
+            _Disposable.Dispose();
             OnClose((swPropertyManagerPageCloseReasons_e)reason);
         }
 
@@ -181,8 +185,6 @@ namespace SolidworksAddinFramework
         public IObservable<string> TextBoxChangedObservable(int id) => _TextBoxChanged
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
         #endregion
-
-        private List<IDisposable> _Disposables;
 
         #region numberbox
 

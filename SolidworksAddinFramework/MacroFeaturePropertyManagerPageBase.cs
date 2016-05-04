@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ReactiveUI;
 using SolidWorks.Interop.swconst;
@@ -15,6 +16,11 @@ namespace SolidworksAddinFramework
         }
 
         public TMacroFeature MacroFeature { get; private set; }
+        protected override IDisposable PushSelections()
+        {
+            return ModelDoc.PushSelections(MacroFeature.Database);
+        }
+
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
             if (reason == swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay)

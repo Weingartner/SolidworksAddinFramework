@@ -35,8 +35,6 @@ namespace DemoMacroFeatures.SampleMacroFeature
         //in which they are added to the object.
         protected override  IEnumerable<IDisposable> AddControlsImpl()
         {
-            yield return ModelDoc.PushSelections(MacroFeature.Database);
-
             var group = Page.CreateGroup(1, "Sample Group 1", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
                 swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
 

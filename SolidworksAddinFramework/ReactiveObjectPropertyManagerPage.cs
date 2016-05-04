@@ -23,6 +23,11 @@ namespace SolidworksAddinFramework
             Data = Json.JsonClone(_Original);
         }
 
+        protected override IDisposable PushSelections()
+        {
+            return ModelDoc.PushSelections(Data);
+        }
+
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
             switch (reason)
