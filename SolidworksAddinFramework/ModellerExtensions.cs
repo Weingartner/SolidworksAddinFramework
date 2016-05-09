@@ -51,7 +51,7 @@ namespace SolidworksAddinFramework
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, MathPoint p0, MathPoint p1)
         {
-            return CreateTrimmedLine( modeler, (Vector3)p0.ArrayData, (Vector3)p1.ArrayData);
+            return CreateTrimmedLine( modeler, p0.ArrayData.CastArray<double>().ToVector3(), p1.ArrayData.CastArray<double>().ToVector3());
         }
 
 

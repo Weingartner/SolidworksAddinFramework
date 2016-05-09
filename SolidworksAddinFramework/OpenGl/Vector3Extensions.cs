@@ -51,6 +51,15 @@ namespace SolidworksAddinFramework.OpenGl
             Debug.Assert(value.Length>=3);
             return new Vector3((float) value[0],(float) value[1],(float) value[2]);
         }
+        public static Vector3 ToVector3(this MathPoint value)
+        {
+            return value.ArrayData.CastArray<double>().ToVector3();
+        }
+        public static Vector3 ToVector3(this MathVector value)
+        {
+            return value.ArrayData.CastArray<double>().ToVector3();
+        }
+
         public static Vector3 ToVector3(this float[] value)
         {
             Debug.Assert(value.Length==3);
