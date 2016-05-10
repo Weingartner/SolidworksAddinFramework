@@ -46,6 +46,10 @@ namespace SolidworksAddinFramework.Geometry
             
         }
 
+        public static PointDirection3 UnitZ = new PointDirection3(Vector3.Zero, Vector3.UnitZ);
+        public static PointDirection3 UnitY = new PointDirection3(Vector3.Zero, Vector3.UnitY);
+        public static PointDirection3 UnitX = new PointDirection3(Vector3.Zero, Vector3.UnitX);
+
 
     }
 
