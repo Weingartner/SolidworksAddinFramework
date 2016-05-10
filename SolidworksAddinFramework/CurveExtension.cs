@@ -53,6 +53,8 @@ namespace SolidworksAddinFramework
             return curve.PointAt(t, 0).First();
         }
 
+        public static PointParam PointParamAt(this ICurve curve, double t)=>new PointParam(curve.PointAt(t), t);
+
 
         public static PointParam ClosestPointOn(this ICurve curve , double x, double y, double z)
         {
@@ -95,33 +97,6 @@ namespace SolidworksAddinFramework
             var pt0 = curve0.ClosestPointOn(pt1).Point;
             var edge = new Edge3(pt1, pt0);
             return new EdgeDistance(edge, solver.Value);
-        }
-
-        public static EdgeDistance ClosestDistanceToRay(IMathUtility m, ICurve curve0, PointDirection3 ray, double tolerance)
-        {
-            return default(EdgeDistance);
-            /*
-            var tessPts = curve0.GetTessPoints(tolerance, tolerance*10);
-            var edges = tessPts.Buffer(2, 1).Where(b => b.Count == 2)
-                .Select(b => new Edge3(b))
-                .ToList();
-            edges.MinBy(edge=>edge.ClosestPoint())
-            var match = Sequences.LinSpace(d[0], d[1], n)
-                .Select(t =>
-                {
-                    var curvePoint = curve0.PointAt(t);
-                    var rayProjection = (curvePoint - ray.Point).ProjectOn(ray.Direction) + ray.Point;
-                    var lengthSquared = (curvePoint - rayProjection);
-                    return new {curvePoint, rayProjection, lengthSquared, t};
-                })
-                .MinBy(o => o.lengthSquared)
-                .FirstOrDefault();
-
-            var t0 = Math.Max(d[0], Math.Floor(match.t/dd)*dd);
-            var t1 = Math.Min( t0 + dd, d[1]);
-            */
-
-
         }
 
         /// <summary>
@@ -202,7 +177,7 @@ namespace SolidworksAddinFramework
                 .ToArray();
 
 
-            return set0.Concat(set1).ToArray();
+            return set0.Concat(set1.Skip(1)).ToArray();
         }
 
         public class MinimumRadiusResult
@@ -246,9 +221,9 @@ namespace SolidworksAddinFramework
             {
 
                 return new MinimumRadiusResult
-                    (t:(double)tObject
+                    (t:((double[])tObject)[0]
                     ,radius:((double[])radiusObject)[0]
-                    ,location:((IMathPoint)locationObject).ToVector3());
+                    ,location:((MathPoint)((object[])locationObject)[0]).ToVector3());
             }
             else
             {
@@ -259,36 +234,51 @@ namespace SolidworksAddinFramework
 
         public static double ReverseEvaluate(this ICurve curve, Vector3 p) => curve.ReverseEvaluate(p.X, p.Y, p.Z);
 
-        public static PointParam ClosestPointToRay(this ICurve curve, PointDirection3 ray, double tol)
+        public static PointParam ClosestPointToRay(this ICurve curve, PointDirection3 ray, double tol = 1e-9)
         {
             var bound = curve.Domain();
             int numOfRadius = 0;
             double[] radius = null;
             MathPoint location = null;
-            double t;
 
             var radiusResult = curve.FindMinimumRadius();
             var domain = new RangeDouble(curve.Domain());
-            var tessTol = radiusResult.Radius/2;
-            var lenTol = tessTol*5;
-            for (var i = 0; i < 5; i++)
+            var tessTol = radiusResult.Radius/10;
+            var closestPointOnEdge = Vector3.Zero;
+            for (var i = 0; i < 1; i++)
             {
-                var tessPoints = curve.GetTessPoints(tessTol, lenTol, domain);
+                var tessPoints = Sequences
+                    .LinSpace(domain.Min, domain.Max, 100)
+                    .Select(curve.PointParamAt).ToList();
                 var edges = tessPoints.Buffer(2, 1).Where(buf => buf.Count == 2)
-                    .Select(buf => new Edge3(buf))
                     .ToList();
 
                 var closestEdge
                     = edges
-                        .Select(edge => new {edge, connection= edge.ShortedEdgeJoining(ray, tol)})
+                        .Select(edge => new {edge, connection= MakeEdge(edge).ShortestEdgeJoining(ray, tol)})
                         .MinBy(o=>o.connection.LengthSquared)[0];
 
-                var a = closestEdge.edge.A;
-                var b = closestEdge.edge.B;
-                domain = new RangeDouble(curve.ReverseEvaluate(a), curve.ReverseEvaluate(b));
+                var a = closestEdge.edge[0].T;
+                var b = closestEdge.edge[1].T;
+                domain = new RangeDouble(a, b);
+                tessTol = tessTol/10;
             }
 
-            return new PointParam(curve.PointAt(domain.Min), domain.Min); 
+            var solver = new BrentSearch(t =>
+            {
+                var p = curve.PointAt(t);
+                var proj = (p - ray.Point).ProjectOn(ray.Direction) + ray.Point;
+                return (p - proj).LengthSquared();
+            }, domain.Min, domain.Max);
+            solver.Minimize();
+            var minT = solver.Solution;
+
+            return curve.PointParamAt(minT);
+        }
+
+        private static Edge3 MakeEdge(IList<PointParam> edge)
+        {
+            return new Edge3(edge[0].Point, edge[1].Point);
         }
 
         private static IEnumerable<Vector3> GetTessPotsAsVector3(ICurve curve, double chordTol, double lengthTol, double[] startPt, double[] midPt)
