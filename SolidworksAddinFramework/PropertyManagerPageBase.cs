@@ -92,7 +92,7 @@ namespace SolidworksAddinFramework
 
         public void OnClose(int reason)
         {
-            _Disposable.Dispose();
+            _Disposable.Clear();
             OnClose((swPropertyManagerPageCloseReasons_e)reason);
         }
 
