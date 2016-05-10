@@ -402,8 +402,16 @@ namespace SolidworksAddinFramework
             return InitControl(@group, box, config, c => c.Checked, CheckBoxChangedObservable(id), source, selector);
         }
 
-        private static IDisposable InitControl<T, TContrl, TProp>
-            (IPropertyManagerPageGroup @group, TContrl control, Func<TContrl, IDisposable> controlConfig, Expression<Func<TContrl, TProp>> ctrlPropSelector, IObservable<TProp> ctrlPropChangeObservable, T propParent, Expression<Func<T, TProp>> propSelector)
+        private static IDisposable InitControl<T, TContrl, TCtrlProp, TDataProp>(
+            IPropertyManagerPageGroup @group,
+            TContrl control,
+            Func<TContrl, IDisposable> controlConfig,
+            Expression<Func<TContrl, TCtrlProp>> ctrlPropSelector,
+            IObservable<TCtrlProp> ctrlPropChangeObservable,
+            T propParent,
+            Expression<Func<T, TDataProp>> propSelector,
+            Func<TCtrlProp, TDataProp> controlToDataConversion ,
+            Func<TDataProp, TCtrlProp> dataToControlConversion)
         {
             var proxy = propSelector.GetProxy(propParent);
             var ctrlProxy = ctrlPropSelector.GetProxy(control);
@@ -412,13 +420,27 @@ namespace SolidworksAddinFramework
 
             var d2 = propParent
                 .WhenAnyValue(propSelector)
+                .Select(dataToControlConversion)
                 .Subscribe(v => ctrlProxy.Value = v);
 
-            var d1 = ctrlPropChangeObservable.Subscribe(v => proxy.Value = v);
+            var d1 = ctrlPropChangeObservable
+                .Select(controlToDataConversion)
+                .Subscribe(v => proxy.Value = v);
 
             return ControlHolder.Create(@group, control, d1, d2, d5);
         }
 
+        private static IDisposable InitControl<T, TContrl, TProp>(
+            IPropertyManagerPageGroup @group,
+            TContrl control,
+            Func<TContrl, IDisposable> controlConfig,
+            Expression<Func<TContrl, TProp>> ctrlPropSelector,
+            IObservable<TProp> ctrlPropChangeObservable,
+            T propParent,
+            Expression<Func<T, TProp>> propSelector)
+        {
+            return InitControl(@group, control, controlConfig, ctrlPropSelector, ctrlPropChangeObservable, propParent, propSelector, x => x, x => x);
+        }
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
         {
