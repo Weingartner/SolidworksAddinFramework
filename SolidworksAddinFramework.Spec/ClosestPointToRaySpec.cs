@@ -21,7 +21,7 @@ namespace SolidworksAddinFramework.Spec
                 var ray = new PointDirection3(new Vector3(1,0,0),Vector3.UnitZ);
                 var mod = SwAddinBase.Active.Modeler;
                 return new CompositeDisposable();
-            };
+            });
         }
 
     }
