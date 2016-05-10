@@ -111,10 +111,20 @@ namespace SolidworksAddinFramework.OpenGl
         /// <returns></returns>
         public static double SignedAngle(this Vector2 v0, Vector2 v1)
         {
-            var sign = Math.Sign(Vector3.Cross(v0.To3D(), v1.To3D()).Z);
-            var retn = Math.Acos(Vector2.Dot(v0, v1)/v0.Length()/v1.Length())*sign;
-            return retn;
+            var v0Length = v0.Length();
+            if (v0Length == 0)
+            {
+                throw new ArgumentException("Length must be greater than 0.", nameof(v0));
+            }
+            var v1Length = v1.Length();
+            if (v1Length == 0)
+            {
+                throw new ArgumentException("Length must be greater than 0.", nameof(v1));
+            }
 
+            var sign = Math.Sign(Vector3.Cross(v0.To3D(), v1.To3D()).Z);
+            var acos = Math.Acos(Vector2.Dot(v0, v1) / v0Length / v1Length);
+            return double.IsNaN(acos) ? 0 : acos * sign;
         }
     }
 
