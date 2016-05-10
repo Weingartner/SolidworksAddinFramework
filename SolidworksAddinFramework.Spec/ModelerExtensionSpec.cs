@@ -126,7 +126,7 @@ namespace SolidworksAddinFramework.Spec
             var edge0 = new Edge3(vector(0,-1,-1), vector(0,1,-1));
             var edge1 = new Edge3(vector(-1,0,1), vector(1,0,1));
 
-            var connect = edge0.ShortedEdgeJoining(edge1);
+            var connect = edge0.ShortestEdgeJoining(edge1);
 
             connect.A.X.Should().BeApproximately(0, 1e-6f);
             connect.A.Y.Should().BeApproximately(0, 1e-6f);

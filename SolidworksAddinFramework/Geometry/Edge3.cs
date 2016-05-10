@@ -58,11 +58,11 @@ namespace SolidworksAddinFramework.Geometry
             return Delta*t + A;
         }
 
-        public Edge3 ShortedEdgeJoining(Edge3 other, double tol = 1e-9)
+        public Edge3 ShortestEdgeJoining(Edge3 other, double tol = 1e-9)
         {
             return ShortestConnectingEdge(this, other, tol);
         }
-        public Edge3 ShortedEdgeJoining(PointDirection3 other, double tol = 1e-9)
+        public Edge3 ShortestEdgeJoining(PointDirection3 other, double tol = 1e-9)
         {
             return ShortestConnectingEdge(this, other, tol);
         }
