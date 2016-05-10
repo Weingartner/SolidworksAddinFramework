@@ -113,7 +113,7 @@ namespace SolidworksAddinFramework.Geometry
             var modeler = SwAddinBase.Active.Modeler;
             var math = SwAddinBase.Active.Math;
             var center = new Vector3(XMid, YMid, ZMin);
-            var box = modeler.CreateBox(center, Vector3.UnitZ, this.Dx, this.Dy, this.Dz);
+            var box = modeler.CreateBox(center, Vector3.UnitZ, Dx, Dy, Dz);
             Debug.Assert(box!=null);
             return box;
         }
@@ -326,9 +326,7 @@ namespace SolidworksAddinFramework.Geometry
                 return false;
 
             return true;
-
         }
-
         public Range3Single Intersect(Range3Single other)
         {
             var xrange = XRange.Intersect(other.XRange);
@@ -339,6 +337,5 @@ namespace SolidworksAddinFramework.Geometry
                  new Vector3(xrange.Max, yrange.Max, zrange.Max));
 
         }
-
     }
 }

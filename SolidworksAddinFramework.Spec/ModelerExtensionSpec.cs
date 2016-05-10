@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -112,6 +113,30 @@ namespace SolidworksAddinFramework.Spec
             });
         }
 
+        
+    }
+
+    public class Edge3Spec
+    {
+        Vector3 vector(double x, double y, double z)=>new Vector3((float) x,(float) y,(float) z);
+
+        [Fact]
+        public void ShouldGetTheShortestLine()
+        {
+            var edge0 = new Edge3(vector(0,-1,-1), vector(0,1,-1));
+            var edge1 = new Edge3(vector(-1,0,1), vector(1,0,1));
+
+            var connect = edge0.ShortedEdgeJoining(edge1);
+
+            connect.A.X.Should().BeApproximately(0, 1e-6f);
+            connect.A.Y.Should().BeApproximately(0, 1e-6f);
+            connect.A.Z.Should().BeApproximately(-1, 1e-6f);
+
+            connect.B.X.Should().BeApproximately(0, 1e-6f);
+            connect.B.Y.Should().BeApproximately(0, 1e-6f);
+            connect.B.Z.Should().BeApproximately(1, 1e-6f);
+
+        }
         
     }
 }

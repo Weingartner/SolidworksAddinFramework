@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 
@@ -48,6 +49,9 @@ namespace SolidworksAddinFramework
         {
             return (MathPoint) a.AddVector(b);
         }
+
+        public static Vector3 ToVector3(this IMathPoint a) => 
+            a.ArrayData.CastArray<double>().ToVector3();
 
         public static double[] Average(this IEnumerable<double[]> points)
         {

@@ -33,6 +33,11 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static Vector3 Unit(this Vector3 v) => v/v.Length();
 
+        public static double Dot(this Vector3 a, Vector3 other)
+        {
+            return Vector3.Dot(a, other);
+        }
+
         public static double[] ToDoubles(this Vector3 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z};
         public static float[] ToSingles(this Vector3 v) => new float[] {v.X, v.Y, v.Z};
 
@@ -68,7 +73,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static Vector3 ProjectOn(this Vector3 point, Vector3 axis)
         {
-            return axis*Vector3.Dot(point, axis);
+            return axis.Unit()*Vector3.Dot(point, axis);
         }
 
         public static Vector3 WithZ(this Vector3 v,float value)=>new Vector3(v.X,v.Y,value);

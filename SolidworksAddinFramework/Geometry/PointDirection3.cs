@@ -40,7 +40,7 @@ namespace SolidworksAddinFramework.Geometry
         }
         public void GLVertex3AndNormal3()
         {
-            if(!Direction.Equals(default(System.Numerics.Vector3)))
+            if(!Direction.Equals(default(Vector3)))
                 Direction.GLNormal3();
             Point.GLVertex3();
             

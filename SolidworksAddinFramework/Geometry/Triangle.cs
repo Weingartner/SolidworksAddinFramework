@@ -2,26 +2,6 @@ using System.Numerics;
 
 namespace SolidworksAddinFramework.Geometry
 {
-    /// <summary>
-    /// </summary>
-    public struct Edge3
-    {
-        public readonly Vector3 A;
-        public readonly Vector3 B;
-
-        public double Length => Delta.Length();
-
-        public Edge3(Vector3 a, Vector3 b)
-        {
-            A = a;
-            B = b;
-        }
-
-        public Vector3 Delta => B - A;
-
-        public Edge3 ApplyTransform(Matrix4x4 transform) => 
-            new Edge3(Vector3.Transform(A, transform), Vector3.Transform(B, transform));
-    }
     public struct Triangle
     {
         public readonly Vector3 A;

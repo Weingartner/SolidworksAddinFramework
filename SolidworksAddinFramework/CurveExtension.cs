@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Accord.Math.Optimization;
+using MathNet.Numerics;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -96,6 +97,33 @@ namespace SolidworksAddinFramework
             return new EdgeDistance(edge, solver.Value);
         }
 
+        public static EdgeDistance ClosestDistanceToRay(IMathUtility m, ICurve curve0, PointDirection3 ray, double tolerance)
+        {
+            return default(EdgeDistance);
+            /*
+            var tessPts = curve0.GetTessPoints(tolerance, tolerance*10);
+            var edges = tessPts.Buffer(2, 1).Where(b => b.Count == 2)
+                .Select(b => new Edge3(b))
+                .ToList();
+            edges.MinBy(edge=>edge.ClosestPoint())
+            var match = Sequences.LinSpace(d[0], d[1], n)
+                .Select(t =>
+                {
+                    var curvePoint = curve0.PointAt(t);
+                    var rayProjection = (curvePoint - ray.Point).ProjectOn(ray.Direction) + ray.Point;
+                    var lengthSquared = (curvePoint - rayProjection);
+                    return new {curvePoint, rayProjection, lengthSquared, t};
+                })
+                .MinBy(o => o.lengthSquared)
+                .FirstOrDefault();
+
+            var t0 = Math.Max(d[0], Math.Floor(match.t/dd)*dd);
+            var t1 = Math.Min( t0 + dd, d[1]);
+            */
+
+
+        }
+
         /// <summary>
         /// Return the length of the curve between the start
         /// and end parameters.
@@ -150,13 +178,20 @@ namespace SolidworksAddinFramework
             return curve.PointAt(d);
         }
 
-        public static Vector3[] GetTessPoints(this ICurve curve, double chordTol, double lengthTol)
+        public static Vector3[] GetTessPoints(this ICurve curve, double chordTol, double lengthTol, RangeDouble? domain = null)
         {
             bool isPeriodic;
             double end;
             bool isClosed;
             double start;
-            curve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
+            if (domain == null)
+                curve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
+            else
+            {
+                start = domain.Value.Min;
+                end = domain.Value.Max;
+            }
+
             var startPt = (double[]) curve.Evaluate2(start, 0);
             var midPt = (double[]) curve.Evaluate2((start + end)/2, 0);
             var endPt = (double[]) curve.Evaluate2(end, 0);
@@ -168,6 +203,92 @@ namespace SolidworksAddinFramework
 
 
             return set0.Concat(set1).ToArray();
+        }
+
+        public class MinimumRadiusResult
+        {
+            /// <summary>
+            /// Location on the curve of the point of minimum radius
+            /// </summary>
+            public Vector3 Location { get; }
+            /// <summary>
+            /// The value of the minimum radius
+            /// </summary>
+            public double Radius { get; }
+            /// <summary>
+            /// The value of the minimum radius
+            /// </summary>
+            public double T { get; }
+
+            public MinimumRadiusResult(double t, double radius, Vector3 location)
+            {
+                this.T = t;
+                this.Radius = radius;
+                this.Location = location;
+            }
+        }
+
+        public static MinimumRadiusResult FindMinimumRadius(this ICurve curve)
+        {
+            var bound = curve.Domain();
+
+            int numOfRadius = 0;
+            object radiusObject = null;
+            object locationObject = null;
+            object tObject = null;
+            var hasRadius = curve.FindMinimumRadius(bound
+                , ref numOfRadius
+                , ref radiusObject
+                , ref locationObject
+                , ref tObject);
+
+            if (hasRadius && numOfRadius > 0)
+            {
+
+                return new MinimumRadiusResult
+                    (t:(double)tObject
+                    ,radius:((double[])radiusObject)[0]
+                    ,location:((IMathPoint)locationObject).ToVector3());
+            }
+            else
+            {
+                return null;
+            }
+
+        }
+
+        public static double ReverseEvaluate(this ICurve curve, Vector3 p) => curve.ReverseEvaluate(p.X, p.Y, p.Z);
+
+        public static PointParam ClosestPointToRay(this ICurve curve, PointDirection3 ray, double tol)
+        {
+            var bound = curve.Domain();
+            int numOfRadius = 0;
+            double[] radius = null;
+            MathPoint location = null;
+            double t;
+
+            var radiusResult = curve.FindMinimumRadius();
+            var domain = new RangeDouble(curve.Domain());
+            var tessTol = radiusResult.Radius/2;
+            var lenTol = tessTol*5;
+            for (var i = 0; i < 5; i++)
+            {
+                var tessPoints = curve.GetTessPoints(tessTol, lenTol, domain);
+                var edges = tessPoints.Buffer(2, 1).Where(buf => buf.Count == 2)
+                    .Select(buf => new Edge3(buf))
+                    .ToList();
+
+                var closestEdge
+                    = edges
+                        .Select(edge => new {edge, connection= edge.ShortedEdgeJoining(ray, tol)})
+                        .MinBy(o=>o.connection.LengthSquared)[0];
+
+                var a = closestEdge.edge.A;
+                var b = closestEdge.edge.B;
+                domain = new RangeDouble(curve.ReverseEvaluate(a), curve.ReverseEvaluate(b));
+            }
+
+            return new PointParam(curve.PointAt(domain.Min), domain.Min); 
         }
 
         private static IEnumerable<Vector3> GetTessPotsAsVector3(ICurve curve, double chordTol, double lengthTol, double[] startPt, double[] midPt)

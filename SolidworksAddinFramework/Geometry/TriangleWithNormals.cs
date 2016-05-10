@@ -1,6 +1,4 @@
 using System.Numerics;
-using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.OpenGl;
 
 namespace SolidworksAddinFramework.Geometry
 {
