@@ -174,7 +174,6 @@
     <Compile Include="Geometry\Edge3.cs" />
     <Compile Include="Geometry\Range3Single.cs" />
     <Compile Include="Geometry\PointDirection3.cs" />
-    <Compile Include="Geometry\RangeIntersects.cs" />
     <Compile Include="Geometry\Triangle.cs" />
     <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
