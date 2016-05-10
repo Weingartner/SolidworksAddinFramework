@@ -534,6 +534,14 @@ namespace SolidworksAddinFramework
             return InitControl(group, control, config, c => c.Position, SliderPositionChangedObservable(id), source, selector, controlToDataConversion, dataToControlConversion);
         }
 
+        protected IDisposable SetupControlEnabling(IPropertyManagerPageControl control, IObservable<bool> enabledObservable)
+        {
+            return AfterActivationObs
+                .Select(_ => enabledObservable)
+                .Switch()
+                .Subscribe(v => control.Enabled = v);
+        }
+
         internal int NextId()
         {
             _NextId++;
