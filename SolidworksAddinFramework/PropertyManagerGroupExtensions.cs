@@ -133,6 +133,18 @@ namespace SolidworksAddinFramework
             return AddControl<IPropertyManagerPageOption>(@group, id, caption, optionGroup, leftAlign, options);
         }
 
+        public static IPropertyManagerPageSlider
+            CreateSlider(this IPropertyManagerPageGroup group,
+                int id,
+                string caption,
+                string optionGroup,
+                swPropertyManagerPageControlLeftAlign_e leftAlign = 0,
+                IEnumerable<swAddControlOptions_e> options = null
+            )
+        {
+            return AddControl<IPropertyManagerPageSlider>(@group, id, caption, optionGroup, leftAlign, options);
+        }
+
         public static T AddControl<T>(this IPropertyManagerPageGroup @group,
             int id,
             string caption,
@@ -169,6 +181,9 @@ namespace SolidworksAddinFramework
                     break;
                 case nameof(IPropertyManagerPageLabel):
                     typeE = swPropertyManagerPageControlType_e.swControlType_Label;
+                    break;
+                case nameof(IPropertyManagerPageSlider):
+                    typeE = swPropertyManagerPageControlType_e.swControlType_Slider;
                     break;
                 default:
                     throw new ArgumentException($"Cannot handle type{typeof(T).Name}");

@@ -280,12 +280,19 @@ namespace SolidworksAddinFramework
             return -1;
         }
 
+        private readonly Subject<Tuple<int, double>> _SliderPositionChangedSubject = new Subject<Tuple<int, double>>();
+        private IObservable<int> SliderPositionChangedObservable(int id) =>
+            _SliderPositionChangedSubject
+            .Where(p => id == p.Item1)
+            .Select(p => (int)p.Item2);
         public virtual void OnSliderPositionChanged(int id, double value)
         {
+            _SliderPositionChangedSubject.OnNext(Tuple.Create(id, value));
         }
 
         public virtual void OnSliderTrackingCompleted(int id, double value)
         {
+            _SliderPositionChangedSubject.OnNext(Tuple.Create(id, value));
         }
 
         public virtual bool OnKeystroke(int wparam, int message, int lparam, int id)
@@ -490,6 +497,20 @@ namespace SolidworksAddinFramework
             return ControlHolder.Create(@group, box, d0);
         }
 
+        protected IDisposable CreateSlider<T, TProp>(
+            IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            T source,
+            Expression<Func<T, TProp>> selector,
+            Func<IPropertyManagerPageSlider, IDisposable> config,
+            Func<int, TProp> controlToDataConversion,
+            Func<TProp, int> dataToControlConversion)
+        {
+            var id = NextId();
+            var control = group.CreateSlider(id, caption, tip);
+            return InitControl(group, control, config, c => c.Position, SliderPositionChangedObservable(id), source, selector, controlToDataConversion, dataToControlConversion);
+        }
 
         internal int NextId()
         {
