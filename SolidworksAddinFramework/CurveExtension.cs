@@ -24,6 +24,18 @@ namespace SolidworksAddinFramework
         }
     }
 
+    public struct PointParamWithRayProjection
+    {
+        public readonly PointParam PointParam;
+        public readonly Vector3 RayPoint;
+
+        public PointParamWithRayProjection(PointParam pointParam, Vector3 rayPoint)
+        {
+            PointParam = pointParam;
+            RayPoint = rayPoint;
+        }
+    }
+
     public static class CurveExtension
     {
         /// <summary>
@@ -234,7 +246,7 @@ namespace SolidworksAddinFramework
 
         public static double ReverseEvaluate(this ICurve curve, Vector3 p) => curve.ReverseEvaluate(p.X, p.Y, p.Z);
 
-        public static PointParam ClosestPointToRay(this ICurve curve, PointDirection3 ray, double tol = 1e-9)
+        public static PointParamWithRayProjection ClosestPointToRay(this ICurve curve, PointDirection3 ray, double tol = 1e-9)
         {
             var bound = curve.Domain();
             int numOfRadius = 0;
@@ -264,16 +276,19 @@ namespace SolidworksAddinFramework
                 tessTol = tessTol/10;
             }
 
+            Func<Vector3, Vector3> projectOnRay = p => (p - ray.Point).ProjectOn(ray.Direction) + ray.Point;
+
             var solver = new BrentSearch(t =>
             {
                 var p = curve.PointAt(t);
-                var proj = (p - ray.Point).ProjectOn(ray.Direction) + ray.Point;
+                var proj = projectOnRay(p);
                 return (p - proj).LengthSquared();
             }, domain.Min, domain.Max);
             solver.Minimize();
             var minT = solver.Solution;
 
-            return curve.PointParamAt(minT);
+            var pointParam = curve.PointParamAt(minT);
+            return new PointParamWithRayProjection(pointParam, projectOnRay(pointParam.Point));
         }
 
         private static Edge3 MakeEdge(IList<PointParam> edge)
