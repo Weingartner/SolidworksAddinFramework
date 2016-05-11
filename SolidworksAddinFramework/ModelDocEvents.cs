@@ -6843,6 +6843,390 @@ namespace SolidworksAddinFramework.Events {
 }
 
 
+
+namespace SolidworksAddinFramework.Events {
+    public static class DMouseEvents_Event {
+
+        public class MouseNotifyEventArgs
+        {
+            public MouseNotifyEventArgs (System.Int32 Message, System.Int32 WParam, System.Int32 LParam)
+            {
+                this.Message = Message;
+                this.WParam = WParam;
+                this.LParam = LParam;
+            }
+            public System.Int32 Message { get; }
+            public System.Int32 WParam { get; }
+            public System.Int32 LParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseNotifyEventHandler.html
+        public static IObservable<MouseNotifyEventArgs> MouseNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseNotifyEventHandler callback = 
+                        (System.Int32 Message, System.Int32 WParam, System.Int32 LParam)=>{
+                            var ea = new MouseNotifyEventArgs(Message, WParam, LParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseMoveNotifyEventArgs
+        {
+            public MouseMoveNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseMoveNotifyEventHandler.html
+        public static IObservable<MouseMoveNotifyEventArgs> MouseMoveNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseMoveNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseMoveNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseMoveNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseMoveNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseMoveNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseLBtnDownNotifyEventArgs
+        {
+            public MouseLBtnDownNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnDownNotifyEventHandler.html
+        public static IObservable<MouseLBtnDownNotifyEventArgs> MouseLBtnDownNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseLBtnDownNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnDownNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseLBtnDownNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseLBtnDownNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseLBtnDownNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseLBtnUpNotifyEventArgs
+        {
+            public MouseLBtnUpNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnUpNotifyEventHandler.html
+        public static IObservable<MouseLBtnUpNotifyEventArgs> MouseLBtnUpNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseLBtnUpNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnUpNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseLBtnUpNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseLBtnUpNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseLBtnUpNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseRBtnDownNotifyEventArgs
+        {
+            public MouseRBtnDownNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnDownNotifyEventHandler.html
+        public static IObservable<MouseRBtnDownNotifyEventArgs> MouseRBtnDownNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseRBtnDownNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnDownNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseRBtnDownNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseRBtnDownNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseRBtnDownNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseRBtnUpNotifyEventArgs
+        {
+            public MouseRBtnUpNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnUpNotifyEventHandler.html
+        public static IObservable<MouseRBtnUpNotifyEventArgs> MouseRBtnUpNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseRBtnUpNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnUpNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseRBtnUpNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseRBtnUpNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseRBtnUpNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseMBtnDownNotifyEventArgs
+        {
+            public MouseMBtnDownNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnDownNotifyEventHandler.html
+        public static IObservable<MouseMBtnDownNotifyEventArgs> MouseMBtnDownNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseMBtnDownNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnDownNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseMBtnDownNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseMBtnDownNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseMBtnDownNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseMBtnUpNotifyEventArgs
+        {
+            public MouseMBtnUpNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnUpNotifyEventHandler.html
+        public static IObservable<MouseMBtnUpNotifyEventArgs> MouseMBtnUpNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseMBtnUpNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnUpNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseMBtnUpNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseMBtnUpNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseMBtnUpNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseLBtnDblClkNotifyEventArgs
+        {
+            public MouseLBtnDblClkNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnDblClkNotifyEventHandler.html
+        public static IObservable<MouseLBtnDblClkNotifyEventArgs> MouseLBtnDblClkNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseLBtnDblClkNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseLBtnDblClkNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseLBtnDblClkNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseLBtnDblClkNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseLBtnDblClkNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseRBtnDblClkNotifyEventArgs
+        {
+            public MouseRBtnDblClkNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnDblClkNotifyEventHandler.html
+        public static IObservable<MouseRBtnDblClkNotifyEventArgs> MouseRBtnDblClkNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseRBtnDblClkNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseRBtnDblClkNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseRBtnDblClkNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseRBtnDblClkNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseRBtnDblClkNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseMBtnDblClkNotifyEventArgs
+        {
+            public MouseMBtnDblClkNotifyEventArgs (System.Int32 X, System.Int32 Y, System.Int32 WParam)
+            {
+                this.X = X;
+                this.Y = Y;
+                this.WParam = WParam;
+            }
+            public System.Int32 X { get; }
+            public System.Int32 Y { get; }
+            public System.Int32 WParam { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnDblClkNotifyEventHandler.html
+        public static IObservable<MouseMBtnDblClkNotifyEventArgs> MouseMBtnDblClkNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseMBtnDblClkNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseMBtnDblClkNotifyEventHandler callback = 
+                        (System.Int32 X, System.Int32 Y, System.Int32 WParam)=>{
+                            var ea = new MouseMBtnDblClkNotifyEventArgs(X, Y, WParam);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseMBtnDblClkNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseMBtnDblClkNotify-= callback);
+                    
+                }
+            );
+        }
+        public class MouseSelectNotifyEventArgs
+        {
+            public MouseSelectNotifyEventArgs (System.Int32 Ix, System.Int32 Iy, System.Double X, System.Double Y, System.Double Z)
+            {
+                this.Ix = Ix;
+                this.Iy = Iy;
+                this.X = X;
+                this.Y = Y;
+                this.Z = Z;
+            }
+            public System.Int32 Ix { get; }
+            public System.Int32 Iy { get; }
+            public System.Double X { get; }
+            public System.Double Y { get; }
+            public System.Double Z { get; }
+        }
+        /// See http://chocolatecubed.com/2016/English/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.DMouseEvents_MouseSelectNotifyEventHandler.html
+        public static IObservable<MouseSelectNotifyEventArgs> MouseSelectNotifyObservable(this SolidWorks.Interop.sldworks.DMouseEvents_Event eventSource)
+        {
+            return Observable.Create<MouseSelectNotifyEventArgs>
+            ( observer => 
+                {
+                    SolidWorks.Interop.sldworks.DMouseEvents_MouseSelectNotifyEventHandler callback = 
+                        (System.Int32 Ix, System.Int32 Iy, System.Double X, System.Double Y, System.Double Z)=>{
+                            var ea = new MouseSelectNotifyEventArgs(Ix, Iy, X, Y, Z);
+                            observer.OnNext(ea);
+                            return default(System.Int32);
+                        }; 
+
+                    eventSource.MouseSelectNotify += callback;
+                    return Disposable.Create(()=> eventSource.MouseSelectNotify-= callback);
+                    
+                }
+            );
+        }
+    }
+}
+
+
 namespace SolidworksAddinFramework.Events {
 public static class ModelDoc2Events
 {

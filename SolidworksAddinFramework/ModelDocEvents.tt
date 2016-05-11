@@ -33,6 +33,7 @@ using System.Reactive.Disposables;
 <# OutputEventType<DDrawingDocEvents_Event,DrawingDoc>();#>
 <# OutputEventType<DSldWorksEvents_Event,SldWorks>();#>
 <# OutputEventType<DModelViewEvents_Event,ModelView>();#>
+<# OutputEventType<DMouseEvents_Event,Mouse>();#>
 <# OutputCommonEvents(typeof(DPartDocEvents_Event), typeof(DAssemblyDocEvents_Event), typeof(DDrawingDocEvents_Event)); #>
 
 <#+
