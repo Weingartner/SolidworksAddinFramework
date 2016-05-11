@@ -53,6 +53,12 @@ namespace SolidworksAddinFramework
         {
             return CreateTrimmedLine( modeler, p0.ArrayData.CastArray<double>().ToVector3(), p1.ArrayData.CastArray<double>().ToVector3());
         }
+        public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3 v0, double length)
+        {
+            v0 = v0.Unit() * (float) length;
+            var p1 = p0 + v0;
+            return CreateTrimmedLine(modeler,p0, p1);
+        }
 
 
         #region CreateSheetFromSurface
