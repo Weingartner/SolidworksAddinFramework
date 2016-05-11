@@ -107,6 +107,72 @@ namespace SolidworksAddinFramework
         }
 
         /// <summary>
+        /// Doesn't work when intersecting with wire bodies. 
+        /// </summary>
+        /// <param name="modelDoc"></param>
+        /// <param name="ray"></param>
+        /// <param name="bodies"></param>
+        /// <param name="hitRadius"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static List<RayIntersection> GetRayIntersections(this IModelDoc2 modelDoc, PointDirection3 ray, IBody2[] bodies, double hitRadius, double offset)
+        {
+            var icount = modelDoc.RayIntersections
+                (BodiesIn: bodies
+                , BasePointsIn: ray.Point.ToDoubles()
+                , VectorsIn: ray.Direction.ToDoubles()
+                , Options: (int) (swRayPtsOpts_e.swRayPtsOptsENTRY_EXIT | swRayPtsOpts_e.swRayPtsOptsNORMALS |
+                                  swRayPtsOpts_e.swRayPtsOptsTOPOLS | swRayPtsOpts_e.swRayPtsOptsUNBLOCK)
+                , HitRadius: hitRadius
+                , Offset: offset);
+            var result = modelDoc.GetRayIntersectionsPoints().CastArray<double>();
+
+            const int fields = 9;
+            return Enumerable.Range(0, icount)
+                .Select(i =>
+                {
+                    var baseOffset = i * fields;
+
+                    var bodyIndex = result[baseOffset + 0];
+                    var rayIndex = result[baseOffset + 1];
+                    var intersectionType = result[baseOffset + 2];
+                    var x = result[baseOffset + 3];
+                    var y = result[baseOffset + 4];
+                    var z = result[baseOffset + 5];
+                    var nx = result[baseOffset + 6];
+                    var ny = result[baseOffset + 7];
+                    var nz = result[baseOffset + 8];
+
+                    return new RayIntersection(
+                        bodies[(int)bodyIndex],
+                        (int)rayIndex,
+                        (swRayPtsResults_e)intersectionType,
+                        new [] { x, y, z }.ToVector3(),
+                        new[] { nx, ny, nz }.ToVector3()
+                        );
+                }).ToList();
+        }
+
+        public class RayIntersection
+        {
+            public RayIntersection(IBody2 body, int rayIndex, swRayPtsResults_e intersectionType, Vector3 hitPoint, Vector3 normals)
+            {
+                Body = body;
+                RayIndex = rayIndex;
+                IntersectionType = intersectionType;
+                HitPoint = hitPoint;
+                Normals = normals;
+            }
+
+            public IBody2 Body { get; }
+            public int RayIndex { get; }
+            public swRayPtsResults_e IntersectionType { get; }
+            public Vector3 HitPoint { get; }
+            public Vector3 Normals { get; }
+
+        }
+
+        /// <summary>
         /// From a given X,Y screen coordinate return the model
         /// coordinates and the direction of looking.
         /// </summary>
