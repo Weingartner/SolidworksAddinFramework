@@ -201,10 +201,9 @@ namespace SolidworksAddinFramework
         }
 
         public static IDisposable DisplayUndoable
-            ( this IRenderable renderable
-            , IModelDoc2 doc)
+            (this IRenderable renderable, IModelDoc2 doc, int layer = 0)
         {
-            return OpenGlRenderer.DisplayUndoable(renderable, doc);
+            return OpenGlRenderer.DisplayUndoable(renderable, doc, layer);
         }
 
         /// <summary>

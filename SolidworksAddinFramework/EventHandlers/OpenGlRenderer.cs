@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -52,12 +54,12 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(d0, d1);
         }
 
-        public static IDisposable DisplayUndoable(IRenderable body, IModelDoc2 doc)
+        public static IDisposable DisplayUndoable(IRenderable body, IModelDoc2 doc, int layer = 0)
         {
             OpenGlRenderer openGlRenderer;
             if (Lookup.TryGetValue(doc, out openGlRenderer))
             {
-                return openGlRenderer.DisplayUndoableImpl(body, doc);
+                return openGlRenderer.DisplayUndoableImpl(body, doc, layer);
             }
             throw new Exception("Can't render OpenGL content, because the model view wasn't setup properly.");
         }
@@ -74,26 +76,38 @@ namespace SolidworksAddinFramework
             _Disposable = _MView.BufferSwapNotifyObservable().Subscribe(args =>
             {
                 var time = DateTime.Now;
-                foreach (var o in _BodiesToRender.Values)
+                var layers =
+                    _BodiesToRender.GroupBy(o => o.Value.Item1)
+                        .OrderBy(o => o.Key)
+                        .Select(o => new {Index = o.Key, Renderables = o.Select(q => q.Value.Item2).ToList()})
+                        .ToList();
+                int i = 0;
+                foreach (var layer in layers)
                 {
-                    o.Render(time);
+                    // Clear the depth buffer after each subsequent layer. This
+                    // will ensure that they are drawn on top of each other.
+                    if(layer.Index!=0)
+                        GL.Clear(ClearBufferMask.DepthBufferBit);
+                    foreach (var r in layer.Renderables)
+                        r.Render(time);
                 }
             });
         }
 
-        private readonly ConcurrentDictionary<IRenderable, IRenderable> _BodiesToRender =
-            new ConcurrentDictionary<IRenderable, IRenderable>();
+        private readonly ConcurrentDictionary<IRenderable, Tuple<int, IRenderable>> _BodiesToRender =
+            new ConcurrentDictionary<IRenderable, Tuple<int, IRenderable>>();
 
-        private IDisposable DisplayUndoableImpl(IRenderable body, IModelDoc2 doc)
+        private IDisposable DisplayUndoableImpl(IRenderable body, IModelDoc2 doc, int layer)
         {
-            _BodiesToRender[body] = body;
+            _BodiesToRender[body] = Tuple.Create(layer, body);
             var activeView = (IModelView)doc.ActiveView;
             activeView.GraphicsRedraw(null);
             
             return Disposable.Create(() =>
             {
-                IRenderable dummy;
+                Tuple<int, IRenderable> dummy;
                 _BodiesToRender.TryRemove(body, out dummy);
+                doc.GraphicsRedraw2();
             });
         }
 
