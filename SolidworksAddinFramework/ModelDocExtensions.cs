@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using SolidworksAddinFramework.Events;
+using SolidworksAddinFramework.Geometry;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -101,6 +104,41 @@ namespace SolidworksAddinFramework
             var marks = selections.SelectMany(s => Enumerable.Repeat(s.Mark, s.ObjectIds.Count)).ToArray();
             var views = selections.SelectMany(s => Enumerable.Repeat(view, s.ObjectIds.Count)).ToArray();
             return Tuple.Create(selectedObjects, marks, views);
+        }
+
+        /// <summary>
+        /// From a given X,Y screen coordinate return the model
+        /// coordinates and the direction of looking.
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static PointDirection3 ScreenToView(this IModelDoc2 doc, int x, int y)
+        {
+            var math = SwAddinBase.Active.Math;
+            var view = doc.ActiveView.DirectCast<IModelView>();
+            var t = view.Transform.Inverse().DirectCast<MathTransform>();
+
+            var eye = math.Point(new[] {x, y, 0.0});
+
+            var look = math.ZAxis().DirectCast<MathVector>();
+
+            eye = eye.MultiplyTransformTs(t);
+            look = look.MultiplyTransformTs(t);
+
+            return new PointDirection3(Vector3Extensions.ToVector3(eye), look.ToVector3().Unit());
+        }
+
+        public static Vector2 ViewToScreen(this IModelDoc2 doc, Vector3 point)
+        {
+            var math = SwAddinBase.Active.Math;
+            var view = doc.ActiveView.DirectCast<IModelView>();
+            var t = view.Transform.DirectCast<MathTransform>();
+            var mathPoint = point.ToSwMathPoint(math);
+            mathPoint = mathPoint.MultiplyTransformTs(t);
+            var v3 = mathPoint.ToVector3();
+            return new Vector2(v3.X, v3.Y);
         }
     }
 }
