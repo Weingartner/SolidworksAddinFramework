@@ -9,7 +9,7 @@ namespace SolidworksAddinFramework
         where T : ReactiveUI.ReactiveObject
     {
         protected T Data { get; }
-        private readonly T _Original;
+        private T _Original;
 
 
         protected ReactiveObjectPropertyManagerPage
@@ -19,8 +19,13 @@ namespace SolidworksAddinFramework
                 , IModelDoc2 modelDoc
                 , T data) : base(name, optionsE, swApp, modelDoc)
         {
-            _Original = data;
-            Data = Json.JsonClone(_Original);
+            Data = data;
+        }
+
+        public override void Show()
+        {
+            _Original = Json.JsonClone(Data);
+            base.Show();
         }
 
         protected override IDisposable PushSelections()
@@ -33,10 +38,10 @@ namespace SolidworksAddinFramework
             switch (reason)
             {
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
-                    using (Data.DelayChangeNotifications())
-                        Json.JsonCopyTo(Data, _Original);
                     break;
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
+                    using (Data.DelayChangeNotifications())
+                        Json.JsonCopyTo(_Original, Data);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(reason), reason, null);

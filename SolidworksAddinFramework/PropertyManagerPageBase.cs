@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework
         /// <summary>
         /// Creates a new SolidWorks property manager page, adds controls, and shows the page.
         /// </summary>
-        public void Show()
+        public virtual void Show()
         {
             var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
             var errors = 0;
