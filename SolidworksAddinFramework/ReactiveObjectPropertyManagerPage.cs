@@ -37,16 +37,20 @@ namespace SolidworksAddinFramework
         {
             switch (reason)
             {
-                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
-                    break;
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UnknownReason:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UserEscape:
+                //case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Closed:
+                //case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_ParentClosed:
                     using (Data.DelayChangeNotifications())
                     {
                         Json.Copy(_Original, Data);
                     }
                     break;
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Apply:
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(reason), reason, null);
+                    break;
             }
         }
     }
