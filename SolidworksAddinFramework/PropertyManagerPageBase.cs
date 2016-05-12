@@ -41,23 +41,25 @@ namespace SolidworksAddinFramework
         /// </summary>
         public virtual void Show()
         {
+            if (Page != null)
+            {
+                Page.Show();
+                return;
+            }
+
             var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
             var errors = 0;
             _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
             var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, _PropertyManagerPage2Handler9Wrapper, ref errors);
 
-
             Page = (IPropertyManagerPage2)propertyManagerPage;
-            if (Page != null && errors == (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
-            {
-            }
-            else
+            if (errors != (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
                 throw new Exception("Unable to Create PMP");
             }
             AddControls();
 
-            Page?.Show();
+            Page.Show();
 
             _Disposable.Add(PushSelections());
         }
