@@ -24,7 +24,7 @@ namespace SolidworksAddinFramework
 
         public override void Show()
         {
-            _Original = Json.JsonClone(Data);
+            _Original = Json.Clone(Data);
             base.Show();
         }
 
@@ -41,7 +41,9 @@ namespace SolidworksAddinFramework
                     break;
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
                     using (Data.DelayChangeNotifications())
-                        Json.JsonCopyTo(_Original, Data);
+                    {
+                        Json.Copy(_Original, Data);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(reason), reason, null);

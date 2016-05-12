@@ -4,12 +4,12 @@ namespace SolidworksAddinFramework
 {
     public static class Json
     {
-        public static T JsonClone<T>(T tool)
+        public static T Clone<T>(T tool)
         {
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(tool));
         }
 
-        public static void JsonCopyTo<T>(T source, T target)
+        public static void Copy<T>(T source, T target)
         {
             JsonConvert.PopulateObject(JsonConvert.SerializeObject(source),target);
         }
