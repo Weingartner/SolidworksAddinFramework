@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Accord.Math.Optimization;
+using AForge;
 using MathNet.Numerics;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
@@ -308,13 +309,15 @@ namespace SolidworksAddinFramework
             return (ICurve)edge.GetCurve();
         }
 
-        public static List<Vector3> GetPointsByLength(this ICurve curve, double pointDistance)
+        public static List<Vector3> GetPointsByLength(this ICurve curve, double pointDistance, DoubleRange? flankHelixDomain = null)
         {
             var length = curve.Length();
             var numberOfPoints = (int)(length/pointDistance);
 
-            var domain = curve.Domain();
-            return Sequences.LinSpace(domain[0], domain[1], numberOfPoints)
+            var curveDomain = curve.Domain();
+            var domain = flankHelixDomain ?? new DoubleRange(curveDomain[0], curveDomain[1]);
+
+            return Sequences.LinSpace(domain.Min, domain.Max, numberOfPoints)
                 .Select(t => curve.PointAt(t))
                 .ToList();
         }
