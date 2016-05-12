@@ -22,7 +22,7 @@ namespace SolidworksAddinFramework
             Data = data;
         }
 
-        public override void Show()
+        public sealed override void Show()
         {
             _Original = Json.Clone(Data);
             base.Show();
