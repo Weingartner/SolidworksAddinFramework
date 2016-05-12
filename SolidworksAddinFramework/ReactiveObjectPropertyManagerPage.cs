@@ -40,8 +40,6 @@ namespace SolidworksAddinFramework
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UnknownReason:
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UserEscape:
-                //case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Closed:
-                //case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_ParentClosed:
                     using (Data.DelayChangeNotifications())
                     {
                         Json.Copy(_Original, Data);
@@ -49,6 +47,8 @@ namespace SolidworksAddinFramework
                     break;
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Apply:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Closed: // renders as green tick, so I guess it means "save"
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_ParentClosed: // don't know what this is, maybe it applies to `swPropertyManagerPageOptions_e .swPropertyManagerOptions_MultiplePages`
                 default:
                     break;
             }
