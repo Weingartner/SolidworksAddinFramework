@@ -12,9 +12,11 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(d);
         }
 
-        public static void DisposeWith(this IDisposable disposable, CompositeDisposable container)
+        public static T DisposeWith<T>(this T disposable, CompositeDisposable container)
+            where T : IDisposable
         {
             container.Add(disposable);
+            return disposable;
         }
     }
 }
