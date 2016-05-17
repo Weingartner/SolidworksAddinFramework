@@ -108,8 +108,11 @@ namespace SolidworksAddinFramework.OpenGl
                     {
                         doc.GraphicsRedraw2();
                         return Unit.Default;
-                    });
-                
+                    })
+                    // Just in case the sequence terminate before there
+                    // is a value.
+                    .StartWith(Unit.Default);
+
             }
         }
 
