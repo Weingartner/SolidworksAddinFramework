@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,6 +46,35 @@ namespace SolidworksAddinFramework
         public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IEnumerable<IDisposable>> fn)
         {
             return SubscribeDisposable(o, v =>(IDisposable) new CompositeDisposable(fn(v)));
+        }
+
+        /// <summary>
+        /// This behaves like the normal sample except that it will always generate
+        /// an event when the sampler is triggered even if the input stream has not changed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="sampled"></param>
+        /// <param name="sampler"></param>
+        /// <returns></returns>
+        public static IObservable<T> SampleAlways<T, U>(this IObservable<T> sampled, IObservable<U> sampler)
+        {
+            return Observable.Create<T>(observer =>
+            {
+                var started = false;
+                var value = default(T);
+                var d0 = sampled.Subscribe(v =>
+                {
+                    value = v;
+                    started = true;
+                });
+                var d1 = sampler.Subscribe(s =>
+                {
+                    if(started)
+                        observer.OnNext(value);
+                });
+                return new CompositeDisposable(d0,d1);
+            });
         }
 
         /// <summary>
