@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
@@ -19,19 +20,23 @@ namespace SolidworksAddinFramework.OpenGl
 
 
 
-
+        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
 
         public Mesh(IBody2 body, Color color)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
-            var faceList = body.GetFaces().CastArray<IFace2>();
-            var tess = GetTess(body, faceList);
-            var tris = Tesselate(faceList, tess)
+            TrianglesWithNormals = MeshCache.GetValue(body, bdy =>
+            {
+                var faceList = bdy.GetFaces().CastArray<IFace2>();
+                var tess = GetTess(bdy, faceList);
+                return Tesselate(faceList, tess)
                 .Buffer(3,3)
                 .Select(b=>new TriangleWithNormals(b[0],b[1],b[2])).ToList();
+                
+            });
+
             Edges = new List<Edge3>();
-            TrianglesWithNormals = tris.ToList();
             _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
             _Color = color;
