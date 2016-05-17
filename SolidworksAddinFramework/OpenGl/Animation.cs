@@ -58,26 +58,54 @@ namespace SolidworksAddinFramework.OpenGl
     }
 
 
+    public class SectionTime
+    {
+        private readonly IAnimationSection _Section;
+        private readonly DateTime _EndTime;
+
+        public IAnimationSection section
+        {
+            get { return _Section; }
+        }
+
+        public DateTime endTime
+        {
+            get { return _EndTime; }
+        }
+
+        public SectionTime(IAnimationSection section, DateTime endTime)
+        {
+            _Section = section;
+            _EndTime = endTime;
+        }
+    }
+
     public class Animator : IRenderable
     {
         public IReadOnlyList<IAnimationSection> AnimationSections { get; }
-        public DateTime StartTime { get; private set; }
         private readonly IReadOnlyList<IRenderable> _Children;
-        private IMathUtility _Math;
 
-        public Animator(IReadOnlyList<IAnimationSection> animationSections, IReadOnlyList<IRenderable> children, IMathUtility math)
+        private List<SectionTime> _SectionTimes;
+
+        public Animator(IReadOnlyList<IAnimationSection> animationSections, IReadOnlyList<IRenderable> children)
         {
             AnimationSections = animationSections;
             _Children = children;
-            _Math = math;
         }
+
         public IDisposable Animate(IModelDoc2 doc, TimeSpan? startDelay = null , int framerate = 60)
         {
-            StartTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
+
+            var startTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
             var d = OpenGlRenderer.DisplayUndoable(this, doc);
             var interval = 1.0/framerate;
+            _SectionTimes = AnimationSections
+                .Scan(new SectionTime(null, startTime), (acc, section) => new SectionTime(section, acc.endTime + section.Duration))
+                .ToList();
+
             var d2 = Observable.Interval(TimeSpan.FromSeconds(interval))
                 .ObserveOnUiDispatcher()
+                .TakeWhile(_=>_SectionTimes.Last().endTime > DateTime.Now)
                 .Subscribe(l =>
                 {
                     doc.GraphicsRedraw2();
@@ -88,19 +116,8 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void Render(DateTime t)
         {
-            var os = AnimationSections
-                .Scan(new
-                {
-                    section = (IAnimationSection) null
-                    , endTime = StartTime
-                }, (acc, section) => new
-                {
-                    section
-                    , endTime = acc.endTime + section.Duration
-                })
-                .ToList();
 
-            var currentSection = os.FirstOrDefault(o => o.endTime > t);
+            var currentSection = _SectionTimes.FirstOrDefault(o => o.endTime > t);
             if (currentSection == null)
                 return;
 
