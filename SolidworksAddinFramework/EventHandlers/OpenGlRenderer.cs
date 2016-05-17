@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -15,7 +16,8 @@ namespace SolidworksAddinFramework
 {
     public class OpenGlRenderer : IDisposable
     {
-        private static readonly ConcurrentDictionary<IModelDoc2, OpenGlRenderer> Lookup =
+
+        public static ConcurrentDictionary<IModelDoc2, OpenGlRenderer> Lookup = 
             new ConcurrentDictionary<IModelDoc2, OpenGlRenderer>();
 
         private static int _isInitialized;
@@ -77,7 +79,7 @@ namespace SolidworksAddinFramework
             {
                 var time = DateTime.Now;
                 var layers =
-                    _BodiesToRender.GroupBy(o => o.Value.Item1)
+                    BodiesToRenderPrimary.GroupBy(o => o.Value.Item1)
                         .OrderBy(o => o.Key)
                         .Select(o => new {Index = o.Key, Renderables = o.Select(q => q.Value.Item2).ToList()})
                         .ToList();
@@ -94,21 +96,47 @@ namespace SolidworksAddinFramework
             });
         }
 
-        private readonly ConcurrentDictionary<IRenderable, Tuple<int, IRenderable>> _BodiesToRender =
-            new ConcurrentDictionary<IRenderable, Tuple<int, IRenderable>>();
+        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRender
+        {
+            set
+            {
+                if (_DeferRedraw)
+                    BodiesToRenderBacking = value;
+                else
+                    BodiesToRenderPrimary = value;
+            }
+            get
+            {
+                return _DeferRedraw ? BodiesToRenderBacking: BodiesToRenderPrimary;
+            }
+        }
+
+        public ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderPrimary { get; private set; } =
+            ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
+
+        public ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderBacking { get; private set; } =
+            ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
 
         private IDisposable DisplayUndoableImpl(IRenderable body, IModelDoc2 doc, int layer)
         {
-            _BodiesToRender[body] = Tuple.Create(layer, body);
-            var activeView = (IModelView)doc.ActiveView;
-            activeView.GraphicsRedraw(null);
-            
+            BodiesToRender = BodiesToRender.SetItem(body, Tuple.Create(layer, body));
+            Redraw(doc);
+
             return Disposable.Create(() =>
             {
-                Tuple<int, IRenderable> dummy;
-                _BodiesToRender.TryRemove(body, out dummy);
-                doc.GraphicsRedraw2();
+                var btr = BodiesToRender;
+                if(btr.ContainsKey(body))
+                    BodiesToRender = btr.Remove(body);
+                Redraw(doc);
             });
+        }
+
+        private static IModelView Redraw(IModelDoc2 doc)
+        {
+            var activeView = (IModelView) doc.ActiveView;
+            if (!_DeferRedraw)
+                activeView.GraphicsRedraw(null);
+            return activeView;
         }
 
         private void DoSetup()
@@ -141,6 +169,24 @@ namespace SolidworksAddinFramework
         public void Dispose()
         {
             _Disposable.Dispose();
+        }
+
+        private static bool _DeferRedraw = false;
+        public static IDisposable DeferRedraw(IModelDoc2 doc)
+        {
+            if (!OpenGlRenderer.Lookup.ContainsKey(doc))
+                return Disposable.Empty;
+
+            var renderer = OpenGlRenderer.Lookup[doc];
+            renderer.BodiesToRenderBacking = renderer.BodiesToRenderPrimary;
+            _DeferRedraw = true;
+            return Disposable.Create(() =>
+            {
+                var activeView = (IModelView)doc.ActiveView;
+                renderer.BodiesToRenderPrimary= renderer.BodiesToRenderBacking;
+                _DeferRedraw = false;
+                activeView.GraphicsRedraw(null);
+            });
         }
     }
 }
