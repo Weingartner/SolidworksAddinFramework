@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using LanguageExt;
 using Newtonsoft.Json;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -46,9 +47,13 @@ namespace SolidworksAddinFramework
                 });
         }
 
-        public static object GetSingleObject(this SelectionData selectionData, IModelDoc2 doc)
+        public static Option<object> GetSingleObject(this SelectionData selectionData, IModelDoc2 doc)
         {
-            return selectionData.GetObjects(doc).Single();
+            return selectionData.GetObjects(doc).FirstOrDefault();
+        }
+        public static Option<T> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
+        {
+            return GetSingleObject(selectionData, doc).DirectCast<T>();
         }
 
         public static SelectionData SetObjects(this SelectionData selectionData, IEnumerable<object> objects, IModelDoc2 doc)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using LanguageExt;
 using ReactiveUI;
 using SolidworksAddinFramework;
 using SolidworksAddinFramework.OpenGl;
@@ -57,9 +58,8 @@ namespace DemoMacroFeatures.ManipulatorSample
                     config.AllowMultipleSelectOfSameEntity = false;
                 });
 
-            yield return _Model.WhenAnyValue(p => p.Body)
-                .Where(p => !p.IsEmpty)
-                .Select(p => p.GetSingleObject(ModelDoc).DirectCast<IBody2>())
+            yield return BodySelector()
+                .WhereIsSome()
                 .SubscribeDisposable((body, yield) =>
                 {
                     // The code here execute every time a new selection is made.
@@ -124,6 +124,13 @@ namespace DemoMacroFeatures.ManipulatorSample
 
 
                 });
+        }
+
+        private IObservable<Option<IBody2>> BodySelector()
+        {
+            return _Model.WhenAnyValue(p => p.Body)
+                .Where(p => !p.IsEmpty)
+                .Select(p => p.GetSingleObject<IBody2>(ModelDoc));
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)

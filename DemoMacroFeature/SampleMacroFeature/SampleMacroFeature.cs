@@ -18,21 +18,22 @@ namespace DemoMacroFeatures.SampleMacroFeature
 
         protected override object Regenerate(IModeler modeler)
         {
-            var body = (IBody2)Database.Body.GetSingleObject(ModelDoc);
-            if (body == null)
-                return null;
+            return Database.Body
+                .GetSingleObject<IBody2>(ModelDoc)
+                .Match<object>(body =>
+                {
+                    body = (IBody2) body.Copy();
+                    SwFeatureData.EnableMultiBodyConsume = true;
+                    var splitBodies = SplitBodies(modeler, body, Database);
+                    if (splitBodies == null) return "There was some error";
 
-            body = (IBody2)body.Copy();
-            SwFeatureData.EnableMultiBodyConsume = true;
-            var splitBodies = SplitBodies(modeler, body, Database);
-            if (splitBodies == null) return "There was some error";
+                    foreach (var splitBody in splitBodies)
+                    {
+                        SwFeatureData.AddIdsToBody(splitBody);
+                    }
 
-            foreach (var splitBody in splitBodies)
-            {
-                SwFeatureData.AddIdsToBody(splitBody);
-            }
-
-            return splitBodies;
+                    return splitBodies;
+                },()=>null);
         }
 
         public static IBody2[] SplitBodies(IModeler modeler, IBody2 body, SampleMacroFeatureDataBase database)

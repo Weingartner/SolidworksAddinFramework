@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using LanguageExt;
+using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
 {
@@ -28,7 +29,7 @@ namespace SolidworksAddinFramework
             var s = o.Subscribe(v =>
             {
                 d.Disposable = Disposable.Empty;
-                d.Disposable = fn(v);
+                d.Disposable = fn(v) ?? Disposable.Empty;
             });
 
             return new CompositeDisposable(s,d);
@@ -174,9 +175,9 @@ namespace SolidworksAddinFramework
             return Observable.FromEvent(conversion, add, remove);
         }
 
-        public static IObservable<TA> FromEvent<T,TA>(Action<Func<TA,T>> add, Action<Func<TA,T>> remove)
+        public static IObservable<TA> FromEvent<T,TA>(Action<Func<TA, T>> add, Action<Func<TA, T>> remove)
         {
-            Func<Action<TA>, Func<TA,T>> conversion = action =>
+            Func<Action<TA>, Func<TA, T>> conversion = action =>
             {
                 return arg =>
                 {
@@ -251,5 +252,10 @@ namespace SolidworksAddinFramework
             return Observable.FromEvent(conversion, add, remove);
         }
         */
+
+        public static IObservable<T> WhereIsSome<T>(this IObservable<Option<T>> q)
+        {
+            return q.SelectMany(o => o.MatchObservable(Observable.Return<T>, Observable.Empty<T>));
+        }
     }
 }

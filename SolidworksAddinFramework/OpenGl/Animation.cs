@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using MathNet.Numerics.Interpolation;
@@ -82,29 +83,34 @@ namespace SolidworksAddinFramework.OpenGl
             _Children = children;
         }
 
-        public static IDisposable Animate
+        public static async Task Animate
             (IEnumerable<IAnimationSection> animationSections,
             IReadOnlyList<IRenderable> children,
             IModelDoc2 doc,
+            CancellationToken token,
             TimeSpan? startDelay = null,
             int framerate = 60)
         {
+            if (token.IsCancellationRequested)
+                return;
+
             var startTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
             var sectionTimes = animationSections
                 .Scan(new SectionTime(null, startTime), (acc, section) => new SectionTime(section, acc.EndTime + section.Duration))
                 .ToList();
             var animator = new Animator(sectionTimes, children);
-            var d = OpenGlRenderer.DisplayUndoable(animator, doc);
-
-            var d2 = Observable.Interval(TimeSpan.FromSeconds(1.0/framerate))
-                .ObserveOnUiDispatcher()
-                .TakeWhile(_=>sectionTimes.Last().EndTime > DateTime.Now)
-                .Subscribe(l =>
-                {
-                    doc.GraphicsRedraw2();
-                });
-
-            return new CompositeDisposable(d,d2);
+            using (OpenGlRenderer.DisplayUndoable(animator, doc))
+            {
+                await Observable.Interval(TimeSpan.FromSeconds(1.0/framerate))
+                    .ObserveOnUiDispatcher()
+                    .TakeWhile(_=>sectionTimes.Last().EndTime > DateTime.Now && !token.IsCancellationRequested)
+                    .Select(l =>
+                    {
+                        doc.GraphicsRedraw2();
+                        return Unit.Default;
+                    });
+                
+            }
         }
 
         public void Render(DateTime t)

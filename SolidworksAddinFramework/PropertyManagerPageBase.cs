@@ -20,7 +20,7 @@ namespace SolidworksAddinFramework
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase : IPropertyManagerPage2Handler9
+    public abstract class PropertyManagerPageBase : IPropertyManagerPage2Handler9, IDisposable
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
@@ -446,9 +446,15 @@ namespace SolidworksAddinFramework
 
         protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
         {
+            return CreateLabel(@group, tip, Observable.Return(caption));
+        }
+
+        private IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, IObservable<string> captionObs)
+        {
             var id = NextId();
-            var box = PropertyManagerGroupExtensions.CreateLabel(@group, id, caption, tip);
-            return ControlHolder.Create(@group, box);
+            var box = @group.CreateLabel(id, string.Empty, tip);
+            var d0 = captionObs.Subscribe(caption => box.Caption = caption);
+            return ControlHolder.Create(@group, box, d0);
         }
 
         /// <summary>
@@ -549,6 +555,11 @@ namespace SolidworksAddinFramework
             _NextId++;
             return _NextId;
         }
+
+        public virtual void Dispose()
+        {
+            Page?.Close(true);
+        }
     }
 
     #region control reference holding
@@ -562,17 +573,20 @@ namespace SolidworksAddinFramework
     /// This object just allows the control to be help along with another IDisposable
     /// which will get disposed when the dispose method on this class is called. 
     /// </summary>
-    internal class ControlHolder : IDisposable
+    public class ControlHolder : IDisposable
     {
-        private readonly IPropertyManagerPageGroup _Group;
-        private readonly object _Control;
-        private readonly IDisposable _Disposable;
+        private readonly List<object> _Objects = new List<object>(); 
+        private readonly IDisposable _Disposable = Disposable.Empty;
 
-        public ControlHolder(IPropertyManagerPageGroup @group, object control, IDisposable disposable)
+        public ControlHolder(IPropertyManagerPageGroup pageGroup, object control, IDisposable disposable)
         {
-            _Group = @group;
-            _Control = control;
+            _Objects.Add(pageGroup);
+            _Objects.Add(control);
             _Disposable = disposable;
+        }
+        public ControlHolder(IPropertyManagerPage2 object0 )
+        {
+            _Objects.Add(object0);
         }
 
         public void Dispose()
@@ -583,6 +597,10 @@ namespace SolidworksAddinFramework
         public static IDisposable Create(IPropertyManagerPageGroup @group, object control, params IDisposable[] d)
         {
             return new ControlHolder(group, control, d.ToCompositeDisposable());
+        }
+        public static IDisposable Create(IPropertyManagerPage2 page )
+        {
+            return new ControlHolder(page);
         }
     }
 

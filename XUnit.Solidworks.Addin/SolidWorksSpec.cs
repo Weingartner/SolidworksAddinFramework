@@ -65,6 +65,18 @@ namespace XUnit.Solidworks.Addin
                 CreatePartDoc().Using(SwApp, m => action(m).Dispose());
             }
         }
+        protected async Task CreatePartDoc(bool keep, Func<IModelDoc2, Task<IDisposable>> action)
+        {
+            if (keep)
+            {
+                var doc =CreatePartDoc();
+                _keptStuff.Add( await action(doc));
+            }
+            else
+            {
+                CreatePartDoc().Using(SwApp, m => action(m).Dispose());
+            }
+        }
 
         protected void CreatePartDoc(bool keep, string path, Func<IModelDoc2, IDisposable> action)
         {
@@ -72,6 +84,18 @@ namespace XUnit.Solidworks.Addin
             {
                 var doc =CreatePartDoc(path);
                 _keptStuff.Add(action(doc));
+            }
+            else
+            {
+                CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
+            }
+        }
+        protected async Task CreatePartDoc(bool keep, string path, Func<IModelDoc2, Task<IDisposable>> action)
+        {
+            if (keep)
+            {
+                var doc =CreatePartDoc(path);
+                _keptStuff.Add(await action(doc));
             }
             else
             {
