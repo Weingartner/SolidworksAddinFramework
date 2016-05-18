@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -54,6 +55,19 @@ namespace SolidworksAddinFramework
                 .Select(p => p.ToVector3())
                 .ToList();
             return ret;
+        }
+
+        public static IDisposable DisplayUndoable(
+            this ICurve curve
+            , IModelDoc2 doc
+            , Color color
+            , double thickness
+            , double chordTol=1e-6
+            , double lengthTol=0
+            , int layer = 0)
+        {
+            var wire = new OpenWire(curve,thickness, color, chordTol, lengthTol);
+            return wire.DisplayUndoable(doc, layer);
         }
 
         public static PointDirection3 PointTangentAt(this ICurve c, double t)

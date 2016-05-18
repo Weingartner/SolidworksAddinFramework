@@ -47,6 +47,12 @@ namespace SolidworksAddinFramework.OpenGl
         public OpenWire(IEnumerable<Vector3> points, float thickness, Color color)
             : base(points, thickness, PrimitiveType.LineStrip, color)
         { }
+
+        public OpenWire(ICurve curve, double thickness, Color color, double chordTol=1e-6, double lengthTol = 0) : this(curve.GetTessPoints(chordTol, lengthTol), (float)thickness, color)
+        {
+            
+        }
+
         public OpenWire(IEnumerable<double[]> points, float thickness, Color color) : this(points.Select(p=>p.ToVector3D()), thickness, color)
         { }
     }
