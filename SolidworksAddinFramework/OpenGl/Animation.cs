@@ -102,7 +102,7 @@ namespace SolidworksAddinFramework.OpenGl
             using (OpenGlRenderer.DisplayUndoable(animator, doc))
             {
                 await Observable.Interval(TimeSpan.FromSeconds(1.0/framerate))
-                    .ObserveOnUiDispatcher()
+                    .ObserveOnSolidworksThread()
                     .TakeWhile(_=>sectionTimes.Last().EndTime > DateTime.Now && !token.IsCancellationRequested)
                     .Select(l =>
                     {

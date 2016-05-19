@@ -8,6 +8,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using LanguageExt;
+using LanguageExt.SomeHelp;
 using SolidWorks.Interop.sldworks;
 using Unit = System.Reactive.Unit;
 
@@ -159,21 +160,101 @@ namespace SolidworksAddinFramework
                 .Switch();
         }
 
-            /// <summary>
-            /// <para>Observe on UIDispatcherScheduler.</para>
-            /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
-            /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
-            /// </summary>
-            public static IObservable<T> ObserveOnUiDispatcher<T>(this IObservable<T> source) =>
-                source.ObserveOn(UiDispatcherScheduler.Default);
+        /// <summary>
+        /// Allows cancellation of a call to `selector` when the input observable produces a new value.
+        /// </summary>
+        /// <typeparam name="TIn"></typeparam>
+        /// <typeparam name="TOut"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static IObservable<Unit> SelectAsync<TIn>(this IObservable<TIn> o, Func<TIn, CancellationToken, Task> selector)
+        {
+            Func<TIn,CancellationToken,Task<Unit>> wrapper =
+                async (t, token) =>
+                {
+                    await selector(t, token);
+                    return Unit.Default;
+                };
 
-            /// <summary>
-            /// <para>Subscribe on UIDispatcherScheduler.</para>
-            /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
-            /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
-            /// </summary>
-            public static IObservable<T> SubscribeOnUiDispatcher<T>(this IObservable<T> source) =>
-                source.SubscribeOn(UiDispatcherScheduler.Default);
+            return o.SelectAsync(wrapper);
+        }
+
+        /// <summary>
+        /// <para>Observe on UIDispatcherScheduler.</para>
+        /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
+        /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
+        /// If a new value arrives before the selector is finished calculated the old one then it is canceled.
+        /// </summary>
+        public static IObservable<U> ObserveOnSolidworksThread<T,U>(this IObservable<T> source, Func<T,CancellationToken,U> selector )
+        {
+            return source
+                .StartWith(default(T))
+                .Select(s => new {s, cts = new CancellationTokenSource()})
+                .Buffer(2, 1).Where(b => b.Count == 2)
+                .Select(b =>
+                {
+                    b[0].cts.Cancel();
+                    return b[1];
+                })
+                .ObserveOn(UiDispatcherScheduler.Default)
+                .Select(b => { 
+                        try
+                        {
+                            return selector(b.s, b.cts.Token).ToSome();
+                        }
+                        catch (OperationCanceledException e)
+                        {
+                            return Option<U>.None;
+                        }
+                    })
+                .WhereIsSome();
+        }
+        public static IObservable<Task> ObserveOnSolidworksThread<T>(this IObservable<T> source, Func<T,CancellationToken,Task> selector )
+        {
+            return source
+                .StartWith(default(T))
+                .Select(s => new {s, cts = new CancellationTokenSource()})
+                .Buffer(2, 1).Where(b => b.Count == 2)
+                .Select(b =>
+                {
+                    b[0].cts.Cancel();
+                    return b[1];
+                })
+                .ObserveOn(UiDispatcherScheduler.Default)
+                .Select(async b =>
+                {
+                    try
+                    {
+                        await selector(b.s, b.cts.Token);
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        Console.WriteLine("Operation cancelled");
+                    }
+                });
+        }
+
+        public static IObservable<T> ObserveOnSolidworksThread<T>(this IObservable<T> source) =>
+            source
+            .ObserveOn(UiDispatcherScheduler.Default);
+
+        /// <summary>
+        /// <para>Subscribe on UIDispatcherScheduler.</para>
+        /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
+        /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
+        /// </summary>
+        public static IObservable<T> SubscribeOnSolidworksThread<T>(this IObservable<T> source) =>
+            source.SubscribeOn(UiDispatcherScheduler.Default);
+
+        public static IObservable<Unit> Switch(this IObservable<Task> o)
+        {
+            return Observable.Switch(o.Select(async t =>
+            {
+                await t;
+                return Unit.Default;
+            }));
+        }
 
         /// <summary>
         /// A helper for attaching observables to solidworks events with delegates that have <![CDATA[Func<T>]]> type signitures.
