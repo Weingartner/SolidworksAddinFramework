@@ -89,7 +89,7 @@ namespace SolidworksAddinFramework.OpenGl
             IModelDoc2 doc,
             CancellationToken token,
             TimeSpan? startDelay = null,
-            int framerate = 60)
+            int framerate = 30)
         {
             if (token.IsCancellationRequested)
                 return;
