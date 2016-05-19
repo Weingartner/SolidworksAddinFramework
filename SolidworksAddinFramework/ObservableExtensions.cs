@@ -36,6 +36,22 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(s,d);
 
         }
+
+        /// <summary>
+        /// Fluent version of connect that adds the disposable to a composite disposable
+        /// and then returns the original observable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static IObservable<T> Connect<T>(this IConnectableObservable<T> observable, CompositeDisposable d)
+        {
+            var d0 = observable.Connect();
+            d.Add(d0);
+            return observable;
+        }
+
         public static IDisposable SubscribeDisposableRender<T>(this IObservable<T> o, Func<T, IDisposable> fn, IModelDoc2 doc)
         {
 
