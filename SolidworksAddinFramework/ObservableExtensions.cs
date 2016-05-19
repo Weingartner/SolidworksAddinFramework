@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework
         /// <param name="o"></param>
         /// <param name="fn"></param>
         /// <returns></returns>
-        public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IDisposable> fn )
+        public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IDisposable> fn)
         {
             var d = new SerialDisposable();
 
@@ -36,24 +36,18 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(s,d);
 
         }
-
-        /// <summary>
-        /// Disposes the previous after the new disposable is created. This can help creating flicker free animation.
-        /// Normally use SubscribeDisposable if you want the previous disposable disposed before the new one is
-        /// created.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="o"></param>
-        /// <param name="doc"></param>
-        /// <param name="fn"></param>
-        /// <returns></returns>
-        public static IDisposable SubscribeRenderableDisposable<T>(this IObservable<T> o, IModelDoc2 doc, Func<T, IDisposable> fn )
+        public static IDisposable SubscribeDisposableRender<T>(this IObservable<T> o, Func<T, IDisposable> fn, IModelDoc2 doc)
         {
+
             var d = new SerialDisposable();
 
             var s = o.Subscribe(v =>
             {
-                d.Disposable = fn(v) ?? Disposable.Empty;
+                using(OpenGlRenderer.DeferRedraw(doc))
+                {
+                    d.Disposable = Disposable.Empty;
+                    d.Disposable = fn(v) ?? Disposable.Empty;
+                }
             });
 
             return new CompositeDisposable(s,d);

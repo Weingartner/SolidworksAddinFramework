@@ -56,12 +56,12 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(d0, d1);
         }
 
-        public static IDisposable DisplayUndoable(IRenderable body, IModelDoc2 doc, int layer = 0)
+        public static IDisposable DisplayUndoable(IRenderable renderable, IModelDoc2 doc, int layer = 0)
         {
             OpenGlRenderer openGlRenderer;
             if (Lookup.TryGetValue(doc, out openGlRenderer))
             {
-                return openGlRenderer.DisplayUndoableImpl(body, doc, layer);
+                return openGlRenderer.DisplayUndoableImpl(renderable, doc, layer);
             }
             throw new Exception("Can't render OpenGL content, because the model view wasn't setup properly.");
         }
@@ -100,43 +100,42 @@ namespace SolidworksAddinFramework
         {
             set
             {
-                if (_DeferRedraw)
-                    BodiesToRenderBacking = value;
-                else
+                if (UsingPrimaryBuffer)
                     BodiesToRenderPrimary = value;
+                else
+                    BodiesToRenderBacking = value;
             }
             get
             {
-                return _DeferRedraw ? BodiesToRenderBacking: BodiesToRenderPrimary;
+                return UsingPrimaryBuffer ? BodiesToRenderPrimary: BodiesToRenderBacking;
             }
         }
 
-        public ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderPrimary { get; private set; } =
+        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderPrimary { get; set; } =
             ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
 
-        public ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderBacking { get; private set; } =
+        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderBacking { get; set; } =
             ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
 
-        private IDisposable DisplayUndoableImpl(IRenderable body, IModelDoc2 doc, int layer)
+        private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
         {
-            BodiesToRender = BodiesToRender.SetItem(body, Tuple.Create(layer, body));
+            BodiesToRender = BodiesToRender.SetItem(renderable, Tuple.Create(layer, renderable));
             Redraw(doc);
 
             return Disposable.Create(() =>
             {
                 var btr = BodiesToRender;
-                if(btr.ContainsKey(body))
-                    BodiesToRender = btr.Remove(body);
+                if(btr.ContainsKey(renderable))
+                    BodiesToRender = btr.Remove(renderable);
                 Redraw(doc);
             });
         }
 
-        private static IModelView Redraw(IModelDoc2 doc)
+        private static void Redraw(IModelDoc2 doc)
         {
             var activeView = (IModelView) doc.ActiveView;
-            if (!_DeferRedraw)
-                activeView.GraphicsRedraw(null);
-            return activeView;
+            if (!UsingPrimaryBuffer) return;
+            activeView.GraphicsRedraw(null);
         }
 
         private void DoSetup()
@@ -171,22 +170,54 @@ namespace SolidworksAddinFramework
             _Disposable.Dispose();
         }
 
-        private static bool _DeferRedraw = false;
+        private static int _DeferRedraw = 0;
+
+
+        public static IDisposable DeferRedraw(IModelDoc2 doc, Func<IDisposable> fn  )
+        {
+            IDisposable d;
+            using (DeferRedraw(doc))
+            {
+                d = fn();
+            }
+
+            return Disposable.Create(() =>
+            {
+                using (DeferRedraw(doc))
+                    d.Dispose();
+            });
+        }
+
         public static IDisposable DeferRedraw(IModelDoc2 doc)
         {
             if (!OpenGlRenderer.Lookup.ContainsKey(doc))
                 return Disposable.Empty;
 
-            var renderer = OpenGlRenderer.Lookup[doc];
-            renderer.BodiesToRenderBacking = renderer.BodiesToRenderPrimary;
-            _DeferRedraw = true;
+            if(UsingPrimaryBuffer)
+            {
+                var renderer = Lookup[doc];
+                renderer.BodiesToRenderBacking = renderer.BodiesToRenderPrimary;
+            }
+            Incr();
+
             return Disposable.Create(() =>
             {
-                var activeView = (IModelView)doc.ActiveView;
-                renderer.BodiesToRenderPrimary= renderer.BodiesToRenderBacking;
-                _DeferRedraw = false;
-                activeView.GraphicsRedraw(null);
+                if(UsingPrimaryBufferOnNextDecr)
+                {
+                    OpenGlRenderer renderer = Lookup[doc];
+                    var activeView = (IModelView)doc.ActiveView;
+                    renderer.BodiesToRenderPrimary= renderer.BodiesToRenderBacking;
+                    activeView.GraphicsRedraw(null);
+                }
+                Decr();
             });
         }
+
+        private static bool UsingPrimaryBuffer => _DeferRedraw==0;
+        private static bool UsingPrimaryBufferOnNextDecr => _DeferRedraw==1;
+
+        private static void Decr() => _DeferRedraw --;
+
+        private static void Incr() => _DeferRedraw ++;
     }
 }
