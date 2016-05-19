@@ -323,7 +323,10 @@ namespace SolidworksAddinFramework
             return (ICurve)edge.GetCurve();
         }
 
-        public static List<Vector3> GetPointsByLength(this ICurve curve, double pointDistance, DoubleRange? flankHelixDomain = null)
+        public static List<PointParam> GetPointsByLength
+            ( this ICurve curve
+            , double pointDistance
+            , DoubleRange? flankHelixDomain = null)
         {
             var length = curve.Length();
             var numberOfPoints = (int)(length/pointDistance);
@@ -332,7 +335,7 @@ namespace SolidworksAddinFramework
             var domain = flankHelixDomain ?? new DoubleRange(curveDomain[0], curveDomain[1]);
 
             return Sequences.LinSpace(domain.Min, domain.Max, numberOfPoints)
-                .Select(t => curve.PointAt(t))
+                .Select(t => new PointParam(curve.PointAt(t), t))
                 .ToList();
         }
     }
