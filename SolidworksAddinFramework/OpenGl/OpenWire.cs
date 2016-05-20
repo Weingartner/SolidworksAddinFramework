@@ -26,9 +26,9 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void Render(DateTime time)
         {
-            using (ModernOpenGl.Begin(_Mode))
-            using (ModernOpenGl.SetColor(_Color, ShadingModel.Smooth))
             using (ModernOpenGl.SetLineWidth(_Thickness))
+            using (ModernOpenGl.SetColor(_Color, ShadingModel.Smooth))
+            using (ModernOpenGl.Begin(_Mode))
             {
                 _Points.ForEach(p=>p.GLVertex3());
             }
