@@ -69,7 +69,7 @@ namespace DemoMacroFeatures.ManipulatorSample
                     // the previous selection.
 
                     // Copy the selected body so we can transform it
-                    var newbody = (IBody2) body.Copy();
+                    var newbody = (IBody2) body().Copy();
                     var mathUtility = (IMathUtility)SwApp.GetMathUtility();
 
                     // Create our triad. This is a custom class to make working with triads easier
@@ -107,7 +107,7 @@ namespace DemoMacroFeatures.ManipulatorSample
 
                     }));
 
-                    SetManipulatorPositionToBodyCenter(SwApp, triad, body, ModelDoc);
+                    SetManipulatorPositionToBodyCenter(SwApp, triad, body(), ModelDoc);
 
                     // Show the triad and register it to be removed if the selection changes
                     triad.Show(ModelDoc);
@@ -120,13 +120,13 @@ namespace DemoMacroFeatures.ManipulatorSample
 
                     // Hide the selected body and register it to be shown again
                     // if the selection changes
-                    yield(body.HideBodyUndoable());
+                    yield(body().HideBodyUndoable());
 
 
                 });
         }
 
-        private IObservable<Option<IBody2>> BodySelector()
+        private IObservable<Option<Func<IBody2>>> BodySelector()
         {
             return _Model.WhenAnyValue(p => p.Body)
                 .Where(p => !p.IsEmpty)

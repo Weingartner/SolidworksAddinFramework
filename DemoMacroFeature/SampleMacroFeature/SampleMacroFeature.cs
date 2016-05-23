@@ -20,9 +20,9 @@ namespace DemoMacroFeatures.SampleMacroFeature
         {
             return Database.Body
                 .GetSingleObject<IBody2>(ModelDoc)
-                .Match<object>(body =>
+                .Match<object>(bodyFn =>
                 {
-                    body = (IBody2) body.Copy();
+                    var body = (IBody2) bodyFn().Copy();
                     SwFeatureData.EnableMultiBodyConsume = true;
                     var splitBodies = SplitBodies(modeler, body, Database);
                     if (splitBodies == null) return "There was some error";

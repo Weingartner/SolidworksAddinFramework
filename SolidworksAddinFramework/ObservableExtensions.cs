@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using LanguageExt;
 using LanguageExt.SomeHelp;
 using SolidWorks.Interop.sldworks;
@@ -36,6 +38,49 @@ namespace SolidworksAddinFramework
 
             return new CompositeDisposable(s,d);
 
+        }
+
+        public static void LoadUnloadHandler(this FrameworkElement control, Func<IEnumerable<IDisposable>> action)
+        {
+            LoadUnloadHandler(control, () => (IDisposable)new CompositeDisposable(action()));
+        }
+
+        public static void LoadUnloadHandler(this FrameworkElement control, Func<IDisposable> action)
+        {
+            var state = false;
+            var cleanup = new SerialDisposable();
+            Observable.Merge
+                (Observable.Return(control.IsLoaded)
+                , control.Events().Loaded.Select(x => true)
+                , control.Events().Unloaded.Select(x => false)
+                )
+                .Subscribe(isLoadEvent =>
+                {
+                    if (!state)
+                    {
+                        // unloaded state
+                        if (isLoadEvent)
+                        {
+                            state = true;
+                            cleanup.Disposable = new CompositeDisposable(action());
+                        }
+                    }
+                    else
+                    {
+                        // loaded state
+                        if (!isLoadEvent)
+                        {
+                            state = false;
+                            cleanup.Disposable = Disposable.Empty;
+                        }
+                    }
+
+                });
+        }
+
+        public static void LoadUnloadHandler<T>(this IObservable<T> @this, FrameworkElement control, Action<T> action)
+        {
+            LoadUnloadHandler(control, () => @this.Subscribe(action));
         }
 
         /// <summary>
@@ -371,6 +416,11 @@ namespace SolidworksAddinFramework
         public static IObservable<T> WhereIsSome<T>(this IObservable<Option<T>> q)
         {
             return q.SelectMany(o => o.MatchObservable(Observable.Return<T>, Observable.Empty<T>));
+        }
+
+        public static IEnumerable<T> WhereIsSome<T>(this IEnumerable<Option<T>> q)
+        {
+            return q.SelectMany(o => o.Match(EnumerableEx.Return, Enumerable.Empty<T>));
         }
     }
 }

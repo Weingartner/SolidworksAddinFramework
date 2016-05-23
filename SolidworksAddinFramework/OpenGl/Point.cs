@@ -31,7 +31,7 @@ namespace SolidworksAddinFramework.OpenGl
             //}
 
             //GL.Clear(ClearBufferMask.ColorBufferBit);
-            using (ModernOpenGl.SetColor(_Color, ShadingModel.Flat))
+            using (ModernOpenGl.SetColor(_Color, ShadingModel.Flat, solidBody: false))
             {
                 GL.PointSize(_Size);
                 GL.Enable(EnableCap.AlphaTest);

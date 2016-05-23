@@ -71,24 +71,14 @@ namespace DemoMacroFeatures.SampleMacroFeature
                 )
                 .Select(o =>
                 {
-                    var body = o.selection.GetSingleObject(ModelDoc).DirectCast<IBody2>();
-
-                    var newBody = (IBody2)body?.Copy();
-                    if (newBody == null)
-                        return null;
-
-                    var splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody,
-                        MacroFeature.Database);
-
-                    return splits == null ? null : new { body, splits = splits.ToList() };
+                    return from bodyFn in o.selection.GetSingleObject<IBody2>(ModelDoc)
+                           let newBody = (IBody2) bodyFn().Copy()
+                           let splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody, MacroFeature.Database)
+                           select splits == null ? null : new { body = bodyFn(), splits = splits.ToList() };
                 })
+                .WhereIsSome()
                 .SubscribeDisposable((v, yield) =>
                 {
-                    if (v == null)
-                    {
-                        return;
-                    }
-
                     yield(v.body.HideBodyUndoable());
                     yield(v.splits.DisplayBodiesUndoable(MacroFeature.ModelDoc));
 

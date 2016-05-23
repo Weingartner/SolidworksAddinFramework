@@ -98,6 +98,10 @@
       <HintPath>$(SolutionDir)packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ReactiveUI.Events, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\reactiveui-events.6.5.0\lib\net45\ReactiveUI.Events.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
       <HintPath>$(SolidWorksLocation)\SOLIDWORKS\api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>

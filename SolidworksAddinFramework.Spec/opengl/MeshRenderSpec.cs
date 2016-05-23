@@ -122,7 +122,7 @@ namespace SolidworksAddinFramework.Spec.opengl
                 //var clonedFace = (IFace2) face.
                 //var clonedSurface = (ISurface) clonedFace.Copy();
                 var faceBody = (IBody2)face.GetBody();
-                var faceMesh = new Mesh(faceBody, Color.Green);
+                var faceMesh = new Mesh(faceBody, Color.Green, isSolid:false);
                 var d1 = faceMesh.DisplayUndoable(modelDoc);
 
                 //return new CompositeDisposable(d, d1);

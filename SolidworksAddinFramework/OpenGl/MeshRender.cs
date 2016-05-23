@@ -14,9 +14,9 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public static class MeshRender
     {
-        public static void Render(Mesh mesh, Color color)
+        public static void Render(Mesh mesh, Color color, bool isSolid)
         {
-            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
+            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth, solidBody:isSolid))
             using (ModernOpenGl.SetLineWidth(2.0f))
             using (ModernOpenGl.Begin(PrimitiveType.Triangles))
             {
@@ -27,7 +27,7 @@ namespace SolidworksAddinFramework.OpenGl
                 }
             }
             if (mesh.Edges == null) return;
-            using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth))
+            using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth, solidBody:isSolid))
             using (ModernOpenGl.SetLineWidth(2.0f))
             using (ModernOpenGl.Begin(PrimitiveType.Lines))
                 foreach (var v in mesh.Edges)
@@ -37,9 +37,9 @@ namespace SolidworksAddinFramework.OpenGl
                 }
         }
 
-        public static void Render(IFace2[] faces, Color color, float lineWidth)
+        public static void Render(IFace2[] faces, Color color, float lineWidth, bool isSolid)
         {
-            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth))
+            using (ModernOpenGl.SetColor(color, ShadingModel.Smooth, solidBody:isSolid))
             using (ModernOpenGl.SetLineWidth(lineWidth))
             {
                 faces

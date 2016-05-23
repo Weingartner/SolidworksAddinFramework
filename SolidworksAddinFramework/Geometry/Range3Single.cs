@@ -120,12 +120,12 @@ namespace SolidworksAddinFramework.Geometry
 
         public Mesh ToMesh(Color color)
         {
-            return new Mesh(color, Triangles(),Edges());
+            return new Mesh(color, false, Triangles(), Edges());
         }
 
         public static Mesh ToMesh(IEnumerable<Range3Single> voxels, Color color)
         {
-            return new Mesh(color, voxels.SelectMany(p=>p.Triangles()));
+            return new Mesh(color, false, voxels.SelectMany(p=>p.Triangles()));
         }
 
 

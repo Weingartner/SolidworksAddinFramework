@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Text;
+using System.Threading;
 
 namespace SolidworksAddinFramework
 {
@@ -19,5 +20,6 @@ namespace SolidworksAddinFramework
                 container.Add(disposable);
             return disposable;
         }
+        public static IDisposable DisposeWith(this IDisposable d, CancellationToken token) => token.Register(d.Dispose);
     }
 }

@@ -338,5 +338,20 @@ namespace SolidworksAddinFramework
                 .Select(t => new PointParam(curve.PointAt(t), t))
                 .ToList();
         }
+
+        public static void GetPlanePoints(this ICurve curve, double position, out Vector3 pNormal, out Vector3 pCurve, out Vector3 pAxis)
+        {
+            var pCurvePoint = curve.PointTangentAt(position);
+
+            pCurve = pCurvePoint.Point;
+            pAxis = pCurve.ProjectOn(Vector3.UnitZ);
+
+            var vTangent = pCurvePoint.Direction;
+            var vCa = pAxis - pCurve;
+
+            var vNormal = Vector3.Cross(vTangent, vCa);
+
+            pNormal = pCurve + vNormal;
+        }
     }
 }

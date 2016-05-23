@@ -16,9 +16,9 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
 
-        public static IDisposable SetColor(Color value, ShadingModel shadingModel)
+        public static IDisposable SetColor(Color value, ShadingModel shadingModel, bool solidBody)
         {
-
+            var revert = new CompositeDisposable();
             GL.ShadeModel(shadingModel);
             if (shadingModel == ShadingModel.Smooth)
             {
@@ -41,33 +41,32 @@ namespace SolidworksAddinFramework.OpenGl
                 GL.Disable(EnableCap.Lighting);
             }
 
-            var enableCull = false;
-            if (value.A<255)
+            var isTransparent = value.A < 255;
+            if (!solidBody || isTransparent)
+            {
+                if (GL.IsEnabled(EnableCap.CullFace))
+                {
+                    revert.Add(Disposable.Create(() => GL.Enable(EnableCap.CullFace)));
+                }
+                GL.Disable(EnableCap.CullFace);
+            }
+
+            if (isTransparent)
             {
                 GL.DepthMask(false);
-
-                enableCull = GL.IsEnabled(EnableCap.CullFace);
-                GL.Disable(EnableCap.CullFace);
+                revert.Add(Disposable.Create(() => GL.DepthMask(true)));
 
                 GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                revert.Add(Disposable.Create(() => GL.Disable(EnableCap.Blend)));
 
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             }
 
             var color = new[] { value.R / 255f, value.G / 255f, value.B / 255f, value.A / 255f };
             GL.Color4(color);
 
-            return Disposable.Create(() =>
-            {
-                if(value.A<255)
-                {
-                    if(enableCull)
-                        GL.Enable(EnableCap.CullFace);
-                    GL.Disable(EnableCap.Blend);
-                    GL.DepthMask(true);
-                }
-            });
+            return revert;
         }
 
         public static IDisposable SetLineWidth(float value)

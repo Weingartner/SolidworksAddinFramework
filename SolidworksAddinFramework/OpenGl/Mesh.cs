@@ -17,12 +17,11 @@ namespace SolidworksAddinFramework.OpenGl
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
         private IReadOnlyList<Edge3> _OriginalEdgeVertices;
         private readonly Color _Color;
-
-
+        private bool _IsSolid;
 
         private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
 
-        public Mesh(IBody2 body, Color color)
+        public Mesh(IBody2 body, Color color, bool isSolid)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
@@ -40,19 +39,22 @@ namespace SolidworksAddinFramework.OpenGl
             _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
             _Color = color;
+            _IsSolid = isSolid;
         }
 
-        public Mesh(Color color, IEnumerable<Triangle> enumerable,IReadOnlyList<Edge3> edges = null)
+        public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null)
         {
             TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
             Edges = edges;
             _Color = color;
+            _IsSolid = isSolid;
         }
-        public Mesh(Color color,IEnumerable<TriangleWithNormals> enumerable,IReadOnlyList<Edge3> edges = null)
+        public Mesh(Color color, bool isSolid, IEnumerable<TriangleWithNormals> enumerable, IReadOnlyList<Edge3> edges = null)
         {
             TrianglesWithNormals = enumerable.ToList();
             Edges = edges ?? new List<Edge3>();
             _Color = color;
+            _IsSolid = isSolid;
         }
 
 
@@ -68,7 +70,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void Render(DateTime time)
         {
-            MeshRender.Render(this, _Color);
+            MeshRender.Render(this, _Color, _IsSolid);
         }
 
         public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)

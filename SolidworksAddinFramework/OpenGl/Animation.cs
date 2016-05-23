@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -74,50 +75,79 @@ namespace SolidworksAddinFramework.OpenGl
 
     public class Animator : IRenderable
     {
-        public IReadOnlyList<SectionTime> SectionTimes { get; }
+        public IReadOnlyList<SectionTime> SectionTimes { get; private set; }
+        private readonly IReadOnlyList<IAnimationSection> _Sections;
         private readonly IReadOnlyList<IRenderable> _Children;
+        public double Framerate { get; }
 
-        private Animator(IReadOnlyList<SectionTime> sectionTimes, IReadOnlyList<IRenderable> children)
+        public Task CompletionTask { get; set; }
+
+        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children, int framerate=30)
         {
-            SectionTimes = sectionTimes;
+            _Sections = sections;
             _Children = children;
+            Framerate = framerate;
         }
 
-        public static async Task Animate
+        public IDisposable DisplayUndoable
+            (IModelDoc2 doc, int layer = 0)
+        {
+            if (SectionTimes != null)
+                throw new Exception("You have allready added this animation");
+
+            var cts = new CancellationDisposable();
+            SectionTimes = Calculate(_Sections, TimeSpan.Zero);
+
+            CompletionTask = Observable.Interval(TimeSpan.FromSeconds(1.0/Framerate))
+                .ObserveOnSolidworksThread()
+                .TakeWhile(_ => SectionTimes.Last().EndTime > DateTime.Now && !cts.Token.IsCancellationRequested)
+                .Select(l =>
+                {
+                    doc.GraphicsRedraw2();
+                    return Unit.Default;
+                })
+                // Just in case the sequence terminate before there
+                // is a value.
+                .StartWith(Unit.Default)
+                .Finally(()=>SectionTimes=null)
+                .ToTask(cts.Token);
+
+            var d = OpenGlRenderer.DisplayUndoable(this, doc);
+            return new CompositeDisposable(d, cts);
+        }
+
+        public async Task ToTask(IModelDoc2 doc, CancellationToken token, int layer = 0)
+        {
+            using (DisplayUndoable(doc,layer).DisposeWith(token))
+                await CompletionTask;
+        }
+
+
+        public static Animator Animate
             (IReadOnlyList<IAnimationSection> animationSections,
             IReadOnlyList<IRenderable> children,
-            IModelDoc2 doc,
-            CancellationToken token,
-            TimeSpan? startDelay = null,
             int framerate = 30)
         {
-            if (token.IsCancellationRequested)
-                return;
+            return new Animator(animationSections, children, framerate);
 
+        }
+
+        private static List<SectionTime> Calculate(IReadOnlyList<IAnimationSection> animationSections, TimeSpan? startDelay)
+        {
             var startTime = DateTime.Now + (startDelay ?? TimeSpan.Zero);
             var sectionTimes = animationSections
-                .Scan(new SectionTime(null, startTime), (acc, section) => new SectionTime(section, acc.EndTime + section.Duration))
+                .Scan(new SectionTime(null, startTime),
+                    (acc, section) => new SectionTime(section, acc.EndTime + section.Duration))
                 .ToList();
-            var animator = new Animator(sectionTimes, children);
-            using (OpenGlRenderer.DisplayUndoable(animator, doc))
-            {
-                await Observable.Interval(TimeSpan.FromSeconds(1.0/framerate))
-                    .ObserveOnSolidworksThread()
-                    .TakeWhile(_=>sectionTimes.Last().EndTime > DateTime.Now && !token.IsCancellationRequested)
-                    .Select(l =>
-                    {
-                        doc.GraphicsRedraw2();
-                        return Unit.Default;
-                    })
-                    // Just in case the sequence terminate before there
-                    // is a value.
-                    .StartWith(Unit.Default);
-
-            }
+            return sectionTimes;
         }
 
         public void Render(DateTime t)
         {
+
+            // ReSharper disable once UseNullPropagation
+            if (SectionTimes == null)
+                return;
 
             var currentSection = SectionTimes.FirstOrDefault(o => o.EndTime > t);
             if (currentSection == null)
@@ -136,6 +166,28 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void ApplyTransform(Matrix4x4 transform)
         {
+        }
+
+    }
+
+    public static class AnimationExtensions
+    {
+        
+        public static Animator CreateAnimator
+            (this IReadOnlyList<IAnimationSection> animationSections,
+            IReadOnlyList<IRenderable> children,
+            int framerate = 30)
+        {
+            return new Animator(animationSections, children, framerate);
+
+        }
+        public static Animator CreateAnimator
+            (this IReadOnlyList<IAnimationSection> animationSections,
+            IRenderable children,
+            int framerate = 30)
+        {
+            return new Animator(animationSections, new [] { children}, framerate);
+
         }
     }
 }

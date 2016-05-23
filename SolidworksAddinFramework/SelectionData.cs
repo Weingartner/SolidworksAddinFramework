@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -47,13 +48,24 @@ namespace SolidworksAddinFramework
                 });
         }
 
-        public static Option<object> GetSingleObject(this SelectionData selectionData, IModelDoc2 doc)
+        /// <summary>
+        /// Gets an evaluator for the selected object. We return Func because if you return the solidworks
+        /// object itself and store it you get burned by solidworks rebuilds when the object is invalidated.
+        /// Only evaluate the function when you actually need the solidworks object. If the return value
+        /// is None then it means that there is nothing selected.
+        /// </summary>
+        /// <param name="selectionData"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        public static Option<Func<object>> GetSingleObject(this SelectionData selectionData, IModelDoc2 doc) => 
+            selectionData.IsEmpty 
+            ? Option<Func<object>>.None 
+            : new Func<object>(()=> selectionData.GetObjects(doc).First());
+
+        public static Option<Func<T>> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
         {
-            return selectionData.GetObjects(doc).FirstOrDefault();
-        }
-        public static Option<T> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
-        {
-            return GetSingleObject(selectionData, doc).DirectCast<T>();
+            return from o in GetSingleObject(selectionData, doc)
+                select new Func<T>(()=> o().DirectCast<T>());
         }
 
         public static SelectionData SetObjects(this SelectionData selectionData, IEnumerable<object> objects, IModelDoc2 doc)
