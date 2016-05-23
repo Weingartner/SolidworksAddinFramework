@@ -84,7 +84,7 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
         public static async Task Animate
-            (IEnumerable<IAnimationSection> animationSections,
+            (IReadOnlyList<IAnimationSection> animationSections,
             IReadOnlyList<IRenderable> children,
             IModelDoc2 doc,
             CancellationToken token,
