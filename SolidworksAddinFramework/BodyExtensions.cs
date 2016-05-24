@@ -166,7 +166,14 @@ namespace SolidworksAddinFramework
         }
 
 
-        public static List<IEdge> GetIntersectionEdgesNonDestructive(IBody2 toolBody, IBody2 cuttingPlane)
+        /// <summary>
+        /// Get the edges formed by intersection both bodies together. The bodies are first copied 
+        /// before intersecting so that the input bodies are not modified.
+        /// </summary>
+        /// <param name="toolBody"></param>
+        /// <param name="cuttingPlane"></param>
+        /// <returns></returns>
+        public static List<IEdge> GetIntersectionEdgesNonDestructive(this IBody2 toolBody, IBody2 cuttingPlane)
         {
             toolBody = (IBody2) toolBody.Copy();
             cuttingPlane = (IBody2) cuttingPlane.Copy();
