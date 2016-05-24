@@ -166,8 +166,13 @@ namespace SolidworksAddinFramework
         }
 
 
-
-
+        public static List<IEdge> GetIntersectionEdgesNonDestructive(IBody2 toolBody, IBody2 cuttingPlane)
+        {
+            toolBody = (IBody2) toolBody.Copy();
+            cuttingPlane = (IBody2) cuttingPlane.Copy();
+            var enumerable = ((object[]) toolBody.GetIntersectionEdges(cuttingPlane)).Cast<IEdge>().ToList();
+            return enumerable;
+        }
     }
     
 
