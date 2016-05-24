@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using LanguageExt;
+using static LanguageExt.Prelude;
 using Newtonsoft.Json;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -61,6 +62,12 @@ namespace SolidworksAddinFramework
             selectionData.IsEmpty 
             ? Option<Func<object>>.None 
             : new Func<object>(()=> selectionData.GetObjects(doc).First());
+
+        public static IEnumerable<T> GetObjects<T>(this SelectionData selectionData, IModelDoc2 doc)
+        {
+            return from o in selectionData.GetObjects(doc)
+                select o.DirectCast<T>();
+        }
 
         public static Option<Func<T>> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
         {
