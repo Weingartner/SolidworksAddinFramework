@@ -14,7 +14,8 @@ namespace SolidworksAddinFramework
         public static IFace2 ToFace(this ISurface surface)
             => (IFace2) surface.ToSheetBody().GetFirstFace();
 
-        public static IBody2 ToSheetBody(this ISurface surface) => SwAddinBase.Active.Modeler.CreateSurfaceBody(surface);
+        public static IBody2 ToSheetBody(this ISurface surface, bool transferOwnership = false)
+            => SwAddinBase.Active.Modeler.CreateSurfaceBody(transferOwnership ? surface : (ISurface) surface.Copy());
 
         /// <summary>
         /// Represents a point on a surface. 
