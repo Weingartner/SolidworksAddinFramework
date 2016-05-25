@@ -66,5 +66,19 @@ namespace SolidworksAddinFramework
 
             throw new InvalidCastException($"Cannot cast {o.GetType().Name} to {typeof(T).Name} ");
         }
+
+        public static int GetHashCode(params object[] objects)
+        {
+            var olist = objects.ToList();
+            return GetHashCode(olist, o => o.GetHashCode());
+        }
+
+        public static int GetHashCode<T>(IEnumerable<T> items, Func<T, int> hashFunc )
+        {
+            unchecked
+            {
+                return items.Aggregate(19, (current, item) => current*31 + hashFunc(item));
+            }
+        }
     }
 }
