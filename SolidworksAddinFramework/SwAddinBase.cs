@@ -122,9 +122,9 @@ namespace SolidworksAddinFramework
 
         private static Assembly ResolveAssembly(object s, ResolveEventArgs e)
         {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var dir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var asmName = new AssemblyName(e.Name);
-            var asmPath = Path.Combine(dir, asmName.Name + ".dll");
+            var asmPath = System.IO.Path.Combine(dir, asmName.Name + ".dll");
             try
             {
                 return Assembly.LoadFrom(asmPath);
@@ -133,6 +133,19 @@ namespace SolidworksAddinFramework
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Return the path to where this plugin is loaded from
+        /// </summary>
+        public static string Path<Type>()
+        {
+                var Assembly = typeof(Type).Assembly;
+                var codeBase = Assembly.CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
+                var dir = System.IO.Path.GetDirectoryName(path);
+                return dir;
         }
 
         /// <summary>

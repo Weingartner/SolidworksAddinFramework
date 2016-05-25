@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using LanguageExt;
 using LanguageExt.SomeHelp;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using static LanguageExt.Prelude;
 using Unit = System.Reactive.Unit;
@@ -39,6 +40,11 @@ namespace SolidworksAddinFramework
 
             return new CompositeDisposable(s,d);
 
+        }
+
+        public static IObservable<T> Log<T>(this IObservable<T> o)
+        {
+            return o.Do(v => LogViewer.Log(v.ToString()));
         }
 
         public static void LoadUnloadHandler(this FrameworkElement control, Func<IEnumerable<IDisposable>> action)
