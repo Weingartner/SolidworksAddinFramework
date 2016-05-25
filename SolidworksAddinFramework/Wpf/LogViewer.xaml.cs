@@ -31,7 +31,7 @@ namespace SolidworksAddinFramework.Wpf
         public static void Log(LogEntry entry)
         {
             var window = Window.Value;
-            window.LogEntries.Add(entry);
+            window.Dispatcher.Invoke(()=> window.LogEntries.Add(entry));
         }
 
         private static int CurrentIndex = 0;
