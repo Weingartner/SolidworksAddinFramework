@@ -209,6 +209,7 @@
     <Compile Include="ModelDocExtensions.cs" />
     <Compile Include="ModellerExtensions.cs" />
     <Compile Include="ModelViewExtensions.cs" />
+    <Compile Include="ModelViewManagerExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
