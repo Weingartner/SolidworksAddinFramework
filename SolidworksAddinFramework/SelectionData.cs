@@ -59,9 +59,9 @@ namespace SolidworksAddinFramework
         /// <param name="doc"></param>
         /// <returns></returns>
         public static Option<Func<object>> GetSingleObject(this SelectionData selectionData, IModelDoc2 doc) => 
-            selectionData.IsEmpty 
-            ? Option<Func<object>>.None 
-            : new Func<object>(()=> selectionData.GetObjects(doc).First());
+            selectionData.IsEmpty
+            ? None
+            : Some(fun(()=> selectionData.GetObjects(doc).First()));
 
         public static IEnumerable<T> GetObjects<T>(this SelectionData selectionData, IModelDoc2 doc)
         {
@@ -72,7 +72,7 @@ namespace SolidworksAddinFramework
         public static Option<Func<T>> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
         {
             return from o in GetSingleObject(selectionData, doc)
-                select new Func<T>(()=> o().DirectCast<T>());
+                select fun(()=> o().DirectCast<T>());
         }
 
         public static SelectionData SetObjects(this SelectionData selectionData, IEnumerable<object> objects, IModelDoc2 doc)

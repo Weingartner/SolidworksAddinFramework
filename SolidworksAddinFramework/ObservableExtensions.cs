@@ -12,6 +12,7 @@ using System.Windows;
 using LanguageExt;
 using LanguageExt.SomeHelp;
 using SolidWorks.Interop.sldworks;
+using static LanguageExt.Prelude;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
@@ -246,11 +247,11 @@ namespace SolidworksAddinFramework
                 .Select(b => { 
                         try
                         {
-                            return selector(b.s, b.cts.Token).ToSome();
+                            return Optional(selector(b.s, b.cts.Token));
                         }
                         catch (OperationCanceledException e)
                         {
-                            return Option<U>.None;
+                            return None;
                         }
                     })
                 .WhereIsSome();
