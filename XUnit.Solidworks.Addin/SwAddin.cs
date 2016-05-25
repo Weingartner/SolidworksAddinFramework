@@ -56,7 +56,7 @@ namespace XUnit.Solidworks.Addin
         static Assembly LoadFromSolidworks(object sender, ResolveEventArgs args, string baseDirectory)
         {
             baseDirectory = @"C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS";
-            string assemblyPath = Path.Combine(baseDirectory, new AssemblyName(args.Name).Name + ".dll");
+            string assemblyPath = System.IO.Path.Combine(baseDirectory, new AssemblyName(args.Name).Name + ".dll");
             if (File.Exists(assemblyPath) == false) return null;
             var assembly = Assembly.LoadFrom(assemblyPath);
             return assembly;
@@ -65,7 +65,7 @@ namespace XUnit.Solidworks.Addin
         private static AppDomain CloneDomain(string name)
         {
             string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
-            var dir = Path.GetDirectoryName(path);
+            var dir = System.IO.Path.GetDirectoryName(path);
             var domaininfo = AppDomain.CurrentDomain.SetupInformation;
             domaininfo.ApplicationBase = dir;
             var domain = AppDomain.CreateDomain(name, AppDomain.CurrentDomain.Evidence, domaininfo);
