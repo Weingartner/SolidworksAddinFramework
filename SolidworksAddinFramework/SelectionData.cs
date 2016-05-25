@@ -15,10 +15,43 @@ namespace SolidworksAddinFramework
     [DataContract]
     public class SelectionData
     {
+        protected bool Equals(SelectionData other)
+        {
+            return Equals(ObjectIds, other.ObjectIds) && Mark == other.Mark;
+        }
+
+        private static bool Equals(IReadOnlyList<byte[]> itemsA, IReadOnlyList<byte[]> itemsB)
+        {
+            if (itemsA.Count != itemsB.Count)
+                return false;
+            return itemsA
+                .Zip(itemsB, (a,b)=> a.SequenceEqual(b))
+                .All(x=>x);
+        }
+
+        private static int GetHashCode(IEnumerable<byte[]> a) => ObjectExtensions.GetHashCode(a, v => ObjectExtensions.GetHashCode(v, v2 => v2.GetHashCode()));
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != this.GetType())
+                return false;
+            return Equals((SelectionData) obj);
+        }
+
+        public override int GetHashCode() => ObjectExtensions.GetHashCode(GetHashCode(ObjectIds), Mark);
+
         public static readonly SelectionData Empty = new SelectionData(Enumerable.Empty<byte[]>(), -1);
+
+        public override string ToString() => $"SelectionData ( {Mark} - {ObjectIdsHuman}";
 
         [DataMember]
         public IReadOnlyList<byte[]> ObjectIds { get; }
+
+        public string ObjectIdsHuman => string.Join(":",ObjectIds.Select(id => BitConverter.ToString(id, 0, id.Length)));
         [DataMember]
         public int Mark { get; }
 
