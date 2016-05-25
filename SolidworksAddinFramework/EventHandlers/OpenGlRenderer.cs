@@ -24,11 +24,17 @@ namespace SolidworksAddinFramework
 
         public static IDisposable Setup(SldWorks swApp)
         {
+            if (swApp == null)
+                throw new ArgumentNullException(nameof(swApp));
+
             if (Interlocked.CompareExchange(ref _isInitialized, 1, 0) == 1) return Disposable.Empty;
 
             var d0 = swApp
                 .DoWithOpenDoc(modelDoc =>
                 {
+                    if (!modelDoc.Visible)
+                        return Disposable.Empty;
+
                     var modelView = (ModelView) modelDoc.GetFirstModelView();
                     Lookup.GetOrAdd(modelDoc, mv => new OpenGlRenderer(modelView));
 
@@ -58,6 +64,11 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DisplayUndoable(IRenderable renderable, IModelDoc2 doc, int layer = 0)
         {
+            if (renderable == null)
+                throw new ArgumentNullException(nameof(renderable));
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+
             OpenGlRenderer openGlRenderer;
             if (Lookup.TryGetValue(doc, out openGlRenderer))
             {
@@ -72,6 +83,9 @@ namespace SolidworksAddinFramework
 
         private OpenGlRenderer(ModelView mv)
         {
+            if (mv == null)
+                throw new ArgumentNullException(nameof(mv));
+
             _MView = mv;
 
             DoSetup();
@@ -119,6 +133,11 @@ namespace SolidworksAddinFramework
 
         private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
         {
+            if (renderable == null)
+                throw new ArgumentNullException(nameof(renderable));
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+
             BodiesToRender = BodiesToRender.SetItem(renderable, Tuple.Create(layer, renderable));
             Redraw(doc);
 
@@ -133,6 +152,9 @@ namespace SolidworksAddinFramework
 
         private static void Redraw(IModelDoc2 doc)
         {
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+
             var activeView = (IModelView) doc.ActiveView;
             if (!UsingPrimaryBuffer) return;
             activeView.GraphicsRedraw(null);
@@ -175,6 +197,11 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DeferRedraw(IModelDoc2 doc, Func<IDisposable> fn  )
         {
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+            if (fn == null)
+                throw new ArgumentNullException(nameof(fn));
+
             IDisposable d;
             using (DeferRedraw(doc))
             {
@@ -190,6 +217,9 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DeferRedraw(IModelDoc2 doc)
         {
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+
             if (!OpenGlRenderer.Lookup.ContainsKey(doc))
                 return Disposable.Empty;
 
