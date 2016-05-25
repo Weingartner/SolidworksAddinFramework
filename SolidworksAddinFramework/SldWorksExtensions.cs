@@ -9,11 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SolidworksAddinFramework.Events;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework
 {
     public static class SldWorksExtensions
     {
+
         public static IObservable<IModelDoc2> DocOpenObservable(this SldWorks swApp)
         {
             return swApp.DocumentLoadNotify2Observable()
@@ -47,6 +49,35 @@ namespace SolidworksAddinFramework
                 return disposables;
             };
             return swApp.DoWithOpenDoc(func);
+        }
+
+        /// <summary>
+        /// Open a document invisibly. It will not be shown to the user but you will be
+        /// able to interact with it through the API as if it is loaded.
+        /// </summary>
+        /// <param name="sldWorks"></param>
+        /// <param name="toolFile"></param>
+        /// <returns></returns>
+        public static ModelDoc2 OpenInvisibleReadOnly(this ISldWorks sldWorks, string toolFile, swDocumentTypes_e type = swDocumentTypes_e.swDocPART)
+        {
+            try
+            {
+                sldWorks.DocumentVisible(false, (int)type);
+                var spec = (IDocumentSpecification)sldWorks.GetOpenDocSpec(toolFile);
+                spec.Silent = true;
+                spec.ReadOnly = true;
+                var doc = SwAddinBase.Active.SwApp.OpenDoc7(spec);
+                doc.Visible = false;
+                return doc;
+            }
+            finally
+            {
+                sldWorks.DocumentVisible
+                    (true,
+                        (int)
+                            type);
+
+            }
         }
     }
 }
