@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using LanguageExt;
 using LanguageExt.Parsec;
-using LanguageExt.UnitsOfMeasure;
 using static LanguageExt.Prelude;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.Geometry;
@@ -433,114 +432,9 @@ namespace SolidworksAddinFramework
     {
     }
 
-    public class SwEq
+    public enum UnitsEnum
     {
-        public string Id { get; }
-        public double Val { get; }
-        /// <summary>
-        /// The units that the value will be written to solidworks as. The Val
-        /// property is always stored as meters or radians.
-        /// </summary>
-        public string SolidWorksUnits { get; }
-
-        public SwEq(string id, double val, string solidWorksUnits )
-        {
-            Id = id;
-            Val = val;
-            switch (solidWorksUnits)
-            {
-                case "cm": // centimeters
-                    Val = val.Centimetres().Metres;
-                    break;
-                case "ft": // feet
-                    Val = val.Feet().Metres;
-                    break;
-                case "in": // inches
-                    Val = val.Inches().Metres;
-                    break;
-                case "m":  // meters
-                    Val = val.Metres().Metres;
-                    break;
-                case "uin":// micro inches
-                    Val = (val/1e9).Inches().Metres;
-                    break;
-                case "um": // micro meteres
-                    Val = val.Micrometres().Metres;
-                    break;
-                case "mil": // thousanth of an inch
-                    Val = (val/1e6).Inches().Metres;
-                    break;
-                case "mm": // millimeteres
-                    Val = val.Millimetres().Metres;
-                    break;
-                case "nm": // nanometers
-                    Val = val.Nanometres().Metres;
-                    break;
-                case "deg": // degrees
-                    Val = val*Math.PI/180;
-                    break;
-                case "rad": // radians
-                    Val = val;
-                    break;
-                case "undefined":
-                default:
-                    throw new Exception($"Not supported {solidWorksUnits}");
-                    
-            }
-            SolidWorksUnits = solidWorksUnits;
-        }
-
-        public override string ToString() => $@"""{Id}""={ValUnits}";
-
-        public string ValUnits
-        {
-            get
-            {
-
-                var scaled = 0.0;
-                switch (SolidWorksUnits)
-                {
-                    case "cm": // centimeters
-                        scaled = Val.Metres().Centimetres;
-                        break;
-                    case "ft": // feet
-                        scaled = Val.Metres().Feet;
-                        break;
-                    case "in": // inches
-                        scaled = Val.Metres().Inches;
-                        break;
-                    case "m":  // meters
-                        scaled = Val.Metres().Metres;
-                        break;
-                    case "uin":// micro inches
-                        scaled = Val.Metres().Inches * 1e9;
-                        break;
-                    case "um": // micro meteres
-                        scaled = Val.Metres().Micrometres;
-                        break;
-                    case "mil": // thousanth of an inch
-                        scaled = Val.Metres().Inches * 1e6;
-                        break;
-                    case "mm": // millimeteres
-                        scaled = Val.Metres().Millimetres;
-                        break;
-                    case "nm": // nanometers
-                        scaled = Val.Metres().Nanometres;
-                        break;
-                    case "deg": // degrees
-                        scaled = Val * 180 / Math.PI;
-                        break;
-                    case "rad": // radians
-                        scaled = Val;
-                        break;
-                    default:
-                        throw new Exception($"Not supported {SolidWorksUnits}");
-
-                }
-
-                return $"{scaled}{SolidWorksUnits}";
-            }
-
-        }
-    }
+        Length,
+        Angle
+    };
 }

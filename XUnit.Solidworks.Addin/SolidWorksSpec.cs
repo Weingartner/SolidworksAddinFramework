@@ -65,6 +65,19 @@ namespace XUnit.Solidworks.Addin
                 CreatePartDoc().Using(SwApp, m => action(m).Dispose());
             }
         }
+        protected void CreatePartDocWithTitle(bool keep, string title, Func<IModelDoc2, IDisposable> action)
+        {
+            if (keep)
+            {
+                var doc =CreatePartDoc();
+                doc.SetTitle2(title);
+                _keptStuff.Add(action(doc));
+            }
+            else
+            {
+                CreatePartDoc().Using(SwApp, m => action(m).Dispose());
+            }
+        }
         protected async Task CreatePartDoc(bool keep, Func<IModelDoc2, Task<IDisposable>> action)
         {
             if (keep)

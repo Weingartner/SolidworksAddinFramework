@@ -444,7 +444,7 @@ namespace SolidworksAddinFramework
             return InitControl(@group, control, controlConfig, ctrlPropSelector, ctrlPropChangeObservable, propParent, propSelector, x => x, x => x);
         }
 
-        protected IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
+        public IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
         {
             return CreateLabel(@group, tip, Observable.Return(caption));
         }
@@ -559,6 +559,13 @@ namespace SolidworksAddinFramework
         public virtual void Dispose()
         {
             Page?.Close(true);
+        }
+
+
+        protected static void ConfigAngleNumberBox(IPropertyManagerPageNumberbox config)
+        {
+            config.SetRange2((int) swNumberboxUnitType_e.swNumberBox_Angle, -10, 10, true, 0.005, 0.010, 0.001);
+            config.DisplayedUnit = (int) swAngleUnit_e.swDEGREES;
         }
     }
 
