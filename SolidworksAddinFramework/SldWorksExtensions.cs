@@ -58,24 +58,30 @@ namespace SolidworksAddinFramework
         /// <param name="sldWorks"></param>
         /// <param name="toolFile"></param>
         /// <returns></returns>
-        public static ModelDoc2 OpenInvisibleReadOnly(this ISldWorks sldWorks, string toolFile, swDocumentTypes_e type = swDocumentTypes_e.swDocPART)
+        public static ModelDoc2 OpenInvisibleReadOnly(this ISldWorks sldWorks, string toolFile, bool visible = false, swDocumentTypes_e type = swDocumentTypes_e.swDocPART)
         {
             try
             {
-                sldWorks.DocumentVisible(false, (int)type);
+                if(!visible)
+                    sldWorks.DocumentVisible(false, (int)type);
                 var spec = (IDocumentSpecification)sldWorks.GetOpenDocSpec(toolFile);
-                spec.Silent = true;
-                spec.ReadOnly = true;
+                if(!visible)
+                {
+                    spec.Silent = true;
+                    spec.ReadOnly = true;
+                }
                 var doc = SwAddinBase.Active.SwApp.OpenDoc7(spec);
-                doc.Visible = false;
+
+                doc.Visible = visible;
                 return doc;
             }
             finally
             {
-                sldWorks.DocumentVisible
-                    (true,
-                        (int)
-                            type);
+                if(!visible)
+                    sldWorks.DocumentVisible
+                        (true,
+                            (int)
+                                type);
 
             }
         }
