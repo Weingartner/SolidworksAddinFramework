@@ -211,6 +211,7 @@ namespace SolidworksAddinFramework.Geometry
         /// return the value minimum dimension from Dx, Dy, Dz
         /// </summary>
         public float MinDim => Math.Min(Math.Min(Dx, Dy), Dz);
+        public float MaxDim => Math.Max(Math.Max(Dx, Dy), Dz);
 
         public Vector3 GetAt(int i, int j, int k)
         {
