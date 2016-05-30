@@ -14,6 +14,7 @@ using static LanguageExt.Prelude;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Char = LanguageExt.Parsec.Char;
@@ -225,25 +226,25 @@ namespace SolidworksAddinFramework
         }
 
         /// <summary>
-        /// Set a global variable as you would find in the equation manager.
+        /// Set a global variable as you would find in the equation manager. The units
+        /// of this setting will always be meters.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="doc"></param>
         /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="meters"></param>
         /// <returns></returns>
-        public static bool SetGlobal(this IModelDoc2 doc, string name, double value)
+        public static bool SetGlobalMeters(this IModelDoc2 doc, string name, double meters)
         {
-            var swEqnMgr = doc.GetEquationMgr();
-            for (int i = 0; i < swEqnMgr.GetCount(); i++)
-            {
-                if (
-                    (from q in TrySet(swEqnMgr.Equation[i], name, value)
-                        let _ = swEqnMgr.Equation[i] = q
-                        select Unit.Default).IsSome)
-                    return true;
-            }
-            return false;
+            return SetGlobal(doc, new SwEq(name, meters, "m"));
+        }
+        public static bool SetGlobalRadians(this IModelDoc2 doc, string name, double radians)
+        {
+            return SetGlobal(doc, new SwEq(name, radians, "rad"));
+        }
+        public static bool SetGlobalDegrees(this IModelDoc2 doc, string name, double degrees)
+        {
+            return SetGlobal(doc, new SwEq(name, degrees, "deg"));
         }
 
         /// <summary>
@@ -251,31 +252,74 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="doc"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> GetGlobals(this IModelDoc2 doc )
+        public static Dictionary<int, SwEq> GetGlobals(this IModelDoc2 doc )
         {
             var swEqnMgr = doc.GetEquationMgr();
-            return Enumerable.Range(0, swEqnMgr.GetCount()).Select
+            var p = ModelDocExtensions.SwEwParser;
+            return Enumerable.Range(0, swEqnMgr.GetCount())
+                .Select
                 (i =>
                 {
                     var str = swEqnMgr.Equation[i];
-                    var nv = str.Split('=').Select(s => s.Trim('"', ' ')).ToList();
-                    var kvp = new
+                    var r = p.Parse(str);
+                    if(r.IsFaulted)
                     {
-                        name = nv[0],
-                        value = nv[1]
-                    };
+                        LogViewer.Log($"Can't parse variable {str}");
+                        return None;
 
-                    return kvp;
-
-                }).ToDictionary(v => v.name, v => v.value);
+                    }
+                    return Some(new {i, r.Reply.Result});
+                })
+                .WhereIsSome()
+                .ToDictionary(v => v.i, v => v.Result);
         }
 
-        public static Option<string> GetGlobal(this IModelDoc2 doc, string name)
+        /// <summary>
+        /// Set a number of globals at specific positions in the equation table
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="globals"></param>
+        public static void SetGlobals(this IModelDoc2 doc, Dictionary<int, SwEq> globals)
         {
-            var globals = doc.GetGlobals();
-            if (globals.ContainsKey((name)))
-                return globals[name];
-            return None;
+            foreach (var kv in globals)
+            {
+                SetGlobal(doc,kv.Key, kv.Value);
+            }
+        }
+
+        /// <summary>
+        /// Set a global variable at position i in the globals table
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="i"></param>
+        /// <param name="eq"></param>
+        private static void SetGlobal(this IModelDoc2 doc, int i, SwEq eq)
+        {
+            var swEqnMgr = doc.GetEquationMgr();
+            swEqnMgr.Equation[i] = eq.ToString();
+        }
+
+        /// <summary>
+        /// Set a global variable if the name exists allready. If it doesn't
+        /// then nothing happens and the function returns false;
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="eq"></param>
+        /// <returns></returns>
+        public static bool SetGlobal(this IModelDoc2 doc, SwEq eq)
+        {
+            var existing = doc.GetGlobal(eq.Id);
+            return existing.Match
+                (kv =>
+                {
+                    SetGlobal(doc, kv.Key, eq);
+                    return true;
+                },()=>false);
+        }
+
+        public static Option<KeyValuePair<int,SwEq>> GetGlobal(this IModelDoc2 doc, string name)
+        {
+            return doc.GetGlobals().FirstOrDefault(g => g.Value.Id == name);
         }
 
         /// <summary>
@@ -393,13 +437,17 @@ namespace SolidworksAddinFramework
     {
         public string Id { get; }
         public double Val { get; }
-        public string Units { get; }
+        /// <summary>
+        /// The units that the value will be written to solidworks as. The Val
+        /// property is always stored as meters or radians.
+        /// </summary>
+        public string SolidWorksUnits { get; }
 
-        public SwEq(string id, double val, string units )
+        public SwEq(string id, double val, string solidWorksUnits )
         {
             Id = id;
             Val = val;
-            switch (units)
+            switch (solidWorksUnits)
             {
                 case "cm": // centimeters
                     Val = val.Centimetres().Metres;
@@ -436,10 +484,10 @@ namespace SolidworksAddinFramework
                     break;
                 case "undefined":
                 default:
-                    throw new Exception($"Not supported {units}");
+                    throw new Exception($"Not supported {solidWorksUnits}");
                     
             }
-            Units = units;
+            SolidWorksUnits = solidWorksUnits;
         }
 
         public override string ToString() => $@"""{Id}""={ValUnits}";
@@ -450,7 +498,7 @@ namespace SolidworksAddinFramework
             {
 
                 var scaled = 0.0;
-                switch (Units)
+                switch (SolidWorksUnits)
                 {
                     case "cm": // centimeters
                         scaled = Val.Metres().Centimetres;
@@ -486,11 +534,11 @@ namespace SolidworksAddinFramework
                         scaled = Val;
                         break;
                     default:
-                        throw new Exception($"Not supported {Units}");
+                        throw new Exception($"Not supported {SolidWorksUnits}");
 
                 }
 
-                return $"{scaled}{Units}";
+                return $"{scaled}{SolidWorksUnits}";
             }
 
         }
