@@ -111,10 +111,10 @@ namespace SolidworksAddinFramework
             CommandManager = SwApp.GetCommandManager(cookie);
 
             _Bmp = new BitmapHandler();
-            var d0 = OpenGlRenderer.Setup((SldWorks) SwApp);
-            var d1 = new CompositeDisposable(Setup());
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
-            var d2 = Disposable.Create(() => AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssembly);
+            var d0 = Disposable.Create(() => AppDomain.CurrentDomain.AssemblyResolve -= ResolveAssembly);
+            var d1 = OpenGlRenderer.Setup((SldWorks) SwApp);
+            var d2 = new CompositeDisposable(Setup());
             _Disposable = new CompositeDisposable(_Bmp, d0, d1, d2);
 
             return true;
