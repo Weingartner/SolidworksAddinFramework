@@ -6,23 +6,31 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Point : IRenderable
+    public class Point : RenderableBase
     {
         private readonly Color _Color;
         private readonly int _Size;
-        private bool _InFront;
 
         public Point(Vector3 location, Color color, int size, bool inFront=false)
         {
             Location = location;
             _Color = color;
             _Size = size;
-            _InFront = inFront;
+            UpdateBoundingSphere();
         }
 
-        private Vector3 Location { get; }
+        private void UpdateBoundingSphere()
+        {
+            UpdateBoundingSphere
+                (new[]
+                {
+                    Location
+                });
+        }
 
-        public void Render(DateTime time)
+        private Vector3 Location { get; set; }
+
+        public override void Render(DateTime time)
         {
             //using(ModernOpenGl.SetColor(_Color, ShadingModel.Smooth))
             //using (ModernOpenGl.Begin(PrimitiveType.Points))
@@ -50,10 +58,12 @@ namespace SolidworksAddinFramework.OpenGl
             }
         }
 
-        public void ApplyTransform(Matrix4x4 transform)
+        public override void ApplyTransform(Matrix4x4 transform)
         {
-            throw new NotImplementedException();
+            Location = Vector3.Transform(Location,transform);
+            UpdateBoundingSphere();
         }
+
     }
 
     public static class PointExtensions

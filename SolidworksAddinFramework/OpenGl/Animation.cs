@@ -168,6 +168,10 @@ namespace SolidworksAddinFramework.OpenGl
         {
         }
 
+        public Tuple<Vector3, float> BoundingSphere()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public static class AnimationExtensions

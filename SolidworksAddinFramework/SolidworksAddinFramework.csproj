@@ -223,6 +223,7 @@
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ModelViewManagerExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
+    <Compile Include="OpenGl\RenderableBase.cs" />
     <Compile Include="OptionTestingExtensios.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />

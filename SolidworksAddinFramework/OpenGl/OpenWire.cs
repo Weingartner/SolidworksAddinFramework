@@ -9,9 +9,9 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public abstract class Wire : IRenderable
+    public abstract class Wire : RenderableBase
     {
-        private IList<Vector3> _Points;
+        private IReadOnlyList<Vector3> _Points;
         private readonly float _Thickness;
         private readonly PrimitiveType _Mode;
         private Color _Color;
@@ -22,9 +22,10 @@ namespace SolidworksAddinFramework.OpenGl
             _Thickness = thickness;
             _Mode = mode;
             _Color = color;
+            UpdateBoundingSphere(_Points);
         }
 
-        public void Render(DateTime time)
+        public override void Render(DateTime time)
         {
             using (ModernOpenGl.SetLineWidth(_Thickness))
             using (ModernOpenGl.SetColor(_Color, ShadingModel.Smooth, solidBody:false))
@@ -34,11 +35,12 @@ namespace SolidworksAddinFramework.OpenGl
             }
         }
 
-        public void ApplyTransform(Matrix4x4 transform)
+        public override void ApplyTransform(Matrix4x4 transform)
         {
             _Points = _Points
                 .Select(p => Vector3.Transform(p,transform))
                 .ToList();
+            UpdateBoundingSphere(_Points);
         }
     }
 

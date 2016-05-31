@@ -12,7 +12,7 @@ using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Mesh : IRenderable
+    public class Mesh : RenderableBase
     {
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
         private IReadOnlyList<Edge3> _OriginalEdgeVertices;
@@ -40,6 +40,13 @@ namespace SolidworksAddinFramework.OpenGl
             _OriginalEdgeVertices = Edges;
             _Color = color;
             _IsSolid = isSolid;
+
+            UpdateBoundingSphere();
+        }
+
+        private void UpdateBoundingSphere()
+        {
+            UpdateBoundingSphere(TrianglesWithNormals.Points().Select(p => p.Point).ToList());
         }
 
         public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null)
@@ -48,13 +55,16 @@ namespace SolidworksAddinFramework.OpenGl
             Edges = edges;
             _Color = color;
             _IsSolid = isSolid;
+            UpdateBoundingSphere();
         }
+
         public Mesh(Color color, bool isSolid, IEnumerable<TriangleWithNormals> enumerable, IReadOnlyList<Edge3> edges = null)
         {
             TrianglesWithNormals = enumerable.ToList();
             Edges = edges ?? new List<Edge3>();
             _Color = color;
             _IsSolid = isSolid;
+            UpdateBoundingSphere();
         }
 
 
@@ -68,7 +78,7 @@ namespace SolidworksAddinFramework.OpenGl
                 .ToList();
 
 
-        public void Render(DateTime time)
+        public override void Render(DateTime time)
         {
             MeshRender.Render(this, _Color, _IsSolid);
         }
@@ -129,7 +139,7 @@ namespace SolidworksAddinFramework.OpenGl
         /// calls are NOT cumulative.
         /// </summary>
         /// <param name="transform"></param>
-        public void ApplyTransform(Matrix4x4 transform)
+        public override void ApplyTransform(Matrix4x4 transform)
         {
             Vector3 scale;
             Quaternion rotation;
@@ -144,6 +154,9 @@ namespace SolidworksAddinFramework.OpenGl
                 .Select(pn => pn.ApplyTransform(transform))
                 .ToList();
 
+            UpdateBoundingSphere();
+
         }
+
     }
 }
