@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.Numerics;
 using Weingartner.ReactiveCompositeCollections;
 
 namespace SolidworksAddinFramework
@@ -179,57 +181,54 @@ namespace SolidworksAddinFramework
         }
 
 
-        public override string ToString() => $@"""{Id}""={ValUnits}";
+        public override string ToString() => $@"""{Id}""={GetValUnits()}";
+        public string ToShortString() => $@"{Id.Abbreviate()}={GetValUnits(3)}";
 
-        public string ValUnits
+        public string GetValUnits(int sigFigs = 0)
         {
-            get
+            var scaled = 0.0;
+            switch (SolidWorksUnits)
             {
-
-                var scaled = 0.0;
-                switch (SolidWorksUnits)
-                {
-                    case "cm": // centimeters
-                        scaled = Val.Metres().Centimetres;
-                        break;
-                    case "ft": // feet
-                        scaled = Val.Metres().Feet;
-                        break;
-                    case "in": // inches
-                        scaled = Val.Metres().Inches;
-                        break;
-                    case "m":  // meters
-                        scaled = Val.Metres().Metres;
-                        break;
-                    case "uin":// micro inches
-                        scaled = Val.Metres().Inches * 1e9;
-                        break;
-                    case "um": // micro meteres
-                        scaled = Val.Metres().Micrometres;
-                        break;
-                    case "mil": // thousanth of an inch
-                        scaled = Val.Metres().Inches * 1e6;
-                        break;
-                    case "mm": // millimeteres
-                        scaled = Val.Metres().Millimetres;
-                        break;
-                    case "nm": // nanometers
-                        scaled = Val.Metres().Nanometres;
-                        break;
-                    case "deg": // degrees
-                        scaled = Val * 180 / Math.PI;
-                        break;
-                    case "rad": // radians
-                        scaled = Val;
-                        break;
-                    default:
-                        throw new Exception($"Not supported {SolidWorksUnits}");
-
-                }
-
-                return $"{scaled}{SolidWorksUnits}";
+                case "cm": // centimeters
+                    scaled = Val.Metres().Centimetres;
+                    break;
+                case "ft": // feet
+                    scaled = Val.Metres().Feet;
+                    break;
+                case "in": // inches
+                    scaled = Val.Metres().Inches;
+                    break;
+                case "m": // meters
+                    scaled = Val.Metres().Metres;
+                    break;
+                case "uin": // micro inches
+                    scaled = Val.Metres().Inches*1e9;
+                    break;
+                case "um": // micro meteres
+                    scaled = Val.Metres().Micrometres;
+                    break;
+                case "mil": // thousanth of an inch
+                    scaled = Val.Metres().Inches*1e6;
+                    break;
+                case "mm": // millimeteres
+                    scaled = Val.Metres().Millimetres;
+                    break;
+                case "nm": // nanometers
+                    scaled = Val.Metres().Nanometres;
+                    break;
+                case "deg": // degrees
+                    scaled = Val*180/Math.PI;
+                    break;
+                case "rad": // radians
+                    scaled = Val;
+                    break;
+                default:
+                    throw new Exception($"Not supported {SolidWorksUnits}");
             }
 
+            var str = sigFigs == 0 
+                ? scaled.ToString() : ((decimal) scaled).RoundToSignificantDigits((short)sigFigs).ToString(CultureInfo.InvariantCulture);
+            return $"{str}{SolidWorksUnits}";
         }
     }
 }

@@ -176,6 +176,53 @@ namespace Weingartner.Numerics
                 .Select(n => Math.Pow(n, gamma) * g + start);
         }
 
+        public static int CountDigits
+       (BigInteger number) => ((int)BigInteger.Log10(number)) + 1;
+
+        private static readonly BigInteger[] BigPowers10
+           = Enumerable.Range(0, 100)
+                     .Select(v => BigInteger.Pow(10, v))
+                     .ToArray();
+
+        private static readonly BigInteger BigUnitMask = new BigInteger(~(uint)0);
+
+        public static decimal RoundToSignificantDigits
+        (this decimal num,
+         short n)
+        {
+            if (num == 0)
+                return 0;
+            
+            var bits = decimal.GetBits(num);
+            var u0 = unchecked((uint)bits[0]);
+            var u1 = unchecked((uint)bits[1]);
+            var u2 = unchecked((uint)bits[2]);
+
+            var i = new BigInteger(u0)
+                    + (new BigInteger(u1) << 32)
+                    + (new BigInteger(u2) << 64);
+
+            var d = CountDigits(i);
+
+            var delta = d - n;
+            if (delta < 0)
+                return num;
+
+            var scale = BigPowers10[delta];
+            var div = i / scale;
+            var rem = i % scale;
+            var up = rem > scale / 2;
+            if (up)
+                div += 1;
+            var shifted = div * scale;
+
+            bits[0] = unchecked((int)(uint)(shifted & BigUnitMask));
+            bits[1] = unchecked((int)(uint)(shifted >> 32 & BigUnitMask));
+            bits[2] = unchecked((int)(uint)(shifted >> 64 & BigUnitMask));
+
+            return new decimal(bits);
+        }
+
 
     }
 }
