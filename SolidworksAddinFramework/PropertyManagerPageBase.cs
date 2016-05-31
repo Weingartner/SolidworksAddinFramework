@@ -550,7 +550,7 @@ namespace SolidworksAddinFramework
                 .Subscribe(v => control.Enabled = v);
         }
 
-        internal int NextId()
+        public int NextId()
         {
             _NextId++;
             return _NextId;
