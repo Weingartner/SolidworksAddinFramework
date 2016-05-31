@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using LanguageExt;
 using LanguageExt.SomeHelp;
+using SolidworksAddinFramework.Reflection;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using static LanguageExt.Prelude;
@@ -83,6 +85,34 @@ namespace SolidworksAddinFramework
                     }
 
                 });
+        }
+
+        /// <summary>
+        /// Using a selector bind the property to the observable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="S"></typeparam>
+        /// <param name="obs"></param>
+        /// <param name="target"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static IDisposable AssignTo<T, S>(this IObservable<T> obs, S target, Expression<Func<S, T>> selector)
+        {
+            var proxy = selector.GetProxy(target);
+            return obs.Subscribe(u => proxy.Value = u);
+        }
+
+        public static IObservable<bool> Not(this IObservable<bool> obs) => obs.Select(b => !b);
+        public static IObservable<bool> IsSome<T>(this IObservable<Option<T>> obs) => obs.Select(b => b.IsSome);
+
+        public static IObservable<Option<T>> IfTrue<T>(this IObservable<bool> obs, T t) => obs.Select(v => v.IfTrue(t));
+        public static IObservable<Option<T>> IfTrue<T>(this IObservable<bool> obs, Func<T> t) => obs.Select(v => v.IfTrue(t));
+
+
+        public static IDisposable AssignTo<T,S,U>(this IObservable<U> obs, Func<U, T> fn, S target, Expression<Func<S, T>> selector)
+        {
+            var proxy = selector.GetProxy(target);
+            return obs.Subscribe(u => proxy.Value = fn(u));
         }
 
         public static void LoadUnloadHandler<T>(this IObservable<T> @this, FrameworkElement control, Action<T> action)

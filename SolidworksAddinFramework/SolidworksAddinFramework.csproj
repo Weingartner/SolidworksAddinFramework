@@ -184,6 +184,7 @@
   <ItemGroup>
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
+    <Compile Include="BoolExtensions.cs" />
     <Compile Include="CommitableUndoablePropertyManagerPage.cs" />
     <Compile Include="ComWangling.cs" />
     <Compile Include="CooperativeTask.cs" />

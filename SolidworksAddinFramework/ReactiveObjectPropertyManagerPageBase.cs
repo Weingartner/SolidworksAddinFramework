@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using LanguageExt;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -55,5 +57,37 @@ namespace SolidworksAddinFramework
         protected abstract void OnCommit();
 
         protected abstract void OnCancel();
+
+        /// <summary>
+        /// Creates a simple label that when the option is some it becomes
+        /// visibile and displays the text in red.
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="errorObservable"></param>
+        /// <returns></returns>
+        protected IDisposable CreateErrorLabel(IPropertyManagerPageGroup @group, IObservable<Option<string>> errorObservable)
+        {
+            return CreateLabel(@group, "", "",
+                label =>
+                {
+                    var ctrl = (IPropertyManagerPageControl) label;
+                    ctrl.TextColor = ColorTranslator.ToWin32(System.Drawing.Color.Red);
+                    return errorObservable.Subscribe
+                        (errorOpt =>
+                        {
+                            errorOpt.Match
+                                (text =>
+                                {
+                                    label.Caption = text;
+                                    ctrl.Visible = true;
+
+                                },
+                                    () =>
+                                    {
+                                        ctrl.Visible = false;
+                                    });
+                        });
+                });
+        }
     }
 }

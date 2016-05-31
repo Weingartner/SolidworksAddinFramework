@@ -575,6 +575,17 @@ namespace SolidworksAddinFramework
             config.DisplayedUnit = (int) swAngleUnit_e.swDEGREES;
         }
 
+        public IDisposable CreatePMPControlFromForm(IPropertyManagerPageGroup @group,
+            Form host,
+            Action<IPropertyManagerPageWindowFromHandle> config = null) => CreatePMPControlFromForm
+                (@group,
+                    host,
+                    c =>
+                    {
+                        config?.Invoke(c);
+                        return Disposable.Empty;
+                    });
+
         public IDisposable CreatePMPControlFromForm(IPropertyManagerPageGroup @group, Form host, Func<IPropertyManagerPageWindowFromHandle, IDisposable> config = null)
         {
             host.Dock = DockStyle.Fill;
