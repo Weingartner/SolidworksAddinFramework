@@ -263,7 +263,7 @@ namespace SolidworksAddinFramework
                     var r = p.Parse(str);
                     if(r.IsFaulted)
                     {
-                        LogViewer.Log($"Can't parse variable {str}");
+                        Debug.WriteLine($"Can't parse variable {str}");
                         return None;
 
                     }

@@ -184,6 +184,7 @@
   <ItemGroup>
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
+    <Compile Include="CommitableUndoablePropertyManagerPage.cs" />
     <Compile Include="ComWangling.cs" />
     <Compile Include="CooperativeTask.cs" />
     <Compile Include="CurveExtension.cs" />
@@ -226,6 +227,9 @@
     <Compile Include="OpenGl\RenderableBase.cs" />
     <Compile Include="OptionTestingExtensios.cs" />
     <Compile Include="ParserExtensions.cs" />
+    <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
+    <Compile Include="ReactiveTransaction.cs" />
+    <Compile Include="ReactiveUndo.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
@@ -246,7 +250,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Range.tt</DependentUpon>
     </Compile>
-    <Compile Include="ReactiveObjectPropertyManagerPage.cs" />
+    <Compile Include="RevertiblePropertyManagerPage.cs" />
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionData.cs" />

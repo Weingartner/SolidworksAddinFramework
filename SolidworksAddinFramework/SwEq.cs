@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using LanguageExt.UnitsOfMeasure;
 using Newtonsoft.Json;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.ReactiveCompositeCollections;
@@ -69,7 +72,7 @@ namespace SolidworksAddinFramework
             var label = pmp.CreateLabel(@group, caption, caption);
             var id = pmp.NextId();
             var box = @group.CreateNumberBox(id, caption, caption);
-            box.Value = equation.Val;
+
             if (equation.UnitsType == UnitsEnum.Angle)
             {
                 box.SetRange2((int) swNumberboxUnitType_e.swNumberBox_Angle, -10, 10, true, 0.005, 0.010, 0.001);
@@ -83,7 +86,13 @@ namespace SolidworksAddinFramework
             }
             var obs = pmp.NumberBoxChangedObservable(id);
             var d2 = obs.Subscribe(value => list.ReplaceAt(index,equation.WithValue(value)));
-            return ControlHolder.Create(@group, box, d2, label);
+
+            var d3 = list.ChangesObservable()
+                .Select(_=>Unit.Default)
+                .StartWith(Unit.Default)
+                .Subscribe(v => box.Value = list.Source[index].Val);
+
+            return ControlHolder.Create(@group, box, d2, label, d3);
         }
 
         public static IDisposable CreateControls(PropertyManagerPageBase pmp,

@@ -11,7 +11,18 @@ namespace SolidworksAddinFramework
 
         public static void Copy<T>(T source, T target)
         {
-            JsonConvert.PopulateObject(JsonConvert.SerializeObject(source),target);
+            var serializeObject = JsonConvert.SerializeObject(source);
+            Copy(serializeObject, target);
+        }
+
+        public static void Copy<T>(string serializeObject, T target)
+        {
+            JsonConvert.PopulateObject(serializeObject, target);
+        }
+
+        public static string ToJson<T>(this T source)
+        {
+            return JsonConvert.SerializeObject(source);
         }
         
     }

@@ -21,7 +21,7 @@ namespace SolidworksAddinFramework
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase : IPropertyManagerPage2Handler9, IDisposable
+    public abstract class PropertyManagerPageBase : ReactiveObject, IPropertyManagerPage2Handler9, IDisposable
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
@@ -63,6 +63,11 @@ namespace SolidworksAddinFramework
             Page.Show();
 
             _Disposable.Add(PushSelections());
+        }
+
+        protected void DisposeOnClose(IDisposable disposable)
+        {
+            _Disposable.Add(disposable);
         }
 
         protected abstract IDisposable PushSelections();
@@ -445,17 +450,18 @@ namespace SolidworksAddinFramework
             return InitControl(@group, control, controlConfig, ctrlPropSelector, ctrlPropChangeObservable, propParent, propSelector, x => x, x => x);
         }
 
-        public IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption)
+        public IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption, Func<IPropertyManagerPageLabel, IDisposable> config = null)
         {
-            return CreateLabel(@group, tip, Observable.Return(caption));
+            return CreateLabel(@group, tip, Observable.Return(caption), config);
         }
 
-        private IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, IObservable<string> captionObs)
+        private IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, IObservable<string> captionObs, Func<IPropertyManagerPageLabel, IDisposable> config)
         {
             var id = NextId();
             var box = @group.CreateLabel(id, string.Empty, tip);
+            var d1 = config?.Invoke(box) ?? Disposable.Empty;
             var d0 = captionObs.Subscribe(caption => box.Caption = caption);
-            return ControlHolder.Create(@group, box, d0);
+            return ControlHolder.Create(@group, box, d0, d1);
         }
 
         /// <summary>
