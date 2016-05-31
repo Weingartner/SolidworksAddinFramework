@@ -592,7 +592,6 @@ namespace SolidworksAddinFramework
                         (NextId(), controlType, "", align, options, "");
 
             dotnet3.SetWindowHandlex64(host.Handle.ToInt64());
-            dotnet3.Height = 300;
 
             var d = config?.Invoke(dotnet3) ?? Disposable.Empty;
 
