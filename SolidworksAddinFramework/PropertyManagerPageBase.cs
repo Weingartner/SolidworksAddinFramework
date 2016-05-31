@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using ReactiveUI;
 using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
@@ -566,6 +567,32 @@ namespace SolidworksAddinFramework
         {
             config.SetRange2((int) swNumberboxUnitType_e.swNumberBox_Angle, -10, 10, true, 0.005, 0.010, 0.001);
             config.DisplayedUnit = (int) swAngleUnit_e.swDEGREES;
+        }
+
+        public IDisposable CreatePMPControlFromForm(IPropertyManagerPageGroup @group, Form host, Func<IPropertyManagerPageWindowFromHandle, IDisposable> config = null)
+        {
+            host.Dock = DockStyle.Fill;
+            host.TopLevel = false;
+
+
+            short controlType = (short) swPropertyManagerPageControlType_e.swControlType_WindowFromHandle;
+            short align = 0;
+            var options = (int) swAddControlOptions_e.swControlOptions_Enabled |
+                          (int) swAddControlOptions_e.swControlOptions_Visible;
+
+            var dotnet3 =
+                (IPropertyManagerPageWindowFromHandle)
+                    @group.AddControl2
+                        (NextId(), controlType, "", align, options, "");
+
+            dotnet3.SetWindowHandlex64(host.Handle.ToInt64());
+            dotnet3.Height = 300;
+
+            var d = config?.Invoke(dotnet3) ?? Disposable.Empty;
+
+            //wrapper.SizeChanged += (sender, args) => host.Size = wrapper.Size; 
+
+            return new ControlHolder(@group, dotnet3, d);
         }
     }
 
