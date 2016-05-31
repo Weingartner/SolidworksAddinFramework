@@ -20,9 +20,9 @@ namespace SolidworksAddinFramework.OpenGl
     {
         public static Tuple<Vector3,float> BoundingSphere(IReadOnlyList<Vector3> points)
         {
-            var avg = points.Aggregate(Vector3.Zero, (a, b) => a + b)/points.Count;
-            var radius = points.Max(p => (p - avg).Length());
-            return Prelude.Tuple(new Vector3(avg.X,avg.Y,0), radius);
+            var range = Range3Single.FromVertices(points);
+            var d = Math.Sqrt(range.Dx*range.Dx + range.Dy*range.Dy + range.Dz*range.Dz);
+            return Prelude.Tuple(range.Center, (float)d/2);
         }
 
         public static IEnumerable<Vector3> Points(this IEnumerable<Triangle> @this) => @this.SelectMany
