@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using LanguageExt;
 using ReactiveUI;
 using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
+using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
 {
@@ -609,6 +611,38 @@ namespace SolidworksAddinFramework
             //wrapper.SizeChanged += (sender, args) => host.Size = wrapper.Size; 
 
             return new ControlHolder(@group, dotnet3, d);
+        }
+
+        /// <summary>
+        /// Creates a simple label that when the option is some it becomes
+        /// visibile and displays the text in red.
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="errorObservable"></param>
+        /// <returns></returns>
+        protected IDisposable CreateErrorLabel(IPropertyManagerPageGroup @group, IObservable<Option<string>> errorObservable)
+        {
+            return CreateLabel(@group, "", "",
+                label =>
+                {
+                    var ctrl = (IPropertyManagerPageControl) label;
+                    ctrl.TextColor = ColorTranslator.ToWin32(System.Drawing.Color.Red);
+                    return errorObservable.Subscribe
+                        (errorOpt =>
+                        {
+                            errorOpt.Match
+                                (text =>
+                                {
+                                    label.Caption = text;
+                                    ctrl.Visible = true;
+
+                                },
+                                    () =>
+                                    {
+                                        ctrl.Visible = false;
+                                    });
+                        });
+                });
         }
     }
 
