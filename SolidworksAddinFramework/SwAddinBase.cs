@@ -122,7 +122,7 @@ namespace SolidworksAddinFramework
 
         private Assembly ResolveAssembly(object s, ResolveEventArgs e)
         {
-            var dir = System.IO.Path.GetDirectoryName(GetType().Location);
+            var dir = System.IO.Path.GetDirectoryName(GetType().Assembly.Location);
             var asmName = new AssemblyName(e.Name);
             var asmPath = System.IO.Path.Combine(dir, asmName.Name + ".dll");
             try
