@@ -109,9 +109,7 @@ namespace SolidworksAddinFramework
             return d;
         }
 
-        private SwEq WithValue(double value) => UnitsType == UnitsEnum.Length 
-            ? new SwEq(Id, value, "m") 
-            : new SwEq(Id, value, "rad");
+        private SwEq WithValue(double value) => new SwEq(Id, value, SolidWorksUnits, UnitsType);
 
         [JsonConstructor]
         private SwEq(string id, double val, string solidWorksUnits, UnitsEnum unitsType)
