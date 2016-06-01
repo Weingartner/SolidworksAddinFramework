@@ -4,6 +4,8 @@ namespace SolidworksAddinFramework
 {
     public static class Json
     {
+        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
+
         public static T Clone<T>(T tool)
         {
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(tool));
@@ -17,12 +19,17 @@ namespace SolidworksAddinFramework
 
         public static void Copy<T>(string serializeObject, T target)
         {
-            JsonConvert.PopulateObject(serializeObject, target);
+            JsonConvert.PopulateObject(serializeObject, target, SerializerSettings);
         }
 
-        public static string ToJson<T>(this T source)
+        public static T FromJson<T>(string value)
         {
-            return JsonConvert.SerializeObject(source);
+            return JsonConvert.DeserializeObject<T>(value, SerializerSettings);
+        }
+
+        public static string ToJson(this object source)
+        {
+            return JsonConvert.SerializeObject(source, SerializerSettings);
         }
         
     }

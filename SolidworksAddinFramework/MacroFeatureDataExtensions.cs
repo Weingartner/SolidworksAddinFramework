@@ -78,17 +78,16 @@ namespace SolidworksAddinFramework
         {
             string data;
             macroFeatureData.GetStringByName(FeatureDataKey, out data);
-            var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
-            return JsonConvert.DeserializeObject<T>(data, serializerSettings);
+            return Json.FromJson<T>(data);
         }
 
         public static void Write(this IMacroFeatureData macroFeatureData, object data)
         {
-            macroFeatureData.SetStringByName(FeatureDataKey, JsonConvert.SerializeObject(data));
+            macroFeatureData.SetStringByName(FeatureDataKey, Json.ToJson(data));
         }
 
         public static string[] GetFeatureDataNames() => new[] { FeatureDataKey };
         public static int[] GetFeatureDataTypes() => new[] { (int)swMacroFeatureParamType_e.swMacroFeatureParamTypeString };
-        public static string[] GetFeatureDataValues(object data) => new[] { JsonConvert.SerializeObject(data) };
+        public static string[] GetFeatureDataValues(object data) => new[] { Json.ToJson(data) };
     }
 }
