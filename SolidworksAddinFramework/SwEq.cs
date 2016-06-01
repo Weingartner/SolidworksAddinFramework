@@ -70,7 +70,7 @@ namespace SolidworksAddinFramework
         {
             var equation = list.Source[index];
 
-            var caption = equation.Id;
+            var caption = equation.Id.CamelCaseToHumanReadable();
             var label = pmp.CreateLabel(@group, caption, caption);
             var id = pmp.NextId();
             var box = @group.CreateNumberBox(id, caption, caption);
@@ -181,8 +181,8 @@ namespace SolidworksAddinFramework
         }
 
 
-        public override string ToString() => $@"""{Id}""={GetValUnits()}";
-        public string ToShortString() => $@"{Id.Abbreviate()}={GetValUnits(3)}";
+        public override string ToString() => $@"{Id.CamelCaseToHumanReadable()} = {GetValUnits()}";
+        public string ToShortString() => $@"{Id.Abbreviate()} = {GetValUnits(3)}";
 
         public string GetValUnits(int sigFigs = 0)
         {
