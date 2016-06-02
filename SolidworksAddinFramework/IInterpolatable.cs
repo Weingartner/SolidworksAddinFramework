@@ -1,5 +1,4 @@
 using System.Numerics;
-using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
@@ -7,7 +6,7 @@ namespace SolidworksAddinFramework
         where T : IInterpolatable<T>
     {
         T Interpolate(T other, double blend);
-        Matrix4x4 Transform(IMathUtility math);
+        Matrix4x4 Transform();
 
     }
 }

@@ -55,7 +55,7 @@ namespace SolidworksAddinFramework.OpenGl
         public Matrix4x4 BlendTransform(double beta)
         {
             Debug.Assert(beta>=0 && beta<=1);
-            return From.Interpolate(To, beta).Transform(_Math);
+            return From.Interpolate(To, beta).Transform();
         }
     }
 
