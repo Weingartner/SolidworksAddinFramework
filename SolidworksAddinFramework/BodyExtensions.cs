@@ -180,6 +180,11 @@ namespace SolidworksAddinFramework
             var enumerable = ((object[]) toolBody.GetIntersectionEdges(cuttingPlane)).Cast<IEdge>().ToList();
             return enumerable;
         }
+
+        public static IBody2 CopyTs(this IBody2 tool)
+        {
+            return (IBody2) tool.Copy();
+        }
     }
     
 
