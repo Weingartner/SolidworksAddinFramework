@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using SolidworksAddinFramework;
@@ -62,7 +63,9 @@ namespace XUnit.Solidworks.Addin
             }
             else
             {
-                CreatePartDoc().Using(SwApp, m => action(m).Dispose());
+                var doc = CreatePartDoc();
+                Debug.Assert(doc!=null);
+                doc.Using(SwApp, m => action(m).Dispose());
             }
         }
         protected void CreatePartDocWithTitle(bool keep, string title, Func<IModelDoc2, IDisposable> action)
