@@ -39,32 +39,38 @@ namespace SolidworksAddinFramework
             _OptionsE = optionsE;
         }
 
+        private readonly Subject<Unit> _ShowSubject = new Subject<Unit>();
+        public IObservable<Unit> ShowObservable => _ShowSubject.AsObservable(); 
         /// <summary>
         /// Creates a new SolidWorks property manager page, adds controls, and shows the page.
         /// </summary>
         public virtual void Show()
         {
-            if (Page != null)
+            using (Disposable.Create(() => _ShowSubject.OnNext(Unit.Default)))
             {
+                if (Page != null)
+                {
+                    Page.Show();
+                    return;
+                }
+
+                var options = _OptionsE.Aggregate(0, (acc, v) => (int)v | acc);
+                var errors = 0;
+                _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
+                var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options,
+                    _PropertyManagerPage2Handler9Wrapper, ref errors);
+
+                Page = (IPropertyManagerPage2)propertyManagerPage;
+                if (errors != (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
+                {
+                    throw new Exception("Unable to Create PMP");
+                }
+                AddControls();
+
                 Page.Show();
-                return;
+
+                _Disposable.Add(PushSelections());
             }
-
-            var options = _OptionsE.Aggregate(0,(acc,v)=>(int)v | acc);
-            var errors = 0;
-            _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
-            var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options, _PropertyManagerPage2Handler9Wrapper, ref errors);
-
-            Page = (IPropertyManagerPage2)propertyManagerPage;
-            if (errors != (int) swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
-            {
-                throw new Exception("Unable to Create PMP");
-            }
-            AddControls();
-
-            Page.Show();
-
-            _Disposable.Add(PushSelections());
         }
 
         protected void DisposeOnClose(IDisposable disposable)
@@ -103,14 +109,17 @@ namespace SolidworksAddinFramework
         public void OnClose(int reason)
         {
             _Disposable.Clear();
-            OnClose((swPropertyManagerPageCloseReasons_e)reason);
+            OnClose((swPropertyManagerPageCloseReasons_e) reason);
         }
 
         protected abstract void OnClose(swPropertyManagerPageCloseReasons_e reason);
 
+        private readonly Subject<Unit> _AfterCloseSubject = new Subject<Unit>();
+        public IObservable<Unit> AfterCloseObservable => _AfterCloseSubject.AsObservable(); 
         public void AfterClose()
         {
             Page = null;
+            _AfterCloseSubject.OnNext(Unit.Default);
         }
 
         public virtual bool OnHelp()
