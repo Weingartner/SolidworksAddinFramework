@@ -89,10 +89,10 @@ namespace SolidworksAddinFramework
             var obs = pmp.NumberBoxChangedObservable(id);
             var d2 = obs.Subscribe(value => list.ReplaceAt(index,equation.WithValue(value)));
 
-            var d3 = list.ChangesObservable()
+            var d3 = Disposable.Empty; /*list.ChangesObservable()
                 .Select(_=>Unit.Default)
                 .StartWith(Unit.Default)
-                .Subscribe(v => box.Value = list.Source[index].Val);
+                .Subscribe(v => */box.Value = list.Source[index].Val/*)*/;
 
             return ControlHolder.Create(@group, box, d2, label, d3);
         }
