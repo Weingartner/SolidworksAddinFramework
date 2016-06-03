@@ -179,7 +179,8 @@ namespace SolidworksAddinFramework
         }
 
 
-        public override string ToString() => $@"{Id.CamelCaseToHumanReadable()} = {GetValUnits()}";
+        public override string ToString() => $@"""{Id}""={GetValUnits()}";
+        public string ToLongString() => $@"{Id.CamelCaseToHumanReadable()} = {GetValUnits()}";
         public string ToShortString() => $@"{Id.Abbreviate()} = {GetValUnits(3)}";
 
         public string GetValUnits(int sigFigs = 0)
