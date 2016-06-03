@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,12 +9,13 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using LanguageExt;
+using DiffLib;
 using ReactiveUI;
 using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
+using Weingartner.ReactiveCompositeCollections;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
@@ -28,7 +30,7 @@ namespace SolidworksAddinFramework
         public readonly ISldWorks SwApp;
         private readonly string _Name;
         private readonly IEnumerable<swPropertyManagerPageOptions_e> _OptionsE;
-        private CompositeDisposable _Disposable = new CompositeDisposable();
+        private readonly CompositeDisposable _Disposable = new CompositeDisposable();
 
         protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
         {
@@ -354,16 +356,88 @@ namespace SolidworksAddinFramework
             var d = ListBoxSelectionObservable(id).Subscribe(set);
             return ControlHolder.Create(@group, list, d);
         }
-        protected IDisposable CreateComboBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<int> get, Action<int> set, Action<IPropertyManagerPageCombobox> config)
+        protected IDisposable CreateComboBox<T, TModel>(
+            IPropertyManagerPageGroup @group,
+            string caption,
+            string tip,
+            ICompositeList<T> items,
+            IEqualityComparer<T> itemEqualityComparer,
+            Func<T, string> itemToStringFn,
+            TModel model,
+            Expression<Func<TModel, T>> selectedItemExpression,
+            Action<IPropertyManagerPageCombobox> config = null)
         {
             var id = NextId();
-            var comboBox = PropertyManagerGroupExtensions.CreateComboBox(@group, id, caption, tip);
-            config(comboBox);
-            comboBox.CurrentSelection = (short) get();
-            var d = ComboBoxSelectionObservable(id).Subscribe(set);
-            return ControlHolder.Create(@group, comboBox, d);
-        }
+            var comboBox = @group.CreateComboBox(id, caption, tip);
+            config?.Invoke(comboBox);
 
+            // Sync source collection with SW ComboBox collection
+            Action<short, T> insert = (index, element) =>
+            {
+                var insertIndex = comboBox.InsertItem(index, itemToStringFn(element));
+                Debug.Assert(insertIndex != -1, "Item couldn't be inserted");
+            };
+
+            Action<short> delete = index =>
+            {
+                var deleteIndex = comboBox.DeleteItem(index);
+                Debug.Assert(deleteIndex != -1, "Item couldn't be deleted");
+            };
+
+            var swComboBoxUpdated = new Subject<Unit>();
+            var d0 = AfterActivationObs
+                .Select(_ => items.ChangesObservable(itemEqualityComparer))
+                .Switch()
+                .Subscribe(changes =>
+                {
+                    short index = 0;
+                    foreach (var change in changes)
+                    {
+                        switch (change.Operation)
+                        {
+                            case DiffOperation.Match:
+                                break;
+                            case DiffOperation.Insert:
+                                insert(index++, change.ElementFromCollection2.Value);
+                                break;
+                            case DiffOperation.Delete:
+                                delete(index);
+                                break;
+                            case DiffOperation.Replace:
+                                delete(index);
+                                insert(index++, change.ElementFromCollection2.Value);
+                                break;
+                            case DiffOperation.Modify:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                    swComboBoxUpdated.OnNext(Unit.Default);
+                });
+
+            // Sync source to SW selection
+            var d1 = swComboBoxUpdated
+                .Select(_ => model.WhenAnyValue(selectedItemExpression))
+                .Switch()
+                .Select(selectedItem => items
+                    .Items
+                    .Select(list => (short)list.IndexOf(selectedItem))
+                )
+                .Switch()
+                .AssignTo(comboBox, box => box.CurrentSelection);
+
+            // Sync SW to source selection
+            var selectedItemProxy = selectedItemExpression.GetProxy(model);
+            var d2 = ComboBoxSelectionObservable(id)
+                .Select(index => items
+                    .Items
+                    .Select(list => list[index])
+                )
+                .Switch()
+                .AssignTo(selectedItemProxy, p=> p.Value);
+            return ControlHolder.Create(@group, comboBox, d0, d1, d2, swComboBoxUpdated);
+        }
 
         protected IDisposable CreateTextBox(IPropertyManagerPageGroup @group, string caption, string tip, Func<string> get, Action<string> set)
         {
@@ -629,7 +703,7 @@ namespace SolidworksAddinFramework
         /// <param name="group"></param>
         /// <param name="errorObservable"></param>
         /// <returns></returns>
-        protected IDisposable CreateErrorLabel(IPropertyManagerPageGroup @group, IObservable<Option<string>> errorObservable)
+        protected IDisposable CreateErrorLabel(IPropertyManagerPageGroup @group, IObservable<LanguageExt.Option<string>> errorObservable)
         {
             return CreateLabel(@group, "", "",
                 label =>
