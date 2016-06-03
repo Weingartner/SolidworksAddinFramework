@@ -175,7 +175,8 @@ namespace SolidworksAddinFramework
                 .Where(p=>p.Count==2)
                 .SelectMany(p =>
                 {
-                    var n = (int)Math.Ceiling(p.Count / stepSize);
+                    var distance = (p[1] - p[0]).Length();
+                    var n = (int)Math.Ceiling(distance / stepSize);
                     n = Math.Max(2, n);
                     return Sequences.LinSpace(p[0], p[1], n, false)
                         .ToList();
