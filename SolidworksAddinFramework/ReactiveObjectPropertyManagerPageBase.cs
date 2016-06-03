@@ -10,7 +10,7 @@ namespace SolidworksAddinFramework
     public abstract class ReactiveObjectPropertyManagerPageBase<T> : PropertyManagerPageBase
         where T : ReactiveUI.ReactiveObject
     {
-        protected T Data { get; set; }
+        public T Data { get; }
 
         protected ReactiveObjectPropertyManagerPageBase
             (string name
