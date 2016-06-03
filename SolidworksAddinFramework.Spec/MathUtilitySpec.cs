@@ -64,7 +64,7 @@ namespace SolidworksAddinFramework.Spec
                 .Where(p => p.Count == 2)
                 .ForEach(p =>
                 {
-                    (p[1] - p[0]).Length().DirectCast<double>()
+                    ((double)((p[1] - p[0]).Length()))
                     .Should().BeApproximately(stepSize, 1e-5);
                 });
         }
