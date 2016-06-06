@@ -16,7 +16,7 @@ namespace SolidworksAddinFramework.OpenGl
     {
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
         private IReadOnlyList<Edge3> _OriginalEdgeVertices;
-        private readonly Color _Color;
+        public Color Color { get; }
         private bool _IsSolid;
 
         private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
@@ -38,7 +38,7 @@ namespace SolidworksAddinFramework.OpenGl
             Edges = new List<Edge3>();
             _OriginalTriangleVerticies = TrianglesWithNormals;
             _OriginalEdgeVertices = Edges;
-            _Color = color;
+            Color = color;
             _IsSolid = isSolid;
 
             UpdateBoundingSphere();
@@ -53,7 +53,7 @@ namespace SolidworksAddinFramework.OpenGl
         {
             TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
             Edges = edges;
-            _Color = color;
+            Color = color;
             _IsSolid = isSolid;
             UpdateBoundingSphere();
         }
@@ -62,7 +62,7 @@ namespace SolidworksAddinFramework.OpenGl
         {
             TrianglesWithNormals = enumerable.ToList();
             Edges = edges ?? new List<Edge3>();
-            _Color = color;
+            Color = color;
             _IsSolid = isSolid;
             UpdateBoundingSphere();
         }
@@ -80,7 +80,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public override void Render(DateTime time)
         {
-            MeshRender.Render(this, _Color, _IsSolid);
+            MeshRender.Render(this, Color, _IsSolid);
         }
 
         public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
