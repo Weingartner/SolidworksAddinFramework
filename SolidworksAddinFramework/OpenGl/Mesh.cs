@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
@@ -14,18 +15,12 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public class Mesh : RenderableBase
     {
-        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
-        private IReadOnlyList<Edge3> _OriginalEdgeVertices;
-        public Color Color { get; }
-        private bool _IsSolid;
-
-        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
-
-        public Mesh(IBody2 body, Color color, bool isSolid)
+        public static Mesh CreateMesh(IBody2 body, Color color, bool isSolid)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
-            TrianglesWithNormals = MeshCache.GetValue(body, bdy =>
+
+            var tris = MeshCache.GetValue(body, bdy =>
             {
                 var faceList = bdy.GetFaces().CastArray<IFace2>();
                 var tess = GetTess(bdy, faceList);
@@ -35,13 +30,37 @@ namespace SolidworksAddinFramework.OpenGl
                 
             });
 
-            Edges = new List<Edge3>();
-            _OriginalTriangleVerticies = TrianglesWithNormals;
-            _OriginalEdgeVertices = Edges;
+            var edges = new List<Edge3>();
+
+            return new Mesh(color, isSolid, tris, edges);
+        }
+
+        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
+        private readonly IReadOnlyList<Edge3> _OriginalEdgeVertices;
+        public Color Color { get; }
+        private bool _IsSolid;
+
+        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
+
+        public Mesh(Color color, bool isSolid,
+            [NotNull] IEnumerable<TriangleWithNormals> tris, IReadOnlyList<Edge3> edges = null)
+        {
+            if (tris == null)
+                throw new ArgumentNullException(nameof(tris));
+
             Color = color;
+            _OriginalTriangleVerticies = tris.ToList();
+            _OriginalEdgeVertices = edges ?? new List<Edge3>();
             _IsSolid = isSolid;
 
+            TrianglesWithNormals = _OriginalTriangleVerticies;
+            Edges = _OriginalEdgeVertices;
+
             UpdateBoundingSphere();
+        }
+        public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
+            : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
+        {
         }
 
         private void UpdateBoundingSphere()
@@ -49,23 +68,7 @@ namespace SolidworksAddinFramework.OpenGl
             UpdateBoundingSphere(TrianglesWithNormals.Points().Select(p => p.Point).ToList());
         }
 
-        public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null)
-        {
-            TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
-            Edges = edges;
-            Color = color;
-            _IsSolid = isSolid;
-            UpdateBoundingSphere();
-        }
 
-        public Mesh(Color color, bool isSolid, IEnumerable<TriangleWithNormals> enumerable, IReadOnlyList<Edge3> edges = null)
-        {
-            TrianglesWithNormals = enumerable.ToList();
-            Edges = edges ?? new List<Edge3>();
-            Color = color;
-            _IsSolid = isSolid;
-            UpdateBoundingSphere();
-        }
 
 
         public IReadOnlyList<Edge3> Edges { get; private set; }
