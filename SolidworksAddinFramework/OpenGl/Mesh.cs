@@ -58,6 +58,17 @@ namespace SolidworksAddinFramework.OpenGl
 
             UpdateBoundingSphere();
         }
+
+
+        public static Mesh Combine(IEnumerable<Mesh> meshes, Color color)
+        {
+            var tris = meshes.SelectMany(mesh => mesh.TrianglesWithNormals);
+            var edges = meshes.SelectMany(mesh => mesh.Edges).ToList();
+            return new Mesh(color, false,tris, edges);
+        }
+
+
+
         public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
             : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
         {
