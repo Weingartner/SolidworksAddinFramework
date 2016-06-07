@@ -1,19 +1,20 @@
-// Keep this commented out. I have trouble loading DLL's when I 
-// create isolated app domains. It requires more work
-//#define UseXUnitAppDomain
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorksTools;
-using XUnitRemote.Local;
+using XUnitRemote.Remote;
+using XUnitRemote.Remote.Service.TestService;
+using MessageBox = System.Windows.MessageBox;
 
 
 namespace XUnit.Solidworks.Addin
@@ -29,70 +30,54 @@ namespace XUnit.Solidworks.Addin
         )]
     public class SwAddin : SwAddinBase
     {
-        #region UI Methods
+        public static IScheduler Scheduler { get; set; }
 
         protected override IEnumerable<IDisposable> Setup()
         {
+            yield return StartTestService();
+        }
+
+        private IDisposable StartTestService()
+        {
             try
             {
-#if UseXUnitAppDomain
-                var swDataKey = "SwData";
-                var domain = CloneDomain("XUnitDomain");
-                domain.SetData(swDataKey, SwApp);
-                domain.DoCallBack(() => Callback((ISldWorks)AppDomain.CurrentDomain.GetData(swDataKey)));
-                return new[] { Disposable.Create(() => AppDomain.Unload(domain)) };
-#else
-                Callback(SwApp);
-#endif
+                var data = new Dictionary<string, object> { { nameof(ISldWorks), SwApp } };
+                return XUnitService.StartWithCustomRunner<ScheduledRunner>(new TestServiceConfiguration(TestSettings.Id, data));
+            }
+            catch (TestServiceException e)
+            {
+                MessageBox.Show(e.ToString());
+                return Disposable.Empty;
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show(e.ToString());
+                return Disposable.Empty;
             }
-            return new IDisposable[0];
         }
-
-
-        static Assembly LoadFromSolidworks(object sender, ResolveEventArgs args, string baseDirectory)
-        {
-            baseDirectory = @"C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS";
-            string assemblyPath = System.IO.Path.Combine(baseDirectory, new AssemblyName(args.Name).Name + ".dll");
-            if (File.Exists(assemblyPath) == false) return null;
-            var assembly = Assembly.LoadFrom(assemblyPath);
-            return assembly;
-        }
-
-        private static AppDomain CloneDomain(string name)
-        {
-            string path = (new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).AbsolutePath;
-            var dir = System.IO.Path.GetDirectoryName(path);
-            var domaininfo = AppDomain.CurrentDomain.SetupInformation;
-            domaininfo.ApplicationBase = dir;
-            var domain = AppDomain.CreateDomain(name, AppDomain.CurrentDomain.Evidence, domaininfo);
-
-            domain.AssemblyResolve += (o, args) => LoadFromSolidworks(o, args, AppDomain.CurrentDomain.BaseDirectory);
-
-
-            return domain;
-        }
-
-        private static void Callback(ISldWorks sldWorks )
-        {
-            var marshaller = new ThreadMarshaller();
-            var data = new Dictionary<string, object> { {nameof(ISldWorks), sldWorks}};
-            XUnitService.Start(TestSettings.Id,false, f => marshaller.Marshall(f), data);
-        }
-
-#endregion
-
-#region UI Callbacks
-
-#endregion
-
     }
 
+    internal class ScheduledRunner : ITestRunner
+    {
+        private readonly ThreadMarshaller _Marshaller = new ThreadMarshaller();
+        private readonly ITestRunner _Runner;
 
-    public  class ThreadMarshaller : Control
+        public ScheduledRunner(ITestRunner runner)
+        {
+            _Runner = runner;
+        }
+
+        public Task RunTest(string assemblyPath, string typeName, string methodName)
+        {
+            return _Marshaller.Marshall(() =>
+            {
+                SwAddin.Scheduler = new SynchronizationContextScheduler(SynchronizationContext.Current);
+                return _Runner.RunTest(assemblyPath, typeName, methodName);
+            });
+        }
+    }
+
+    public class ThreadMarshaller : Control
     {
         private bool _MbCallMarshalled;
 
@@ -149,11 +134,11 @@ namespace XUnit.Solidworks.Addin
             Debug.Assert(IsHandleCreated);
 
             if (method == null) return default(T);
-            if (!InvokeRequired) return (T) method.DynamicInvoke();
+            if (!InvokeRequired) return (T)method.DynamicInvoke();
             try
             {
                 CallMarshalled = true;
-                return (T) Invoke(method);
+                return (T)Invoke(method);
             }
             finally
             {
@@ -161,8 +146,5 @@ namespace XUnit.Solidworks.Addin
             }
         }
     }
-
-
-
 }
     
