@@ -19,11 +19,11 @@ namespace SolidworksAddinFramework
         public static IObservable<IModelDoc2> DocOpenObservable(this SldWorks swApp)
         {
             return swApp.DocumentLoadNotify2Observable()
-                .Select(_ => Unit.Default)
-                .StartWith(Unit.Default)
-                .Select(_ => swApp.GetDocuments().CastArray<IModelDoc2>())
-                .Buffer(2, 1)
-                .Select(pair => pair[1].Except(pair[0]).Single());
+                .Select(args => swApp
+                    .GetDocuments()
+                    .CastArray<IModelDoc2>()
+                    .Single(doc => doc.GetTitle() == args.docTitle && doc.GetPathName() == args.docPath)
+                );
         }
 
         public static IDisposable DoWithOpenDoc(this SldWorks swApp, Func<IModelDoc2, IDisposable> action)
