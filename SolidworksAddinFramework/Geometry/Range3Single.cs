@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using LanguageExt;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
@@ -108,16 +110,17 @@ namespace SolidworksAddinFramework.Geometry
             return v >= lower && v < upper;
         }
 
+        [Pure]
         public IBody2 ToSolid()
         {
             var modeler = SwAddinBase.Active.Modeler;
-            var math = SwAddinBase.Active.Math;
             var center = new Vector3(XMid, YMid, ZMin);
             var box = modeler.CreateBox(center, Vector3.UnitZ, Dx, Dy, Dz);
             Debug.Assert(box!=null);
             return box;
         }
 
+        [Pure]
         public Mesh ToMesh(Color color)
         {
             return new Mesh(color, false, Triangles(), Edges());
@@ -125,7 +128,7 @@ namespace SolidworksAddinFramework.Geometry
 
         public static Mesh ToMesh(IEnumerable<Range3Single> voxels, Color color)
         {
-            return new Mesh(color, false, voxels.SelectMany(p=>p.Triangles()));
+            return new Mesh(color, false, voxels.SelectMany(p=>p.TrianglesWithNormals()));
         }
 
 
@@ -133,7 +136,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             var list = new List<Edge3>(12);
 
-            Func<int,int,int, Vector3> _ = GetAt;
+            Func<int, int, int, Vector3> _ = GetAt;
 
             // Bottom square
             list.Add(new Edge3( _(0,0,0), _(1,0,0) ));
@@ -157,31 +160,108 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
-        public List<Triangle> Triangles()
+        [Pure]
+        public Triangle[] Triangles()
         {
+            var v000 = GetAt(0, 0, 1);
+            var v001 = GetAt(0, 0, 0);
+            var v010 = GetAt(0, 1, 1);
+            var v011 = GetAt(0, 1, 0);
+            var v100 = GetAt(1, 0, 1);
+            var v101 = GetAt(1, 0, 0);
+            var v110 = GetAt(1, 1, 1);
+            var v111 = GetAt(1, 1, 0);
 
-            var _ = Vertices;
-
-            var list = new List<Triangle>(12)
+            var list = new[]
             {
             // front
-                new Triangle(_[0, 1, 0], _[1, 0, 0], _[0, 0, 0]),
-                new Triangle(_[1, 0, 0], _[0, 1, 0], _[1, 1, 0]),
+                new Triangle(v010, v100, v000),
+                new Triangle(v100, v010, v110),
             // back
-                new Triangle(_[0, 0, 1], _[1, 0, 1], _[0, 1, 1]),
-                new Triangle(_[1, 1, 1], _[0, 1, 1], _[1, 0, 1]),
+                new Triangle(v001, v101, v011),
+                new Triangle(v111, v011, v101),
             // left
-                new Triangle(_[0, 0, 1], _[0, 1, 0], _[0, 0, 0]),
-                new Triangle(_[0, 1, 1], _[0, 1, 0], _[0, 0, 1]),
+                new Triangle(v001, v010, v000),
+                new Triangle(v011, v010, v001),
             // right
-                new Triangle(_[1, 0, 0], _[1, 1, 0], _[1, 0, 1]),
-                new Triangle(_[1, 0, 1], _[1, 1, 0], _[1, 1, 1]),
+                new Triangle(v100, v110, v101),
+                new Triangle(v101, v110, v111),
             // top
-                new Triangle(_[0, 1, 0], _[1, 1, 1], _[1, 1, 0]),
-                new Triangle(_[0, 1, 0], _[0, 1, 1], _[1, 1, 1]),
+                new Triangle(v010, v111, v110),
+                new Triangle(v010, v011, v111),
             // bottom
-                new Triangle(_[1, 0, 0], _[1, 0, 1], _[0, 0, 0]),
-                new Triangle(_[1, 0, 1], _[0, 0, 1], _[0, 0, 0])
+                new Triangle(v100, v101, v000),
+                new Triangle(v101, v001, v000)
+            };
+
+            return list;
+
+        }
+
+        [Pure]
+        public void TrianglesWithNormals(List<TriangleWithNormals> list )
+        {
+            var v000 = GetAt(0, 0, 1);
+            var v001 = GetAt(0, 0, 0);
+            var v010 = GetAt(0, 1, 1);
+            var v011 = GetAt(0, 1, 0);
+            var v100 = GetAt(1, 0, 1);
+            var v101 = GetAt(1, 0, 0);
+            var v110 = GetAt(1, 1, 1);
+            var v111 = GetAt(1, 1, 0);
+
+            // front
+            list.Add(new TriangleWithNormals(v010, v100, v000));
+            list.Add(new TriangleWithNormals(v100, v010, v110));
+            // back
+            list.Add(new TriangleWithNormals(v001, v101, v011));
+            list.Add(new TriangleWithNormals(v111, v011, v101));
+            // left
+            list.Add(new TriangleWithNormals(v001, v010, v000));
+            list.Add(new TriangleWithNormals(v011, v010, v001));
+            // right
+            list.Add(new TriangleWithNormals(v100, v110, v101));
+            list.Add(new TriangleWithNormals(v101, v110, v111));
+            // top
+            list.Add(new TriangleWithNormals(v010, v111, v110));
+            list.Add(new TriangleWithNormals(v010, v011, v111));
+            // bottom
+            list.Add(new TriangleWithNormals(v100, v101, v000));
+            list.Add(new TriangleWithNormals(v101, v001, v000));
+        }
+
+        [Pure]
+        public TriangleWithNormals[] TrianglesWithNormals()
+        {
+            var v000 = GetAt(0, 0, 1);
+            var v001 = GetAt(0, 0, 0);
+            var v010 = GetAt(0, 1, 1);
+            var v011 = GetAt(0, 1, 0);
+            var v100 = GetAt(1, 0, 1);
+            var v101 = GetAt(1, 0, 0);
+            var v110 = GetAt(1, 1, 1);
+            var v111 = GetAt(1, 1, 0);
+
+            var list = new []
+            {
+            // front
+                new TriangleWithNormals(v010, v100, v000),
+                new TriangleWithNormals(v100, v010, v110),
+            // back
+                new TriangleWithNormals(v001, v101, v011),
+                new TriangleWithNormals(v111, v011, v101),
+            // left
+                new TriangleWithNormals(v001, v010, v000),
+                new TriangleWithNormals(v011, v010, v001),
+            // right
+                new TriangleWithNormals(v100, v110, v101),
+                new TriangleWithNormals(v101, v110, v111),
+            // top
+                new TriangleWithNormals(v010, v111, v110),
+                new TriangleWithNormals(v010, v011, v111),
+            // bottom
+                new TriangleWithNormals(v100, v101, v000),
+                new TriangleWithNormals(v101, v001, v000)
             };
 
             return list;
@@ -193,16 +273,14 @@ namespace SolidworksAddinFramework.Geometry
             get
             {
                 var _ = new Vector3[2, 2, 2];
-                for (var i = 0; i < 2; i++)
-                {
-                    for (var j = 0; j < 2; j++)
-                    {
-                        for (var k = 0; k < 2; k++)
-                        {
-                            _[i, j, k] = GetAt(i, j, k);
-                        }
-                    }
-                }
+                _[0, 0, 0] = GetAt(0, 0, 0);
+                _[0, 0, 1] = GetAt(0, 0, 1);
+                _[0, 1, 0] = GetAt(0, 1, 0);
+                _[0, 1, 1] = GetAt(0, 1, 1);
+                _[1, 0, 0] = GetAt(1, 0, 0);
+                _[1, 0, 1] = GetAt(1, 0, 1);
+                _[1, 1, 0] = GetAt(1, 1, 0);
+                _[1, 1, 1] = GetAt(1, 1, 1);
                 return _;
             }
         }
@@ -223,32 +301,6 @@ namespace SolidworksAddinFramework.Geometry
                 );
         }
 
-        public static Range3Single FromVertices(IReadOnlyList<IReadOnlyList<Vector3>> polygons)
-        {
-            var xmin = float.MaxValue;
-            var ymin = float.MaxValue;
-            var zmin = float.MaxValue;
-
-            var xmax = float.MinValue;
-            var ymax = float.MinValue;
-            var zmax = float.MinValue;
-
-            for (int j = 0; j < polygons.Count; j++)
-            {
-                var polygon = polygons[j];
-
-                // performance optimization. Avoid LINQ
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (int i = 0; i < polygon.Count; i++)
-                {
-                    Adjust(polygon[i], ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
-                }
-            }
-
-            return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
-            
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Adjust(Vector3 vertex, ref float xmin, ref float xmax, ref float ymin, ref float ymax, ref float zmin,
             ref float zmax)
@@ -263,20 +315,67 @@ namespace SolidworksAddinFramework.Geometry
             zmax = Math.Max(zmax, vertex.Z);
         }
 
-        public static Range3Single FromVertices(IReadOnlyList<Vector3>  vertices)
+        public static Range3Single FromVertices(IReadOnlyList<Vector3> vertices)
         {
-            return FromVertices(new List<IReadOnlyList<Vector3>> {vertices});
+            var xmin = Single.MaxValue;
+            var ymin = Single.MaxValue;
+            var zmin = Single.MaxValue;
+
+            var xmax = Single.MinValue;
+            var ymax = Single.MinValue;
+            var zmax = Single.MinValue;
+
+            for (var i = 0; i < vertices.Count; i++)
+            {
+                // performance optimization. Avoid LINQ
+                // ReSharper disable once ForCanBeConvertedToForeach
+                Adjust(vertices[i], ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
+            }
+
+            return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
+        }
+
+        public class Range3SingleBuilder
+        {
+            public float Xmin = Single.MaxValue;
+            public float Ymin = Single.MaxValue;
+            public float Zmin = Single.MaxValue;
+
+            public float Xmax = Single.MinValue;
+            public float Ymax = Single.MinValue;
+            public float Zmax = Single.MinValue;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Update(Vector3 vertex)
+            {
+                unchecked
+                {
+                    var x = vertex.X;
+                    var y = vertex.Y;
+                    var z = vertex.Z;
+                    Xmin = Math.Min(Xmin, x);
+                    Xmax = Math.Max(Xmax, x);
+
+                    Ymin = Math.Min(Ymin, y);
+                    Ymax = Math.Max(Ymax, y);
+
+                    Zmin = Math.Min(Zmin, z);
+                    Zmax = Math.Max(Zmax, z);
+                }
+            }
+
+            public Range3Single Range => new Range3Single(new Vector3(Xmin,Ymin,Zmin), new Vector3(Xmax, Ymax, Zmax));
         }
 
         public static Range3Single FromTriangle(Triangle triangle)
         {
-            var xmin = float.MaxValue;
-            var ymin = float.MaxValue;
-            var zmin = float.MaxValue;
+            var xmin = Single.MaxValue;
+            var ymin = Single.MaxValue;
+            var zmin = Single.MaxValue;
 
-            var xmax = float.MinValue;
-            var ymax = float.MinValue;
-            var zmax = float.MinValue;
+            var xmax = Single.MinValue;
+            var ymax = Single.MinValue;
+            var zmax = Single.MinValue;
 
             Adjust(triangle.A, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
             Adjust(triangle.B, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
@@ -287,13 +386,13 @@ namespace SolidworksAddinFramework.Geometry
         }
         public static Range3Single FromTriangle(IReadOnlyList<Triangle> triangles)
         {
-            var xmin = float.MaxValue;
-            var ymin = float.MaxValue;
-            var zmin = float.MaxValue;
+            var xmin = Single.MaxValue;
+            var ymin = Single.MaxValue;
+            var zmin = Single.MaxValue;
 
-            var xmax = float.MinValue;
-            var ymax = float.MinValue;
-            var zmax = float.MinValue;
+            var xmax = Single.MinValue;
+            var ymax = Single.MinValue;
+            var zmax = Single.MinValue;
 
             for (int j = 0; j < triangles.Count; j++)
             {
@@ -342,6 +441,12 @@ namespace SolidworksAddinFramework.Geometry
                 (new Vector3(xrange.Min, yrange.Min, zrange.Min),
                  new Vector3(xrange.Max, yrange.Max, zrange.Max));
 
+        }
+
+        public Tuple<Vector3, float> BoundingSphere()
+        {
+            var d = Math.Sqrt(Dx*Dx + Dy*Dy + Dz*Dz);
+            return Prelude.Tuple(Center, (float) d/2);
         }
     }
 }

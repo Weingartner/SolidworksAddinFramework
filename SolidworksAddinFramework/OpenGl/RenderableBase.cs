@@ -6,11 +6,15 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public abstract class RenderableBase : IRenderable
     {
-        protected Tuple<Vector3, float> _BoundingSphere;
+        protected Lazy<Tuple<Vector3, float>> _BoundingSphere;
 
-        protected Tuple<Vector3, float> UpdateBoundingSphere(IReadOnlyList<Vector3> points)
+        protected void UpdateBoundingSphere(IReadOnlyList<Vector3> points)
         {
-            return _BoundingSphere = CalcBoundingSphere(points);
+            _BoundingSphere = new Lazy<Tuple<Vector3, float>>(()=> CalcBoundingSphere(points));
+        }
+        protected void UpdateBoundingSphere(Func<Tuple<Vector3, float>> sphere)
+        {
+            _BoundingSphere = new Lazy<Tuple<Vector3, float>>(sphere);
         }
 
         private Tuple<Vector3, float> CalcBoundingSphere(IReadOnlyList<Vector3> points)
@@ -21,9 +25,6 @@ namespace SolidworksAddinFramework.OpenGl
         public abstract void Render(DateTime time);
         public abstract void ApplyTransform(Matrix4x4 transform);
 
-        public virtual Tuple<Vector3, float> BoundingSphere()
-        {
-            return _BoundingSphere;
-        }
+        public virtual Tuple<Vector3, float> BoundingSphere => _BoundingSphere.Value;
     }
 }

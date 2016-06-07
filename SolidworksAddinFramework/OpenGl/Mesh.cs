@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using AForge;
 using JetBrains.Annotations;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
@@ -69,17 +71,30 @@ namespace SolidworksAddinFramework.OpenGl
 
 
 
-        public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
+        public Mesh(Color color, bool isSolid, IReadOnlyList<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
             : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
         {
         }
 
         private void UpdateBoundingSphere()
         {
-            UpdateBoundingSphere(TrianglesWithNormals.Points().Select(p => p.Point).ToList());
+            UpdateBoundingSphere(CreateBoundingSphere);
         }
 
-
+        private Tuple<Vector3, float> CreateBoundingSphere()
+        {
+            var rangeBuilder = new Range3Single.Range3SingleBuilder();
+            var count = TrianglesWithNormals.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var tri = TrianglesWithNormals[i];
+                rangeBuilder.Update(tri.A.Point);
+                rangeBuilder.Update(tri.B.Point);
+                rangeBuilder.Update(tri.C.Point);
+            }
+            var boundingSphere = rangeBuilder.Range.BoundingSphere();
+            return boundingSphere;
+        }
 
 
         public IReadOnlyList<Edge3> Edges { get; private set; }
@@ -155,19 +170,38 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="transform"></param>
         public override void ApplyTransform(Matrix4x4 transform)
         {
-            Vector3 scale;
-            Quaternion rotation;
-            Vector3 translation;
-            Matrix4x4.Decompose(transform, out scale, out rotation, out translation);
+            {
+                var list = new TriangleWithNormals[_OriginalTriangleVerticies.Count];
 
-            TrianglesWithNormals = _OriginalTriangleVerticies
-                .Select(pn => pn.ApplyTransform(transform, rotation))
-                .ToList();
+                list.Length
+                    .ParallelChunked((lower, upper) =>
+                    {
+                        for (int i1 = lower; i1 < upper; i1++)
+                        {
+                            list[i1] = _OriginalTriangleVerticies[i1].ApplyTransform(transform);
+                        }
+                    });
 
-            Edges = _OriginalEdgeVertices
-                .Select(pn => pn.ApplyTransform(transform))
-                .ToList();
+                TrianglesWithNormals = list;
+                
+            }
+            {
+                var list = new Edge3[_OriginalEdgeVertices.Count]; 
 
+                list.Length
+                    .ParallelChunked((lower, upper) =>
+                    {
+                        for (int i = lower; i < upper; i++)
+                        {
+                            list[i] = _OriginalEdgeVertices[i].ApplyTransform(transform);
+
+                        }
+                    
+                    });
+
+                Edges = list;
+                
+            }
             UpdateBoundingSphere();
 
         }
