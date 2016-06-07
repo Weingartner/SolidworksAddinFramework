@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using FluentAssertions;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -26,6 +28,8 @@ namespace XUnit.Solidworks.Addin
 
         protected IModelDoc2 CreatePartDoc(string path)
         {
+            Path.IsPathRooted(path).Should().BeTrue("SW working directory can switch");
+
             var type = (int) swDocumentTypes_e.swDocPART;
             int options = (int) swOpenDocOptions_e.swOpenDocOptions_LoadModel;
             var configuration = "";
