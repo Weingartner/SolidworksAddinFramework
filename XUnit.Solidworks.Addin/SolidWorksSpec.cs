@@ -110,12 +110,12 @@ namespace XUnit.Solidworks.Addin
         {
             if (keep)
             {
-                var doc =CreatePartDoc(path);
+                var doc = CreatePartDoc(path);
                 _keptStuff.Add(await action(doc));
             }
             else
             {
-                CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
+                await CreatePartDoc(path).Using(SwApp, async m => { var d = await action(m); d.Dispose(); });
             }
         }
         protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)
