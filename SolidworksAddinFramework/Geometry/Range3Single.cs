@@ -1,14 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using LanguageExt;
-using SolidworksAddinFramework.OpenGl;
-using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -110,196 +104,12 @@ namespace SolidworksAddinFramework.Geometry
             return v >= lower && v < upper;
         }
 
-        [Pure]
-        public IBody2 ToSolid()
-        {
-            var modeler = SwAddinBase.Active.Modeler;
-            var center = new Vector3(XMid, YMid, ZMin);
-            var box = modeler.CreateBox(center, Vector3.UnitZ, Dx, Dy, Dz);
-            Debug.Assert(box!=null);
-            return box;
-        }
-
-        [Pure]
-        public Mesh ToMesh(Color color)
-        {
-            return new Mesh(color, false, Triangles(), Edges());
-        }
-
-        public static Mesh ToMesh(IEnumerable<Range3Single> voxels, Color color)
-        {
-            return new Mesh(color, false, voxels.SelectMany(p=>p.TrianglesWithNormals()));
-        }
-
-
-        public List<Edge3> Edges()
-        {
-            var list = new List<Edge3>(12);
-
-            Func<int, int, int, Vector3> _ = GetAt;
-
-            // Bottom square
-            list.Add(new Edge3( _(0,0,0), _(1,0,0) ));
-            list.Add(new Edge3( _(1,0,0), _(1,0,1) ));
-            list.Add(new Edge3(_(1,0,1), _(0,0,1) ));
-            list.Add(new Edge3(_(0,0,1), _(0,0,0) ));
-
-            // Top square
-            list.Add(new Edge3(_(0,1,0), _(1,1,0) ));
-            list.Add(new Edge3(_(1,1,0), _(1,1,1) ));
-            list.Add(new Edge3(_(1,1,1), _(0,1,1) ));
-            list.Add(new Edge3(_(0,1,1), _(0,1,0) ));
-
-            // Connecting top and bottom lines
-            list.Add(new Edge3(_(0,0,0), _(0,1,0) ));
-            list.Add(new Edge3(_(1,0,0), _(1,1,0) ));
-            list.Add(new Edge3(_(1,0,1), _(1,1,1) ));
-            list.Add(new Edge3(_(0,0,1), _(0,1,1) ));
-
-            return list;
-
-        }
-
-        [Pure]
-        public Triangle[] Triangles()
-        {
-            var v000 = GetAt(0, 0, 1);
-            var v001 = GetAt(0, 0, 0);
-            var v010 = GetAt(0, 1, 1);
-            var v011 = GetAt(0, 1, 0);
-            var v100 = GetAt(1, 0, 1);
-            var v101 = GetAt(1, 0, 0);
-            var v110 = GetAt(1, 1, 1);
-            var v111 = GetAt(1, 1, 0);
-
-            var list = new[]
-            {
-            // front
-                new Triangle(v010, v100, v000),
-                new Triangle(v100, v010, v110),
-            // back
-                new Triangle(v001, v101, v011),
-                new Triangle(v111, v011, v101),
-            // left
-                new Triangle(v001, v010, v000),
-                new Triangle(v011, v010, v001),
-            // right
-                new Triangle(v100, v110, v101),
-                new Triangle(v101, v110, v111),
-            // top
-                new Triangle(v010, v111, v110),
-                new Triangle(v010, v011, v111),
-            // bottom
-                new Triangle(v100, v101, v000),
-                new Triangle(v101, v001, v000)
-            };
-
-            return list;
-
-        }
-
-        [Pure]
-        public void TrianglesWithNormals(List<TriangleWithNormals> list )
-        {
-            var v000 = GetAt(0, 0, 1);
-            var v001 = GetAt(0, 0, 0);
-            var v010 = GetAt(0, 1, 1);
-            var v011 = GetAt(0, 1, 0);
-            var v100 = GetAt(1, 0, 1);
-            var v101 = GetAt(1, 0, 0);
-            var v110 = GetAt(1, 1, 1);
-            var v111 = GetAt(1, 1, 0);
-
-            // front
-            list.Add(new TriangleWithNormals(v010, v100, v000));
-            list.Add(new TriangleWithNormals(v100, v010, v110));
-            // back
-            list.Add(new TriangleWithNormals(v001, v101, v011));
-            list.Add(new TriangleWithNormals(v111, v011, v101));
-            // left
-            list.Add(new TriangleWithNormals(v001, v010, v000));
-            list.Add(new TriangleWithNormals(v011, v010, v001));
-            // right
-            list.Add(new TriangleWithNormals(v100, v110, v101));
-            list.Add(new TriangleWithNormals(v101, v110, v111));
-            // top
-            list.Add(new TriangleWithNormals(v010, v111, v110));
-            list.Add(new TriangleWithNormals(v010, v011, v111));
-            // bottom
-            list.Add(new TriangleWithNormals(v100, v101, v000));
-            list.Add(new TriangleWithNormals(v101, v001, v000));
-        }
-
-        [Pure]
-        public TriangleWithNormals[] TrianglesWithNormals()
-        {
-            var v000 = GetAt(0, 0, 1);
-            var v001 = GetAt(0, 0, 0);
-            var v010 = GetAt(0, 1, 1);
-            var v011 = GetAt(0, 1, 0);
-            var v100 = GetAt(1, 0, 1);
-            var v101 = GetAt(1, 0, 0);
-            var v110 = GetAt(1, 1, 1);
-            var v111 = GetAt(1, 1, 0);
-
-            var list = new []
-            {
-            // front
-                new TriangleWithNormals(v010, v100, v000),
-                new TriangleWithNormals(v100, v010, v110),
-            // back
-                new TriangleWithNormals(v001, v101, v011),
-                new TriangleWithNormals(v111, v011, v101),
-            // left
-                new TriangleWithNormals(v001, v010, v000),
-                new TriangleWithNormals(v011, v010, v001),
-            // right
-                new TriangleWithNormals(v100, v110, v101),
-                new TriangleWithNormals(v101, v110, v111),
-            // top
-                new TriangleWithNormals(v010, v111, v110),
-                new TriangleWithNormals(v010, v011, v111),
-            // bottom
-                new TriangleWithNormals(v100, v101, v000),
-                new TriangleWithNormals(v101, v001, v000)
-            };
-
-            return list;
-
-        }
-
-        private Vector3[,,] Vertices
-        {
-            get
-            {
-                var _ = new Vector3[2, 2, 2];
-                _[0, 0, 0] = GetAt(0, 0, 0);
-                _[0, 0, 1] = GetAt(0, 0, 1);
-                _[0, 1, 0] = GetAt(0, 1, 0);
-                _[0, 1, 1] = GetAt(0, 1, 1);
-                _[1, 0, 0] = GetAt(1, 0, 0);
-                _[1, 0, 1] = GetAt(1, 0, 1);
-                _[1, 1, 0] = GetAt(1, 1, 0);
-                _[1, 1, 1] = GetAt(1, 1, 1);
-                return _;
-            }
-        }
 
         /// <summary>
         /// return the value minimum dimension from Dx, Dy, Dz
         /// </summary>
         public float MinDim => Math.Min(Math.Min(Dx, Dy), Dz);
         public float MaxDim => Math.Max(Math.Max(Dx, Dy), Dz);
-
-        public Vector3 GetAt(int i, int j, int k)
-        {
-            return new Vector3
-                (
-                    i == 0 ? XMin : XMax,
-                    j == 0 ? YMin : YMax,
-                    k == 0 ? ZMin : ZMax
-                );
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Adjust(Vector3 vertex, ref float xmin, ref float xmax, ref float ymin, ref float ymax, ref float zmin,
