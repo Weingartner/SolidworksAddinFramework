@@ -221,14 +221,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF NOT "$(ConfigurationName)"=="Debug" GOTO END
-
-set FMWK="v4.0.30319"
-
-IF EXIST "%25Windir%25\Microsoft.NET\Framework64\%25FMWK%25\regasm.exe" "%25Windir%25\Microsoft.NET\Framework64\%25FMWK%25\regasm"   /codebase "$(TargetPath)"
-
-
-:END
-</PostBuildEvent>
+    <PostBuildEvent>powershell $(ProjectDir)..\regaddin.ps1 "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
