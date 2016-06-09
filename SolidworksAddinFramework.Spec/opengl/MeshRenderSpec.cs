@@ -112,7 +112,7 @@ namespace SolidworksAddinFramework.Spec.opengl
         [SolidworksFact]
         public void RenderFaceShouldWork()
         {
-            CreatePartDoc(true, modelDoc =>
+            CreatePartDoc(false, modelDoc =>
             {
                 var modeller = SwAddinBase.Active.Modeler;
                 var body = modeller.CreateBox(1, 1, 1);
@@ -122,7 +122,7 @@ namespace SolidworksAddinFramework.Spec.opengl
                 //var clonedFace = (IFace2) face.
                 //var clonedSurface = (ISurface) clonedFace.Copy();
                 var faceBody = (IBody2)face.GetBody();
-                var faceMesh = new Mesh(faceBody, Color.Green, isSolid:false);
+                var faceMesh = Mesh.CreateMesh(faceBody, Color.Green, isSolid:false);
                 var d1 = faceMesh.DisplayUndoable(modelDoc);
 
                 //return new CompositeDisposable(d, d1);

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using FluentAssertions;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -26,6 +28,8 @@ namespace XUnit.Solidworks.Addin
 
         protected IModelDoc2 CreatePartDoc(string path)
         {
+            Path.IsPathRooted(path).Should().BeTrue("SW working directory can switch");
+
             var type = (int) swDocumentTypes_e.swDocPART;
             int options = (int) swOpenDocOptions_e.swOpenDocOptions_LoadModel;
             var configuration = "";
@@ -110,12 +114,12 @@ namespace XUnit.Solidworks.Addin
         {
             if (keep)
             {
-                var doc =CreatePartDoc(path);
+                var doc = CreatePartDoc(path);
                 _keptStuff.Add(await action(doc));
             }
             else
             {
-                CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
+                await CreatePartDoc(path).Using(SwApp, async m => { var d = await action(m); d.Dispose(); });
             }
         }
         protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)

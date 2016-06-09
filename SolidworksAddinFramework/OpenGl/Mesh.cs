@@ -5,6 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using AForge;
+using JetBrains.Annotations;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
@@ -14,18 +17,12 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public class Mesh : RenderableBase
     {
-        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
-        private IReadOnlyList<Edge3> _OriginalEdgeVertices;
-        private readonly Color _Color;
-        private bool _IsSolid;
-
-        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
-
-        public Mesh(IBody2 body, Color color, bool isSolid)
+        public static Mesh CreateMesh(IBody2 body, Color color, bool isSolid)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
 
-            TrianglesWithNormals = MeshCache.GetValue(body, bdy =>
+
+            var tris = MeshCache.GetValue(body, bdy =>
             {
                 var faceList = bdy.GetFaces().CastArray<IFace2>();
                 var tess = GetTess(bdy, faceList);
@@ -35,36 +32,68 @@ namespace SolidworksAddinFramework.OpenGl
                 
             });
 
-            Edges = new List<Edge3>();
-            _OriginalTriangleVerticies = TrianglesWithNormals;
-            _OriginalEdgeVertices = Edges;
-            _Color = color;
+            var edges = new List<Edge3>();
+
+            return new Mesh(color, isSolid, tris, edges);
+        }
+
+        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
+        private readonly IReadOnlyList<Edge3> _OriginalEdgeVertices;
+        public Color Color { get; }
+        private bool _IsSolid;
+
+        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
+
+        public Mesh(Color color, bool isSolid,
+            [NotNull] IEnumerable<TriangleWithNormals> tris, IReadOnlyList<Edge3> edges = null)
+        {
+            if (tris == null)
+                throw new ArgumentNullException(nameof(tris));
+
+            Color = color;
+            _OriginalTriangleVerticies = tris.ToList();
+            _OriginalEdgeVertices = edges ?? new List<Edge3>();
             _IsSolid = isSolid;
 
+            TrianglesWithNormals = _OriginalTriangleVerticies;
+            Edges = _OriginalEdgeVertices;
+
             UpdateBoundingSphere();
+        }
+
+
+        public static Mesh Combine(IEnumerable<Mesh> meshes, Color color)
+        {
+            var tris = meshes.SelectMany(mesh => mesh.TrianglesWithNormals);
+            var edges = meshes.SelectMany(mesh => mesh.Edges).ToList();
+            return new Mesh(color, false,tris, edges);
+        }
+
+
+
+        public Mesh(Color color, bool isSolid, IReadOnlyList<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
+            : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
+        {
         }
 
         private void UpdateBoundingSphere()
         {
-            UpdateBoundingSphere(TrianglesWithNormals.Points().Select(p => p.Point).ToList());
+            UpdateBoundingSphere(CreateBoundingSphere);
         }
 
-        public Mesh(Color color, bool isSolid, IEnumerable<Triangle> enumerable, IReadOnlyList<Edge3> edges = null)
+        private Tuple<Vector3, float> CreateBoundingSphere()
         {
-            TrianglesWithNormals = enumerable.Select(p=>(TriangleWithNormals)p).ToList();
-            Edges = edges;
-            _Color = color;
-            _IsSolid = isSolid;
-            UpdateBoundingSphere();
-        }
-
-        public Mesh(Color color, bool isSolid, IEnumerable<TriangleWithNormals> enumerable, IReadOnlyList<Edge3> edges = null)
-        {
-            TrianglesWithNormals = enumerable.ToList();
-            Edges = edges ?? new List<Edge3>();
-            _Color = color;
-            _IsSolid = isSolid;
-            UpdateBoundingSphere();
+            var rangeBuilder = new Range3Single.Range3SingleBuilder();
+            var count = TrianglesWithNormals.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var tri = TrianglesWithNormals[i];
+                rangeBuilder.Update(tri.A.Point);
+                rangeBuilder.Update(tri.B.Point);
+                rangeBuilder.Update(tri.C.Point);
+            }
+            var boundingSphere = rangeBuilder.Range.BoundingSphere();
+            return boundingSphere;
         }
 
 
@@ -80,7 +109,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public override void Render(DateTime time)
         {
-            MeshRender.Render(this, _Color, _IsSolid);
+            MeshRender.Render(this, Color, _IsSolid);
         }
 
         public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
@@ -141,19 +170,38 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="transform"></param>
         public override void ApplyTransform(Matrix4x4 transform)
         {
-            Vector3 scale;
-            Quaternion rotation;
-            Vector3 translation;
-            Matrix4x4.Decompose(transform, out scale, out rotation, out translation);
+            {
+                var list = new TriangleWithNormals[_OriginalTriangleVerticies.Count];
 
-            TrianglesWithNormals = _OriginalTriangleVerticies
-                .Select(pn => pn.ApplyTransform(transform, rotation))
-                .ToList();
+                list.Length
+                    .ParallelChunked((lower, upper) =>
+                    {
+                        for (int i1 = lower; i1 < upper; i1++)
+                        {
+                            list[i1] = _OriginalTriangleVerticies[i1].ApplyTransform(transform);
+                        }
+                    });
 
-            Edges = _OriginalEdgeVertices
-                .Select(pn => pn.ApplyTransform(transform))
-                .ToList();
+                TrianglesWithNormals = list;
+                
+            }
+            {
+                var list = new Edge3[_OriginalEdgeVertices.Count]; 
 
+                list.Length
+                    .ParallelChunked((lower, upper) =>
+                    {
+                        for (int i = lower; i < upper; i++)
+                        {
+                            list[i] = _OriginalEdgeVertices[i].ApplyTransform(transform);
+
+                        }
+                    
+                    });
+
+                Edges = list;
+                
+            }
             UpdateBoundingSphere();
 
         }

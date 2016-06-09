@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -21,16 +22,19 @@ namespace SolidworksAddinFramework.Geometry
             C = new PointDirection3(c, default(Vector3) );
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator TriangleWithNormals(Triangle tri)
         {
             return new TriangleWithNormals(tri.A, tri.B,tri.C);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Triangle(TriangleWithNormals tri)
         {
             return new Triangle((Vector3)tri.A,(Vector3) tri.B,(Vector3)tri.C);
         }
 
-        public TriangleWithNormals ApplyTransform(Matrix4x4 matrix, Quaternion rotation)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TriangleWithNormals ApplyTransform(Matrix4x4 matrix)
         {
             return new TriangleWithNormals(
                 A.ApplyTransform(matrix),

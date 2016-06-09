@@ -14,6 +14,8 @@ namespace SolidworksAddinFramework {
         private readonly Single _Min;
         private readonly Single _Max;
 
+        public override string ToString() => $"{_Min}:{_Max}";
+
 
         public RangeSingle(IEnumerable<Single> values)
         {

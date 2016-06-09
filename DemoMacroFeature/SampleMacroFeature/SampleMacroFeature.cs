@@ -20,7 +20,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
         {
             return Database.Body
                 .GetSingleObject<IBody2>(ModelDoc)
-                .Match<object>(bodyFn =>
+                .MatchUnsafe<object>(bodyFn =>
                 {
                     var body = (IBody2) bodyFn().Copy();
                     SwFeatureData.EnableMultiBodyConsume = true;

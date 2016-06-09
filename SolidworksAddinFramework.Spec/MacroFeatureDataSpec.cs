@@ -11,7 +11,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void ShouldBeAbleToStore2MegabytesOfData()
         {
-            CreatePartDoc(true, doc =>
+            CreatePartDoc(false, doc =>
             {
                 var feature = new DummyMacroFeature();
                 feature.Insert(SwApp, doc, new DummyMacroFeatureData {Data = RandomString(1024 * 1024 * 50)});

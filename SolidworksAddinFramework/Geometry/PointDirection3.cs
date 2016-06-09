@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using SolidworksAddinFramework.OpenGl;
 
 namespace SolidworksAddinFramework.Geometry
@@ -17,6 +18,7 @@ namespace SolidworksAddinFramework.Geometry
         /// </summary>
         /// <param name="matrix"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PointDirection3 ApplyTransform(Matrix4x4 matrix)
         {
             return new PointDirection3
@@ -30,10 +32,13 @@ namespace SolidworksAddinFramework.Geometry
             Direction = direction;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator PointDirection3(Vector3 point)
         {
             return new PointDirection3(point, default(Vector3));
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Vector3(PointDirection3 point)
         {
             return point.Point;

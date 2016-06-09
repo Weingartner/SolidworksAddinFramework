@@ -207,6 +207,7 @@
     <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
     <Compile Include="Json.cs" />
+    <Compile Include="ListExtensions.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataExtensions.cs" />
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
@@ -224,6 +225,7 @@
     <Compile Include="ModellerExtensions.cs" />
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ModelViewManagerExtensions.cs" />
+    <Compile Include="OpenGl\ParallelExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
     <Compile Include="OpenGl\RenderableBase.cs" />
     <Compile Include="OptionTestingExtensios.cs" />

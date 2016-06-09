@@ -254,6 +254,7 @@ namespace SolidworksAddinFramework
         public static Dictionary<int, SwEq> GetGlobals(this IModelDoc2 doc )
         {
             var swEqnMgr = doc.GetEquationMgr();
+            Debug.Assert(swEqnMgr != null, "Couldn't get equation manager");
             var p = ModelDocExtensions.SwEwParser;
             return Enumerable.Range(0, swEqnMgr.GetCount())
                 .Select
