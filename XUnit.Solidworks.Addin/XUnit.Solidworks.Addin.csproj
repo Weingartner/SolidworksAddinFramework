@@ -99,7 +99,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <SolidWorksLocation>C:\Program Files\SOLIDWORKS Corp</SolidWorksLocation>
+    <SolidWorksLocation>C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\</SolidWorksLocation>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -183,19 +183,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
-      <HintPath>$(SolidWorksLocation)\SOLIDWORKS\api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
+      <HintPath>$(SolidWorksLocation)api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.swconst">
-      <HintPath>$(SolidWorksLocation)\SOLIDWORKS\api\redist\SolidWorks.Interop.swconst.dll</HintPath>
+      <HintPath>$(SolidWorksLocation)api\redist\SolidWorks.Interop.swconst.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.swpublished">
-      <HintPath>$(SolidWorksLocation)\SOLIDWORKS\api\redist\SolidWorks.Interop.swpublished.dll</HintPath>
+      <HintPath>$(SolidWorksLocation)api\redist\SolidWorks.Interop.swpublished.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="solidworkstools">
-      <HintPath>$(SolidWorksLocation)\SOLIDWORKS\solidworkstools.dll</HintPath>
+      <HintPath>$(SolidWorksLocation)solidworkstools.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
