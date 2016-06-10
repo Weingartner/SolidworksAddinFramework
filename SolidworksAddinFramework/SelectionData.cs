@@ -49,7 +49,7 @@ namespace SolidworksAddinFramework
         public override string ToString() => $"SelectionData ( {Mark} - {ObjectIdsHuman}";
 
         [DataMember]
-        public IReadOnlyList<byte[]> ObjectIds { get; }
+        public List<byte[]> ObjectIds { get; }
 
         public string ObjectIdsHuman => string.Join(":",ObjectIds.Select(id => BitConverter.ToString(id, 0, id.Length)));
         [DataMember]
@@ -59,7 +59,7 @@ namespace SolidworksAddinFramework
 
         public SelectionData(IEnumerable<byte[]> objectIds, int mark)
         {
-            ObjectIds = new ReadOnlyCollection<byte[]>(objectIds.ToList());
+            ObjectIds = new List<byte[]>(objectIds.ToList());
             Mark = mark;
         }
     }
