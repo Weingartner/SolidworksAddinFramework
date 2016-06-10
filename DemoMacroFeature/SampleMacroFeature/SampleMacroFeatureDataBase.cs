@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using ReactiveUI;
 using SolidworksAddinFramework;
 
@@ -19,6 +20,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
         private SelectionData _Body = SelectionData.Empty;
 
         [DataMember]
+        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
         public SelectionData Body 
         {
             get { return _Body; }
