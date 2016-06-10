@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 using XUnitRemote;
@@ -26,10 +28,15 @@ namespace XUnit.Solidworks.Addin
         public const string SolidworksPath = @"C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\sldworks.exe";
     }
 
+    public static class Common
+    {
+        public static Guid CollectinId { get; } = Guid.NewGuid();
+    }
+
     public class SolidworksFactDiscoverer : XUnitRemoteFactDiscoverer
     {
         public SolidworksFactDiscoverer(IMessageSink diagnosticMessageSink)
-            : base(diagnosticMessageSink, TestSettings.Id, TestSettings.SolidworksPath, t => new ScheduledTestCase(t))
+            : base(diagnosticMessageSink, TestSettings.Id, TestSettings.SolidworksPath, t => new ScheduledTestCase(t), Common.CollectinId)
         {
         }
     }
@@ -37,10 +44,11 @@ namespace XUnit.Solidworks.Addin
     public class SolidworksTheoryDiscoverer : XUnitRemoteTheoryDiscoverer
     {
         public SolidworksTheoryDiscoverer(IMessageSink diagnosticMessageSink)
-            : base(diagnosticMessageSink, TestSettings.Id, TestSettings.SolidworksPath, t => new ScheduledTestCase(t))
+            : base(diagnosticMessageSink, TestSettings.Id, TestSettings.SolidworksPath, t => new ScheduledTestCase(t), Common.CollectinId)
         {
         }
     }
+
 
     public class ScheduledTestCase : IXunitTestCase
     {
