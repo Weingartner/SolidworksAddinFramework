@@ -31,6 +31,7 @@ namespace SolidworksAddinFramework
         private readonly string _Name;
         private readonly IEnumerable<swPropertyManagerPageOptions_e> _OptionsE;
         private readonly CompositeDisposable _Disposable = new CompositeDisposable();
+        private IDisposable _Deselect;
 
         protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
         {
@@ -67,11 +68,13 @@ namespace SolidworksAddinFramework
                 {
                     throw new Exception("Unable to Create PMP");
                 }
+                var selectionMgr = (ISelectionMgr)ModelDoc.SelectionManager;
+                _Deselect = selectionMgr.DeselectAllUndoable();
                 AddControls();
 
                 Page.Show();
 
-                _Disposable.Add(PushSelections());
+                AddSelections();
             }
         }
 
@@ -80,7 +83,7 @@ namespace SolidworksAddinFramework
             _Disposable.Add(disposable);
         }
 
-        protected abstract IDisposable PushSelections();
+        protected abstract void AddSelections();
 
         private void AddControls()
         {
@@ -112,6 +115,7 @@ namespace SolidworksAddinFramework
         {
             _Disposable.Clear();
             OnClose((swPropertyManagerPageCloseReasons_e) reason);
+            _Deselect.Dispose();
         }
 
         protected abstract void OnClose(swPropertyManagerPageCloseReasons_e reason);

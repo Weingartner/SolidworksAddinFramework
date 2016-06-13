@@ -33,9 +33,9 @@ namespace DemoMacroFeatures.ManipulatorSample
         {
         }
 
-        protected override IDisposable PushSelections()
+        protected override void AddSelections()
         {
-            return ModelDoc.PushSelections(_Model);
+            ModelDoc.AddSelections(_Model);
         }
 
         protected override IEnumerable<IDisposable> AddControlsImpl()

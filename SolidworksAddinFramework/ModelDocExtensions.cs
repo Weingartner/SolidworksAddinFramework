@@ -76,11 +76,8 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
-        public static IDisposable PushSelections(this IModelDoc2 doc, object model)
+        public static void AddSelections(this IModelDoc2 doc, object model)
         {
-            var selectionManager = (ISelectionMgr)doc.SelectionManager;
-            var revert = selectionManager.DeselectAllUndoable();
-
             var selections = SelectionDataExtensions.GetSelectionsFromModel(model);
 
             var selectionMgr = (ISelectionMgr) doc.SelectionManager;
@@ -95,8 +92,6 @@ namespace SolidworksAddinFramework
 
                     var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), true, selectData);
                 });
-
-            return revert;
         }
 
         public static IEnumerable<object> GetSelectedObjectsFromModel(this IModelDoc2 doc, object model)

@@ -16,9 +16,9 @@ namespace SolidworksAddinFramework
         }
 
         public TMacroFeature MacroFeature { get; private set; }
-        protected override IDisposable PushSelections()
+        protected override void AddSelections()
         {
-            return ModelDoc.PushSelections(MacroFeature.Database);
+            ModelDoc.AddSelections(MacroFeature.Database);
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)

@@ -30,9 +30,9 @@ namespace SolidworksAddinFramework
 
         protected abstract void OnShow();
 
-        protected override IDisposable PushSelections()
+        protected override void AddSelections()
         {
-            return ModelDoc.PushSelections(Data);
+            ModelDoc.AddSelections(Data);
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
