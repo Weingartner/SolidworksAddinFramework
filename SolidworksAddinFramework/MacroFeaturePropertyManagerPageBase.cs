@@ -18,7 +18,7 @@ namespace SolidworksAddinFramework
         public TMacroFeature MacroFeature { get; private set; }
         protected override void AddSelections()
         {
-            ModelDoc.AddSelections(MacroFeature.Database);
+            ModelDoc.AddSelectionsFromModel(MacroFeature.Database);
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)

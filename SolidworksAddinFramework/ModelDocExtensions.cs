@@ -76,14 +76,13 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
-        public static void AddSelections(this IModelDoc2 doc, object model)
+        public static void AddSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selections)
         {
-            var selections = SelectionDataExtensions.GetSelectionsFromModel(model);
-
             var selectionMgr = (ISelectionMgr) doc.SelectionManager;
             selections
                 .GroupBy(p => p.Mark)
-                .Select(p => new { Mark = p.Key, Objects = p.SelectMany(selectionData => selectionData.GetObjects(doc)).ToArray() })
+                .Select(
+                    p => new {Mark = p.Key, Objects = p.SelectMany(selectionData => selectionData.GetObjects(doc)).ToArray()})
                 .Where(p => p.Objects.Length > 0)
                 .ForEach(o =>
                 {
@@ -92,6 +91,17 @@ namespace SolidworksAddinFramework
 
                     var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), true, selectData);
                 });
+        }
+
+        public static void AddSelectionsFromModel(this IModelDoc2 doc, object model)
+        {
+            var selections = SelectionDataExtensions.GetSelectionsFromModel(model);
+            doc.AddSelections(selections);
+        }
+
+        public static void AddSelection(this IModelDoc2 doc, SelectionData selection)
+        {
+            doc.AddSelections(new[] { selection });
         }
 
         public static IEnumerable<object> GetSelectedObjectsFromModel(this IModelDoc2 doc, object model)

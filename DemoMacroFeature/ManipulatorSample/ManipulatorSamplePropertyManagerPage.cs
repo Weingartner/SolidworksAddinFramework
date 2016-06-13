@@ -35,7 +35,7 @@ namespace DemoMacroFeatures.ManipulatorSample
 
         protected override void AddSelections()
         {
-            ModelDoc.AddSelections(_Model);
+            ModelDoc.AddSelectionsFromModel(_Model);
         }
 
         protected override IEnumerable<IDisposable> AddControlsImpl()

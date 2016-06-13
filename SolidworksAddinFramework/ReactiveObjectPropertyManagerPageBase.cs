@@ -32,7 +32,7 @@ namespace SolidworksAddinFramework
 
         protected override void AddSelections()
         {
-            ModelDoc.AddSelections(Data);
+            ModelDoc.AddSelectionsFromModel(Data);
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
