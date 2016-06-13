@@ -242,10 +242,6 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.25.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\System.Threading.Tasks.Dataflow.4.5.25\lib\dotnet\System.Threading.Tasks.Dataflow.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML">
