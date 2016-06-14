@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using LanguageExt;
 
 namespace SolidworksAddinFramework
 {
-    public static class OptionTestingExtensios
+    public static class OptionExtensions
     {
+
+
         /// <summary>
         /// Get the value from an option. If it is none 
         /// then a null reference exception will be raised.
@@ -21,6 +25,16 @@ namespace SolidworksAddinFramework
                     {
                         throw new NullReferenceException();
                     });
+        }
+
+        public static Option<ImmutableList<T>> Sequence<T>(this IEnumerable<Option<T>> p)
+        {
+            return p.Fold(
+                Prelude.Optional(ImmutableList<T>.Empty),
+                (state, itemOpt) =>
+                    from item in itemOpt
+                    from list in state
+                    select list.Add(item));
         }
     }
 }

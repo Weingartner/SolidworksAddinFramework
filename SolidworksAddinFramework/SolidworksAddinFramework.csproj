@@ -241,7 +241,7 @@
     <Compile Include="OpenGl\ParallelExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
     <Compile Include="OpenGl\RenderableBase.cs" />
-    <Compile Include="OptionTestingExtensios.cs" />
+    <Compile Include="OptionExtensions.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
     <Compile Include="ReactiveTransaction.cs" />
