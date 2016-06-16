@@ -8,6 +8,7 @@ using SolidworksAddinFramework;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.Exceptional.Reactive;
 
 namespace DemoMacroFeatures.ManipulatorSample
 {
@@ -59,7 +60,6 @@ namespace DemoMacroFeatures.ManipulatorSample
                 });
 
             yield return BodySelector()
-                .WhereIsSome()
                 .SubscribeDisposable((body, yield) =>
                 {
                     // The code here execute every time a new selection is made.
@@ -123,12 +123,14 @@ namespace DemoMacroFeatures.ManipulatorSample
                     yield(body().HideBodyUndoable());
 
 
-                });
+                }
+                , e => e.Show());
         }
 
-        private IObservable<Option<Func<IBody2>>> BodySelector()
+        private IObservableExceptional<Func<IBody2>> BodySelector()
         {
             return _Model.WhenAnyValue(p => p.Body)
+                .ToObservableExceptional()
                 .Where(p => !p.IsEmpty)
                 .Select(p => p.GetSingleObject<IBody2>(ModelDoc));
         }

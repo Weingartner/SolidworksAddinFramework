@@ -249,6 +249,10 @@
       <Name>System.XML</Name>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Weingartner.Exceptional, Version=1.4.6011.30924, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6011.30924\lib\net461\Weingartner.Exceptional.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>

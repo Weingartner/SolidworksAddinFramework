@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using MathNet.Numerics.Interpolation;
 using SolidWorks.Interop.sldworks;
+using Weingartner.Exceptional.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl
 {
@@ -99,6 +100,7 @@ namespace SolidworksAddinFramework.OpenGl
             SectionTimes = Calculate(_Sections, TimeSpan.Zero);
 
             CompletionTask = Observable.Interval(TimeSpan.FromSeconds(1.0/Framerate))
+                .ToObservableExceptional()
                 .ObserveOnSolidworksThread()
                 .TakeWhile(_ => SectionTimes.Last().EndTime > DateTime.Now && !cts.Token.IsCancellationRequested)
                 .Select(l =>

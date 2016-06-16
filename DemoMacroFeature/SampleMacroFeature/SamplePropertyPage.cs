@@ -9,6 +9,7 @@ using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
+using Weingartner.Exceptional.Reactive;
 
 namespace DemoMacroFeatures.SampleMacroFeature
 {
@@ -62,11 +63,11 @@ namespace DemoMacroFeatures.SampleMacroFeature
 
             // When the alpha value or the selection changes we want to 
             // show a temporary body with the split in it
-            yield return Observable
+            yield return ObservableExceptional
                 .CombineLatest
                 (
-                    MacroFeature.Database.WhenAnyValue(p=>p.Alpha),
-                    MacroFeature.Database.WhenAnyValue(p => p.Body).Where(p => !p.IsEmpty),
+                    MacroFeature.Database.WhenAnyValue(p=>p.Alpha).ToObservableExceptional(),
+                    MacroFeature.Database.WhenAnyValue(p => p.Body).ToObservableExceptional().Where(p => !p.IsEmpty),
                     (alpha, selection) => new { alpha, selection }
                 )
                 .Select(o =>
@@ -76,13 +77,12 @@ namespace DemoMacroFeatures.SampleMacroFeature
                            let splits = SampleMacroFeature.SplitBodies((IModeler)MacroFeature.SwApp.GetModeler(), newBody, MacroFeature.Database)
                            select splits == null ? null : new { body = bodyFn(), splits = splits.ToList() };
                 })
-                .WhereIsSome()
                 .SubscribeDisposable((v, yield) =>
                 {
                     yield(v.body.HideBodyUndoable());
                     yield(v.splits.DisplayBodiesUndoable(MacroFeature.ModelDoc));
 
-                });
+                }, e => e.Show());
 
 
 

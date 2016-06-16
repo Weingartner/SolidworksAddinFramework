@@ -15,13 +15,14 @@ using LanguageExt.SomeHelp;
 using SolidworksAddinFramework.Reflection;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
-using static LanguageExt.Prelude;
+using Weingartner.Exceptional.Reactive;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
 {
     public static class ObservableExtensions
     {
+        #region SubscribeDisposable
         /// <summary>
         /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
         /// is before the function is called again the previous disposable is disposed.
@@ -30,7 +31,7 @@ namespace SolidworksAddinFramework
         /// <param name="o"></param>
         /// <param name="fn"></param>
         /// <returns></returns>
-        public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IDisposable> fn)
+        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Func<T, IDisposable> fn, Action<Exception> errHandler)
         {
             var d = new SerialDisposable();
 
@@ -38,11 +39,47 @@ namespace SolidworksAddinFramework
             {
                     d.Disposable = Disposable.Empty;
                     d.Disposable = fn(v) ?? Disposable.Empty;
-            });
+            }, onError:errHandler);
 
             return new CompositeDisposable(s,d);
 
         }
+
+        public static IDisposable SubscribeDisposable(this IObservableExceptional<IDisposable> o, Action<Exception> errHandler) => o.SubscribeDisposable(d => d, errHandler);
+
+        /// <summary>
+        /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
+        /// is before the function is called again the previous disposable is disposed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="fn"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Func<T, IEnumerable<IDisposable>> fn, Action<Exception> errHandler)
+        {
+            return SubscribeDisposable(o, v =>(IDisposable) new CompositeDisposable(fn(v)),errHandler);
+        }
+
+
+        /// <summary>
+        /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
+        /// is before the function is called again the previous disposable is disposed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="disposableYielder"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Action<T, Action<IDisposable>> disposableYielder, Action<Exception> errHandler)
+        {
+            Func<T, IDisposable> fn2 = v =>
+            {
+                var c = new CompositeDisposable();
+                disposableYielder(v, c.Add);
+                return c;
+            };
+            return SubscribeDisposable(o, fn2, errHandler);
+        }
+        #endregion
 
         public static IObservable<T> Log<T>(this IObservable<T> o)
         {
@@ -95,7 +132,14 @@ namespace SolidworksAddinFramework
         /// <param name="obs"></param>
         /// <param name="target"></param>
         /// <param name="selector"></param>
+        /// <param name="handler"></param>
         /// <returns></returns>
+        public static IDisposable AssignTo<T, S>(this IObservableExceptional<T> obs, S target, Expression<Func<S, T>> selector, Action<Exception> handler)
+        {
+            var proxy = selector.GetProxy(target);
+            return obs.Subscribe(u => proxy.Value = u, onError: handler);
+        }
+
         public static IDisposable AssignTo<T, S>(this IObservable<T> obs, S target, Expression<Func<S, T>> selector)
         {
             var proxy = selector.GetProxy(target);
@@ -128,43 +172,44 @@ namespace SolidworksAddinFramework
         /// <param name="observable"></param>
         /// <param name="d"></param>
         /// <returns></returns>
-        public static IObservable<T> Connect<T>(this IConnectableObservable<T> observable, CompositeDisposable d)
+        public static IConnectableObservableExceptional<T> Connect<T>(this IConnectableObservableExceptional<T> observable, CompositeDisposable d)
         {
             var d0 = observable.Connect();
             d.Add(d0);
             return observable;
         }
 
-        public static IDisposable SubscribeDisposableRender<T>(this IObservable<T> o, Func<T, IDisposable> fn, IModelDoc2 doc)
+        public static IDisposable SubscribeDisposableRender<T>(this IObservableExceptional<T> o, Func<T, IDisposable> fn, IModelDoc2 doc, Action<Exception> errHandler)
         {
 
             var d = new SerialDisposable();
 
-            var s = o.Subscribe(v =>
+            var s = o
+                .Subscribe(onNext:v =>
             {
                 using(OpenGlRenderer.DeferRedraw(doc))
                 {
-                    d.Disposable = Disposable.Empty;
-                    d.Disposable = fn(v) ?? Disposable.Empty;
+                    try
+                    {
+                        d.Disposable = Disposable.Empty;
+                        d.Disposable = fn(v) ?? Disposable.Empty;
+                    }
+                    catch (Exception e)
+                    {
+                        errHandler(e);
+                    }
                 }
+            },
+            onError: e =>
+            {
+                d.Disposable = Disposable.Empty;
+                errHandler(e);
             });
 
             return new CompositeDisposable(s,d);
 
         }
 
-        /// <summary>
-        /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
-        /// is before the function is called again the previous disposable is disposed.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="o"></param>
-        /// <param name="fn"></param>
-        /// <returns></returns>
-        public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Func<T, IEnumerable<IDisposable>> fn)
-        {
-            return SubscribeDisposable(o, v =>(IDisposable) new CompositeDisposable(fn(v)));
-        }
 
         /// <summary>
         /// This behaves like the normal sample except that it will always generate
@@ -193,25 +238,6 @@ namespace SolidworksAddinFramework
                 });
                 return new CompositeDisposable(d0,d1);
             });
-        }
-
-        /// <summary>
-        /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
-        /// is before the function is called again the previous disposable is disposed.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="o"></param>
-        /// <param name="disposableYielder"></param>
-        /// <returns></returns>
-        public static IDisposable SubscribeDisposable<T>(this IObservable<T> o, Action<T, Action<IDisposable>> disposableYielder)
-        {
-            Func<T, IDisposable> fn2 = v =>
-            {
-                var c = new CompositeDisposable();
-                disposableYielder(v, c.Add);
-                return c;
-            };
-            return SubscribeDisposable(o, fn2);
         }
 
         /// <summary>
@@ -262,37 +288,40 @@ namespace SolidworksAddinFramework
             return o.SelectAsync(wrapper);
         }
 
+        public static IObservable<T> CatchAndRetry<T>(this IObservable<T> @this, Action<Exception> handler)
+        {
+            return @this.Catch<T, Exception>(e =>
+            {
+                handler(e);
+                return @this.CatchAndRetry(handler);
+            });
+        }
+
+
         /// <summary>
         /// <para>Observe on UIDispatcherScheduler.</para>
         /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
         /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
         /// If a new value arrives before the selector is finished calculated the old one then it is canceled.
+        /// 
+        /// This will also raise a message box if an exception is thrown downstream.
         /// </summary>
-        public static IObservable<U> ObserveOnSolidworksThread<T,U>(this IObservable<T> source, Func<T,CancellationToken,U> selector )
+        public static IObservableExceptional<U> ObserveOnSolidworksThread<T,U>(this IObservableExceptional<T> source, Func<T,CancellationToken,U> selector )
         {
             return source
                 .StartWith(default(T))
                 .Select(s => new {s, cts = new CancellationTokenSource()})
                 .Buffer(2, 1).Where(b => b.Count == 2)
-                .Select(b =>
+                .Select
+                (b =>
                 {
                     b[0].cts.Cancel();
                     return b[1];
                 })
                 .ObserveOn(UiDispatcherScheduler.Default)
-                .Select(b => { 
-                        try
-                        {
-                            return Optional(selector(b.s, b.cts.Token));
-                        }
-                        catch (OperationCanceledException e)
-                        {
-                            return None;
-                        }
-                    })
-                .WhereIsSome();
+                .Select(b => selector(b.s, b.cts.Token));
         }
-        public static IObservable<Task> ObserveOnSolidworksThread<T>(this IObservable<T> source, Func<T,CancellationToken,Task> selector )
+        public static IObservableExceptional<Task> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source, Func<T,CancellationToken,Task> selector )
         {
             return source
                 .StartWith(default(T))
@@ -310,33 +339,20 @@ namespace SolidworksAddinFramework
                     {
                         await selector(b.s, b.cts.Token);
                     }
-                    catch (OperationCanceledException e)
+                    catch (OperationCanceledException )
                     {
                         Console.WriteLine("Operation cancelled");
                     }
                 });
         }
 
-        public static IObservable<T> ObserveOnSolidworksThread<T>(this IObservable<T> source) =>
+
+        public static IDisposable SubscribeAndReportExceptions<T>(this IObservableExceptional<T> @this)
+            => @this.Subscribe(onNext:v=> {}, onError: e => e.Show());
+
+        public static IObservableExceptional<T> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source) =>
             source
             .ObserveOn(UiDispatcherScheduler.Default);
-
-        /// <summary>
-        /// <para>Subscribe on UIDispatcherScheduler.</para>
-        /// <para>UIDIspatcherScheduler is created when access to UIDispatcher.Default first in the whole application.</para>
-        /// <para>If you want to explicitly initialize, call UIDispatcherScheduler.Initialize() in App.xaml.cs.</para>
-        /// </summary>
-        public static IObservable<T> SubscribeOnSolidworksThread<T>(this IObservable<T> source) =>
-            source.SubscribeOn(UiDispatcherScheduler.Default);
-
-        public static IObservable<Unit> Switch(this IObservable<Task> o)
-        {
-            return Observable.Switch(o.Select(async t =>
-            {
-                await t;
-                return Unit.Default;
-            }));
-        }
 
         /// <summary>
         /// A helper for attaching observables to solidworks events with delegates that have <![CDATA[Func<T>]]> type signitures.
