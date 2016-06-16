@@ -10,6 +10,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
     {
         private double _Alpha;
 
+
         [DataMember]
         public double Alpha 
         {
