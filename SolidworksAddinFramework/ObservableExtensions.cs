@@ -220,9 +220,9 @@ namespace SolidworksAddinFramework
         /// <param name="sampled"></param>
         /// <param name="sampler"></param>
         /// <returns></returns>
-        public static IObservable<T> SampleAlways<T, U>(this IObservable<T> sampled, IObservable<U> sampler)
+        public static IObservableExceptional<T> SampleAlways<T, U>(this IObservableExceptional<T> sampled, IObservable<U> sampler)
         {
-            return Observable.Create<T>(observer =>
+            return ObservableExceptional.Create<T>(observer =>
             {
                 var started = false;
                 var value = default(T);
