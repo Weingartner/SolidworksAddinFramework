@@ -182,6 +182,7 @@ namespace SolidworksAddinFramework
         public static IDisposable SubscribeDisposableRender<T>(this IObservableExceptional<T> o, Func<T, IDisposable> fn, IModelDoc2 doc, Action<Exception> errHandler)
         {
 
+
             var d = new SerialDisposable();
 
             var s = o
@@ -196,6 +197,7 @@ namespace SolidworksAddinFramework
                     }
                     catch (Exception e)
                     {
+                        d.Disposable = Disposable.Empty;
                         errHandler(e);
                     }
                 }
