@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.EventHandlers;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -220,17 +218,13 @@ namespace SolidworksAddinFramework
             if (fn == null)
                 throw new ArgumentNullException(nameof(fn));
 
-            IDisposable d;
-            using (DeferRedraw(doc))
-            {
-                d = fn();
-            }
 
-            return Disposable.Create(() =>
-            {
-                using (DeferRedraw(doc))
-                    d.Dispose();
-            });
+            return  ((IReadOnlyDictionary<IModelDoc2,OpenGlRenderer>) Lookup)
+                .TryGetValue(doc)
+                .Match
+                    ( v=>v.GLDoubleBuffer.RunWithBackBuffer(fn)
+                    , ()=>Disposable.Empty
+                    );
         }
 
         public static IDisposable DeferRedraw(IModelDoc2 doc)
@@ -246,25 +240,5 @@ namespace SolidworksAddinFramework
                     );
         }
 
-    }
-
-    public class GLDoubleBuffer : DoubleBuffer<ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>>
-    {
-        private ModelView _ModelView;
-
-        public GLDoubleBuffer(ModelView modelView) : base(ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty)
-        {
-            _ModelView = modelView;
-        }
-
-        public override void OnSwitchToFront()
-        {
-            _ModelView.GraphicsRedraw(null);
-        }
-
-        public override void OnSwitchToBack()
-        {
-            _ModelView.GraphicsRedraw(null);
-        }
     }
 }
