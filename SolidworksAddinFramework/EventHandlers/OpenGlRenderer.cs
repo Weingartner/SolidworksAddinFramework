@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Reactive.Disposables;
 using System.Threading;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using SolidworksAddinFramework.EventHandlers;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -86,6 +88,8 @@ namespace SolidworksAddinFramework
             if (mv == null)
                 throw new ArgumentNullException(nameof(mv));
 
+            GLDoubleBuffer = new GLDoubleBuffer(mv);
+
             _MView = mv;
 
             DoSetup();
@@ -93,7 +97,7 @@ namespace SolidworksAddinFramework
             {
                 var time = DateTime.Now;
                 var layers =
-                    BodiesToRenderPrimary.GroupBy(o => o.Value.Item1)
+                    GLDoubleBuffer.Front.GroupBy(o => o.Value.Item1)
                         .OrderBy(o => o.Key)
                         .Select(o => new {Index = o.Key, Renderables = o.Select(q => q.Value.Item2).ToList()})
                         .ToList();
@@ -110,26 +114,32 @@ namespace SolidworksAddinFramework
             });
         }
 
-        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRender
+        private readonly GLDoubleBuffer GLDoubleBuffer;
+
+        private class FooDisposable : IDisposable
         {
-            set
+            private IDisposable _Inner;
+            private bool _IsDisposed;
+
+            ~FooDisposable()
             {
-                if (UsingPrimaryBuffer)
-                    BodiesToRenderPrimary = value;
-                else
-                    BodiesToRenderBacking = value;
+                if(!_IsDisposed)
+                    Console.WriteLine("Not disposed");
+                
             }
-            get
+
+            public FooDisposable(IDisposable inner)
             {
-                return UsingPrimaryBuffer ? BodiesToRenderPrimary: BodiesToRenderBacking;
+                _Inner = inner;
+            }
+
+            public void Dispose()
+            {
+                _IsDisposed = true;
+                _Inner.Dispose();
             }
         }
 
-        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderPrimary { get; set; } =
-            ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
-
-        private ImmutableDictionary<IRenderable, Tuple<int, IRenderable>> BodiesToRenderBacking { get; set; } =
-            ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty;
 
         private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
         {
@@ -138,16 +148,25 @@ namespace SolidworksAddinFramework
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
-            BodiesToRender = BodiesToRender.SetItem(renderable, Tuple.Create(layer, renderable));
+            GLDoubleBuffer.Update(b => b.SetItem(renderable, Tuple.Create(layer, renderable)));
+
             Redraw(doc);
 
-            return Disposable.Create(() =>
+            return new FooDisposable( Disposable.Create(() =>
             {
-                var btr = BodiesToRender;
-                if(btr.ContainsKey(renderable))
-                    BodiesToRender = btr.Remove(renderable);
+                GLDoubleBuffer.Update(btr =>
+                {
+                    if (btr.ContainsKey(renderable))
+                    {
+                        return btr.Remove(renderable);
+                    }
+                    else
+                    {
+                        return btr;
+                    }
+                });
                 Redraw(doc);
-            });
+            }));
         }
 
         private static void Redraw(IModelDoc2 doc)
@@ -156,8 +175,9 @@ namespace SolidworksAddinFramework
                 throw new ArgumentNullException(nameof(doc));
 
             var activeView = (IModelView) doc.ActiveView;
-            if (!UsingPrimaryBuffer) return;
-            activeView.GraphicsRedraw(null);
+            var renderer = Lookup[doc];
+            if (renderer.GLDoubleBuffer.FrontIsActive)
+                activeView.GraphicsRedraw(null);
         }
 
         private void DoSetup()
@@ -192,8 +212,6 @@ namespace SolidworksAddinFramework
             _Disposable.Dispose();
         }
 
-        private static int _DeferRedraw = 0;
-
 
         public static IDisposable DeferRedraw(IModelDoc2 doc, Func<IDisposable> fn  )
         {
@@ -220,34 +238,33 @@ namespace SolidworksAddinFramework
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
-            if (!OpenGlRenderer.Lookup.ContainsKey(doc))
-                return Disposable.Empty;
-
-            if(UsingPrimaryBuffer)
-            {
-                var renderer = Lookup[doc];
-                renderer.BodiesToRenderBacking = renderer.BodiesToRenderPrimary;
-            }
-            Incr();
-
-            return Disposable.Create(() =>
-            {
-                if(UsingPrimaryBufferOnNextDecr)
-                {
-                    OpenGlRenderer renderer = Lookup[doc];
-                    var activeView = (IModelView)doc.ActiveView;
-                    renderer.BodiesToRenderPrimary= renderer.BodiesToRenderBacking;
-                    activeView.GraphicsRedraw(null);
-                }
-                Decr();
-            });
+            return  ((IReadOnlyDictionary<IModelDoc2,OpenGlRenderer>) Lookup)
+                .TryGetValue(doc)
+                .Match
+                    ( v=>v.GLDoubleBuffer.SwitchToBackBufferTemporarily()
+                    , ()=>Disposable.Empty
+                    );
         }
 
-        private static bool UsingPrimaryBuffer => _DeferRedraw==0;
-        private static bool UsingPrimaryBufferOnNextDecr => _DeferRedraw==1;
+    }
 
-        private static void Decr() => _DeferRedraw --;
+    public class GLDoubleBuffer : DoubleBuffer<ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>>
+    {
+        private ModelView _ModelView;
 
-        private static void Incr() => _DeferRedraw ++;
+        public GLDoubleBuffer(ModelView modelView) : base(ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty)
+        {
+            _ModelView = modelView;
+        }
+
+        public override void OnSwitchToFront()
+        {
+            _ModelView.GraphicsRedraw(null);
+        }
+
+        public override void OnSwitchToBack()
+        {
+            _ModelView.GraphicsRedraw(null);
+        }
     }
 }

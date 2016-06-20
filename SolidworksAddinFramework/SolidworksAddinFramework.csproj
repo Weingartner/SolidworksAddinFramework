@@ -206,6 +206,7 @@
     <Compile Include="EdgeDistance.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
+    <Compile Include="EventHandlers\DoubleBuffer.cs" />
     <Compile Include="EventHandlers\OpenGlRenderer.cs" />
     <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="FaceExtensions.cs" />
