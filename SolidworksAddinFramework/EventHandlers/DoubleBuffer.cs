@@ -35,7 +35,6 @@ namespace SolidworksAddinFramework.EventHandlers
 
         private void SwitchToBackBuffer()
         {
-            return;
             lock (this)
             {
                 _Level++;
@@ -49,7 +48,6 @@ namespace SolidworksAddinFramework.EventHandlers
 
         private void SwitchToFrontBuffer()
         {
-            return;
             lock (this)
             {
                 _Level--;
