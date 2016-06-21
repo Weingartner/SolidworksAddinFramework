@@ -45,8 +45,6 @@ namespace SolidworksAddinFramework
 
         }
 
-        public static IDisposable SubscribeDisposable(this IObservableExceptional<IDisposable> o, Action<Exception> errHandler) => o.SubscribeDisposable(d => d, errHandler);
-
         /// <summary>
         /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
         /// is before the function is called again the previous disposable is disposed.
