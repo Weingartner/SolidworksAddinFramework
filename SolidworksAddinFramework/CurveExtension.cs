@@ -347,6 +347,13 @@ namespace SolidworksAddinFramework
             return (ICurve)edge.GetCurve();
         }
 
+        /// <summary>
+        /// Approximation. Be carefull
+        /// </summary>
+        /// <param name="curve"></param>
+        /// <param name="pointDistance"></param>
+        /// <param name="flankHelixDomain"></param>
+        /// <returns></returns>
         public static List<PointParam> GetPointsByLength
             ( this ICurve curve
             , double pointDistance
