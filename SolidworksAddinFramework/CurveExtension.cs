@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -55,6 +56,29 @@ namespace SolidworksAddinFramework
                 .Select(p => p.ToVector3())
                 .ToList();
             return ret;
+        }
+
+        /// <summary>
+        /// Should solve
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="t0"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static double PointAtDistanceFrom(this ICurve c, double t0, double length)
+        {
+            Func<double, double> objFunc = t1 => c.GetLength3(t0, t1) - length;
+            var domain = c.Domain();
+            Debug.Assert(domain[0]<t0);
+            Debug.Assert(domain[1]>t0);
+            var solver = new BrentSearch(objFunc, domain[0], domain[1]);
+            solver.FindRoot();
+            return solver.Solution;
+        }
+        public static double PointAtDistanceFrom(this ICurve c, Vector3 p0, double length)
+        {
+            var t0 = c.ClosestPointOn(p0);
+            return PointAtDistanceFrom(c, t0.T, length);
         }
 
         public static IDisposable DisplayUndoable(
