@@ -44,7 +44,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
 
             // Find the point to cut the object
             center.X = (float) (database.Alpha*box.P0.X + (1 - database.Alpha)*box.P1.X);
-            var sheet = modeler.CreateSheet(center, axisX, box.P0, box.P1);
+            var sheet = modeler.CreateSheet(center, axisX, box.MaxDim*2);
 
             var cutResult = body.Cut(sheet);
             return cutResult.Error == 0 ? cutResult.Bodies : null;

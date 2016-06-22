@@ -87,11 +87,20 @@ namespace SolidworksAddinFramework
         /// <param name="p0">Point to project onto surface to find UV bounds</param>
         /// <param name="p1">Point to project onto surface to find UV bounds</param>
         /// <returns></returns>
-        public static IBody2 CreateSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, Vector3 p0, Vector3 p1)
+        public static IBody2 CreateSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, float r)
         {
             var surf = (Surface) modeler.CreatePlanarSurface(center.ToDoubles(), vNormal.ToDoubles());
-            var uvLow = surf.GetClosestPointOnTs(p0);
-            var uvHigh = surf.GetClosestPointOnTs(p1);
+            var mid = surf.GetClosestPointOnTs(center);
+            var midPoint = mid.Point.ToVector3();
+            var upVector = (surf.PointAt(mid.U, mid.V + 1) - midPoint).Unit();
+            var rightVector = (surf.PointAt(mid.U + 1, mid.V) - midPoint).Unit();
+
+
+            var low = midPoint - upVector*r - rightVector*r;
+            var high = midPoint + upVector*r + rightVector*r;
+
+            var uvLow = surf.GetClosestPointOnTs(low);
+            var uvHigh = surf.GetClosestPointOnTs(high);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
 
