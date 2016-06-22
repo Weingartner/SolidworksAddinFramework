@@ -38,6 +38,15 @@ namespace SolidworksAddinFramework.OpenGl
             return Vector3.Dot(a, other);
         }
 
+        /// <summary>
+        /// Returns an orthoganl vector. This is robust
+        /// From http://lolengine.net/blog/2013/09/21/picking-orthogonal-vector-combing-coconuts
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector3 Orthogonal(this Vector3 v) =>
+            Math.Abs(v.X) > Math.Abs(v.Z) ? new Vector3(-v.Y, v.X, 0.0f) : new Vector3(0.0f, -v.Z, v.Y); 
+
         public static double[] ToDoubles(this Vector3 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z};
         public static float[] ToSingles(this Vector3 v) => new float[] {v.X, v.Y, v.Z};
 
