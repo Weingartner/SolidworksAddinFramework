@@ -263,6 +263,7 @@
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
     <Compile Include="ReactiveTransaction.cs" />
     <Compile Include="ReactiveUndo.cs" />
+    <Compile Include="RefAxisExtensions.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
