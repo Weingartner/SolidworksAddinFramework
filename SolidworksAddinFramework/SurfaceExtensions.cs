@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -74,6 +75,11 @@ namespace SolidworksAddinFramework
             var r = (double[]) surface.GetClosestPointOn(x, y, z);
             return new PointUv(r[0], r[1], r[2], r[3], r[4]);
         }
+
+        public static Vector3 PointAt(this ISurface s, double u, double v) => ((double[]) s.Evaluate( u,v,0,0 ))
+            .Take(3)
+            .ToArray()
+            .ToVector3();
 
         public static Vector3 GetClosestPointOnTs(IFace2 f, Vector3 curvePoint)
         {
