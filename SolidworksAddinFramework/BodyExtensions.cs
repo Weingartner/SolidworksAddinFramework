@@ -185,6 +185,33 @@ namespace SolidworksAddinFramework
         {
             return (IBody2) tool.Copy();
         }
+
+        /// <summary>
+        /// Assumes that the tools are non overlapping sheets and that the sheets fully
+        /// overlap the target. The target should be cut into N+1 parts of there are N
+        /// tools. They 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="tools"></param>
+        /// <returns></returns>
+        public static IEnumerable<IBody2> CutBySheets(this IBody2 target, IEnumerable<IBody2> tools)
+        {
+            var targets = new List<IBody2>() {target};
+            foreach (var tool in tools)
+            {
+                targets = targets.SelectMany
+                    (tgt =>
+                    {
+                        var result = tgt.Cut(tool);
+                        if (result.Error != 0)
+                            return new[] {tgt};
+                            //throw new Exception("Tool was unable to cut");
+                        return result.Bodies;
+                    })
+                    .ToList();
+            }
+            return targets;
+        }
     }
     
 
