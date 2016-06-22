@@ -125,6 +125,21 @@ namespace SolidworksAddinFramework.Geometry
             zmax = Math.Max(zmax, vertex.Z);
         }
 
+        public IEnumerable<Vector3> Verticies
+        {
+            get
+            {
+                yield return new Vector3(XMin, YMin, ZMin);
+                yield return new Vector3(XMin, YMin, ZMax);
+                yield return new Vector3(XMin, YMax, ZMin);
+                yield return new Vector3(XMin, YMax, ZMax);
+                yield return new Vector3(XMax, YMin, ZMin);
+                yield return new Vector3(XMax, YMin, ZMax);
+                yield return new Vector3(XMax, YMax, ZMin);
+                yield return new Vector3(XMax, YMax, ZMax);
+            }
+        }
+
         public static Range3Single FromVertices(IReadOnlyList<Vector3> vertices)
         {
             var xmin = Single.MaxValue;
