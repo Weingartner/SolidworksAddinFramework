@@ -63,22 +63,27 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="c"></param>
         /// <param name="t0"></param>
-        /// <param name="length"></param>
+        /// <param name="distance"></param>
         /// <returns></returns>
-        public static double PointAtDistanceFrom(this ICurve c, double t0, double length)
+        public static double PointAtDistanceFrom(this ICurve c, double t0, double distance)
         {
-            Func<double, double> objFunc = t1 => c.GetLength3(t0, t1) - length;
+            Func<double, double> objFunc = t1 =>
+            {
+                var length3 = t0 < t1 ? c.GetLength3(t0, t1) : c.GetLength3(t1, t0);
+                return length3 - Math.Abs(distance);
+            };
             var domain = c.Domain();
-            Debug.Assert(domain[0]<t0);
-            Debug.Assert(domain[1]>t0);
-            var solver = new BrentSearch(objFunc, domain[0], domain[1]);
+            var min = distance < 0.0 ? 0.8*domain[0] : t0;
+            var max = distance < 0.0 ? t0 : 1.2*domain[1];
+            var solver = new BrentSearch(objFunc, min, max);
             solver.FindRoot();
-            return solver.Solution;
+            var sol = solver.Solution;
+            return sol;
         }
-        public static double PointAtDistanceFrom(this ICurve c, Vector3 p0, double length)
+        public static double PointAtDistanceFrom(this ICurve c, Vector3 p0, double distance)
         {
-            var t0 = c.ClosestPointOn(p0);
-            return PointAtDistanceFrom(c, t0.T, length);
+            var ptT0 = c.ClosestPointOn(p0);
+            return PointAtDistanceFrom(c, ptT0.T, distance);
         }
 
         public static IDisposable DisplayUndoable(
