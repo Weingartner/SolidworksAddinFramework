@@ -15,6 +15,7 @@ using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
+using Weingartner.Exceptional.Reactive;
 using Weingartner.ReactiveCompositeCollections;
 using Unit = System.Reactive.Unit;
 
@@ -599,8 +600,37 @@ namespace SolidworksAddinFramework
             config(box);
             box.SetSelectionFilters(new[] { selectType });
             var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
-            var d1 = SelectionChangedObservable(id).Subscribe(_ => SetSelection(box, selectType, model, propertyExpr));
+
+            var d1 = TwoWayBind(
+                sourceObservable: model.WhenAnyValue(propertyExpr),
+                onSourceChanged: s => ModelDoc.AddSelection(s),
+                targetObservable: SelectionChangedObservable(id),
+                onTargetChanged: _ => SetSelection(box, selectType, model, propertyExpr)
+            );
             return ControlHolder.Create(@group, box, d0, d1);
+        }
+
+        private static IDisposable TwoWayBind<TSource, TTarget>(IObservable<TSource> sourceObservable, Func<TSource, IDisposable> onSourceChanged, IObservable<TTarget> targetObservable, Action<TTarget> onTargetChanged)
+        {
+            var canSetSelectionSubject = new BehaviorSubject<bool>(true);
+            var d0 = targetObservable
+                .CombineLatest(canSetSelectionSubject, (value, canUpdateSource) => new {value, canUpdateSource})
+                .Where(p => p.canUpdateSource)
+                .Select(p => p.value)
+                .Subscribe(onTargetChanged);
+
+            var disposable = new SerialDisposable();
+            var d1 = sourceObservable
+                .Subscribe(s =>
+                {
+                    canSetSelectionSubject.OnNext(false);
+                    using (Disposable.Create(() => canSetSelectionSubject.OnNext(true)))
+                    {
+                        disposable.Disposable = Disposable.Empty;
+                        disposable.Disposable = onSourceChanged(s);
+                    }
+                });
+            return new CompositeDisposable(canSetSelectionSubject, d0, d1, disposable);
         }
 
         private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
