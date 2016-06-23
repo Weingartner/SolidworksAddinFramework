@@ -73,7 +73,7 @@ namespace SolidworksAddinFramework
             return GetHashCode(olist, o => o.GetHashCode());
         }
 
-        public static int GetHashCode<T>(IEnumerable<T> items, Func<T, int> hashFunc )
+        public static int GetHashCode<T>(this IEnumerable<T> items, Func<T, int> hashFunc )
         {
             unchecked
             {

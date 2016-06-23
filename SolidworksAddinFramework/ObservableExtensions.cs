@@ -475,5 +475,10 @@ namespace SolidworksAddinFramework
         {
             return q.SelectMany(o => o.Match(EnumerableEx.Return, Enumerable.Empty<T>));
         }
+
+        public static IObservable<Unit> Ignore<T>(this IObservable<T> obs)
+        {
+            return obs.Select(_ => Unit.Default);
+        }
     }
 }
