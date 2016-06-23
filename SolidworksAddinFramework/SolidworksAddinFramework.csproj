@@ -191,6 +191,14 @@
       <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6011.30924\lib\net461\Weingartner.Exceptional.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Weingartner.Json.Migration, Version=0.8.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.8\lib\net45\Weingartner.Json.Migration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Weingartner.Json.Migration.Common, Version=0.8.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.8\lib\net45\Weingartner.Json.Migration.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -321,7 +329,10 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Common.dll" />
+    <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Roslyn.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

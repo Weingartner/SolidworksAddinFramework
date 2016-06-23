@@ -610,7 +610,7 @@ namespace SolidworksAddinFramework
             var selectedItems = selectionManager
                 .GetSelectedObjects((type, mark) => type == selectType && box.Mark == mark);
             var expressionChain = ReactiveUI.Reflection.Rewrite(propertyExpr.Body).GetExpressionChain().ToList();
-            var newSelection = new SelectionData(Enumerable.Empty<byte[]>(), box.Mark)
+            var newSelection = new SelectionData(Enumerable.Empty<SelectionData.ObjectId>(), box.Mark)
                 .SetObjects(selectedItems, ModelDoc);
             ReactiveUI.Reflection.TrySetValueToPropertyChain(model, expressionChain, newSelection);
         }

@@ -26,7 +26,7 @@ namespace SolidworksAddinFramework
 
     public static class SelectionManagerExtensions
     {
-        private const int AnyMark = -1;
+        internal const int AnyMark = -1;
         private const int NoMark = 0;
 
         private const int StartIndex = 1;

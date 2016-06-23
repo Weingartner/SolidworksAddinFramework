@@ -1,19 +1,27 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Weingartner.Json.Migration;
 
 namespace SolidworksAddinFramework
 {
     public static class Json
     {
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
+        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        {
+            Converters =
+            {
+                new MigrationConverter(new VerifyingJsonDataMigrator(new HashBasedDataMigrator<JToken>(new JsonVersionUpdater())))
+            }
+        };
 
         public static T Clone<T>(T tool)
         {
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(tool));
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(tool, SerializerSettings), SerializerSettings);
         }
 
         public static void Copy<T>(T source, T target)
         {
-            var serializeObject = JsonConvert.SerializeObject(source);
+            var serializeObject = JsonConvert.SerializeObject(source, SerializerSettings);
             Copy(serializeObject, target);
         }
 
