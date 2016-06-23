@@ -89,10 +89,12 @@ namespace SolidworksAddinFramework
             var obs = pmp.NumberBoxChangedObservable(id);
             var d2 = obs.Subscribe(value => list.ReplaceAt(index,equation.WithValue(value)));
 
-            var d3 = Disposable.Empty; /*list.ChangesObservable()
-                .Select(_=>Unit.Default)
+            var d3 = list.ChangesObservable()
+                .Ignore()
                 .StartWith(Unit.Default)
-                .Subscribe(v => */box.Value = list.Source[index].Val/*)*/;
+                // Don't set value when we selected another model with less equations. We will recreate the controls anyway.
+                .Where(_ => list.Source.Count > index)
+                .Subscribe(v => box.Value = list.Source[index].Val);
 
             return ControlHolder.Create(@group, box, d2, label, d3);
         }
