@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using ReactiveUI;
 
 namespace SolidworksAddinFramework
@@ -17,34 +20,39 @@ namespace SolidworksAddinFramework
     public class ReactiveUndo<T> : ReactiveObject, IDisposable
         where T : ReactiveObject
     {
-        public T Clone { get; }
+        private readonly T _Target;
 
-        private readonly Stack<string> _UndoStack = new Stack<string>();
+        private readonly Stack<T> _UndoStack = new Stack<T>();
         private readonly IDisposable _Disposable;
         private bool _Undoing;
 
         public ReactiveUndo(T target)
         {
-            Clone = target;
+            _Target = target;
             Do();
-            _Disposable = target.Changed.Subscribe(_ =>
-            {
-                if(!_Undoing) Do();
-            });
+            _Disposable = _Target.Changed
+                .DistinctUntilChanged()
+                .Subscribe(_ =>
+                {
+                    if(!_Undoing) Do();
+                });
         }
 
         private void Do()
         {
-            _UndoStack.Push(Clone.ToJson());
+            if (_UndoStack.Count > 0 && Equals(_UndoStack.Peek(), _Target))
+                return;
+
+            _UndoStack.Push(Json.Clone(_Target));
 
             UpdateCanUndo();
         }
 
-        bool _CanUndo;
+        private bool _CanUndo;
         public bool CanUndo 
         {
             get { return _CanUndo; }
-            set { this.RaiseAndSetIfChanged(ref _CanUndo, value); }
+            private set { this.RaiseAndSetIfChanged(ref _CanUndo, value); }
         }
 
         public void Undo()
@@ -57,8 +65,10 @@ namespace SolidworksAddinFramework
             _UndoStack.Pop();
             var json = _UndoStack.Peek();
             _Undoing = true;
-            Json.Copy(json, Clone);
-            _Undoing = false;
+            using (Disposable.Create(() => _Undoing = false))
+            {
+                Json.Copy(json, _Target);
+            }
 
             UpdateCanUndo();
         }
