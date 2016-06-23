@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Security.RightsManagement;
 using OpenTK.Graphics.OpenGL;
+using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
@@ -33,10 +34,20 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static Vector3 Unit(this Vector3 v) => v/v.Length();
 
-        public static double Dot(this Vector3 a, Vector3 other)
+        public static float Dot(this Vector3 a, Vector3 other)
         {
             return Vector3.Dot(a, other);
         }
+
+        /// <summary>
+        /// Returns 1 for right handed vectors and -1 for left handed
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static int Orientation(this Vector3 a, Vector3 b, Vector3 c) =>
+            Vector3.Cross(a, b).Dot(c) > 0 ? 1 : -1;
 
         /// <summary>
         /// Returns an orthoganl vector. This is robust
@@ -135,9 +146,21 @@ namespace SolidworksAddinFramework.OpenGl
             var acos = Math.Acos(Vector2.Dot(v0, v1) / v0Length / v1Length);
             return double.IsNaN(acos) ? 0 : acos * sign;
         }
+
     }
 
     public static class Matrix4x4Extensions
     {
+        public static Matrix4x4 CreateFromAxisAngleOrigin(PointDirection3 p, float angle)
+        {
+            return
+                Matrix4x4.CreateTranslation(-p.Point)
+                *Matrix4x4.CreateFromAxisAngle(p.Direction.Unit(), angle)
+                *Matrix4x4.CreateTranslation(p.Point);
+        }
+        public static Matrix4x4 CreateFromEdgeAngleOrigin(Edge3 p, float angle)
+        {
+            return CreateFromAxisAngleOrigin(new PointDirection3(p.A,p.Delta),angle);
+        }
     }
 }

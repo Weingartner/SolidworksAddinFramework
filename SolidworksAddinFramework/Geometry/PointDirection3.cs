@@ -51,6 +51,17 @@ namespace SolidworksAddinFramework.Geometry
             
         }
 
+        /// <summary>
+        /// Project a point onto this plane
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public Vector3 ProjectOnPlane(Vector3 q)
+        {
+            var p = this.Point;
+            return q - (q - p).Dot(Direction)*Direction;
+        }
+
         public static PointDirection3 UnitZ = new PointDirection3(Vector3.Zero, Vector3.UnitZ);
         public static PointDirection3 UnitY = new PointDirection3(Vector3.Zero, Vector3.UnitY);
         public static PointDirection3 UnitX = new PointDirection3(Vector3.Zero, Vector3.UnitX);

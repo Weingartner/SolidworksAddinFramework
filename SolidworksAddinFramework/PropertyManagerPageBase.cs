@@ -540,8 +540,9 @@ namespace SolidworksAddinFramework
             return InitControl(@group, control, controlConfig, ctrlPropSelector, ctrlPropChangeObservable, propParent, propSelector, x => x, x => x);
         }
 
-        public IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption, Func<IPropertyManagerPageLabel, IDisposable> config = null)
+        public IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, string caption = null, Func<IPropertyManagerPageLabel, IDisposable> config = null)
         {
+            caption = caption ?? tip;
             return CreateLabel(@group, tip, Observable.Return(caption), config);
         }
 

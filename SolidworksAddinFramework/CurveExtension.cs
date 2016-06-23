@@ -99,6 +99,23 @@ namespace SolidworksAddinFramework
             return wire.DisplayUndoable(doc, layer);
         }
 
+        public static IDisposable DisplayUndoable
+            (
+            this Edge3 line
+            ,
+            IModelDoc2 doc
+            ,
+            Color color
+            ,
+            float thickness = 1
+            ,
+            int layer = 0
+            )
+        {
+            var wire = new OpenWire(new [] {line.A, line.B}.ToList(),thickness, color);
+            return wire.DisplayUndoable(doc, layer);
+        }
+
         public static PointDirection3 PointTangentAt(this ICurve c, double t)
         {
             return c.PointAt(t, 1).ToPointDirection3();

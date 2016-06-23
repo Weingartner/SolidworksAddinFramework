@@ -17,10 +17,17 @@ namespace SolidworksAddinFramework.Spec.opengl
             {
                 var v = new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble());
                 var o = v.Orthogonal();
-                v.Dot(o).Should().BeApproximately(0, 1e-9);
+                v.Dot(o).Should().BeApproximately(0, 1e-9f);
 
             }
             
-        } 
+        }
+
+        [Fact]
+        public void OrientationShouldWork()
+        {
+            Vector3Extensions.Orientation(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ).Should().Be(1);
+            Vector3Extensions.Orientation(Vector3.UnitY, Vector3.UnitX, Vector3.UnitZ).Should().Be(-1);
+        }
     }
 }

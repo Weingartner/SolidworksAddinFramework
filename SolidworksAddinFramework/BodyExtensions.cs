@@ -9,6 +9,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Xml;
 using Accord.Math.Optimization;
+using LanguageExt;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
@@ -196,7 +197,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IEnumerable<IBody2> CutBySheets(this IBody2 target, IEnumerable<IBody2> tools)
         {
-            var targets = new List<IBody2>() {target};
+            var targets = new List<IBody2>() {target.CopyTs()};
             foreach (var tool in tools)
             {
                 targets = targets.SelectMany
@@ -211,6 +212,21 @@ namespace SolidworksAddinFramework
                     .ToList();
             }
             return targets;
+        }
+
+        public static Option<Curve> GetIntersectionCurve(this IBody2 toolBody, IBody2 cuttingPlane, IModeler modeler)
+        {
+            var innerCurves =
+                toolBody.GetIntersectionEdgesNonDestructive(cuttingPlane)
+                    .Buffer(2, 2)
+                    .Select(b => (ICurve) b[0].GetCurve())
+                    .ToArray();
+
+            if (innerCurves.Length <= 0)
+                return Prelude.None;
+
+            var curve = modeler.MergeCurves(innerCurves);
+            return Prelude.Optional(curve);
         }
     }
     
