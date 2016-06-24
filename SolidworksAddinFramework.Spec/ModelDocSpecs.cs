@@ -51,8 +51,23 @@ namespace SolidworksAddinFramework.Spec
             CreatePartDoc(doc =>
             {
                 var config = doc.ConfigurationManager.AddConfiguration("test", "", "", (int)swConfigurationOptions2_e.swConfigOption_DontActivate, "", "");
-                var result = doc.GetConfigurationFromID(config.GetID());
-                result.Some(r => r.Name.Should().Be("test"));
+                var output = doc.GetConfigurationFromID(config.GetID());
+                var result = output.Match(
+                    Some: v => v.Name == "test",
+                    None: () => false
+                    );
+                result.Should().BeTrue();
+            });
+        }
+
+        [SolidworksFact]
+        public void GetConfigurationFromIDNullTest()
+        {
+            CreatePartDoc(doc =>
+            {
+                var config = doc.ConfigurationManager.AddConfiguration("test", "", "", (int)swConfigurationOptions2_e.swConfigOption_DontActivate, "", "");
+                var result = doc.GetConfigurationFromID(27);
+                result.IsNone.Should().BeTrue();
             });
         }
     }
