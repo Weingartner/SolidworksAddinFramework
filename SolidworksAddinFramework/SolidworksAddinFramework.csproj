@@ -230,6 +230,7 @@
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="FeatureMgrViewObservables.cs" />
     <Compile Include="Geometry\Edge3.cs" />
+    <Compile Include="Geometry\PlanePolygon.cs" />
     <Compile Include="Geometry\Range3Single.cs" />
     <Compile Include="Geometry\PointDirection3.cs" />
     <Compile Include="Geometry\Triangle.cs" />

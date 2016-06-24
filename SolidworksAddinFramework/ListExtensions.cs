@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SolidworksAddinFramework
 {
@@ -15,6 +16,30 @@ namespace SolidworksAddinFramework
             }
 
             return listu;
+        }
+
+        public static List<T> RotateToHead<T>(this IList<T> list, Func<T, bool> selector)
+        {
+            var q = new Queue<T>(list);
+            while (!selector(q.Head()))
+            {
+                var v = q.Dequeue();
+                q.Enqueue(v);
+            }
+
+            return q.ToList();
+        }
+
+        public static List<T> Rotate<T>(this IList<T> list, int n)
+        {
+            var q = new Queue<T>(list);
+            for (int i = 0; i < n; i++)
+            {
+                var v = q.Dequeue();
+                q.Enqueue(v);
+                
+            }
+            return q.ToList();
         }
     }
 }

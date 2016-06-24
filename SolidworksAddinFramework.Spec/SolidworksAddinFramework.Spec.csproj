@@ -160,6 +160,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnumerableExtensionsSpec.cs" />
+    <Compile Include="Geometry\PlanePolygonSpec.cs" />
+    <Compile Include="ListExtensionsSpec.cs" />
     <Compile Include="ModelerExtensionSpec.cs" />
     <Compile Include="MacroFeatureDataSpec.cs" />
     <Compile Include="MathUtilitySpec.cs" />

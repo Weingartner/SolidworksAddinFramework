@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework
 {
@@ -34,6 +37,48 @@ namespace SolidworksAddinFramework
                 i++;
                 
             }
+        }
+
+        public static IEnumerable<List<T>> BufferTillChanged<T,U>(this IEnumerable<T> source, Func<T,U> selector )
+        {
+            List<T> buffer = new List<T>();
+            Option<U> pattern = None; 
+            foreach (var item in source)
+            {
+                var key = selector(item);
+                if (pattern != key)
+                {
+                    if (buffer.Count > 0)
+                        yield return buffer;
+                    buffer = new List<T>();
+                }
+                buffer.Add(item);
+                pattern = Some(key);
+            }
+            if(buffer.Count>0)
+                yield return buffer;
+        }
+
+        /// <summary>
+        /// Index of minium elements
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IList<int> IndexOfMinBy<T, U>(this IEnumerable<T> @this, Func<T, U> fn)
+        {
+            return @this.Select((v, i) => new { v, i }).MinBy(p => fn(p.v)).Select(p => p.i).ToList();
+        }
+
+        /// <summary>
+        /// Index of maximum elements
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IList<int> IndexOfMaxBy<T, U>(this IEnumerable<T> @this, Func<T, U> fn)
+        {
+            return @this.Select((v, i) => new { v, i }).MaxBy(p => fn(p.v)).Select(p => p.i).ToList();
         }
 
     }
