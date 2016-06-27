@@ -324,17 +324,22 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static Option<Configuration> GetConfigurationFromID(this IModelDoc2 modelDoc,int ID)
         {
-            var configNames = (string[])modelDoc.GetConfigurationNames();
-            foreach (var configName in configNames)
-            {
-                var config = (Configuration)modelDoc.GetConfigurationByName(configName);
-                if (config.GetID() == ID)
-                {
-                    return Some(config);
-                }
-            }
-            return None;
+            return Optional(modelDoc
+                .GetConfigurations()
+                .FirstOrDefault(config => config.GetID() == ID));
+
         }
+
+        /// <summary>
+        /// Get all configurations
+        /// </summary>
+        /// <param name="modelDoc"></param>
+        /// <returns></returns>
+        public static IEnumerable<Configuration> GetConfigurations(this IModelDoc2 modelDoc) =>
+            modelDoc
+            .GetConfigurationNames()
+            .CastArray<string>()
+            .Select(name => (Configuration)modelDoc.GetConfigurationByName(name));
 
         /// <summary>
         /// Set a number of globals at specific positions in the equation table
