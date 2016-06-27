@@ -206,6 +206,7 @@
     <Compile Include="BodyMaterials.cs" />
     <Compile Include="BoolExtensions.cs" />
     <Compile Include="CommitableUndoablePropertyManagerPage.cs" />
+    <Compile Include="ComponentExtensions.cs" />
     <Compile Include="ComWangling.cs" />
     <Compile Include="CooperativeTask.cs" />
     <Compile Include="CurveExtension.cs" />
