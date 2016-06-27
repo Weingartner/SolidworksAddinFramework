@@ -39,6 +39,27 @@ namespace SolidworksAddinFramework
             }
         }
 
+        /// <summary>
+        /// Switch the dimensions in IEnumerable of IEnumerable. Assumes
+        /// that all the sub IEnumerables have the same dimension
+        /// http://stackoverflow.com/a/10555037/158285
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IEnumerable<IEnumerable<T>> Transpose<T>( this IEnumerable<IEnumerable<T>> @this)
+        {
+            var enumerators = @this.Select(t => t.GetEnumerator());
+            do
+            {
+                enumerators = enumerators.Where(e => e.MoveNext());
+                var r = enumerators.Select(e => e.Current);
+                if (!r.Any())
+                    break;
+                yield return r;
+            } while (true);
+        }
+
         public static IEnumerable<KeyValuePair<U,List<T>>> BufferTillChanged<T,U>(this IEnumerable<T> source, Func<T,U> selector )
         {
             List<T> buffer = new List<T>();

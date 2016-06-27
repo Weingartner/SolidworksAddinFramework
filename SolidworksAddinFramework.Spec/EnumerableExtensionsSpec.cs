@@ -21,8 +21,20 @@ namespace SolidworksAddinFramework.Spec
 
 
             new int[] {}.BufferTillChanged(v => v).ToList().Count.Should().Be(0);
+        [Fact]
+        public void TransposeShouldWork()
+        {
+            var t = new[] { new[] { 1, 2, 3 }, new[] { 4, 5, 6 }, new[] { 7, 8, 9 } };
+
+            var r = t.Transpose().Select(v => v.ToList()).ToList();
+
+            r[0].Should().Equal(1, 4, 7);
+            r[1].Should().Equal(2, 5, 8);
+            r[2].Should().Equal(3, 6, 9);
+
+            r.Count.Should().Be(3);
 
         }
-        
     }
+
 }
