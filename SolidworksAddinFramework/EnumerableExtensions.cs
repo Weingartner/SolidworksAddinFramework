@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static IEnumerable<List<T>> BufferTillChanged<T,U>(this IEnumerable<T> source, Func<T,U> selector )
+        public static IEnumerable<KeyValuePair<U,List<T>>> BufferTillChanged<T,U>(this IEnumerable<T> source, Func<T,U> selector )
         {
             List<T> buffer = new List<T>();
             Option<U> pattern = None; 
@@ -49,14 +49,14 @@ namespace SolidworksAddinFramework
                 if (pattern != key)
                 {
                     if (buffer.Count > 0)
-                        yield return buffer;
+                        yield return new KeyValuePair<U, List<T>>(pattern.__Value__(), buffer);
                     buffer = new List<T>();
                 }
                 buffer.Add(item);
                 pattern = Some(key);
             }
             if(buffer.Count>0)
-                yield return buffer;
+                yield return new KeyValuePair<U, List<T>>(pattern.__Value__(),buffer);
         }
 
         /// <summary>

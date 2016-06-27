@@ -13,11 +13,11 @@ namespace SolidworksAddinFramework.Spec
 
             var r = list.BufferTillChanged(v => v % 2).ToList();
 
-            r[0].Should().Equal(2, 4, 6, 8);
-            r[1].Should().Equal(1, 3, 7);
-            r[2].Should().Equal(2);
-            r[3].Should().Equal(9, 7, 11);
-            r[4].Should().Equal(4, 8, 100);
+            r[0].Value.Should().Equal(2, 4, 6, 8);
+            r[1].Value.Should().Equal(1, 3, 7);
+            r[2].Value.Should().Equal(2);
+            r[3].Value.Should().Equal(9, 7, 11);
+            r[4].Value.Should().Equal(4, 8, 100);
 
 
             new int[] {}.BufferTillChanged(v => v).ToList().Count.Should().Be(0);
