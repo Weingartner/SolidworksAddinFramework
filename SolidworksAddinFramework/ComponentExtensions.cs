@@ -12,24 +12,36 @@ namespace SolidworksAddinFramework
     {
         public struct ExternalReferenceInfo
         {
+            public ExternalReferenceInfo(string modelPathName,string componentPathName,string feature,string dataType,swExternalReferenceStatus_e status,string refEntity,string featCom, swExternalFileReferencesConfig_e configOption,string configName)
+            {
+                this.ModelPathName = modelPathName;
+                this.ComponentPathName = componentPathName;
+                this.Feature = feature;
+                this.DataType = dataType;
+                this.Status = status;
+                this.RefEntity = refEntity;
+                this.FeatCom = featCom;
+                this.ConfigOption = configOption;
+                this.ConfigName = configName;
+            }
             /// <summary>Path and name of the part or assembly</summary>
-            public string ModelPathName;
+            public readonly string ModelPathName;
             /// <summary>Path and name of the referenced part or component</summary>
-            public string ComponentPathName;
+            public readonly string ComponentPathName;
             /// <summary>In-context items (sketches, features, and so on)</summary>
-            public string Feature;
+            public readonly string Feature;
             /// <summary>Data used to create the items (converted edge or face, converted or offset sketch entity, body, and so on)</summary>
-            public string DataType;
+            public readonly string DataType;
             /// <summary>Status of external reference</summary>
-            public swExternalReferenceStatus_e Status;
+            public readonly swExternalReferenceStatus_e Status;
             /// <summary>Actual item being used and the name of the document that contains the item</summary>
-            public string RefEntity;
+            public readonly string RefEntity;
             /// <summary>Name of the component in which the affected feature exists; this information is only displayed when one or more RefEntity is in a different component in an assembly and does not apply to derived parts</summary>
-            public string FeatCom;
+            public readonly string FeatCom;
             /// <summary>Configuration option</summary>
-            public swExternalFileReferencesConfig_e ConfigOption;
+            public readonly swExternalFileReferencesConfig_e ConfigOption;
             /// <summary>Name of the configuration when ConfigOption is swExternalFileReferencesNamedConfig</summary>
-            public string ConfigName;
+            public readonly string ConfigName;
 
             /*
              
@@ -53,9 +65,8 @@ namespace SolidworksAddinFramework
         /// This helper method shortens the amount of code required and makes it more readable.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<ExternalReferenceInfo> ListExternalFileReferences2(this IComponent2 comp)
+        public static IEnumerable<ExternalReferenceInfo> ListExternalFileReferences(this IComponent2 comp)
         {
-            List<ExternalReferenceInfo> results = new List<ExternalReferenceInfo>();
             object vModelPathName = null;
             object vComponentPathName = null;
             object vFeature = null;
@@ -66,23 +77,18 @@ namespace SolidworksAddinFramework
             int configOption;
             string configName;
             comp.ListExternalFileReferences2(out vModelPathName, out vComponentPathName, out vFeature, out vDataType, out vStatus, out vRefEntity, out vFeatCom, out configOption, out configName);
-            if (vModelPathName != null && vComponentPathName != null && vFeature != null && vDataType != null && vStatus != null && vRefEntity != null && vFeatCom != null)
+            var modelPathNames = vModelPathName.CastArray<string>();
+            var componentPathNames = vComponentPathName.CastArray<string>();
+            var features = vFeature.CastArray<string>();
+            var dataTypes = vDataType.CastArray<string>();
+            var statuses = vStatus.CastArray<swExternalReferenceStatus_e>();
+            var refEntities = vRefEntity.CastArray<string>();
+            var featComs = vFeatCom.CastArray<string>();
+            for (int i = 0; i < modelPathNames.Count(); i++)
             {
-                var modelPathNames = vModelPathName.CastArray<string>();
-                var componentPathNames = vComponentPathName.CastArray<string>();
-                var features = vFeature.CastArray<string>();
-                var dataTypes = vDataType.CastArray<string>();
-                var statuses = vStatus.CastArray<swExternalReferenceStatus_e>();
-                var refEntities = vRefEntity.CastArray<string>();
-                var featComs = vFeatCom.CastArray<string>();
-                for (int i = 0; i < modelPathNames.Count(); i++)
-                {
-                    results.Add(new ExternalReferenceInfo { ModelPathName = modelPathNames[i], ComponentPathName = componentPathNames[i], Feature = features[i],
-                        DataType = dataTypes[i], Status = statuses[i], RefEntity = refEntities[i], FeatCom = featComs[i],
-                        ConfigOption = (swExternalFileReferencesConfig_e)configOption, ConfigName = configName });
-                }
+                yield return new ExternalReferenceInfo(modelPathNames[i], componentPathNames[i], features[i],dataTypes[i], statuses[i], 
+                    refEntities[i], featComs[i],(swExternalFileReferencesConfig_e)configOption, configName );
             }
-            return results;
         }
     }
 }
