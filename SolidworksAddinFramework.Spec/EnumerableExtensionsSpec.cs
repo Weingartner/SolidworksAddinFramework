@@ -21,6 +21,8 @@ namespace SolidworksAddinFramework.Spec
 
 
             new int[] {}.BufferTillChanged(v => v).ToList().Count.Should().Be(0);
+        }
+
         [Fact]
         public void TransposeShouldWork()
         {
