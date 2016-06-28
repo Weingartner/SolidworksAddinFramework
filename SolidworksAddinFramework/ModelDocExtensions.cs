@@ -317,6 +317,32 @@ namespace SolidworksAddinFramework
         }
 
         /// <summary>
+        /// Look-up a configuration based on it's ID
+        /// </summary>
+        /// <param name="modelDoc"></param>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        public static Option<Configuration> GetConfigurationFromID(this IModelDoc2 modelDoc,int ID)
+        {
+            return modelDoc
+                .GetConfigurations()
+                .FirstOrDefault(config => config.GetID() == ID)
+                .ToOption();
+
+        }
+
+        /// <summary>
+        /// Get all configurations
+        /// </summary>
+        /// <param name="modelDoc"></param>
+        /// <returns></returns>
+        public static IEnumerable<Configuration> GetConfigurations(this IModelDoc2 modelDoc) =>
+            modelDoc
+            .GetConfigurationNames()
+            .CastArray<string>()
+            .Select(name => (Configuration)modelDoc.GetConfigurationByName(name));
+
+        /// <summary>
         /// Set a number of globals at specific positions in the equation table
         /// </summary>
         /// <param name="doc"></param>
@@ -383,7 +409,6 @@ namespace SolidworksAddinFramework
             }
             return r;
         }
-
 
         static Parser<T> DeOpt<T>(Parser<Option<T>> p)
             => from i in p from r in i.Match(result,()=> failure<T>($"Could not parse {typeof(T).Name}")) select r;
@@ -469,6 +494,8 @@ namespace SolidworksAddinFramework
 
             }
         }
+
+
     }
 
     public static class ParserExt
