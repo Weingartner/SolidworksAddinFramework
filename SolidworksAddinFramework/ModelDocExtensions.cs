@@ -324,9 +324,10 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static Option<Configuration> GetConfigurationFromID(this IModelDoc2 modelDoc,int ID)
         {
-            return Optional(modelDoc
+            return modelDoc
                 .GetConfigurations()
-                .FirstOrDefault(config => config.GetID() == ID));
+                .FirstOrDefault(config => config.GetID() == ID)
+                .ToOption();
 
         }
 

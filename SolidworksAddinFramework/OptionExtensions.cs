@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework
 {
@@ -35,6 +36,17 @@ namespace SolidworksAddinFramework
                     from item in itemOpt
                     from list in state
                     select list.Add(item));
+        }
+
+        /// <summary>
+        /// Fluent version Optional
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static Option<T> ToOption<T>(this T obj)
+        {
+            return Optional(obj);
         }
     }
 }
