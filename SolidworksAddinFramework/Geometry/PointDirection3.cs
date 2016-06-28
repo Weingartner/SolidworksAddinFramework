@@ -62,6 +62,13 @@ namespace SolidworksAddinFramework.Geometry
             return q - (q - p).Dot(Direction)*Direction;
         }
 
+        public Vector3 ProjectOnEdge(Vector3 point)
+        {
+            var d = Direction;
+            var t = Vector3.Dot(point - Point, d)/d.LengthSquared();
+            return d*t + Point;
+        }
+
         public static PointDirection3 UnitZ = new PointDirection3(Vector3.Zero, Vector3.UnitZ);
         public static PointDirection3 UnitY = new PointDirection3(Vector3.Zero, Vector3.UnitY);
         public static PointDirection3 UnitX = new PointDirection3(Vector3.Zero, Vector3.UnitX);
