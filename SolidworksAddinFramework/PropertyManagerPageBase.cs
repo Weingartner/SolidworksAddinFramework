@@ -619,7 +619,7 @@ namespace SolidworksAddinFramework
                 .Select(p => p.value)
                 .Subscribe(onTargetChanged);
 
-            var disposable = new SerialDisposable();
+            var disposable = new SerialDisposable(); //don't add to CompositeDisposable because we want to keep the last selection
             var d1 = sourceObservable
                 .Subscribe(s =>
                 {
@@ -630,7 +630,7 @@ namespace SolidworksAddinFramework
                         disposable.Disposable = onSourceChanged(s);
                     }
                 });
-            return new CompositeDisposable(canSetSelectionSubject, d0, d1, disposable);
+            return new CompositeDisposable(canSetSelectionSubject, d0, d1);
         }
 
         private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
