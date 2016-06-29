@@ -59,7 +59,8 @@ namespace SolidworksAddinFramework.Geometry
         public Vector3 ProjectOnPlane(Vector3 q)
         {
             var p = this.Point;
-            return q - (q - p).Dot(Direction)*Direction;
+            var dUnit = Direction.Unit();
+            return q - (q - p).Dot(dUnit)*dUnit;
         }
 
         public Vector3 ProjectOnEdge(Vector3 point)
