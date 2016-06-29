@@ -10,7 +10,7 @@ namespace SolidworksAddinFramework
 {
     public static class ComponentExtensions
     {
-        public struct ExternalReferenceInfo
+        public class ExternalReferenceInfo
         {
             public ExternalReferenceInfo(string modelPathName,string componentPathName,string feature,string dataType,swExternalReferenceStatus_e status,string refEntity,string featCom, swExternalFileReferencesConfig_e configOption,string configName)
             {
