@@ -26,6 +26,19 @@ namespace SolidworksAddinFramework
             T = t;
         }
     }
+    public struct PointParamUV
+    {
+        public readonly Vector3 Point;
+        public readonly double U;
+        public readonly double V;
+
+        public PointParamUV(Vector3 point, double u, double v)
+        {
+            Point = point;
+            U = u;
+            V = v;
+        }
+    }
 
     public struct PointParamWithRayProjection
     {
