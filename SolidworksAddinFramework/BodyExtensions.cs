@@ -220,6 +220,7 @@ namespace SolidworksAddinFramework
                 toolBody.GetIntersectionEdgesNonDestructive(cuttingPlane)
                     .Buffer(2, 2)
                     .Select(b => (ICurve) b[0].GetCurve())
+                    .Select(c=>(ICurve)c.Copy())
                     .ToArray();
 
             if (innerCurves.Length <= 0)
