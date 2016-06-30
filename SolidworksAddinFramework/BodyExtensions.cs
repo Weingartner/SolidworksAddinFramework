@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -187,21 +188,21 @@ namespace SolidworksAddinFramework
             return (IBody2) tool.Copy();
         }
 
-        /// <summary>
-        /// Assumes that the tools are non overlapping sheets and that the sheets fully
-        /// overlap the target. The target should be cut into N+1 parts of there are N
-        /// tools. They 
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="tools"></param>
-        /// <returns></returns>
-        public static IEnumerable<IBody2> CutBySheets(this IBody2 target, IEnumerable<IBody2> tools)
+        public static List<ICurve> GetXzCrossSectionCurves(this IBody2 body)
         {
-            var targets = new List<IBody2>() {target.CopyTs()};
-            foreach (var tool in tools)
-            {
-                targets = targets.SelectMany
-                    (tgt =>
+            var modeler = SwAddinBase.Active.Modeler;
+            var yZPlane = ((ISurface) modeler.CreatePlanarSurface2(new[] {0, 0, 0.0}, new[] {1.0, 0, 0}, new[] {0, 0, 1.0})).ToSheetBody();
+
+            var result = body.Cut(yZPlane);
+            Debug.Assert(result.Error == 0);
+
+            var zXPlane = ((ISurface) modeler.CreatePlanarSurface2(new[] {0, 0, 0.0}, new[] {0, 1.0, 0}, new[] {0, 0, 1.0})).ToSheetBody();
+            var edges = body.GetIntersectionEdgesNonDestructive(zXPlane);
+
+            return edges
+                .Select(e => e.GetCurveTs())
+                .Where(c => !(Math.Abs(c.StartPoint().X) < 1e-6 & Math.Abs(c.EndPoint().X) < 1e-6))
+                .ToList();
                     {
                         var result = tgt.Cut(tool);
                         if (result.Error != 0)
