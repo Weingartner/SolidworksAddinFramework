@@ -9,35 +9,27 @@ using Weingartner.Exceptional.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
-    public class Animator : IRenderable
+    public class Animator : AnimatorBase
     {
-        public IReadOnlyList<SectionTime> SectionTimes { get; private set; }
-        private readonly IReadOnlyList<IAnimationSection> _Sections;
+        private IReadOnlyList<SectionTime> _SectionTimes;
+        public override TimeSpan Duration => Sections.Aggregate(TimeSpan.Zero, (sum, s) => sum + s.Duration);
+        public IReadOnlyList<SectionTime> SectionTimes => _SectionTimes;
+        public override IReadOnlyList<IAnimationSection> Sections { get; }
         private readonly IReadOnlyList<IRenderable> _Children;
-        public double Framerate { get; }
 
         public Task CompletionTask { get; set; }
 
-        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children, int framerate=30)
+        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children)
         {
-            _Sections = sections;
+            Sections = sections;
             _Children = children;
-            Framerate = framerate;
         }
 
-        public static IDisposable Redraw(IModelDoc2 doc, double framerate = 30)
-        {
-            return Observable.Interval(TimeSpan.FromSeconds(1.0 / framerate))
-                .ToObservableExceptional()
-                .ObserveOnSolidworksThread()
-                .Subscribe(_ => doc.GraphicsRedraw2());
-        }
-
-        public void CalculateSectionTimes(DateTime startTime)
+        public override void CalculateSectionTimes(DateTime startTime)
         {
             if (SectionTimes != null)
                 throw new Exception("You have allready added this animation");
-            SectionTimes = Calculate(_Sections, startTime);
+            _SectionTimes = Calculate(Sections, startTime);
         }
 
         private static List<SectionTime> Calculate(IReadOnlyList<IAnimationSection> animationSections, DateTime startTime)
@@ -48,7 +40,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 .ToList();
         }
 
-        public void Render(DateTime t)
+        public override void Render(DateTime t)
         {
             // ReSharper disable once UseNullPropagation
             if (SectionTimes == null)
@@ -66,19 +58,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             {
                 child.ApplyTransform(currentTransform);
                 child.Render(t);
-            }
-        }
-
-        public void ApplyTransform(Matrix4x4 transform)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Tuple<Vector3, float> BoundingSphere
-        {
-            get
-            {
-                throw new NotImplementedException();
             }
         }
     }

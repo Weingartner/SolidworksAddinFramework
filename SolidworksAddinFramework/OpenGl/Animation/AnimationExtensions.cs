@@ -11,7 +11,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             IReadOnlyList<IRenderable> children,
             int framerate = 30)
         {
-            return new Animator(animationSections, children, framerate);
+            return new Animator(animationSections, children);
 
         }
         public static Animator CreateAnimator
@@ -19,7 +19,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             IRenderable children,
             int framerate = 30)
         {
-            return new Animator(animationSections, new [] { children}, framerate);
+            return new Animator(animationSections, new [] { children});
 
         }
 

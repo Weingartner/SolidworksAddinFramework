@@ -1,76 +1,63 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Reactive.Disposables;
 using JetBrains.Annotations;
-using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
-    public class MultiAnimator : IRenderable
+    public sealed class MultiAnimator : AnimatorBase
     {
         private readonly Func<TimeSpan, double> _GetCurrentValue;
-        private readonly IReadOnlyList<Animator> _Animators;
+        private readonly IReadOnlyList<AnimatorBase> _Animators;
+        private DateTime _ReferenceTime;
 
-        public DateTime ReferenceTime { get; }
+        public override TimeSpan Duration => _Animators.Aggregate(TimeSpan.Zero, (sum, a) => sum + a.Duration);
+        public override IReadOnlyList<IAnimationSection> Sections => _Animators.SelectMany(a => a.Sections).ToList();
 
-        public TimeSpan FullAnimationTimeSpan { get; }
-
-        public IReadOnlyList<SectionTime> SectionTimes => _Animators.SelectMany(a => a.SectionTimes).ToList();
-
-        public MultiAnimator([NotNull] IEnumerable<Animator> animators, Func<TimeSpan, double> getCurrentValue = null)
+        public MultiAnimator([NotNull] IEnumerable<AnimatorBase> animators, Func<TimeSpan, double> getCurrentValue = null)
         {
             if (animators == null) throw new ArgumentNullException(nameof(animators));
             _GetCurrentValue = getCurrentValue ??
-                (t => (t.TotalMilliseconds % FullAnimationTimeSpan.TotalMilliseconds) / FullAnimationTimeSpan.TotalMilliseconds);
+                (t => (t.TotalMilliseconds % Duration.TotalMilliseconds) / Duration.TotalMilliseconds);
 
             _Animators = animators.ToList();
-            ReferenceTime = DateTime.Now;
-            if (_Animators.Count > 0)
+        }
+
+        public override void CalculateSectionTimes(DateTime startTime)
+        {
+            if (_Animators.Count == 0) return;
+
+            _ReferenceTime = startTime;
+            var animatorStartTime = _ReferenceTime;
+            foreach (var animator in _Animators)
             {
-                _Animators.Buffer(2, 1)
-                    .Where(b => b.Count == 2)
-                    .Select(b => new {StartTime = b[0].SectionTimes.Last().EndTime, Animator = b[1]})
-                    .StartWith(new {StartTime = ReferenceTime, Animator = _Animators.First()})
-                    .ForEach(p =>
-                    {
-                        p.Animator.CalculateSectionTimes(p.StartTime);
-                    });
-                var endTime = _Animators.LastOrDefault(a => a.SectionTimes.Any())?.SectionTimes.Last().EndTime ?? ReferenceTime;
-                FullAnimationTimeSpan = endTime - ReferenceTime;
+                animator.CalculateSectionTimes(animatorStartTime);
+                animatorStartTime += animator.Duration;
             }
         }
 
-        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, int layer = 0)
+        public override void Render(DateTime now)
         {
-            var d = new CompositeDisposable();
-            OpenGlRenderer.DisplayUndoable(this, modelDoc, layer).DisposeWith(d);
-            Animator.Redraw(modelDoc).DisposeWith(d);
-            return d;
+            if (_Animators.Count == 0) return;
+
+            var value = _GetCurrentValue(now - _ReferenceTime);
+            var time = TimeSpan.FromMilliseconds(Duration.TotalMilliseconds * value);
+
+            FindAnimator(time).Render(_ReferenceTime + time);
         }
 
-        public void Render(DateTime now)
+        private AnimatorBase FindAnimator(TimeSpan time)
         {
-            var value = _GetCurrentValue(now - ReferenceTime);
-            var time = ReferenceTime + TimeSpan.FromMilliseconds(FullAnimationTimeSpan.TotalMilliseconds * value);
-            var animator = _Animators
-                .Where(a => a.SectionTimes.Any())
-                .First(a => a.SectionTimes.Last()?.EndTime >= time);
-            animator.Render(time);
-        }
-
-        public void ApplyTransform(Matrix4x4 transform)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Tuple<Vector3, float> BoundingSphere
-        {
-            get
+            var duration = TimeSpan.Zero;
+            foreach (var animator in _Animators)
             {
-                throw new NotImplementedException();
+                duration += animator.Duration;
+                if (duration >= time)
+                {
+                    return animator;
+                }
             }
+            throw new IndexOutOfRangeException("Can't find animator.");
         }
     }
 }

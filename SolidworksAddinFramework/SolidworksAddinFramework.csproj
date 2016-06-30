@@ -204,6 +204,7 @@
   <ItemGroup>
     <Compile Include="ArrayExtensions.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
+    <Compile Include="OpenGl\Animation\AnimatorBase.cs" />
     <Compile Include="OpenGl\Animation\IAnimationSection.cs" />
     <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
