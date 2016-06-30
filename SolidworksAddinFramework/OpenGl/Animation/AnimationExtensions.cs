@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         }
 
-        public static MultiAnimator ConcatAnimators(this IEnumerable<Animator> animators, Func<double> getCurrentValue)
+        public static MultiAnimator ConcatAnimators(this IEnumerable<Animator> animators, Func<TimeSpan, double> getCurrentValue = null)
         {
             return new MultiAnimator(animators, getCurrentValue);
         }

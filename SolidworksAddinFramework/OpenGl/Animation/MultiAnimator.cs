@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reactive.Disposables;
 using JetBrains.Annotations;
+using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
     public class MultiAnimator : IRenderable
     {
-        private readonly Func<double> _GetCurrentValue;
+        private readonly Func<TimeSpan, double> _GetCurrentValue;
         private readonly IReadOnlyList<Animator> _Animators;
 
         public DateTime ReferenceTime { get; }
@@ -17,12 +19,12 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public IReadOnlyList<SectionTime> SectionTimes => _Animators.SelectMany(a => a.SectionTimes).ToList();
 
-        public MultiAnimator([NotNull] IEnumerable<Animator> animators, [NotNull] Func<double> getCurrentValue)
+        public MultiAnimator([NotNull] IEnumerable<Animator> animators, Func<TimeSpan, double> getCurrentValue = null)
         {
             if (animators == null) throw new ArgumentNullException(nameof(animators));
-            if (getCurrentValue == null) throw new ArgumentNullException(nameof(getCurrentValue));
+            _GetCurrentValue = getCurrentValue ??
+                (t => (t.TotalMilliseconds % FullAnimationTimeSpan.TotalMilliseconds) / FullAnimationTimeSpan.TotalMilliseconds);
 
-            _GetCurrentValue = getCurrentValue;
             _Animators = animators.ToList();
             ReferenceTime = DateTime.Now;
             if (_Animators.Count > 0)
@@ -40,20 +42,22 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             }
         }
 
-        public void Render(DateTime _)
+        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, int layer = 0)
         {
-            var value = _GetCurrentValue();
+            var d = new CompositeDisposable();
+            OpenGlRenderer.DisplayUndoable(this, modelDoc, layer).DisposeWith(d);
+            Animator.Redraw(modelDoc).DisposeWith(d);
+            return d;
+        }
+
+        public void Render(DateTime now)
+        {
+            var value = _GetCurrentValue(now - ReferenceTime);
             var time = ReferenceTime + TimeSpan.FromMilliseconds(FullAnimationTimeSpan.TotalMilliseconds * value);
-            try
-            {
-                var animator = _Animators
-                    .Where(a => a.SectionTimes.Any())
-                    .First(a => a.SectionTimes.Last()?.EndTime >= time);
-                animator.Render(time);
-            }
-            catch (Exception e)
-            {
-            }
+            var animator = _Animators
+                .Where(a => a.SectionTimes.Any())
+                .First(a => a.SectionTimes.Last()?.EndTime >= time);
+            animator.Render(time);
         }
 
         public void ApplyTransform(Matrix4x4 transform)

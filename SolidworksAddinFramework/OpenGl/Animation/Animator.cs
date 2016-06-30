@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Exceptional.Reactive;
@@ -28,20 +25,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             Framerate = framerate;
         }
 
-        public IDisposable DisplayUndoable(IModelDoc2 doc, int layer = 0)
-        {
-            if (SectionTimes == null)
-            {
-                CalculateSectionTimes(DateTime.Now);
-            }
-
-            var d0 = Redraw(doc/*, () => SectionTimes.Last().EndTime > DateTime.Now*/, Framerate);
-            var d1 = Disposable.Create(() => SectionTimes = null);
-
-            var d2 = OpenGlRenderer.DisplayUndoable(this, doc, layer);
-            return new CompositeDisposable(d0, d1, d2);
-        }
-
         public static IDisposable Redraw(IModelDoc2 doc, double framerate = 30)
         {
             return Observable.Interval(TimeSpan.FromSeconds(1.0 / framerate))
@@ -57,12 +40,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             SectionTimes = Calculate(_Sections, startTime);
         }
 
-        public async Task ToTask(IModelDoc2 doc, CancellationToken token, int layer = 0)
-        {
-            using (DisplayUndoable(doc,layer).DisposeWith(token))
-                await CompletionTask;
-        }
-
         private static List<SectionTime> Calculate(IReadOnlyList<IAnimationSection> animationSections, DateTime startTime)
         {
             return animationSections
@@ -72,7 +49,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public void Render(DateTime t)
         {
-
             // ReSharper disable once UseNullPropagation
             if (SectionTimes == null)
                 return;
@@ -94,6 +70,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public void ApplyTransform(Matrix4x4 transform)
         {
+            throw new NotImplementedException();
         }
 
         public Tuple<Vector3, float> BoundingSphere
