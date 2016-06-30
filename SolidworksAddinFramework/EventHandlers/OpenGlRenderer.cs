@@ -99,7 +99,6 @@ namespace SolidworksAddinFramework
                         .OrderBy(o => o.Key)
                         .Select(o => new {Index = o.Key, Renderables = o.Select(q => q.Value.Item2).ToList()})
                         .ToList();
-                int i = 0;
                 foreach (var layer in layers)
                 {
                     // Clear the depth buffer after each subsequent layer. This
@@ -114,31 +113,6 @@ namespace SolidworksAddinFramework
 
         private readonly GLDoubleBuffer GLDoubleBuffer;
 
-        private class FooDisposable : IDisposable
-        {
-            private IDisposable _Inner;
-            private bool _IsDisposed;
-
-            ~FooDisposable()
-            {
-                if(!_IsDisposed)
-                    Console.WriteLine("Not disposed");
-                
-            }
-
-            public FooDisposable(IDisposable inner)
-            {
-                _Inner = inner;
-            }
-
-            public void Dispose()
-            {
-                _IsDisposed = true;
-                _Inner.Dispose();
-            }
-        }
-
-
         private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
         {
             if (renderable == null)
@@ -150,7 +124,7 @@ namespace SolidworksAddinFramework
 
             Redraw(doc);
 
-            return new FooDisposable( Disposable.Create(() =>
+            return Disposable.Create(() =>
             {
                 GLDoubleBuffer.Update(btr =>
                 {
@@ -164,7 +138,7 @@ namespace SolidworksAddinFramework
                     }
                 });
                 Redraw(doc);
-            }));
+            });
         }
 
         private static void Redraw(IModelDoc2 doc)
