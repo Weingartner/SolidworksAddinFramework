@@ -146,10 +146,14 @@ namespace SolidworksAddinFramework
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
-            var activeView = (IModelView) doc.ActiveView;
-            var renderer = Lookup[doc];
-            if (renderer.GLDoubleBuffer.FrontIsActive)
-                activeView.GraphicsRedraw(null);
+            ((IReadOnlyDictionary<IModelDoc2, OpenGlRenderer>)Lookup)
+                .TryGetValue(doc)
+                .IfSome(renderer =>
+                {
+                    var activeView = (IModelView) doc.ActiveView;
+                    if (renderer.GLDoubleBuffer.FrontIsActive)
+                        activeView.GraphicsRedraw(null);
+                });
         }
 
         private void DoSetup()
