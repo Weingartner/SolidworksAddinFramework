@@ -88,6 +88,57 @@ namespace SolidworksAddinFramework
                 .ToVector3();
             return pt;
         }
+
+        /// <summary>
+        /// Create a surface
+        /// </summary>
+        /// <param name="controlPointList">Indexed [u,v] </param>
+        /// <param name="swOrderU"></param>
+        /// <param name="swOrderV"></param>
+        /// <param name="knotVectorU"></param>
+        /// <param name="knotVectorV"></param>
+        /// <returns></returns>
+        public static ISurface CreateBSplineSurface
+            (Vector4[,] controlPointList, int swOrderU, int swOrderV, double[] knotVectorU, double[] knotVectorV)
+        {
+            var vOrder = BitConverter.GetBytes(swOrderV);
+            var uOrder = BitConverter.GetBytes(swOrderU);
+
+            var swControlPointList = controlPointList
+                .Cast<Vector4>()
+                .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
+                .ToArray();
+
+            var uLength = controlPointList.GetLength(0);
+            var vLength = controlPointList.GetLength(1);
+
+            var numUCtrPts = BitConverter.GetBytes(uLength);
+            var numVCtrPts = BitConverter.GetBytes(vLength);
+            //TODO: find out what periodicity means in this context 
+            var uPeriodicity = BitConverter.GetBytes(0);
+            var vPeriodicity = BitConverter.GetBytes(0);
+            var dimControlPoints = BitConverter.GetBytes(4);
+            var unusedParameter = BitConverter.GetBytes(0);
+
+            var props = new[]
+            {
+                BitConverter.ToDouble(uOrder.Concat(vOrder).ToArray(), 0),
+                BitConverter.ToDouble(numUCtrPts.Concat(numVCtrPts).ToArray(), 0),
+                BitConverter.ToDouble(uPeriodicity.Concat(vPeriodicity).ToArray(), 0),
+                BitConverter.ToDouble(dimControlPoints.Concat(unusedParameter).ToArray(), 0)
+            };
+
+
+            return (Surface) SwAddinBase.Active.Modeler
+                .CreateBsplineSurface
+                (props
+                    ,
+                    knotVectorV
+                    ,
+                    knotVectorU
+                    ,
+                    swControlPointList);
+        }
     }
 
 }
