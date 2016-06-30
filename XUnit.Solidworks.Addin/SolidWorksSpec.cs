@@ -14,7 +14,7 @@ namespace XUnit.Solidworks.Addin
     public abstract class SolidWorksSpec
     {
         private static CompositeDisposable _keptStuff = new CompositeDisposable();
-        protected static ISldWorks SwApp => SwAddinBase.Active.SwApp;
+        protected static SldWorks SwApp => SwAddinBase.Active.SwApp;
 
         /// <summary>
         /// Create a part using the standard template

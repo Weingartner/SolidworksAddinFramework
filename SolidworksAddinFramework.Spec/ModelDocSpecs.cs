@@ -70,5 +70,41 @@ namespace SolidworksAddinFramework.Spec
                 result.IsNone.Should().BeTrue();
             });
         }
+
+        [SolidworksFact]
+        public void DoWithOpenDocShouldCleanup()
+        {
+            var opened = 0;
+            var closed = 0;
+            using (SwApp.DoWithOpenDoc(doc =>
+            {
+                opened++;
+                return Disposable.Create(() => closed++);
+            }))
+            {
+                opened.Should().Be(0);
+                closed.Should().Be(0);
+
+                var doc = CreatePartDoc();
+
+                opened.Should().Be(1);
+                closed.Should().Be(0);
+
+                var doc2 = CreatePartDoc();
+
+                opened.Should().Be(2);
+                closed.Should().Be(0);
+
+                SwApp.CloseDoc(doc2.GetTitle());
+
+                opened.Should().Be(2);
+                closed.Should().Be(1);
+
+                SwApp.CloseDoc(doc.GetTitle());
+
+                opened.Should().Be(2);
+                closed.Should().Be(2);
+            }
+        }
     }
 }

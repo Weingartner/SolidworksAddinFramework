@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Win32;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
@@ -17,7 +14,7 @@ namespace SolidworksAddinFramework
 
     public interface ISolidworksAddin
     {
-        ISldWorks SwApp { get; }
+        SldWorks SwApp { get; }
         IModeler Modeler { get; }
         MathUtility Math { get; }
     }
@@ -32,7 +29,7 @@ namespace SolidworksAddinFramework
         protected ICommandManager CommandManager { get; private set; }
 
         #region ISolidworksAddin
-        public ISldWorks SwApp { get; private set; }
+        public SldWorks SwApp { get; private set; }
 
         public MathUtility Math => (MathUtility) SwApp.GetMathUtility();
 
@@ -102,7 +99,7 @@ namespace SolidworksAddinFramework
 
         public bool ConnectToSW(object thisSw, int cookie)
         {
-            SwApp = (ISldWorks)thisSw;
+            SwApp = (SldWorks)thisSw;
 
             Active = this;
 

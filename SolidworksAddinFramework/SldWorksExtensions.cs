@@ -29,14 +29,14 @@ namespace SolidworksAddinFramework
         public static IDisposable DoWithOpenDoc(this SldWorks swApp, Func<IModelDoc2, IDisposable> action)
         {
             return swApp.DocOpenObservable()
-                .Select(doc =>
+                .SelectMany(doc =>
                 {
                     var disposable = action(doc);
                     return doc
                         .DestroyNotify2Observable()
+                        .FirstAsync()
                         .Select(_ => disposable);
                 })
-                .Switch()
                 .Subscribe(disposable => disposable.Dispose());
         }
 
