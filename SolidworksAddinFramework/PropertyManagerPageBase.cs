@@ -583,10 +583,23 @@ namespace SolidworksAddinFramework
             Expression<Func<TModel, SelectionData>> propertyExpr,
             Action<IPropertyManagerPageSelectionbox> config)
         {
-            return CreateSelectionBox(@group, tip, caption, selectType, model, propertyExpr, config, () => { });
+            return CreateSelectionBox(@group, tip, caption, new[] { selectType}, model, propertyExpr, config, () => { });
         }
 
         protected IDisposable CreateSelectionBox<TModel>(
+            IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            swSelectType_e[] selectType,
+            TModel model,
+            Expression<Func<TModel, SelectionData>> propertyExpr,
+            Action<IPropertyManagerPageSelectionbox> config)
+        {
+            return CreateSelectionBox(@group, tip, caption,  selectType, model, propertyExpr, config, () => { });
+        }
+
+        protected IDisposable CreateSelectionBox<TModel>
+            (
             IPropertyManagerPageGroup @group,
             string tip,
             string caption,
@@ -596,10 +609,23 @@ namespace SolidworksAddinFramework
             Action<IPropertyManagerPageSelectionbox> config,
             Action onFocus)
         {
+            return CreateSelectionBox(@group, tip, caption, new[] {selectType}, model, propertyExpr, config, onFocus);
+        }
+
+        protected IDisposable CreateSelectionBox<TModel>(
+            IPropertyManagerPageGroup @group,
+            string tip,
+            string caption,
+            swSelectType_e[] selectType,
+            TModel model,
+            Expression<Func<TModel, SelectionData>> propertyExpr,
+            Action<IPropertyManagerPageSelectionbox> config,
+            Action onFocus)
+        {
             var id = NextId();
             var box = @group.CreateSelectionBox(id, caption, tip);
             config(box);
-            box.SetSelectionFilters(new[] { selectType });
+            box.SetSelectionFilters( selectType );
             var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
 
             var d1 = TwoWayBind(
@@ -634,12 +660,12 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(canSetSelectionSubject, d0, d1);
         }
 
-        private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
+        private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e[] selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
         {
             var selectionManager = (ISelectionMgr)ModelDoc.SelectionManager;
 
             var selectedItems = selectionManager
-                .GetSelectedObjects((type, mark) => type == selectType && box.Mark == mark);
+                .GetSelectedObjects((type, mark) => selectType.Any(st => type == st) && box.Mark == mark);
             var expressionChain = ReactiveUI.Reflection.Rewrite(propertyExpr.Body).GetExpressionChain().ToList();
             var newSelection = new SelectionData(Enumerable.Empty<SelectionData.ObjectId>(), box.Mark)
                 .SetObjects(selectedItems, ModelDoc);
