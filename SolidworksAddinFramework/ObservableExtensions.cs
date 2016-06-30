@@ -51,20 +51,6 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="o"></param>
-        /// <param name="fn"></param>
-        /// <returns></returns>
-        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Func<T, IEnumerable<IDisposable>> fn, Action<Exception> errHandler)
-        {
-            return SubscribeDisposable(o, v =>(IDisposable) new CompositeDisposable(fn(v)),errHandler);
-        }
-
-
-        /// <summary>
-        /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
-        /// is before the function is called again the previous disposable is disposed.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="o"></param>
         /// <param name="disposableYielder"></param>
         /// <returns></returns>
         public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Action<T, Action<IDisposable>> disposableYielder, Action<Exception> errHandler)
