@@ -105,7 +105,7 @@ namespace SolidworksAddinFramework
             var uOrder = BitConverter.GetBytes(swOrderU);
 
             var swControlPointList = controlPointList
-                .Cast<Vector4>()
+                .EnumerateColumnWise()
                 .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
                 .ToArray();
 
