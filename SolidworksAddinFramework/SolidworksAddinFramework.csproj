@@ -202,6 +202,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OpenGl\Animation\Animator.cs" />
+    <Compile Include="OpenGl\Animation\IAnimationSection.cs" />
+    <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
+    <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
+    <Compile Include="OpenGl\Animation\SectionTime.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
@@ -260,7 +265,7 @@
     <Compile Include="SelectionBoxExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
-    <Compile Include="OpenGl\Animation.cs" />
+    <Compile Include="OpenGl\Animation\AnimationExtensions.cs" />
     <Compile Include="OpenGl\FaceTriStrips.cs" />
     <Compile Include="OpenGl\IRenderable.cs" />
     <Compile Include="OpenGl\Mesh.cs" />
