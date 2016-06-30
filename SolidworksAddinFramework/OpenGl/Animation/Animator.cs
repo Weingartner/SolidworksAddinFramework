@@ -44,6 +44,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         {
             return animationSections
                 .Scan(new SectionTime(null, startTime), (acc, section) => new SectionTime(section, acc.EndTime + section.Duration))
+                .Skip(1)
                 .ToList();
         }
 
