@@ -54,7 +54,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             if (SectionTimes == null)
                 return;
 
-            var currentSection = SectionTimes.FirstOrDefault(o => o.EndTime > t);
+            var currentSection = SectionTimes.FirstOrDefault(o => o.EndTime >= t);
             if (currentSection == null)
                 return;
 
