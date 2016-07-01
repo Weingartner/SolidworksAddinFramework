@@ -193,15 +193,17 @@ namespace SolidworksAddinFramework
             var modeler = SwAddinBase.Active.Modeler;
             var yZPlane = ((ISurface)modeler.CreatePlanarSurface2(new[] { 0, 0, 0.0 }, new[] { 1.0, 0, 0 }, new[] { 0, 0, 1.0 })).ToSheetBody();
 
-            var result = body.Cut(yZPlane);
-            Debug.Assert(result.Error == 0);
+            var cutBody = body
+                    .CutBySheets(new[] {yZPlane})
+                    .First(b => b.GetBodyBoxTs().XMax > 1e-5);
 
             var zXPlane = ((ISurface)modeler.CreatePlanarSurface2(new[] { 0, 0, 0.0 }, new[] { 0, 1.0, 0 }, new[] { 0, 0, 1.0 })).ToSheetBody();
-            var edges = body.GetIntersectionEdgesNonDestructive(zXPlane);
+            var edges = cutBody.GetIntersectionEdgesNonDestructive(zXPlane);
 
             return edges
                 .Select(e => e.GetCurveTs())
-                .Where(c => !(Math.Abs(c.StartPoint().X) < 1e-6 & Math.Abs(c.EndPoint().X) < 1e-6))
+                .Where(c => !(Math.Abs(c.StartPoint().X) < 1e-6 && Math.Abs(c.EndPoint().X) < 1e-6))
+                .Distinct()
                 .ToList();
         }
 

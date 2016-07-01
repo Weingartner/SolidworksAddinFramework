@@ -185,6 +185,7 @@ namespace SolidworksAddinFramework
             return new EdgeDistance(edge, solver.Value);
         }
 
+
         /// <summary>
         /// Return the length of the curve between the start
         /// and end parameters.
@@ -200,6 +201,9 @@ namespace SolidworksAddinFramework
             curve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
             return curve.GetLength3(start, end);
         }
+
+
+
 
 
         /// <summary>

@@ -89,28 +89,62 @@ namespace SolidworksAddinFramework
             return pt;
         }
 
+        public static SwBSplineSurfaceParams GetBSplineSurfaceParams(this ISurface swSurf, double tol)
+        {
+
+            var swSurfParameterisation = swSurf.Parameterization2();
+
+            bool sense;
+            var surfParams = swSurf.GetBSurfParams3(false, false, swSurfParameterisation, tol, out sense);
+
+            var uKnotVector = surfParams.UKnots.CastArray<double>();
+            var vKnotVector = surfParams.VKnots.CastArray<double>();
+
+            // Yeah it is flipped. I know. Don't switch it back. BPH
+            var controlPointArray = new Vector4[surfParams.ControlPointColumnCount, surfParams.ControlPointRowCount];
+            Enumerable.Range(0, surfParams.ControlPointRowCount)
+                .ForEach(u =>
+                {
+                    Enumerable.Range(0, surfParams.ControlPointColumnCount)
+                        .ForEach(v =>
+                        {
+                            var array = surfParams.GetControlPoints(u+1, v+1).CastArray<double>();
+                            var ctrlPoint = surfParams.ControlPointDimension == 3 ? 
+                                new Vector4((float) array[0], (float) array[1], (float) array[2],1) :
+                                new Vector4((float) array[0], (float) array[1], (float) array[2], (float) array[3]);
+                            controlPointArray[v, u] = ctrlPoint;
+                        });
+                });
+
+
+            return new SwBSplineSurfaceParams
+                ( controlPointList: controlPointArray
+                ,swOrderU: surfParams.UOrder
+                ,swOrderV: surfParams.VOrder
+                ,knotVectorU: uKnotVector
+                ,knotVectorV: vKnotVector);
+
+
+        }
+
         /// <summary>
         /// Create a surface
         /// </summary>
-        /// <param name="controlPointList">Indexed [u,v] </param>
-        /// <param name="swOrderU"></param>
-        /// <param name="swOrderV"></param>
-        /// <param name="knotVectorU"></param>
-        /// <param name="knotVectorV"></param>
+        /// <param name="swBSplineSurfaceParams"></param>
         /// <returns></returns>
         public static ISurface CreateBSplineSurface
-            (Vector4[,] controlPointList, int swOrderU, int swOrderV, double[] knotVectorU, double[] knotVectorV)
+            (SwBSplineSurfaceParams swBSplineSurfaceParams)
         {
-            var vOrder = BitConverter.GetBytes(swOrderV);
-            var uOrder = BitConverter.GetBytes(swOrderU);
+            var vOrder = BitConverter.GetBytes(swBSplineSurfaceParams.SwOrderV);
+            var uOrder = BitConverter.GetBytes(swBSplineSurfaceParams.SwOrderU);
 
-            var swControlPointList = controlPointList
+            var swControlPointList = swBSplineSurfaceParams.ControlPointList
                 .EnumerateColumnWise()
                 .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
                 .ToArray();
 
-            var uLength = controlPointList.GetLength(0);
-            var vLength = controlPointList.GetLength(1);
+            var uLength = swBSplineSurfaceParams.ControlPointList.GetLength(0);
+            var vLength = swBSplineSurfaceParams.ControlPointList.GetLength(1);
 
             var numUCtrPts = BitConverter.GetBytes(uLength);
             var numVCtrPts = BitConverter.GetBytes(vLength);
@@ -123,7 +157,7 @@ namespace SolidworksAddinFramework
             var props = new[]
             {
                 BitConverter.ToDouble(uOrder.Concat(vOrder).ToArray(), 0),
-                BitConverter.ToDouble(numUCtrPts.Concat(numVCtrPts).ToArray(), 0),
+                BitConverter.ToDouble(numVCtrPts.Concat(numUCtrPts).ToArray(), 0),
                 BitConverter.ToDouble(uPeriodicity.Concat(vPeriodicity).ToArray(), 0),
                 BitConverter.ToDouble(dimControlPoints.Concat(unusedParameter).ToArray(), 0)
             };
@@ -131,14 +165,10 @@ namespace SolidworksAddinFramework
 
             return (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
-                (props
-                    ,
-                    knotVectorV
-                    ,
-                    knotVectorU
-                    ,
-                    swControlPointList);
+                    ( props
+                    , swBSplineSurfaceParams.KnotVectorU
+                    , swBSplineSurfaceParams.KnotVectorV
+                    , swControlPointList);
         }
     }
-
 }
