@@ -171,6 +171,7 @@
     <Compile Include="opengl\Vector3ExtensionsSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionDataSpec.cs" />
+    <Compile Include="SwBSplineParams Spec.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">

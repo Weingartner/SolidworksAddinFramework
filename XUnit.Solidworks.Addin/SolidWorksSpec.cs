@@ -15,6 +15,8 @@ namespace XUnit.Solidworks.Addin
     {
         private static CompositeDisposable _keptStuff = new CompositeDisposable();
         protected static SldWorks SwApp => SwAddinBase.Active.SwApp;
+        protected static IModeler Modeler => (IModeler)SwApp.GetModeler();
+        protected static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
 
         /// <summary>
         /// Create a part using the standard template

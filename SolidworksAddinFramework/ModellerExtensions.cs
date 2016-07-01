@@ -27,7 +27,8 @@ namespace SolidworksAddinFramework
             Debug.Assert(line != null, "line != null");
             var pp0 = line.GetClosestPointOn(edge.A.X, edge.A.Y, edge.A.Z).CastArray<double>();
             var pp1 = line.GetClosestPointOn(edge.B.X, edge.B.Y, edge.B.Z).CastArray<double>();
-            line = line.CreateTrimmedCurve2(pp0[0], pp0[1], pp0[2], pp1[0], pp1[1], pp1[2]);
+            //line = line.CreateTrimmedCurve2(pp0[0], pp0[1], pp0[2], pp1[0], pp1[1], pp1[2]);
+            line = line.ICreateTrimmedCurve(pp0[3], pp1[3]);
             Debug.Assert(line != null, "line != null");
             return line;
         }

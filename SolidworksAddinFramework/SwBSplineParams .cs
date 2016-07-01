@@ -9,7 +9,7 @@ namespace SolidworksAddinFramework
 {
     public class SwBSplineParams : IEquatable<SwBSplineParams>
     {
-        public Vector4[] ControlPointList { get; }
+        public Vector4[] ControlPoints { get; }
         
         public int ControlPointDimension { get; }
         public bool IsPeriodic { get; }
@@ -18,29 +18,34 @@ namespace SolidworksAddinFramework
 
         public double[] KnotVectorU { get; }
 
-        public SwBSplineParams([NotNull] Vector4[] controlPointList, int swOrderU,
-            [NotNull] double[] knotVectorU, int controlPointDimension, bool isPeriodic)
+        public SwBSplineParams([NotNull] Vector4[] controlPoints, int swOrderU, [NotNull] double[] knotVectorU, int controlPointDimension, bool isPeriodic, double t0, double t1)
         {
 
-            if (controlPointList == null) throw new ArgumentNullException(nameof(controlPointList));
+            if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
             if (knotVectorU == null) throw new ArgumentNullException(nameof(knotVectorU));
 
-            ControlPointList = controlPointList;
+            ControlPoints = controlPoints;
             SwOrderU = swOrderU;
             KnotVectorU = knotVectorU;
             ControlPointDimension = controlPointDimension;
             IsPeriodic = isPeriodic;
+            T1 = t1;
+            T0 = t0;
         }
+
+        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => new SwBSplineParams(transform(ControlPoints),SwOrderU, KnotVectorU,ControlPointDimension,IsPeriodic, T0, T1);
 
         #region equality
         public bool Equals(SwBSplineParams other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return ControlPointList.Cast<Vector4>().SequenceEqual(other.ControlPointList.Cast<Vector4>())
+            return ControlPoints.Cast<Vector4>().SequenceEqual(other.ControlPoints.Cast<Vector4>())
                    && KnotVectorU.SequenceEqual(other.KnotVectorU)
 
-                   && SwOrderU == other.SwOrderU;
+                   && SwOrderU == other.SwOrderU
+                   && T0 == other.T0
+                   && T1 == other.T1 ;
         }
 
         public override bool Equals(object obj)
@@ -55,9 +60,11 @@ namespace SolidworksAddinFramework
         {
             unchecked
             {
-                var hashCode = ControlPointList.Cast<Vector4>().GetHashCode(v=>v.GetHashCode());
+                var hashCode = ControlPoints.Cast<Vector4>().GetHashCode(v=>v.GetHashCode());
                 hashCode = (hashCode*397) ^ KnotVectorU.GetHashCode(v=>v.GetHashCode());
                 hashCode = (hashCode*397) ^ SwOrderU;
+                hashCode = (hashCode*397) ^ T0.GetHashCode();
+                hashCode = (hashCode*397) ^ T1.GetHashCode();
                 return hashCode;
             }
         }
@@ -76,13 +83,13 @@ namespace SolidworksAddinFramework
         public ICurve ToCurve()
         {
             var modeler = SwAddinBase.Active.Modeler;
-            var controlPointsList = ControlPointList
-                .SelectMany(p=>new[] {p.X, p.Y, p.Z, p.W})
+            var controlPointsList = ControlPoints
+                .SelectMany(p=> new double[] {p.X, p.Y, p.Z, p.W}.Take(ControlPointDimension).ToArray())
                 .ToArray();
 
             var dimensionControlPoints = BitConverter.GetBytes(ControlPointDimension);
             var order = BitConverter.GetBytes((int) SwOrderU);
-            var numControlPoints = BitConverter.GetBytes((int) ControlPointList.Length);
+            var numControlPoints = BitConverter.GetBytes((int) ControlPoints.Length);
 
             var periodicity = BitConverter.GetBytes(IsPeriodic? 1 : 0);
 
@@ -93,10 +100,17 @@ namespace SolidworksAddinFramework
             };
 
             var swCurve = (Curve) modeler.CreateBsplineCurve(props, KnotVectorU, controlPointsList);
-            return swCurve;
+            return swCurve.ICreateTrimmedCurve(T0, T1);
         }
 
-        public static SwBSplineParams GetBSplineParams(ICurve swCurve, bool isClosed, double tol)
+        public double T1 { get; }
+
+        public double T0 { get; }
+    }
+
+    public static class SwBSplineParamsExtensions
+    {
+        public static SwBSplineParams GetBSplineParams(this ICurve swCurve, bool isClosed, double tol)
         {
 
             var swSurfParameterisation = swCurve.GetBCurveParams5(false, false, false, isClosed);
@@ -154,7 +168,10 @@ namespace SolidworksAddinFramework
                 })
                 .ToArray();
 
-            return new SwBSplineParams(controlPoints4D, order, knotArray, dimension, isPeriodic);
+            double start;
+            double end;
+            swCurve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
+            return new SwBSplineParams(controlPoints4D, order, knotArray, dimension, isPeriodic, start, end);
         }
     }
 }
