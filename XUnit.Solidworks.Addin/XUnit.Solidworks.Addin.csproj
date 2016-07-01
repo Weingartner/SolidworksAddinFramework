@@ -280,6 +280,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SolidWorksSpec.cs" />
+    <Compile Include="SpecHelper.cs" />
     <Compile Include="SwAddin.cs">
       <SubType>Code</SubType>
     </Compile>

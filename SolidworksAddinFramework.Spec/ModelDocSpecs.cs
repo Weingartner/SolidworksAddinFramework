@@ -106,5 +106,29 @@ namespace SolidworksAddinFramework.Spec
                 closed.Should().Be(2);
             }
         }
+
+        [SolidworksFact]
+        public async Task GettingPersistentEntityReferenceShouldWork()
+        {
+            await CreatePartDoc(false, async doc =>
+            {
+                var feature = SpecHelper.InsertDummyBody(doc);
+                var body = doc.GetBodiesTs().Single();
+                var box1 = body.GetBodyBoxTs();
+                // Attempts to invalidate `body`
+                // Attempt 1: change active configuration
+                var config = doc.ConfigurationManager.AddConfiguration("TestConfig", "", "", 0, "Default", "");
+                doc.ConfigurationManager.ActiveConfiguration.Should().Be(config);
+                // Attempt 2: Rebuild doc
+                doc.ForceRebuild3(false);
+                // Attempt 3: Insert delay
+                await Task.Delay(TimeSpan.FromSeconds(10));
+
+                // This still succeeds
+                var box2 = body.GetBodyBoxTs();
+
+                return Disposable.Empty;
+            });
+        }
     }
 }
