@@ -94,7 +94,7 @@ namespace XUnit.Solidworks.Addin
             }
             else
             {
-                CreatePartDoc().Using(SwApp, m => action(m).Dispose());
+                await CreatePartDoc().Using(SwApp, async m => (await action(m)).Dispose());
             }
         }
 
@@ -119,7 +119,7 @@ namespace XUnit.Solidworks.Addin
             }
             else
             {
-                await CreatePartDoc(path).Using(SwApp, async m => { var d = await action(m); d.Dispose(); });
+                await CreatePartDoc(path).Using(SwApp, async m => (await action(m)).Dispose());
             }
         }
         protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)
