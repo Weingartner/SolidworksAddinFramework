@@ -70,6 +70,16 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
+        public static void AddSelections(this IModelDoc2 doc, int mark, IEnumerable<object> objects)
+        {
+            var selectionMgr = (ISelectionMgr) doc.SelectionManager;
+            var selectData = selectionMgr.CreateSelectData();
+            selectData.Mark = mark;
+
+            var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(objects), true, selectData);
+            //var count = selectionMgr.AddSelectionListObjects(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), selectData);
+        }
+
         /// <summary>
         /// Add 
         /// </summary>
@@ -94,15 +104,7 @@ namespace SolidworksAddinFramework
                         return new { Mark = p.Key, Objects = objects };
                     })
                     .Where(p => p.Objects.Length > 0)
-                    .ForEach(o =>
-                    {
-                        var selectData = selectionMgr.CreateSelectData();
-                        selectData.Mark = o.Mark;
-
-                        var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), true,
-                            selectData);
-                        //var count = selectionMgr.AddSelectionListObjects(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), selectData);
-                    });
+                    .ForEach(o => doc.AddSelections(o.Mark, o.Objects));
             }
 
             return Disposable.Create(() => doc.ClearSelections(selections));
