@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -108,23 +109,30 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [SolidworksFact]
-        public async Task GettingPersistentEntityReferenceShouldWork()
+        public void GettingPersistentEntityReferenceShouldWork()
         {
-            await CreatePartDoc(false, async doc =>
+            CreatePartDoc(false, doc =>
             {
                 var feature = SpecHelper.InsertDummyBody(doc);
                 var body = doc.GetBodiesTs().Single();
                 var box1 = body.GetBodyBoxTs();
-                // Attempts to invalidate `body`
-                // Attempt 1: change active configuration
-                var config = doc.ConfigurationManager.AddConfiguration("TestConfig", "", "", 0, "Default", "");
-                doc.ConfigurationManager.ActiveConfiguration.Should().Be(config);
-                // Attempt 2: Rebuild doc
-                doc.ForceRebuild3(false);
-                // Attempt 3: Insert delay
-                await Task.Delay(TimeSpan.FromSeconds(10));
 
-                // This still succeeds
+                // switch to new config
+                var defaultConfig = doc.ConfigurationManager.ActiveConfiguration;
+                var newConfig = doc.ConfigurationManager.AddConfiguration("TestConfig", "", "", 0, "Default", "");
+                doc.ConfigurationManager.ActiveConfiguration.Should().Be(newConfig);
+
+                // delete body
+                doc.AddSelections(0, new[] { body });
+                var deleteFeature = doc.FeatureManager.InsertDeleteBody2(false);
+                doc.GetBodiesTs().Should().BeEmpty();
+                doc.ForceRebuild3(false);
+                new Action(() => body.GetBodyBoxTs()).ShouldThrow<COMException>().Which.Message.Should().Contain("disconnected");
+
+                // switch back to default config
+                doc.ShowConfiguration2(defaultConfig.Name).Should().BeTrue();
+                doc.ConfigurationManager.ActiveConfiguration.Should().Be(defaultConfig);
+
                 var box2 = body.GetBodyBoxTs();
 
                 return Disposable.Empty;
