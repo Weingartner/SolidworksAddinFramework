@@ -158,6 +158,22 @@ namespace SolidworksAddinFramework
             return Tuple(selectedObjects, marks, views);
         }
 
+        public static Func<T> GetPersistentEntityReference<T>(IModelDoc2 modelDoc, T obj)
+        {
+            var persistReference = modelDoc.Extension.GetPersistReference(obj);
+            return fun(() =>
+            {
+                int errorCode;
+                var result = (T)modelDoc.Extension.GetObjectByPersistReference3(persistReference, out errorCode);
+                var error = (swPersistReferencedObjectStates_e)errorCode;
+                if (error != swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
+                {
+                    throw new SelectionException($"GetObjectByPersistReference3 returned {error}");
+                }
+                return result;
+            });
+        }
+
         /// <summary>
         /// Doesn't work when intersecting with wire bodies. 
         /// </summary>
