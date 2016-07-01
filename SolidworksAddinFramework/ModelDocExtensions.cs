@@ -158,20 +158,29 @@ namespace SolidworksAddinFramework
             return Tuple(selectedObjects, marks, views);
         }
 
+        public static object GetObjectFromPersistReference(this IModelDoc2 doc, byte[] persistId)
+        {
+            int errorCode;
+            var @object = doc.Extension.GetObjectByPersistReference3(persistId, out errorCode);
+            var result = (swPersistReferencedObjectStates_e) errorCode;
+            if (result != swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
+            {
+                throw new SelectionException($"GetObjectByPersistReference3 returned {result}");
+            }
+            return @object;
+        }
+
+        /// <summary>
+        /// Generates a lambda which resolves an entity from its persist reference every time you invoke it.
+        /// </summary>
+        /// <typeparam name="T">Entity type, e.g. IBody2</typeparam>
+        /// <param name="modelDoc"></param>
+        /// <param name="obj">Entity with a valid persist reference</param>
+        /// <returns></returns>
         public static Func<T> GetPersistentEntityReference<T>(IModelDoc2 modelDoc, T obj)
         {
-            var persistReference = modelDoc.Extension.GetPersistReference(obj);
-            return fun(() =>
-            {
-                int errorCode;
-                var result = (T)modelDoc.Extension.GetObjectByPersistReference3(persistReference, out errorCode);
-                var error = (swPersistReferencedObjectStates_e)errorCode;
-                if (error != swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
-                {
-                    throw new SelectionException($"GetObjectByPersistReference3 returned {error}");
-                }
-                return result;
-            });
+            var persistReference = modelDoc.Extension.GetPersistReference(obj).CastArray<byte>();
+            return fun(() => (T)GetObjectFromPersistReference(modelDoc, persistReference));
         }
 
         /// <summary>

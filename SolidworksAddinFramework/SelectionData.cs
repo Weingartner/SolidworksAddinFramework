@@ -115,17 +115,7 @@ namespace SolidworksAddinFramework
         public static IEnumerable<object> GetObjects(this SelectionData selectionData, IModelDoc2 doc)
         {
             return selectionData.ObjectIds
-                .Select(objectId =>
-                {
-                    int errorCode;
-                    var @object = doc.Extension.GetObjectByPersistReference3(objectId.Data, out errorCode);
-                    var result = (swPersistReferencedObjectStates_e) errorCode;
-                    if (result != swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
-                    {
-                        throw new SelectionException($"GetObjectByPersistReference3 returned {result}");
-                    }
-                    return @object;
-                });
+                .Select(objectId => doc.GetObjectFromPersistReference(objectId.Data));
         }
 
         /// <summary>
