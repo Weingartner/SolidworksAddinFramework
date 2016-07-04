@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
@@ -12,13 +13,13 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public override IReadOnlyList<IAnimationSection> Sections { get; }
         private readonly IReadOnlyList<IRenderable> _Children;
-        private readonly Action<Matrix4x4> _OnRender;
+        private readonly IObserver<Matrix4x4> _RenderObserver;
 
-        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children, Action<Matrix4x4> onRender)
+        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children, IObserver<Matrix4x4> renderObserver)
         {
             Sections = sections;
             _Children = children;
-            _OnRender = onRender ?? (_ => {});
+            _RenderObserver = renderObserver ?? Observer.Create<Matrix4x4>(_ => {});
         }
 
         public override void OnStart(DateTime startTime)
@@ -56,7 +57,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 child.Render(t);
             }
 
-            _OnRender(currentTransform);
+            _RenderObserver.OnNext(currentTransform);
         }
     }
 }

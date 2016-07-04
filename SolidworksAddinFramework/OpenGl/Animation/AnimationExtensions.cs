@@ -10,17 +10,17 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public static Animator CreateAnimator
             (this IReadOnlyList<IAnimationSection> animationSections,
             IReadOnlyList<IRenderable> children,
-            Action<Matrix4x4> onRender = null)
+            IObserver<Matrix4x4> renderObserver = null)
         {
-            return new Animator(animationSections, children, onRender);
+            return new Animator(animationSections, children, renderObserver);
 
         }
         public static Animator CreateAnimator
             (this IReadOnlyList<IAnimationSection> animationSections,
             IRenderable child,
-            Action<Matrix4x4> onRender = null)
+            IObserver<Matrix4x4> renderObserver = null)
         {
-            return animationSections.CreateAnimator(new[] { child }, onRender);
+            return animationSections.CreateAnimator(new[] { child }, renderObserver);
 
         }
 
