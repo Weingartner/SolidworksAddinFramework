@@ -16,7 +16,6 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using static LanguageExt.Parsec.Prim;
 using static LanguageExt.Parsec.Char;
-using Environment = System.Environment;
 
 namespace SolidworksAddinFramework
 {
@@ -161,47 +160,16 @@ namespace SolidworksAddinFramework
             return Tuple(selectedObjects, marks, views);
         }
 
-        /// <summary>
-        /// Gets an object from its persist reference.
-        /// 
-        /// This method currently tries to call all available versions of `GetObjectByPersistReference`
-        /// because we saw the latest one failing where it shouldn't fail. The other two versions succeeded.
-        /// We sent a bug report to the SW API support.
-        /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="persistId"></param>
-        /// <returns></returns>
         public static object GetObjectFromPersistReference(this IModelDoc2 doc, byte[] persistId)
         {
-            var errors = new List<string>();
+            int errorCode;
+            var @object = doc.Extension.GetObjectByPersistReference3(persistId, out errorCode);
+            var result = (swPersistReferencedObjectStates_e) errorCode;
+            if (result != swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
             {
-                int errorCode;
-                var @object = doc.Extension.GetObjectByPersistReference3(persistId, out errorCode);
-                if (errorCode == (int)swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
-                {
-                    return @object;
-                }
-                errors.Add($"`GetObjectByPersistReference3` returned `{(swPersistReferencedObjectStates_e)errorCode}`");
+                throw new SelectionException($"GetObjectByPersistReference3 returned {result}");
             }
-            {
-                int errorCode;
-                var @object = doc.Extension.GetObjectByPersistReference2(persistId, out errorCode);
-                if (errorCode == (int)swPersistReferencedObjectStates_e.swPersistReferencedObject_Ok)
-                {
-                    return @object;
-                }
-                errors.Add($"`GetObjectByPersistReference2` returned `{(swPersistReferencedObjectStates_e)errorCode}`");
-            }
-            {
-                var @object = doc.Extension.GetObjectByPersistReference(persistId);
-                if (@object != null)
-                {
-                    return @object;
-                }
-                errors.Add("`GetObjectByPersistReference` returned `null`");
-            }
-            var nl = Environment.NewLine;
-            throw new SelectionException("Can't get object from persist id:" + nl + string.Join(nl, errors));
+            return @object;
         }
 
         public static byte[] GetPersistReference<T>(this IModelDoc2 modelDoc, T obj)
