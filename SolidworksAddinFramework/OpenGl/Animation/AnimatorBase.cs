@@ -13,13 +13,13 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public abstract TimeSpan Duration { get; }
         public abstract IReadOnlyList<IAnimationSection> Sections { get; }
 
-        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, int layer = 0)
+        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, double framerate = 30, int layer = 0)
         {
             OnStart(DateTime.Now);
 
             var d = new CompositeDisposable();
             OpenGlRenderer.DisplayUndoable(this, modelDoc, layer).DisposeWith(d);
-            Redraw(modelDoc).DisposeWith(d);
+            Redraw(modelDoc, framerate).DisposeWith(d);
             return d;
         }
 
