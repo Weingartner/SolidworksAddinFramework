@@ -160,6 +160,16 @@ namespace SolidworksAddinFramework
             return Tuple(selectedObjects, marks, views);
         }
 
+        /// <summary>
+        /// Get an entity from its persist id.
+        /// 
+        /// Because we should use the same version of `GetPersistReference` and `GetObjectFromPersistReference` resp.
+        /// and the persist reference is saved with the models we should never ever use another version of the two methods.
+        /// For more details see http://help.solidworks.com/2016/english/api/sldworksapi/SolidWorks.interop.sldworks~SolidWorks.interop.sldworks.IModelDocExtension~GetPersistReference3.html#remarksSection
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="persistId"></param>
+        /// <returns></returns>
         public static object GetObjectFromPersistReference(this IModelDoc2 doc, byte[] persistId)
         {
             int errorCode;
@@ -172,6 +182,17 @@ namespace SolidworksAddinFramework
             return @object;
         }
 
+        /// <summary>
+        /// Get a persist id from an entity.
+        /// 
+        /// Because we should use the same version of `GetPersistReference` and `GetObjectFromPersistReference` resp.
+        /// and the persist reference is saved with the models we should never ever use another version of the two methods.
+        /// For more details see http://help.solidworks.com/2016/english/api/sldworksapi/SolidWorks.interop.sldworks~SolidWorks.interop.sldworks.IModelDocExtension~GetPersistReference3.html#remarksSection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="modelDoc"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static byte[] GetPersistReference<T>(this IModelDoc2 modelDoc, T obj)
         {
             return modelDoc.Extension.GetPersistReference3(obj).CastArray<byte>();
