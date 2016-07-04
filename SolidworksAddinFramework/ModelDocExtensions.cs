@@ -204,6 +204,11 @@ namespace SolidworksAddinFramework
             throw new SelectionException("Can't get object from persist id:" + nl + string.Join(nl, errors));
         }
 
+        public static byte[] GetPersistReference<T>(this IModelDoc2 modelDoc, T obj)
+        {
+            return modelDoc.Extension.GetPersistReference3(obj).CastArray<byte>();
+        }
+
         /// <summary>
         /// Generates a lambda which resolves an entity from its persist reference every time you invoke it.
         /// </summary>
@@ -213,7 +218,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static Func<T> GetPersistentEntityReference<T>(this IModelDoc2 modelDoc, T obj)
         {
-            var persistReference = modelDoc.Extension.GetPersistReference(obj).CastArray<byte>();
+            var persistReference = modelDoc.GetPersistReference(obj);
             return fun(() => (T)GetObjectFromPersistReference(modelDoc, persistReference));
         }
 

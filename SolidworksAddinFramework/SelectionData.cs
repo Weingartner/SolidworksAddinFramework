@@ -147,9 +147,7 @@ namespace SolidworksAddinFramework
         public static SelectionData SetObjects(this SelectionData selectionData, IEnumerable<object> objects, IModelDoc2 doc)
         {
             var objectIds = objects
-                .Select(o => doc.Extension
-                    .GetPersistReference3(o)
-                    .CastArray<byte>())
+                .Select(doc.GetPersistReference)
                 .Select(id => new SelectionData.ObjectId(id));
             return new SelectionData(objectIds, selectionData.Mark);
         }
