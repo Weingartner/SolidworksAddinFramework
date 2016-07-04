@@ -16,6 +16,8 @@ using SolidWorks.Interop.swconst;
 using XUnit;
 using XUnit.Solidworks.Addin;
 using SolidworksAddinFramework.Events;
+using System.Diagnostics;
+using SolidworksAddinFramework;
 
 namespace SolidworksAddinFramework.Spec
 {
@@ -115,6 +117,9 @@ namespace SolidworksAddinFramework.Spec
             {
                 var feature = SpecHelper.InsertDummyBody(doc);
                 var body = doc.GetBodiesTs().Single();
+                //TODO: If I comment out the code below it won't compile.  Why?
+                //var bodyPerst = doc.GetBodiesTs().Select(b => doc.GetPersistentEntityReference<IBody2>(b)).Single();
+                body.Name.Should().Be("Boss-Extrude1");
                 var box1 = body.GetBodyBoxTs();
 
                 // switch to new config
@@ -126,15 +131,16 @@ namespace SolidworksAddinFramework.Spec
                 doc.AddSelections(0, new[] { body });
                 var deleteFeature = doc.FeatureManager.InsertDeleteBody2(false);
                 doc.GetBodiesTs().Should().BeEmpty();
-                doc.ForceRebuild3(false);
-                new Action(() => body.GetBodyBoxTs()).ShouldThrow<COMException>().Which.Message.Should().Contain("disconnected");
+                body.Name.Should().Be("Boss-Extrude1");
+                var box2 = body.GetBodyBoxTs();
 
                 // switch back to default config
                 doc.ShowConfiguration2(defaultConfig.Name).Should().BeTrue();
                 doc.ConfigurationManager.ActiveConfiguration.Should().Be(defaultConfig);
-
-                var box2 = body.GetBodyBoxTs();
-
+                string name;
+                new Action(() => name = body.Name).ShouldThrow<SEHException>().Which.Message.Should().Contain("External");
+                new Action(() => body.GetBodyBoxTs()).ShouldThrow<COMException>().Which.Message.Should().Contain("disconnected");
+                //bodyPerst.Name.Should().Be("Boss-Extrude1");
                 return Disposable.Empty;
             });
         }
