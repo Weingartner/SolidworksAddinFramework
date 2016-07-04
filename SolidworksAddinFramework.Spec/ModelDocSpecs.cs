@@ -110,37 +110,51 @@ namespace SolidworksAddinFramework.Spec
             }
         }
 
+        private static void DisconnectEntity(IModelDoc2 doc, Func<object> getEntity)
+        {
+            // switch to new config
+            var defaultConfig = doc.ConfigurationManager.ActiveConfiguration;
+            var newConfig = doc.ConfigurationManager.AddConfiguration("TestConfig", "", "", 0, "Default", "");
+            doc.ConfigurationManager.ActiveConfiguration.Should().Be(newConfig);
+
+            // delete body
+            doc.AddSelections(0, new[] { getEntity() });
+            var deleteFeature = doc.FeatureManager.InsertDeleteBody2(false);
+            doc.GetBodiesTs().Should().BeEmpty();
+
+            // switch back to default config
+            doc.ShowConfiguration2(defaultConfig.Name).Should().BeTrue();
+            doc.ConfigurationManager.ActiveConfiguration.Should().Be(defaultConfig);
+        }
+
         [SolidworksFact]
-        public void GettingPersistentEntityReferenceShouldWork()
+        public void EntityReferencesMightBeDisconnected()
         {
             CreatePartDoc(false, doc =>
             {
                 var feature = SpecHelper.InsertDummyBody(doc);
                 var body = doc.GetBodiesTs().Single();
-                //TODO: If I comment out the code below it won't compile.  Why?
-                //var bodyPerst = doc.GetBodiesTs().Select(b => doc.GetPersistentEntityReference<IBody2>(b)).Single();
-                body.Name.Should().Be("Boss-Extrude1");
-                var box1 = body.GetBodyBoxTs();
 
-                // switch to new config
-                var defaultConfig = doc.ConfigurationManager.ActiveConfiguration;
-                var newConfig = doc.ConfigurationManager.AddConfiguration("TestConfig", "", "", 0, "Default", "");
-                doc.ConfigurationManager.ActiveConfiguration.Should().Be(newConfig);
+                DisconnectEntity(doc, () => body);
 
-                // delete body
-                doc.AddSelections(0, new[] { body });
-                var deleteFeature = doc.FeatureManager.InsertDeleteBody2(false);
-                doc.GetBodiesTs().Should().BeEmpty();
-                body.Name.Should().Be("Boss-Extrude1");
-                var box2 = body.GetBodyBoxTs();
-
-                // switch back to default config
-                doc.ShowConfiguration2(defaultConfig.Name).Should().BeTrue();
-                doc.ConfigurationManager.ActiveConfiguration.Should().Be(defaultConfig);
-                string name;
-                new Action(() => name = body.Name).ShouldThrow<SEHException>().Which.Message.Should().Contain("External");
                 new Action(() => body.GetBodyBoxTs()).ShouldThrow<COMException>().Which.Message.Should().Contain("disconnected");
-                //bodyPerst.Name.Should().Be("Boss-Extrude1");
+
+                return Disposable.Empty;
+            });
+        }
+
+        [SolidworksFact]
+        public void PersistentEntityReferencesShouldNotBeDisconnected()
+        {
+            CreatePartDoc(false, doc =>
+            {
+                var feature = SpecHelper.InsertDummyBody(doc);
+                var body = doc.GetPersistentEntityReference(doc.GetBodiesTs().Single());
+
+                DisconnectEntity(doc, body);
+
+                new Action(() => body().GetBodyBoxTs()).ShouldNotThrow<COMException>();
+
                 return Disposable.Empty;
             });
         }
