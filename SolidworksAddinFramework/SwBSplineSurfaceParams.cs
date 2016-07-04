@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Numerics;
 using JetBrains.Annotations;
+using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
@@ -31,7 +32,7 @@ namespace SolidworksAddinFramework
             KnotVectorV = knotVectorV;
         }
 
-        public SwBSplineSurfaceParams WithCtrlPts(Func<Vector4[,],Vector4[,]> converter)
+        public SwBSplineSurfaceParams WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
         {
             var mod = converter(ControlPointList);
             return new SwBSplineSurfaceParams(mod, SwOrderU,SwOrderV,KnotVectorU,KnotVectorV);
@@ -82,5 +83,47 @@ namespace SolidworksAddinFramework
         }
         #endregion
 
+        /// <summary>
+        /// Create a surface
+        /// </summary>
+        /// <param name="swBSplineSurfaceParams"></param>
+        /// <returns></returns>
+        public ISurface ToSurface ()
+        {
+            var vOrder = BitConverter.GetBytes(SwOrderV);
+            var uOrder = BitConverter.GetBytes(SwOrderU);
+
+            var swControlPointList = ControlPointList
+                .EnumerateColumnWise()
+                .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
+                .ToArray();
+
+            var uLength = ControlPointList.GetLength(0);
+            var vLength = ControlPointList.GetLength(1);
+
+            var numUCtrPts = BitConverter.GetBytes(uLength);
+            var numVCtrPts = BitConverter.GetBytes(vLength);
+            //TODO: find out what periodicity means in this context 
+            var uPeriodicity = BitConverter.GetBytes(0);
+            var vPeriodicity = BitConverter.GetBytes(0);
+            var dimControlPoints = BitConverter.GetBytes(4);
+            var unusedParameter = BitConverter.GetBytes(0);
+
+            var props = new[]
+            {
+                BitConverter.ToDouble(uOrder.Concat(vOrder).ToArray(), 0),
+                BitConverter.ToDouble(numVCtrPts.Concat(numUCtrPts).ToArray(), 0),
+                BitConverter.ToDouble(uPeriodicity.Concat(vPeriodicity).ToArray(), 0),
+                BitConverter.ToDouble(dimControlPoints.Concat(unusedParameter).ToArray(), 0)
+            };
+
+
+            return (Surface) SwAddinBase.Active.Modeler
+                .CreateBsplineSurface
+                ( props
+                    , KnotVectorU
+                    , KnotVectorV
+                    , swControlPointList);
+        }
     }
 }

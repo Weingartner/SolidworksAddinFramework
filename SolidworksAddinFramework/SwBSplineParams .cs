@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -7,6 +8,52 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
+    public class SwFaceParams
+    {
+        public SwBSplineSurfaceParams Surface { get; }
+        public IReadOnlyList<IReadOnlyList<SwBSplineParams>> TrimLoops { get; }
+
+        public SwFaceParams
+            TransformSurfaceControlPoints(Func<Vector4[,], Vector4[,]> xformSurface, Func<Vector4[],Vector4[]> xformTrimLoops )
+        {
+            var surface = Surface.WithCtrlPts(xformSurface);
+            var trimLoops = TrimLoops
+                .Select(loop => loop.Select(curve => curve.WithControlPoints(xformTrimLoops)).ToList())
+                .ToList();
+
+            return new SwFaceParams(surface, trimLoops);
+        }
+
+        public SwFaceParams(IFace2 face, double tol)
+        {
+            var surface = ((ISurface) face.GetSurface());
+            Surface = surface.GetBSplineSurfaceParams(tol);
+
+            TrimLoops = face
+                .GetTrimLoops()
+                .Select(curves => curves.Select(curve => curve.GetBSplineParams(false, tol)).ToList())
+                .ToList();
+        }
+
+        private SwFaceParams(SwBSplineSurfaceParams surface, IReadOnlyList<IReadOnlyList<SwBSplineParams>> trimLoops)
+        {
+            Surface = surface;
+            TrimLoops = trimLoops;
+        }
+
+        public IBody2 ToSheetBody()
+        {
+            var surface = Surface.ToSurface();
+
+            var curves = TrimLoops
+                .Select(loop => loop.Select(curve => curve.ToCurve()).ToList())
+                .PackForTrimming();
+
+            return (IBody2) surface.CreateTrimmedSheet4(curves, true);
+
+        }
+    }
+
     public class SwBSplineParams : IEquatable<SwBSplineParams>
     {
         public Vector4[] ControlPoints { get; }
@@ -18,7 +65,7 @@ namespace SolidworksAddinFramework
 
         public double[] KnotVectorU { get; }
 
-        public SwBSplineParams([NotNull] Vector4[] controlPoints, int swOrderU, [NotNull] double[] knotVectorU, int controlPointDimension, bool isPeriodic, double t0, double t1)
+        public SwBSplineParams([NotNull] Vector4[] controlPoints, int swOrderU, [NotNull] double[] knotVectorU, int controlPointDimension, bool isPeriodic)
         {
 
             if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
@@ -29,23 +76,19 @@ namespace SolidworksAddinFramework
             KnotVectorU = knotVectorU;
             ControlPointDimension = controlPointDimension;
             IsPeriodic = isPeriodic;
-            T1 = t1;
-            T0 = t0;
         }
 
-        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => new SwBSplineParams(transform(ControlPoints),SwOrderU, KnotVectorU,ControlPointDimension,IsPeriodic, T0, T1);
+        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => new SwBSplineParams(transform(ControlPoints),SwOrderU, KnotVectorU,ControlPointDimension,IsPeriodic);
 
         #region equality
         public bool Equals(SwBSplineParams other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return ControlPoints.Cast<Vector4>().SequenceEqual(other.ControlPoints.Cast<Vector4>())
+            return ControlPoints.SequenceEqual(other.ControlPoints)
                    && KnotVectorU.SequenceEqual(other.KnotVectorU)
 
-                   && SwOrderU == other.SwOrderU
-                   && T0 == other.T0
-                   && T1 == other.T1 ;
+                   && SwOrderU == other.SwOrderU;
         }
 
         public override bool Equals(object obj)
@@ -63,8 +106,6 @@ namespace SolidworksAddinFramework
                 var hashCode = ControlPoints.Cast<Vector4>().GetHashCode(v=>v.GetHashCode());
                 hashCode = (hashCode*397) ^ KnotVectorU.GetHashCode(v=>v.GetHashCode());
                 hashCode = (hashCode*397) ^ SwOrderU;
-                hashCode = (hashCode*397) ^ T0.GetHashCode();
-                hashCode = (hashCode*397) ^ T1.GetHashCode();
                 return hashCode;
             }
         }
@@ -100,12 +141,13 @@ namespace SolidworksAddinFramework
             };
 
             var swCurve = (Curve) modeler.CreateBsplineCurve(props, KnotVectorU, controlPointsList);
-            return swCurve.ICreateTrimmedCurve(T0, T1);
+            var domain = swCurve.Domain();
+            var eps = Math.Abs(domain[0] - domain[1])/1e6;
+            return swCurve;
+            //if(Math.Abs(domain[0] - T0) < eps && Math.Abs(domain[1] - T1) < eps)
+            //    return swCurve;
+            //return swCurve.CreateTrimmedCurve(T0, T1);
         }
-
-        public double T1 { get; }
-
-        public double T0 { get; }
     }
 
     public static class SwBSplineParamsExtensions
@@ -171,7 +213,7 @@ namespace SolidworksAddinFramework
             double start;
             double end;
             swCurve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
-            return new SwBSplineParams(controlPoints4D, order, knotArray, dimension, isPeriodic, start, end);
+            return new SwBSplineParams(controlPoints4D, order, knotArray, dimension, isPeriodic);
         }
     }
 }

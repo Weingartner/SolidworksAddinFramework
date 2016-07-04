@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -9,6 +11,8 @@ using SolidWorks.Interop.swconst;
 using XUnit.Solidworks.Addin;
 using SwBSplineParamsExtensions = SolidworksAddinFramework.SwBSplineParamsExtensions;
 
+
+
 namespace SolidworksAddinFramework.Spec
 {
     public class SwBSplineParamsSpec : SolidWorksSpec
@@ -18,7 +22,7 @@ namespace SolidworksAddinFramework.Spec
         {
             CreatePartDoc(true, modelDoc =>
             {
-                var trimCurve = Modeler.CreateTrimmedLine(new Vector3(0,0,0f),new Vector3(1,0,0f));
+                var trimCurve = Modeler.CreateTrimmedLine(new Vector3(-0.1f,-0.45f,-7.8f),new Vector3(1.3f,2.7f,3.9f));
 
                 var parameters = trimCurve.GetBSplineParams(false, 1e-8);
                 var swCurve = parameters.ToCurve();
@@ -28,8 +32,8 @@ namespace SolidworksAddinFramework.Spec
 
                 //#####################################
                 var d0 = swCurve.CreateWireBody().DisplayUndoable(modelDoc, Color.Blue);
-                //var d1 = trimCurve.CreateWireBody().DisplayUndoable(modelDoc, Color.Red);
-                return new CompositeDisposable(d0);
+                var d1 = trimCurve.CreateWireBody().DisplayUndoable(modelDoc, Color.Red);
+                return new CompositeDisposable(d0,d1);
             });
         }
 
@@ -47,7 +51,7 @@ namespace SolidworksAddinFramework.Spec
                     .GetBSplineSurfaceParams(1e-5)
                     .WithCtrlPts(ctrlPts => ctrlPts.Select(v => new Vector4(v.X , v.Y, v.Z, v.W)));
 
-                var surface2 = SurfaceExtensions.CreateBSplineSurface(surfaceParams);
+                var surface2 = surfaceParams.ToSurface();
                 var curves = GetCurvesForTrimming(face,c=>c);
 
                 var trimmedSheet = (IBody2) surface2.CreateTrimmedSheet4(curves, true);
@@ -73,28 +77,13 @@ namespace SolidworksAddinFramework.Spec
                     .Select
                     (face =>
                     {
-                        var surface1 = ((Surface) face.GetSurface());
-                        var surfaceParams = surface1
-                            .GetBSplineSurfaceParams(1e-5)
-                            .WithCtrlPts(ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W)));
+                        var faceParams = 
+                            new SwFaceParams(face, 1e-5)
+                            .TransformSurfaceControlPoints
+                              (ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W))
+                              ,ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W)).ToArray());
 
-                        var surface2 = SurfaceExtensions.CreateBSplineSurface(surfaceParams);
-                        var curves = GetCurvesForTrimming(face,
-                            curve =>
-                            {
-                                //curve.DisplayUndoable(modelDoc, Color.Red, 3);
-                                var param = curve.GetBSplineParams(curve.StartPoint() == curve.EndPoint(), 1e-5);
-                                param = param.WithControlPoints
-                                    (ctrlPts => ctrlPts.Select(v => new Vector4(v.X, v.Y, v.Z, v.W)).ToArray());
-                                var curve2 = param.ToCurve();
-                                curve2.DisplayUndoable(modelDoc, Color.Blue, 3);
-
-                                return curve2;
-
-                            });
-
-                        return (IBody2) surface2.CreateTrimmedSheet4(curves, true);
-
+                        return faceParams.ToSheetBody();
                     })
                     .ToArray();
 
@@ -104,16 +93,16 @@ namespace SolidworksAddinFramework.Spec
                 //}
 
 
-                //var error = (int) swSheetSewingError_e.swSewingOk;
-                //var body = Modeler
-                //    .CreateBodiesFromSheets2(sheets, (int) swSheetSewingOption_e.swSewToSolid, 1e-5, ref error)
-                //    .CastArray<IBody2>();
+                var error = (int)swSheetSewingError_e.swSewingOk;
+                var body = Modeler
+                    .CreateBodiesFromSheets2(sheets, (int)swSheetSewingOption_e.swSewToSolid, 1e-5, ref error)
+                    .CastArray<IBody2>();
 
-                //body.Should().NotBeEmpty();
+                body.Should().NotBeEmpty();
 
-                //yielder(body.DisplayUndoable(modelDoc));
+                yielder(body.DisplayUndoable(modelDoc));
 
-                
+
 
             });
 
@@ -124,19 +113,14 @@ namespace SolidworksAddinFramework.Spec
         /// seperated by a null entry as required by Surface::CreateTrimmedSheet4
         /// </summary>
         /// <param name="face"></param>
+        /// <param name="transformer"></param>
         /// <returns></returns>
         private static ICurve[] GetCurvesForTrimming(IFace2 face,Func<ICurve,ICurve> transformer )
         {
-            return face.GetLoops().CastArray<ILoop2>()
-                .SelectMany(
-                    l =>
-                        l.GetEdges()
-                            .CastArray<IEdge>()
-                            .Select(edge => (ICurve) edge.GetCurve() )
-                            .Select(c=>transformer((ICurve)c.Copy()))
-                            .Concat(new ICurve[] {null}))
-                .SkipLast(1)
-                .ToArray();
+            return face
+                .GetTrimLoops()
+                .Select(curves=>curves.Select(transformer).ToList())
+                .PackForTrimming();
         }
 
 
@@ -149,7 +133,7 @@ namespace SolidworksAddinFramework.Spec
                 var planeSurf = (Surface)Modeler.CreatePlanarSurface2(new[] {0,0,0.0}, new[] {0,0,1.0}, new[] {1,0,0.0});
                 var parameters = planeSurf.GetBSplineSurfaceParams(1e-5);
 
-                var foo = SurfaceExtensions.CreateBSplineSurface(parameters);
+                var foo = parameters.ToSurface();
 
                 //#####################################
                 var d0 = foo.ToSheetBody().DisplayUndoable(modelDoc, Color.Blue);

@@ -126,49 +126,5 @@ namespace SolidworksAddinFramework
 
 
         }
-
-        /// <summary>
-        /// Create a surface
-        /// </summary>
-        /// <param name="swBSplineSurfaceParams"></param>
-        /// <returns></returns>
-        public static ISurface CreateBSplineSurface
-            (SwBSplineSurfaceParams swBSplineSurfaceParams)
-        {
-            var vOrder = BitConverter.GetBytes(swBSplineSurfaceParams.SwOrderV);
-            var uOrder = BitConverter.GetBytes(swBSplineSurfaceParams.SwOrderU);
-
-            var swControlPointList = swBSplineSurfaceParams.ControlPointList
-                .EnumerateColumnWise()
-                .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
-                .ToArray();
-
-            var uLength = swBSplineSurfaceParams.ControlPointList.GetLength(0);
-            var vLength = swBSplineSurfaceParams.ControlPointList.GetLength(1);
-
-            var numUCtrPts = BitConverter.GetBytes(uLength);
-            var numVCtrPts = BitConverter.GetBytes(vLength);
-            //TODO: find out what periodicity means in this context 
-            var uPeriodicity = BitConverter.GetBytes(0);
-            var vPeriodicity = BitConverter.GetBytes(0);
-            var dimControlPoints = BitConverter.GetBytes(4);
-            var unusedParameter = BitConverter.GetBytes(0);
-
-            var props = new[]
-            {
-                BitConverter.ToDouble(uOrder.Concat(vOrder).ToArray(), 0),
-                BitConverter.ToDouble(numVCtrPts.Concat(numUCtrPts).ToArray(), 0),
-                BitConverter.ToDouble(uPeriodicity.Concat(vPeriodicity).ToArray(), 0),
-                BitConverter.ToDouble(dimControlPoints.Concat(unusedParameter).ToArray(), 0)
-            };
-
-
-            return (Surface) SwAddinBase.Active.Modeler
-                .CreateBsplineSurface
-                    ( props
-                    , swBSplineSurfaceParams.KnotVectorU
-                    , swBSplineSurfaceParams.KnotVectorV
-                    , swControlPointList);
-        }
     }
 }

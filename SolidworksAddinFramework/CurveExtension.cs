@@ -112,6 +112,14 @@ namespace SolidworksAddinFramework
             return wire.DisplayUndoable(doc, layer);
         }
 
+        public static ICurve CreateTrimmedCurve(this ICurve curve, double t0, double t1)
+        {
+
+            var p0 = curve.Evaluate2(t0, 0).CastArray<double>();
+            var p1 = curve.Evaluate2(t1, 0).CastArray<double>();
+            return (ICurve) curve.CreateTrimmedCurve(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2]);
+        }
+
         public static IDisposable DisplayUndoable
             (
             this Edge3 line

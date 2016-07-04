@@ -28,9 +28,9 @@ namespace SolidworksAddinFramework
             var pp0 = line.GetClosestPointOn(edge.A.X, edge.A.Y, edge.A.Z).CastArray<double>();
             var pp1 = line.GetClosestPointOn(edge.B.X, edge.B.Y, edge.B.Z).CastArray<double>();
             //line = line.CreateTrimmedCurve2(pp0[0], pp0[1], pp0[2], pp1[0], pp1[1], pp1[2]);
-            line = line.ICreateTrimmedCurve(pp0[3], pp1[3]);
-            Debug.Assert(line != null, "line != null");
-            return line;
+            var trimmedLine = line.CreateTrimmedCurve(pp0[3], pp1[3]);
+            Debug.Assert(trimmedLine != null, "line != null");
+            return trimmedLine;
         }
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3  p1)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SolidworksAddinFramework.Geometry;
@@ -40,7 +39,35 @@ namespace SolidworksAddinFramework
                 .ToArray();
         }
 
+        /// <summary>
+        /// Returns all the trim loops of the face as list of a list of curves
+        /// </summary>
+        /// <param name="face"></param>
+        /// <returns></returns>
+        public static List<List<ICurve>> GetTrimLoops(this IFace2 face)
+        {
+            return face
+                .GetLoops()
+                .CastArray<ILoop2>()
+                .Select(l=>l.GetEdges().CastArray<IEdge>().Select(e=>(ICurve)e.GetCurve()))
+                .Select(curves=>curves.Select(c=>(ICurve)c.Copy()).ToList())
+                .ToList();
+        }
+
         public static float[][] GetTessTrianglesNoConversion(this IFace2 face) => face.GetTessTrianglesTs(true);
         public static float[][] GetTessTrianglesAllowConversion(this IFace2 face) => face.GetTessTrianglesTs(false);
+
+        /// <summary>
+        /// Packs trimming loops into an array suitable for usage by ISurface::CreateTrimmedSheet4
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <returns></returns>
+        public static ICurve[] PackForTrimming(this IEnumerable<IEnumerable<ICurve>> enumerable)
+        {
+            return enumerable
+                .SelectMany( l => l .Concat(new ICurve[] {null}))
+                .SkipLast(1)
+                .ToArray();
+        }
     }
 }
