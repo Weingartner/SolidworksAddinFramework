@@ -15,7 +15,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public IDisposable DisplayUndoable(IModelDoc2 modelDoc, int layer = 0)
         {
-            CalculateSectionTimes(DateTime.Now);
+            OnStart(DateTime.Now);
 
             var d = new CompositeDisposable();
             OpenGlRenderer.DisplayUndoable(this, modelDoc, layer).DisposeWith(d);
@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             return d;
         }
 
-        public abstract void CalculateSectionTimes(DateTime startTime);
+        public abstract void OnStart(DateTime startTime);
 
         public abstract void Render(DateTime time);
 

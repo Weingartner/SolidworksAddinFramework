@@ -106,6 +106,8 @@ namespace SolidworksAddinFramework.OpenGl
                 .Select(b => (Triangle) b )
                 .ToList();
 
+        public Matrix4x4 CurrentTransform { get; private set; } = Matrix4x4.Identity;
+
 
         public override void Render(DateTime time)
         {
@@ -203,7 +205,7 @@ namespace SolidworksAddinFramework.OpenGl
                 
             }
             UpdateBoundingSphere();
-
+            CurrentTransform = transform;
         }
 
     }

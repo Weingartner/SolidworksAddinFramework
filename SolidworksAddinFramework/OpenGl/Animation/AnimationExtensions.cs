@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
@@ -9,17 +10,17 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public static Animator CreateAnimator
             (this IReadOnlyList<IAnimationSection> animationSections,
             IReadOnlyList<IRenderable> children,
-            int framerate = 30)
+            Action<Matrix4x4> onRender = null)
         {
-            return new Animator(animationSections, children);
+            return new Animator(animationSections, children, onRender);
 
         }
         public static Animator CreateAnimator
             (this IReadOnlyList<IAnimationSection> animationSections,
-            IRenderable children,
-            int framerate = 30)
+            IRenderable child,
+            Action<Matrix4x4> onRender = null)
         {
-            return new Animator(animationSections, new [] { children});
+            return animationSections.CreateAnimator(new[] { child }, onRender);
 
         }
 

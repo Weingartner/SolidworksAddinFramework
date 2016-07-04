@@ -23,7 +23,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             _Animators = animators.ToList();
         }
 
-        public override void CalculateSectionTimes(DateTime startTime)
+        public override void OnStart(DateTime startTime)
         {
             if (_Animators.Count == 0) return;
 
@@ -31,7 +31,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             var animatorStartTime = _ReferenceTime;
             foreach (var animator in _Animators)
             {
-                animator.CalculateSectionTimes(animatorStartTime);
+                animator.OnStart(animatorStartTime);
                 animatorStartTime += animator.Duration;
             }
         }
