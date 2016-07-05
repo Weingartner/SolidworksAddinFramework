@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Reactive;
@@ -11,11 +12,11 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public override TimeSpan Duration => Sections.Aggregate(TimeSpan.Zero, (sum, s) => sum + s.Duration);
         private IReadOnlyList<SectionTime> _SectionTimes;
 
-        public override IReadOnlyList<IAnimationSection> Sections { get; }
-        private readonly IReadOnlyList<IRenderable> _Children;
+        public override ImmutableList<IAnimationSection> Sections { get; }
+        private readonly ImmutableList<IRenderable> _Children;
         private readonly IObserver<Matrix4x4> _RenderObserver;
 
-        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children, IObserver<Matrix4x4> renderObserver)
+        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children, IObserver<Matrix4x4> renderObserver)
         {
             Sections = sections;
             _Children = children;
