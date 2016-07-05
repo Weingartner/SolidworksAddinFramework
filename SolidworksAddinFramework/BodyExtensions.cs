@@ -198,7 +198,10 @@ namespace SolidworksAddinFramework
                     .First(b => b.GetBodyBoxTs().XMax > 1e-5);
 
             var zXPlane = ((ISurface)modeler.CreatePlanarSurface2(new[] { 0, 0, 0.0 }, new[] { 0, 1.0, 0 }, new[] { 0, 0, 1.0 })).ToSheetBody();
-            var edges = cutBody.GetIntersectionEdgesNonDestructive(zXPlane);
+            var edges = cutBody.GetIntersectionEdgesNonDestructive(zXPlane)
+                //GetIntersectionEdges always returns the edges on the target and on the tool!
+                .Where((p,i)=>i%2==0) 
+                .ToList();
 
             return edges
                 .Select(e => e.GetCurveTs())
