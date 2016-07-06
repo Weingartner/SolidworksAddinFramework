@@ -203,7 +203,6 @@ namespace SolidworksAddinFramework.OpenGl
                 
             }
             UpdateBoundingSphere();
-
         }
 
     }

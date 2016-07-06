@@ -1,33 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using SolidWorks.Interop.sldworks;
-using Weingartner.Exceptional.Reactive;
+using System.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
     public class Animator : AnimatorBase
     {
-        private IReadOnlyList<SectionTime> _SectionTimes;
         public override TimeSpan Duration => Sections.Aggregate(TimeSpan.Zero, (sum, s) => sum + s.Duration);
-        public IReadOnlyList<SectionTime> SectionTimes => _SectionTimes;
-        public override IReadOnlyList<IAnimationSection> Sections { get; }
-        private readonly IReadOnlyList<IRenderable> _Children;
+        private IReadOnlyList<SectionTime> _SectionTimes;
 
-        public Task CompletionTask { get; set; }
+        public override ImmutableList<IAnimationSection> Sections { get; }
+        private readonly ImmutableList<IRenderable> _Children;
+        private readonly IObserver<AnimationData> _RenderObserver;
 
-        public Animator(IReadOnlyList<IAnimationSection> sections, IReadOnlyList<IRenderable> children)
+        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children, IObserver<AnimationData> renderObserver)
         {
             Sections = sections;
             _Children = children;
+            _RenderObserver = renderObserver ?? Observer.Create<AnimationData>(_ => {});
         }
 
-        public override void CalculateSectionTimes(DateTime startTime)
+        public override void OnStart(DateTime startTime)
         {
-            if (SectionTimes != null)
+            if (_SectionTimes != null)
                 throw new Exception("You have allready added this animation");
             _SectionTimes = Calculate(Sections, startTime);
         }
@@ -42,13 +40,10 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public override void Render(DateTime t)
         {
-            // ReSharper disable once UseNullPropagation
-            if (SectionTimes == null)
+            if (_SectionTimes == null)
                 return;
 
-            var currentSection = SectionTimes.FirstOrDefault(o => o.EndTime >= t);
-            if (currentSection == null)
-                return;
+            var currentSection = _SectionTimes.FirstOrDefault(o => o.EndTime > t) ?? _SectionTimes.Last();
 
             var startTime = currentSection.EndTime - currentSection.Section.Duration;
 
@@ -59,6 +54,8 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 child.ApplyTransform(currentTransform);
                 child.Render(t);
             }
+
+            _RenderObserver.OnNext(new AnimationData(currentSection.Section, currentTransform));
         }
     }
 }

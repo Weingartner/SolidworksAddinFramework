@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Numerics;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
@@ -7,25 +9,25 @@ namespace SolidworksAddinFramework.OpenGl.Animation
     {
         
         public static Animator CreateAnimator
-            (this IReadOnlyList<IAnimationSection> animationSections,
-            IReadOnlyList<IRenderable> children,
-            int framerate = 30)
+            (this ImmutableList<IAnimationSection> animationSections,
+            ImmutableList<IRenderable> children,
+            IObserver<AnimationData> renderObserver = null)
         {
-            return new Animator(animationSections, children);
+            return new Animator(animationSections, children, renderObserver);
 
         }
         public static Animator CreateAnimator
-            (this IReadOnlyList<IAnimationSection> animationSections,
-            IRenderable children,
-            int framerate = 30)
+            (this ImmutableList<IAnimationSection> animationSections,
+            IRenderable child,
+            IObserver<AnimationData> renderObserver = null)
         {
-            return new Animator(animationSections, new [] { children});
+            return animationSections.CreateAnimator(ImmutableList.Create(child), renderObserver);
 
         }
 
-        public static MultiAnimator ConcatAnimators(this IEnumerable<Animator> animators, Func<TimeSpan, double> getCurrentValue = null)
+        public static MultiAnimator ConcatAnimators(this IEnumerable<AnimatorBase> animators, Func<TimeSpan, double> getCurrentValue = null)
         {
-            return new MultiAnimator(animators, getCurrentValue);
+            return new MultiAnimator(animators.ToImmutableList(), getCurrentValue);
         }
     }
 }

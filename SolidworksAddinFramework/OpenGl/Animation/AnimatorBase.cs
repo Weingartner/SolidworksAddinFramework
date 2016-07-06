@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -11,19 +12,19 @@ namespace SolidworksAddinFramework.OpenGl.Animation
     public abstract class AnimatorBase : IRenderable
     {
         public abstract TimeSpan Duration { get; }
-        public abstract IReadOnlyList<IAnimationSection> Sections { get; }
+        public abstract ImmutableList<IAnimationSection> Sections { get; }
 
-        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, int layer = 0)
+        public IDisposable DisplayUndoable(IModelDoc2 modelDoc, double framerate = 30, int layer = 0)
         {
-            CalculateSectionTimes(DateTime.Now);
+            OnStart(DateTime.Now);
 
             var d = new CompositeDisposable();
             OpenGlRenderer.DisplayUndoable(this, modelDoc, layer).DisposeWith(d);
-            Redraw(modelDoc).DisposeWith(d);
+            Redraw(modelDoc, framerate).DisposeWith(d);
             return d;
         }
 
-        public abstract void CalculateSectionTimes(DateTime startTime);
+        public abstract void OnStart(DateTime startTime);
 
         public abstract void Render(DateTime time);
 
