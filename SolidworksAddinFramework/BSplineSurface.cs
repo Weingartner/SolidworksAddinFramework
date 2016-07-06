@@ -6,7 +6,7 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
-    public class SwBSplineSurfaceParams : IEquatable<SwBSplineSurfaceParams>
+    public class BSplineSurface : IEquatable<BSplineSurface>
     {
         public Vector4[,] ControlPointList { get; }
 
@@ -17,7 +17,7 @@ namespace SolidworksAddinFramework
         public double[] KnotVectorU { get; }
 
         public double[] KnotVectorV { get; }
-        public SwBSplineSurfaceParams([NotNull] Vector4[,] controlPointList, int swOrderU, int swOrderV,
+        public BSplineSurface([NotNull] Vector4[,] controlPointList, int swOrderU, int swOrderV,
             [NotNull] double[] knotVectorU, [NotNull] double[] knotVectorV)
         {
 
@@ -32,14 +32,14 @@ namespace SolidworksAddinFramework
             KnotVectorV = knotVectorV;
         }
 
-        public SwBSplineSurfaceParams WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
+        public BSplineSurface WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
         {
             var mod = converter(ControlPointList);
-            return new SwBSplineSurfaceParams(mod, SwOrderU,SwOrderV,KnotVectorU,KnotVectorV);
+            return new BSplineSurface(mod, SwOrderU,SwOrderV,KnotVectorU,KnotVectorV);
         }
 
         #region equality
-        public bool Equals(SwBSplineSurfaceParams other)
+        public bool Equals(BSplineSurface other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -56,7 +56,7 @@ namespace SolidworksAddinFramework
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SwBSplineSurfaceParams) obj);
+            return Equals((BSplineSurface) obj);
         }
 
         public override int GetHashCode()
@@ -72,12 +72,12 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static bool operator ==(SwBSplineSurfaceParams left, SwBSplineSurfaceParams right)
+        public static bool operator ==(BSplineSurface left, BSplineSurface right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(SwBSplineSurfaceParams left, SwBSplineSurfaceParams right)
+        public static bool operator !=(BSplineSurface left, BSplineSurface right)
         {
             return !Equals(left, right);
         }

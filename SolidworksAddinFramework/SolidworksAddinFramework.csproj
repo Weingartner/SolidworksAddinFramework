@@ -299,7 +299,7 @@
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="SwBSplineParams .cs" />
-    <Compile Include="SwBSplineSurfaceParams.cs" />
+    <Compile Include="BSplineSurface.cs" />
     <Compile Include="SwEq.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />

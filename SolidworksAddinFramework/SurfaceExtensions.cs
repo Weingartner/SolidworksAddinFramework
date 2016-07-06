@@ -89,7 +89,7 @@ namespace SolidworksAddinFramework
             return pt;
         }
 
-        public static SwBSplineSurfaceParams GetBSplineSurfaceParams(this ISurface swSurf, double tol)
+        public static BSplineSurface GetBSplineSurfaceParams(this ISurface swSurf, double tol)
         {
 
             var swSurfParameterisation = swSurf.Parameterization2();
@@ -117,7 +117,7 @@ namespace SolidworksAddinFramework
                 });
 
 
-            return new SwBSplineSurfaceParams
+            return new BSplineSurface
                 ( controlPointList: controlPointArray
                 ,swOrderU: surfParams.UOrder
                 ,swOrderV: surfParams.VOrder

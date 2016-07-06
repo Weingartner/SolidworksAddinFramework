@@ -12,12 +12,12 @@ using SolidWorks.Interop.sldworks;
 namespace SolidworksAddinFramework
 {
 
-    public class SwFaceParams
+    public class BSplineFace
     {
-        public SwBSplineSurfaceParams Surface { get; }
-        public IReadOnlyList<IReadOnlyList<SwBSplineParams>> TrimLoops { get; }
+        public BSplineSurface Surface { get; }
+        public IReadOnlyList<IReadOnlyList<BSpline>> TrimLoops { get; }
 
-        public SwFaceParams
+        public BSplineFace
             TransformSurfaceControlPoints(Func<Vector4[,], Vector4[,]> xformSurface, Func<Vector4[],Vector4[]> xformTrimLoops )
         {
             var surface = Surface.WithCtrlPts(xformSurface);
@@ -25,10 +25,10 @@ namespace SolidworksAddinFramework
                 .Select(loop => loop.Select(curve => curve.WithControlPoints(xformTrimLoops)).ToList())
                 .ToList();
 
-            return new SwFaceParams(surface, trimLoops);
+            return new BSplineFace(surface, trimLoops);
         }
 
-        public SwFaceParams(IFace2 face, double tol)
+        internal BSplineFace(IFace2 face, double tol)
         {
             var surface = ((ISurface) face.GetSurface());
             Surface = surface.GetBSplineSurfaceParams(tol);
@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework
                 .ToList();
         }
 
-        private SwFaceParams(SwBSplineSurfaceParams surface, IReadOnlyList<IReadOnlyList<SwBSplineParams>> trimLoops)
+        public BSplineFace(BSplineSurface surface, IReadOnlyList<IReadOnlyList<BSpline>> trimLoops)
         {
             Surface = surface;
             TrimLoops = trimLoops;
@@ -59,10 +59,19 @@ namespace SolidworksAddinFramework
 
     }
 
+    public static class SwFaceParamsExtensions
+    {
+
+        public static BSplineFace ToBSplineFace(this IFace2 face, double tol)
+        {
+            return new BSplineFace(face, tol);
+        }
+    }
+
     /// <summary>
     /// BSpline in homogeneous coordinates. Non periodic.
     /// </summary>
-    public class SwBSplineParams : IEquatable<SwBSplineParams>
+    public class BSpline : IEquatable<BSpline>
     {
         /// <summary>
         /// Control points are stored as (X,Y,Z) being the
@@ -87,7 +96,7 @@ namespace SolidworksAddinFramework
 
         public double[] KnotVectorU { get; }
 
-        public SwBSplineParams([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed)
+        public BSpline([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed)
         {
 
             if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
@@ -99,11 +108,11 @@ namespace SolidworksAddinFramework
             IsClosed = isClosed;
         }
 
-        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => 
-            new SwBSplineParams(transform(ControlPoints), KnotVectorU,Order, IsClosed);
+        public BSpline WithControlPoints(Func<Vector4[], Vector4[]> transform) => 
+            new BSpline(transform(ControlPoints), KnotVectorU,Order, IsClosed);
 
         #region equality
-        public bool Equals(SwBSplineParams other)
+        public bool Equals(BSpline other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -119,7 +128,7 @@ namespace SolidworksAddinFramework
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SwBSplineParams) obj);
+            return Equals((BSpline) obj);
         }
 
         public override int GetHashCode()
@@ -134,12 +143,12 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static bool operator ==(SwBSplineParams left, SwBSplineParams right)
+        public static bool operator ==(BSpline left, BSpline right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(SwBSplineParams left, SwBSplineParams right)
+        public static bool operator !=(BSpline left, BSpline right)
         {
             return !Equals(left, right);
         }
@@ -150,7 +159,7 @@ namespace SolidworksAddinFramework
 
     public static class SwBSplineParamsExtensions
     {
-        public static SwBSplineParams GetBSplineParams(this ICurve swCurve, bool isClosed)
+        public static BSpline GetBSplineParams(this ICurve swCurve, bool isClosed)
         {
             return swCurve
                 .GetBCurveParams5
@@ -162,7 +171,7 @@ namespace SolidworksAddinFramework
                 .SwBSplineParams(isClosed);
         }
 
-        public static SwBSplineParams SwBSplineParams(this SplineParamData swSurfParameterisation, bool isClosed)
+        public static BSpline SwBSplineParams(this SplineParamData swSurfParameterisation, bool isClosed)
         {
             object ctrlPts;
             var canGetCtrlPts = swSurfParameterisation.GetControlPoints(out ctrlPts);
@@ -217,7 +226,7 @@ namespace SolidworksAddinFramework
             if (isPeriodic)
                 ConvertToNonPeriodic(ref controlPoints4D, ref knotArray, degree);
 
-            return new SwBSplineParams(controlPoints4D, knotArray, order, isClosed);
+            return new BSpline(controlPoints4D, knotArray, order, isClosed);
         }
 
 

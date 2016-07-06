@@ -15,7 +15,7 @@ using SwBSplineParamsExtensions = SolidworksAddinFramework.SwBSplineParamsExtens
 
 namespace SolidworksAddinFramework.Spec
 {
-    public class SwBSplineParamsSpec : SolidWorksSpec
+    public class BSplineParamsSpec : SolidWorksSpec
     {
         [SolidworksFact]
         public void ForwardAndBackSplineConversionShouldWork()
@@ -101,8 +101,8 @@ namespace SolidworksAddinFramework.Spec
                     .Select
                     (face =>
                     {
-                        var faceParams = 
-                            new SwFaceParams(face, 1e-5)
+                        var faceParams = face
+                            .ToBSplineFace(1e-5)
                             .TransformSurfaceControlPoints
                               (ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W))
                               ,ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W)).ToArray());
