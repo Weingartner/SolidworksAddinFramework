@@ -466,5 +466,11 @@ namespace SolidworksAddinFramework
         {
             return obs.Select(_ => Unit.Default);
         }
+
+        public static IObservable<T> Connect<T>(this IConnectableObservable<T> obs, CompositeDisposable d)
+        {
+            obs.Connect().DisposeWith(d);
+            return obs;
+        }
     }
 }
