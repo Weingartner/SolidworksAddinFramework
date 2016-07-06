@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using JetBrains.Annotations;
@@ -54,12 +53,12 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             foreach (var animator in _Animators)
             {
                 duration += animator.Duration;
-                if (duration >= time)
+                if (duration > time)
                 {
                     return animator;
                 }
             }
-            throw new IndexOutOfRangeException("Can't find animator.");
+            return _Animators.Last();
         }
     }
 }

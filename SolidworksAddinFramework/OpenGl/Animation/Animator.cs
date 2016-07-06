@@ -40,13 +40,10 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public override void Render(DateTime t)
         {
-            // ReSharper disable once UseNullPropagation
             if (_SectionTimes == null)
                 return;
 
-            var currentSection = _SectionTimes.FirstOrDefault(o => o.EndTime >= t);
-            if (currentSection == null)
-                return;
+            var currentSection = _SectionTimes.FirstOrDefault(o => o.EndTime > t) ?? _SectionTimes.Last();
 
             var startTime = currentSection.EndTime - currentSection.Section.Duration;
 
