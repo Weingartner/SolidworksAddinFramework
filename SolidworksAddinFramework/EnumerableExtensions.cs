@@ -102,5 +102,8 @@ namespace SolidworksAddinFramework
             return @this.Select((v, i) => new { v, i }).MaxBy(p => fn(p.v)).Select(p => p.i).ToList();
         }
 
+        public static IEnumerable<T> EndWith<T>(this IEnumerable<T> e, T item) =>
+            e.Concat(new[] {item});
+
     }
 }
