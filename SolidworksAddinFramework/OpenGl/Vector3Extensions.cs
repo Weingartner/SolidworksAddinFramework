@@ -17,6 +17,23 @@ namespace SolidworksAddinFramework.OpenGl
             return new Vector3((float) values[0],(float) values[1],(float) values[2]);
         }
 
+        /// <summary>
+        /// Performs the perspective transformation to turn a 4D homogeneos coordinate into
+        /// Euclidian coordinates. Useful for dealing with b-splines
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector3 ToEuclid(this Vector4 v)=> new Vector3(v.X/v.W,v.Y/v.W,v.Z/v.W);
+
+        /// <summary>
+        /// Converts a euclidian vector into homogeneous space. Use ToEuclid to get it back
+        /// again. Useful in dealing with b-splines
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="w"></param>
+        /// <returns></returns>
+        public static Vector4 ToHomogenous(this Vector3 v, float w) => new Vector4(v*w,w);
+
         public static Vector3 ToVector3D(this float[] values)
         {
             Debug.Assert(values.Length==3);
