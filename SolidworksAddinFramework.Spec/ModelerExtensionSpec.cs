@@ -32,6 +32,34 @@ namespace SolidworksAddinFramework.Spec
             new object[] {new[] {1.7f, 1.426469f, 0f}, new[] {1.7f, 1.175142f, 0f}},
         };
 
+        [SolidworksFact]
+        public void CreateArcShouldWork()
+        {
+            var arc = (Curve) Modeler.CreateTrimmedArc (Vector3.Zero, Vector3.UnitZ, 10 * Vector3.UnitX, -10 * Vector3.UnitX);
+
+            bool isPeriodic;
+            double end;
+            bool isClosed;
+            double start;
+            arc.GetEndParams(out start, out end, out isClosed, out isPeriodic);
+
+            start.Should().Be(0);
+
+            var startArray = (double[]) arc.Evaluate2(start, 0);
+            var endArray = (double[]) arc.Evaluate2(end, 0);
+
+            startArray[0].Should().BeApproximately(10,1e-5);
+            startArray[1].Should().BeApproximately(0,1e-5);
+            startArray[1].Should().BeApproximately(0,1e-5);
+
+            endArray[0].Should().BeApproximately(-10,1e-5); // This fails
+            endArray[1].Should().BeApproximately(0,1e-5);
+            endArray[1].Should().BeApproximately(0,1e-5);
+
+            isClosed.Should().BeFalse(); // This fails
+
+        }
+
         [SolidworksTheory]
         [MemberData(nameof(TrimLineTestData))]
         public void TrimLineShouldWork

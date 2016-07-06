@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static ICurve CreateTrimmedLine(this IModeler modeler, Edge3 edge)
         {
-            Debug.Assert(edge.Delta.Length() > float.Epsilon);
+            Debug.Assert(edge.Delta.Length() > Single.Epsilon);
             var startPoint = new[] {(double)edge.A.X, (double)edge.A.Y,(double)edge.A.Z};
             var dir = edge.Delta.Unit();
             var direction = new[] {(double)dir.X,(double)dir.Y,(double)dir.Z};
@@ -31,6 +32,22 @@ namespace SolidworksAddinFramework
             var trimmedLine = line.CreateTrimmedCurve(pp0[3], pp1[3]);
             Debug.Assert(trimmedLine != null, "line != null");
             return trimmedLine;
+        }
+
+        public static ICurve CreateTrimmedArc
+            (this IModeler modeler, Vector3 center, Vector3 axis, Vector3 startPoint, Vector3 endPoint)
+        {
+            var radius = (startPoint - center).Length();
+            var arc =
+                (Curve)
+                    modeler.CreateArc
+                        (center.ToDoubles(), axis.ToDoubles(), (float) radius, startPoint.ToDoubles(), endPoint.ToDoubles());
+
+            var pp0 = arc.GetClosestPointOn(startPoint.X, startPoint.Y, startPoint.Z).CastArray<double>();
+            var pp1 = arc.GetClosestPointOn(endPoint.X, endPoint.Y, endPoint.Z).CastArray<double>();
+
+            return arc.CreateTrimmedCurve(pp0[3], pp1[3]);
+
         }
 
         public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3  p1)
@@ -139,11 +156,11 @@ namespace SolidworksAddinFramework
             return curve;
         }
 
-        public static IEnumerable<Vector3 > FilterOutShortLines(List<Vector3 > points, double tol)
+        public static IEnumerable<Vector3> FilterOutShortLines(List<Vector3> points, double tol)
         {
             Vector3?  previous = null;
-            Func<Vector3 , Vector3 , double> distance = (p0,p1)=>(p0-p1).Length();
-            var result = new List<Vector3 >();
+            Func<Vector3, Vector3, double> distance = (p0,p1)=>(p0-p1).Length();
+            var result = new List<Vector3>();
             foreach (var pt in points)
             {
                 if (previous == null || distance(pt, previous.Value) > tol)
@@ -157,7 +174,7 @@ namespace SolidworksAddinFramework
 
             result.Reverse();
             points = result;
-            result = new List<Vector3 >();
+            result = new List<Vector3>();
             previous = null;
             foreach (var pt in points)
             {
@@ -237,5 +254,26 @@ namespace SolidworksAddinFramework
                     width,
                     length,
                     height);
+
+        public static ICurve CreateBsplineCurve(IReadOnlyCollection<Vector4> controlPoints, IEnumerable knotVectorU, int order, bool isPeriodic, IModeler modeler)
+        {
+            var controlPointsList = controlPoints
+                .SelectMany(p => new double[] {p.X, p.Y, p.Z, p.W}.ToArray())
+                .ToArray();
+
+            var dimensionControlPoints = BitConverter.GetBytes(4);
+            var orderBytes = BitConverter.GetBytes((int) order);
+            var numControlPointsBytes = BitConverter.GetBytes((int) controlPoints.Count);
+
+            var periodicity = BitConverter.GetBytes(isPeriodic ? 1 : 0);
+
+            var props = new[]
+            {
+                BitConverter.ToDouble(dimensionControlPoints.Concat(orderBytes).ToArray(), 0),
+                BitConverter.ToDouble(numControlPointsBytes.Concat(periodicity).ToArray(), 0)
+            };
+
+            return (Curve) modeler.CreateBsplineCurve(props, knotVectorU, controlPointsList);
+        }
     }
 }

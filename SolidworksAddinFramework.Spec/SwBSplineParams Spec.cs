@@ -24,9 +24,33 @@ namespace SolidworksAddinFramework.Spec
             {
                 var trimCurve = Modeler.CreateTrimmedLine(new Vector3(-0.1f,-0.45f,-7.8f),new Vector3(1.3f,2.7f,3.9f));
 
-                var parameters = trimCurve.GetBSplineParams(false, 1e-8);
+                var parameters = trimCurve.GetBSplineParams(false);
                 var swCurve = parameters.ToCurve();
-                var parameters2 = swCurve.GetBSplineParams(false, 1e-8);
+                var parameters2 = swCurve.GetBSplineParams(false);
+
+                parameters2.Should().Be(parameters);
+
+                //#####################################
+                var d0 = swCurve.CreateWireBody().DisplayUndoable(modelDoc, Color.Blue);
+                var d1 = trimCurve.CreateWireBody().DisplayUndoable(modelDoc, Color.Red);
+                return new CompositeDisposable(d0,d1);
+            });
+        }
+
+        [SolidworksFact]
+        public void ForwardAndBackArcSplineConversionShouldWork()
+        {
+            CreatePartDoc(true, modelDoc =>
+            {
+                var trimCurve = (ICurve) Modeler.CreateTrimmedArc
+                    ( Vector3.Zero
+                    , Vector3.UnitZ, 10 * Vector3.UnitX 
+                    , -10 * Vector3.UnitX
+                    );
+
+                var parameters = trimCurve.GetBSplineParams(false);
+                var swCurve = parameters.ToCurve();
+                var parameters2 = swCurve.GetBSplineParams(false);
 
                 parameters2.Should().Be(parameters);
 

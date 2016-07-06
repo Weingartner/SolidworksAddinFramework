@@ -1,13 +1,17 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using JetBrains.Annotations;
+using MathNet.Numerics;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
+
     public class SwFaceParams
     {
         public SwBSplineSurfaceParams Surface { get; }
@@ -31,7 +35,7 @@ namespace SolidworksAddinFramework
 
             TrimLoops = face
                 .GetTrimLoops()
-                .Select(curves => curves.Select(curve => curve.GetBSplineParams(false, tol)).ToList())
+                .Select(curves => curves.Select(curve => curve.GetBSplineParams(false)).ToList())
                 .ToList();
         }
 
@@ -52,33 +56,51 @@ namespace SolidworksAddinFramework
             return (IBody2) surface.CreateTrimmedSheet4(curves, true);
 
         }
+
     }
 
+    /// <summary>
+    /// BSpline in homogeneous coordinates. Non periodic.
+    /// </summary>
     public class SwBSplineParams : IEquatable<SwBSplineParams>
     {
+        /// <summary>
+        /// Control points are stored as (X,Y,Z) being the
+        /// true location of the control point and (W) being
+        /// the weight. Some frameworks store (X*W,Y*W,Z*W).
+        /// This is not done here. We use the unscaled location
+        /// variables. You may have to scale up and down when
+        /// coverting to other systems such as eyeshot and 
+        /// solidworks.
+        /// 
+        /// Eyeshot always stores as (X*W,Y*W,Z*W,W) in
+        /// it's Point4D class. Solidworks varies depending
+        /// on if the spline is periodic, closed and if 
+        /// it's a tuesday or not. Grrrr. So be careful.
+        /// </summary>
         public Vector4[] ControlPoints { get; }
-        
-        public int ControlPointDimension { get; }
-        public bool IsPeriodic { get; }
 
-        public int SwOrderU { get; }
+        public bool IsPeriodic { get; }
+        public bool IsClosed { get; }
+
+        public int Order { get; }
 
         public double[] KnotVectorU { get; }
 
-        public SwBSplineParams([NotNull] Vector4[] controlPoints, int swOrderU, [NotNull] double[] knotVectorU, int controlPointDimension, bool isPeriodic)
+        public SwBSplineParams([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed)
         {
 
             if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
             if (knotVectorU == null) throw new ArgumentNullException(nameof(knotVectorU));
 
             ControlPoints = controlPoints;
-            SwOrderU = swOrderU;
+            Order = order;
             KnotVectorU = knotVectorU;
-            ControlPointDimension = controlPointDimension;
-            IsPeriodic = isPeriodic;
+            IsClosed = isClosed;
         }
 
-        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => new SwBSplineParams(transform(ControlPoints),SwOrderU, KnotVectorU,ControlPointDimension,IsPeriodic);
+        public SwBSplineParams WithControlPoints(Func<Vector4[], Vector4[]> transform) => 
+            new SwBSplineParams(transform(ControlPoints), KnotVectorU,Order, IsClosed);
 
         #region equality
         public bool Equals(SwBSplineParams other)
@@ -88,7 +110,8 @@ namespace SolidworksAddinFramework
             return ControlPoints.SequenceEqual(other.ControlPoints)
                    && KnotVectorU.SequenceEqual(other.KnotVectorU)
 
-                   && SwOrderU == other.SwOrderU;
+                   && Order == other.Order
+                   && IsClosed == other.IsClosed;
         }
 
         public override bool Equals(object obj)
@@ -105,7 +128,8 @@ namespace SolidworksAddinFramework
             {
                 var hashCode = ControlPoints.Cast<Vector4>().GetHashCode(v=>v.GetHashCode());
                 hashCode = (hashCode*397) ^ KnotVectorU.GetHashCode(v=>v.GetHashCode());
-                hashCode = (hashCode*397) ^ SwOrderU;
+                hashCode = (hashCode*397) ^ Order;
+                hashCode = (hashCode*397) ^ IsClosed.GetHashCode();
                 return hashCode;
             }
         }
@@ -121,42 +145,25 @@ namespace SolidworksAddinFramework
         }
         #endregion
 
-        public ICurve ToCurve()
-        {
-            var modeler = SwAddinBase.Active.Modeler;
-            var controlPointsList = ControlPoints
-                .SelectMany(p=> new double[] {p.X, p.Y, p.Z, p.W}.Take(ControlPointDimension).ToArray())
-                .ToArray();
-
-            var dimensionControlPoints = BitConverter.GetBytes(ControlPointDimension);
-            var order = BitConverter.GetBytes((int) SwOrderU);
-            var numControlPoints = BitConverter.GetBytes((int) ControlPoints.Length);
-
-            var periodicity = BitConverter.GetBytes(IsPeriodic? 1 : 0);
-
-            var props = new[]
-            {
-                BitConverter.ToDouble(dimensionControlPoints.Concat(order).ToArray(), 0),
-                BitConverter.ToDouble(numControlPoints.Concat(periodicity).ToArray(), 0)
-            };
-
-            var swCurve = (Curve) modeler.CreateBsplineCurve(props, KnotVectorU, controlPointsList);
-            var domain = swCurve.Domain();
-            var eps = Math.Abs(domain[0] - domain[1])/1e6;
-            return swCurve;
-            //if(Math.Abs(domain[0] - T0) < eps && Math.Abs(domain[1] - T1) < eps)
-            //    return swCurve;
-            //return swCurve.CreateTrimmedCurve(T0, T1);
-        }
+        public ICurve ToCurve() => ModellerExtensions.CreateBsplineCurve(ControlPoints, KnotVectorU, Order, IsPeriodic, SwAddinBase.Active.Modeler);
     }
 
     public static class SwBSplineParamsExtensions
     {
-        public static SwBSplineParams GetBSplineParams(this ICurve swCurve, bool isClosed, double tol)
+        public static SwBSplineParams GetBSplineParams(this ICurve swCurve, bool isClosed)
         {
+            return swCurve
+                .GetBCurveParams5
+                    ( WantCubicIn: false
+                    , WantNRational: false
+                    , ForceNonPeriodic: false
+                    , IsClosed: isClosed
+                    )
+                .SwBSplineParams(isClosed);
+        }
 
-            var swSurfParameterisation = swCurve.GetBCurveParams5(false, false, false, isClosed);
-
+        public static SwBSplineParams SwBSplineParams(this SplineParamData swSurfParameterisation, bool isClosed)
+        {
             object ctrlPts;
             var canGetCtrlPts = swSurfParameterisation.GetControlPoints(out ctrlPts);
             Debug.Assert(canGetCtrlPts);
@@ -169,51 +176,78 @@ namespace SolidworksAddinFramework
 
             var dimension = swSurfParameterisation.Dimension;
             var order = swSurfParameterisation.Order;
+            var degree = order - 1;
 
             var isPeriodic = swSurfParameterisation.Periodic == 1;
 
             var controlPoints4D = ctrlPtArray
                 .Buffer(dimension, dimension)
-                .Where(p=>p.Count==dimension)
+                .Where(p => p.Count == dimension)
                 //http://help.solidworks.com/2016/english/api/sldworksapi/solidworks.interop.sldworks~solidworks.interop.sldworks.isplineparamdata~igetcontrolpoints.html
-                .Select(p =>
+                .Select
+                (p =>
                 {
-                    double x=0.0;
-                    double y=0.0;
-                    double z=0.0;
-                    double w=0.0; 
+                    double x = 0.0;
+                    double y = 0.0;
+                    double z = 0.0;
+                    double w = 1.0;
                     if (dimension == 2)
                     {
                         x = p[0];
                         y = p[1];
-                    }else if (dimension == 3)
+                    }
+                    else if (dimension == 3)
                     {
                         x = p[0];
                         y = p[1];
                         z = p[2];
-                        
-                    }else if (dimension == 4)
+                    }
+                    else if (dimension == 4)
                     {
                         x = p[0];
                         y = p[1];
                         z = p[2];
                         w = p[3];
                     }
-                    if (isPeriodic)
-                    {
-                        x /= w;
-                        y /= w;
-                        z /= w;
-                    }
-                    return new Vector4((float) x,(float) y,(float) z,(float) w);
 
+                    return new Vector4((float) x, (float) y, (float) z, (float) w);
                 })
                 .ToArray();
 
-            double start;
-            double end;
-            swCurve.GetEndParams(out start, out end, out isClosed, out isPeriodic);
-            return new SwBSplineParams(controlPoints4D, order, knotArray, dimension, isPeriodic);
+            if (isPeriodic)
+                ConvertToNonPeriodic(ref controlPoints4D, ref knotArray, degree);
+
+            return new SwBSplineParams(controlPoints4D, knotArray, order, isClosed);
+        }
+
+
+        /// <summary>
+        /// We want to convert the periodic formulation into a non periodic formulation. To do
+        /// this we follow the instructions from Guilia at DevDept.
+        ///
+        /// the things that need to be done to get the correct curve in Eyeshot are:
+        /// - add one last control point equal to the first to close the curve
+        /// - multiply the(x, y, z) coordinates of each control point by its w coordinate
+        /// - the degree p of your curve is given by the multiplicity of the last knot in the periodic knot vector, therefore you need to increase by 1 the multiplicity of the last knot, and by p the multiplicity of the first knot.
+        /// </summary>
+        /// <param name="controlPoints4D"></param>
+        /// <param name="knotArray"></param>
+        /// <param name="degree"></param>
+        private static void ConvertToNonPeriodic(ref Vector4[] controlPoints4D, ref double[] knotArray, int degree)
+        {
+
+            // For somereason the control points are not stored as homogeneous.
+            controlPoints4D = controlPoints4D
+                .Select(p => new Vector3(p.X, p.Y, p.Z).ToHomogenous(p.W))
+                .ToArray();
+
+            controlPoints4D = controlPoints4D.EndWith(controlPoints4D.First()).ToArray();
+
+            var last = knotArray.Last();
+            var first = knotArray.First();
+            knotArray = Enumerable.Repeat(first, degree).Concat(knotArray).EndWith(last).ToArray();
+
+            // We need to do some special handling to make it non periodic
         }
     }
 }
