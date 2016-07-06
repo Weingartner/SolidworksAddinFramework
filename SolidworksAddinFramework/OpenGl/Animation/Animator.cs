@@ -14,13 +14,13 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public override ImmutableList<IAnimationSection> Sections { get; }
         private readonly ImmutableList<IRenderable> _Children;
-        private readonly IObserver<Matrix4x4> _RenderObserver;
+        private readonly IObserver<AnimationData> _RenderObserver;
 
-        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children, IObserver<Matrix4x4> renderObserver)
+        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children, IObserver<AnimationData> renderObserver)
         {
             Sections = sections;
             _Children = children;
-            _RenderObserver = renderObserver ?? Observer.Create<Matrix4x4>(_ => {});
+            _RenderObserver = renderObserver ?? Observer.Create<AnimationData>(_ => {});
         }
 
         public override void OnStart(DateTime startTime)
@@ -58,7 +58,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 child.Render(t);
             }
 
-            _RenderObserver.OnNext(currentTransform);
+            _RenderObserver.OnNext(new AnimationData(currentSection.Section, currentTransform));
         }
     }
 }

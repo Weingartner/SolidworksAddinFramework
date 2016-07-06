@@ -11,7 +11,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public static Animator CreateAnimator
             (this ImmutableList<IAnimationSection> animationSections,
             ImmutableList<IRenderable> children,
-            IObserver<Matrix4x4> renderObserver = null)
+            IObserver<AnimationData> renderObserver = null)
         {
             return new Animator(animationSections, children, renderObserver);
 
@@ -19,7 +19,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public static Animator CreateAnimator
             (this ImmutableList<IAnimationSection> animationSections,
             IRenderable child,
-            IObserver<Matrix4x4> renderObserver = null)
+            IObserver<AnimationData> renderObserver = null)
         {
             return animationSections.CreateAnimator(ImmutableList.Create(child), renderObserver);
 
