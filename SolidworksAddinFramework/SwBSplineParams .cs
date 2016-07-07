@@ -206,11 +206,11 @@ namespace SolidworksAddinFramework
                         x = p[0];
                         y = p[1];
                     }
-                    else if (dimension >= 3)
+                    if (dimension >= 3)
                     {
                         z = p[2];
                     }
-                    else if (dimension == 4)
+                    if (dimension == 4)
                     {
                         w = p[3];
                     }
