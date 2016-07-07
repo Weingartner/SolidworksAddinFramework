@@ -7,6 +7,7 @@ using System.Numerics;
 using JetBrains.Annotations;
 using MathNet.Numerics;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -196,32 +197,30 @@ namespace SolidworksAddinFramework
                 .Select
                 (p =>
                 {
-                    double x = 0.0;
-                    double y = 0.0;
-                    double z = 0.0;
-                    double w = 1.0;
-                    if (dimension == 2)
+                    var x = 0.0;
+                    var y = 0.0;
+                    var z = 0.0;
+                    var w = 1.0;
+                    if (dimension >= 2)
                     {
                         x = p[0];
                         y = p[1];
                     }
-                    else if (dimension == 3)
+                    else if (dimension >= 3)
                     {
-                        x = p[0];
-                        y = p[1];
                         z = p[2];
                     }
                     else if (dimension == 4)
                     {
-                        x = p[0];
-                        y = p[1];
-                        z = p[2];
                         w = p[3];
                     }
 
-                    return new Vector4((float) x, (float) y, (float) z, (float) w);
+                    return new Vector4((float) (x*w), (float) (y*w), (float) (z*w), (float) w);
                 })
                 .ToArray();
+
+            if(controlPoints4D.Any(c=>c.W!=1.0))
+                LogViewer.Log($"Got a rational curve, periodic = {isPeriodic}, isClosed = {isClosed}");
 
             if (isPeriodic)
                 ConvertToNonPeriodic(ref controlPoints4D, ref knotArray, degree);
@@ -244,11 +243,6 @@ namespace SolidworksAddinFramework
         /// <param name="degree"></param>
         private static void ConvertToNonPeriodic(ref Vector4[] controlPoints4D, ref double[] knotArray, int degree)
         {
-
-            // For somereason the control points are not stored as homogeneous.
-            controlPoints4D = controlPoints4D
-                .Select(p => new Vector3(p.X, p.Y, p.Z).ToHomogenous(p.W))
-                .ToArray();
 
             controlPoints4D = controlPoints4D.EndWith(controlPoints4D.First()).ToArray();
 
