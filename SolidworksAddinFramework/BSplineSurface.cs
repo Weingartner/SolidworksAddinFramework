@@ -126,4 +126,55 @@ namespace SolidworksAddinFramework
                     , swControlPointList);
         }
     }
+
+    public static class BSplineSurfaceExt
+    {
+        public static BSplineSurface GetBSplineSurfaceParams(this ISurface swSurf, double tol)
+        {
+
+            var swSurfParameterisation = swSurf.Parameterization2();
+
+            bool sense;
+            var surfParams = swSurf.GetBSurfParams3(false, false, swSurfParameterisation, tol, out sense);
+
+            var uKnotVector = surfParams.UKnots.CastArray<double>();
+            var vKnotVector = surfParams.VKnots.CastArray<double>();
+
+            // Yeah it is flipped. I know. Don't switch it back. BPH
+            var controlPointArray = new Vector4[surfParams.ControlPointColumnCount, surfParams.ControlPointRowCount];
+            Enumerable.Range(0, surfParams.ControlPointRowCount)
+                .ForEach(u =>
+                {
+                    Enumerable.Range(0, surfParams.ControlPointColumnCount)
+                        .ForEach(v =>
+                        {
+
+                            var array = surfParams.GetControlPoints(u+1, v+1).CastArray<double>();
+
+                            var x = array[0];
+                            var y = array[1];
+                            var z = array[2];
+                            var w = 1.0;
+
+                            if (surfParams.ControlPointDimension == 4)
+                                w = array[3];
+
+                            var ctrlPoint = new Vector4((float) (x*w),(float) (y*w),(float) (z*w),(float) w);
+
+
+                            controlPointArray[v, u] = ctrlPoint;
+                        });
+                });
+
+
+            return new BSplineSurface
+                ( controlPointList: controlPointArray
+                    ,swOrderU: surfParams.UOrder
+                    ,swOrderV: surfParams.VOrder
+                    ,knotVectorU: uKnotVector
+                    ,knotVectorV: vKnotVector);
+
+
+        }
+    }
 }
