@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Numerics;
+using System.Windows.Markup;
 using JetBrains.Annotations;
 using SolidWorks.Interop.sldworks;
 
@@ -95,7 +96,7 @@ namespace SolidworksAddinFramework
 
             var swControlPointList = ControlPointList
                 .EnumerateColumnWise()
-                .SelectMany(v => new double [] {v.X, v.Y, v.Z, v.W})
+                .SelectMany(v => new double [] {v.X/v.W, v.Y/v.W, v.Z/v.W, v.W})
                 .ToArray();
 
             var uLength = ControlPointList.GetLength(0);
