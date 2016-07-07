@@ -34,6 +34,24 @@ namespace SolidworksAddinFramework
             return trimmedLine;
         }
 
+        public static IBody2 CreateCone
+            (this IModeler m, Vector3 center, Vector3 axis, double baseRadius, double topRadius, double height)
+        {
+            var array = center.ToDoubles().Concat(axis.ToDoubles()).Concat(new[] {baseRadius, topRadius, height}).ToArray();
+            return (IBody2) m.CreateBodyFromCone(array);
+        }
+
+        public static IBody2 CreateCone
+            (this IModeler m, double baseRadius, double topRadius, double height)
+        {
+            return CreateCone(m, Vector3.Zero, Vector3.UnitZ, baseRadius, topRadius, height);
+        }
+        public static IBody2 CreateCone
+            (this IModeler m, double baseRadius, double height)
+        {
+            return CreateCone(m, Vector3.Zero, Vector3.UnitZ, baseRadius, 0, height);
+        }
+
         public static ICurve CreateTrimmedArc
             (this IModeler modeler, Vector3 center, Vector3 axis, Vector3 startPoint, Vector3 endPoint)
         {
