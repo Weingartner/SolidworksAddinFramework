@@ -12,10 +12,10 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public T To { get; } 
         public TimeSpan Duration { get; }
 
-        public LinearAnimation(TimeSpan duration, T @from, T to)
+        public LinearAnimation(TimeSpan duration, T from, T to)
         {
             Duration = duration;
-            From = @from;
+            From = from;
             To = to;
         }
 
