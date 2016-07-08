@@ -55,7 +55,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 child.Render(t);
             }
 
-            _RenderObserver.OnNext(new AnimationData(currentSection.Section, currentTransform));
+            _RenderObserver.OnNext(new AnimationData(currentSection.Section));
         }
     }
 }

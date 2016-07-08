@@ -1,16 +1,12 @@
-using System.Numerics;
-
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
     public class AnimationData
     {
         public IAnimationSection Section { get; }
-        public Matrix4x4 Transform { get; }
 
-        public AnimationData(IAnimationSection section, Matrix4x4 transform)
+        public AnimationData(IAnimationSection section)
         {
             Section = section;
-            Transform = transform;
         }
     }
 }
