@@ -1,14 +1,19 @@
 using System;
 using System.Reactive.Disposables;
+using System.Threading;
 
 namespace SolidworksAddinFramework.EventHandlers
 {
     public abstract class DoubleBuffer<T>
     {
+        private readonly Thread _InitialThread;
+
         public DoubleBuffer(T t)
         {
             Back = t;
             Front = t;
+
+            _InitialThread = Thread.CurrentThread;
         }
 
         private T Back{ get; set; }
@@ -62,13 +67,27 @@ namespace SolidworksAddinFramework.EventHandlers
 
         public IDisposable SwitchToBackBufferTemporarily()
         {
+            VerifyAccess();
             SwitchToBackBuffer();
-            return Disposable.Create(SwitchToFrontBuffer);
+            return Disposable.Create(() =>
+            {
+                VerifyAccess();
+                SwitchToFrontBuffer();
+            });
+        }
+
+        private void VerifyAccess()
+        {
+            if (_InitialThread != Thread.CurrentThread)
+            {
+                throw new InvalidOperationException("Can't access object from different thread");
+            }
         }
 
 
         public void Update(Func<T, T> update)
         {
+            VerifyAccess();
             lock (this)
             {
                 Current = update(Current);
