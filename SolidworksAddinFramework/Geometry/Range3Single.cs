@@ -140,6 +140,15 @@ namespace SolidworksAddinFramework.Geometry
             }
         }
 
+        public Vector3 Size
+        {
+            get
+            {
+                var result = P1 - P0;
+                return new Vector3(Math.Abs(result.X), Math.Abs(result.Y), Math.Abs(result.Z));
+            }
+        }
+
         public static Range3Single FromVertices(IReadOnlyList<Vector3> vertices)
         {
             var xmin = Single.MaxValue;
