@@ -49,7 +49,7 @@ namespace SolidworksAddinFramework.OpenGl
             GL.Normal3(v.X, v.Y, v.Z);
         }
 
-        public static Vector3 Unit(this Vector3 v) => v/v.Length();
+        public static Vector3 Unit(this Vector3 v) => Vector3.Normalize(v);
 
         public static float Dot(this Vector3 a, Vector3 other)
         {
