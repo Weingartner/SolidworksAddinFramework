@@ -203,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="NotifyingInterpolatable.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
     <Compile Include="OpenGl\Animation\AnimatorBase.cs" />
