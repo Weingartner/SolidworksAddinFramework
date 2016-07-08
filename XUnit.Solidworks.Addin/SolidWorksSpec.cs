@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SolidworksAddinFramework;
@@ -134,6 +138,22 @@ namespace XUnit.Solidworks.Addin
                 return comp;
 
             });
+        }
+
+        private static readonly ISubject<Unit> Subject = new Subject<Unit>();
+        public static bool CanContinueTestExecution { get; private set; }
+        public static void ContinueTestExecution()
+        {
+            Subject.OnNext(Unit.Default);
+        }
+
+        public static async Task PauseTestExecution()
+        {
+            CanContinueTestExecution = true;
+            using (Disposable.Create(() => CanContinueTestExecution = false))
+            {
+                await Subject.FirstAsync();
+            }
         }
     }
 }
