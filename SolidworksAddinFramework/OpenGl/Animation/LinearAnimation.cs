@@ -32,4 +32,13 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             return From.Interpolate(To, beta).Transform();
         }
     }
+
+    public static class LinearAnimation
+    {
+        public static LinearAnimation<T> Create<T>(TimeSpan duration, T from, T to)
+            where T : IInterpolatable<T>
+        {
+            return new LinearAnimation<T>(duration, from, to);
+        } 
+    }
 }
