@@ -49,6 +49,7 @@ namespace SolidworksAddinFramework
             return face
                 .GetLoops()
                 .CastArray<ILoop2>()
+                .OrderBy(l=>l.IsOuter() ? 0 : 1)
                 .Select(l=>l.GetEdges().CastArray<IEdge>().Select(e=>(ICurve)e.GetCurve()))
                 .Select(curves=>curves.Select(c=>(ICurve)c.Copy()).ToList())
                 .ToList();
