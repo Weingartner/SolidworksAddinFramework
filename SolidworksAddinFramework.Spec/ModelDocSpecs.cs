@@ -130,7 +130,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void EntityReferencesMightBeDisconnected()
         {
-            CreatePartDoc(false, doc =>
+            CreatePartDoc(doc =>
             {
                 var feature = SpecHelper.InsertDummyBody(doc);
                 var body = doc.GetBodiesTs().Single();
@@ -146,7 +146,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void PersistentEntityReferencesShouldNotBeDisconnected()
         {
-            CreatePartDoc(false, doc =>
+            CreatePartDoc(doc =>
             {
                 var feature = SpecHelper.InsertDummyBody(doc);
                 var body = doc.GetPersistentEntityReference(doc.GetBodiesTs().Single());

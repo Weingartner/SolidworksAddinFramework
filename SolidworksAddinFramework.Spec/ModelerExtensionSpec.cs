@@ -66,7 +66,7 @@ namespace SolidworksAddinFramework.Spec
             (float[] p0
             , float[] p1)
         {
-            CreatePartDoc(false, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var v0 = new Vector3(p0[0], p0[1], p0[2]);
                 var v1 = new Vector3(p1[0], p1[1], p1[2]);
@@ -94,7 +94,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void InterpolateCurveShouldWork()
         {
-            CreatePartDoc(false, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var points = new[]
                 {
@@ -118,7 +118,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void LinspaceForVector3ShouldWork()
         {
-            CreatePartDoc(false, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var v0 = new Vector3(0, 0, 0);
                 var v1 = new Vector3(1, 0, 0);

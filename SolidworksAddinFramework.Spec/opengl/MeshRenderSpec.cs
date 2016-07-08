@@ -18,7 +18,7 @@ namespace SolidworksAddinFramework.Spec.opengl
         [SolidworksFact]
         public void RenderFaceShouldWork()
         {
-            CreatePartDoc(false, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var modeller = SwAddinBase.Active.Modeler;
                 var body = modeller.CreateBox(1, 1, 1);

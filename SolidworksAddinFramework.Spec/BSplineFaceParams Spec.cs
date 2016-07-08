@@ -20,7 +20,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void ForwardAndBackSplineConversionShouldWork()
         {
-            CreatePartDoc(true, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var trimCurve = Modeler.CreateTrimmedLine(new Vector3(-0.1f,-0.45f,-7.8f),new Vector3(1.3f,2.7f,3.9f));
 
@@ -40,7 +40,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void ForwardAndBackArcSplineConversionShouldWork()
         {
-            CreatePartDoc(true, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
                 var trimCurve = (ICurve) Modeler.CreateTrimmedArc
                     ( Vector3.Zero
@@ -64,7 +64,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void CanRoundTripAFace()
         {
-            CreatePartDoc(true, (modelDoc,yielder) =>
+            CreatePartDoc((modelDoc,yielder) =>
             {
                 var box = Modeler.CreateBox(Vector3.Zero, Vector3.UnitZ, 0.5, 0.6, 0.7);
                 var faces = box.GetFaces().CastArray<IFace2>();
@@ -93,7 +93,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void CanRebuildABox ()
         {
-            CreatePartDoc(true, (modelDoc,yielder) =>
+            CreatePartDoc((modelDoc,yielder) =>
             {
                 var box = Modeler.CreateBox(Vector3.Zero, Vector3.UnitZ, 0.5, 0.6, 0.7);
                 var faces = box.GetFaces().CastArray<IFace2>();
@@ -151,7 +151,7 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksFact]
         public void BoxConversionShouldWork()
         {
-            CreatePartDoc(false, modelDoc =>
+            CreatePartDoc(modelDoc =>
             {
 
                 var planeSurf = (Surface)Modeler.CreatePlanarSurface2(new[] {0,0,0.0}, new[] {0,0,1.0}, new[] {1,0,0.0});

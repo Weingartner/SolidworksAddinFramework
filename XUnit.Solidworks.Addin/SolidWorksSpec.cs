@@ -17,7 +17,6 @@ namespace XUnit.Solidworks.Addin
 {
     public abstract class SolidWorksSpec
     {
-        private static CompositeDisposable _keptStuff = new CompositeDisposable();
         protected static SldWorks SwApp => SwAddinBase.Active.SwApp;
         protected static IModeler Modeler => (IModeler)SwApp.GetModeler();
         protected static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
@@ -62,75 +61,35 @@ namespace XUnit.Solidworks.Addin
         /// just for debugging so that the document is kept open after a test is run so you
         /// can eyeball the results.
         /// </summary>
-        /// <param name="keep"></param>
         /// <param name="action"></param>
-        protected void CreatePartDoc(bool keep, Func<IModelDoc2, IDisposable> action)
+        protected void CreatePartDoc(Func<IModelDoc2, IDisposable> action)
         {
-            if (keep)
-            {
-                var doc =CreatePartDoc();
-                _keptStuff.Add(action(doc));
-            }
-            else
-            {
-                var doc = CreatePartDoc();
-                Debug.Assert(doc!=null);
-                doc.Using(SwApp, m => action(m).Dispose());
-            }
+            var doc = CreatePartDoc();
+            Debug.Assert(doc!=null);
+            doc.Using(SwApp, m => action(m).Dispose());
         }
-        protected void CreatePartDocWithTitle(bool keep, string title, Func<IModelDoc2, IDisposable> action)
+        protected void CreatePartDocWithTitle(string title, Func<IModelDoc2, IDisposable> action)
         {
-            if (keep)
-            {
-                var doc =CreatePartDoc();
-                doc.SetTitle2(title);
-                _keptStuff.Add(action(doc));
-            }
-            else
-            {
-                CreatePartDoc().Using(SwApp, m => action(m).Dispose());
-            }
+            var doc = CreatePartDoc();
+            doc.SetTitle2(title);
+            doc.Using(SwApp, m => action(m).Dispose());
         }
-        protected async Task CreatePartDoc(bool keep, Func<IModelDoc2, Task<IDisposable>> action)
+        protected async Task CreatePartDoc(Func<IModelDoc2, Task<IDisposable>> action)
         {
-            if (keep)
-            {
-                var doc =CreatePartDoc();
-                _keptStuff.Add( await action(doc));
-            }
-            else
-            {
-                await CreatePartDoc().Using(SwApp, async m => (await action(m)).Dispose());
-            }
+            await CreatePartDoc().Using(SwApp, async m => (await action(m)).Dispose());
         }
 
-        protected void CreatePartDoc(bool keep, string path, Func<IModelDoc2, IDisposable> action)
+        protected void CreatePartDoc(string path, Func<IModelDoc2, IDisposable> action)
         {
-            if (keep)
-            {
-                var doc =CreatePartDoc(path);
-                _keptStuff.Add(action(doc));
-            }
-            else
-            {
-                CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
-            }
+            CreatePartDoc(path).Using(SwApp, m => action(m).Dispose());
         }
-        protected async Task CreatePartDoc(bool keep, string path, Func<IModelDoc2, Task<IDisposable>> action)
+        protected async Task CreatePartDoc(string path, Func<IModelDoc2, Task<IDisposable>> action)
         {
-            if (keep)
-            {
-                var doc = CreatePartDoc(path);
-                _keptStuff.Add(await action(doc));
-            }
-            else
-            {
-                await CreatePartDoc(path).Using(SwApp, async m => (await action(m)).Dispose());
-            }
+            await CreatePartDoc(path).Using(SwApp, async m => (await action(m)).Dispose());
         }
-        protected void CreatePartDoc(bool keep, Action<IModelDoc2, Action<IDisposable>> action)
+        protected void CreatePartDoc(Action<IModelDoc2, Action<IDisposable>> action)
         {
-            CreatePartDoc(keep, doc =>
+            CreatePartDoc(doc =>
             {
                 var comp = new CompositeDisposable();
                 Action<IDisposable> yielder = d => comp.Add(d);
