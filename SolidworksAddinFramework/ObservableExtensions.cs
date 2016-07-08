@@ -170,6 +170,7 @@ namespace SolidworksAddinFramework
             var d = new SerialDisposable();
 
             var s = o
+                .ObserveOnSolidworksThread()
                 .Subscribe(onNext:v =>
             {
                 using(OpenGlRenderer.DeferRedraw(doc))
