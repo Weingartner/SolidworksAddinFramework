@@ -172,26 +172,26 @@ namespace SolidworksAddinFramework
             var s = o
                 .ObserveOnSolidworksThread()
                 .Subscribe(onNext:v =>
-            {
-                using(OpenGlRenderer.DeferRedraw(doc))
                 {
-                    try
+                    using(OpenGlRenderer.DeferRedraw(doc))
                     {
-                        d.Disposable = Disposable.Empty;
-                        d.Disposable = fn(v) ?? Disposable.Empty;
+                        try
+                        {
+                            d.Disposable = Disposable.Empty;
+                            d.Disposable = fn(v) ?? Disposable.Empty;
+                        }
+                        catch (Exception e)
+                        {
+                            d.Disposable = Disposable.Empty;
+                            errHandler(e);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        d.Disposable = Disposable.Empty;
-                        errHandler(e);
-                    }
-                }
-            },
-            onError: e =>
-            {
-                d.Disposable = Disposable.Empty;
-                errHandler(e);
-            });
+                },
+                onError: e =>
+                {
+                    d.Disposable = Disposable.Empty;
+                    errHandler(e);
+                });
 
             return new CompositeDisposable(s,d);
 
