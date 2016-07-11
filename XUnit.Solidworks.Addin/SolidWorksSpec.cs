@@ -98,6 +98,17 @@ namespace XUnit.Solidworks.Addin
 
             });
         }
+        protected Task CreatePartDoc(Func<IModelDoc2, Action<IDisposable>,Task> action)
+        {
+            return CreatePartDoc(async doc =>
+             {
+                 var comp = new CompositeDisposable();
+                 Action<IDisposable> yielder = d => comp.Add(d);
+                 await action(doc, yielder);
+                 return comp;
+
+             });
+        }
 
         private static readonly ISubject<Unit> Subject = new Subject<Unit>();
         public static bool CanContinueTestExecution { get; private set; }
