@@ -76,6 +76,7 @@ namespace SolidworksAddinFramework.OpenGl
             Math.Abs(v.X) > Math.Abs(v.Z) ? new Vector3(-v.Y, v.X, 0.0f) : new Vector3(0.0f, -v.Z, v.Y); 
 
         public static double[] ToDoubles(this Vector3 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z};
+        public static double[] ToDoubles(this Vector4 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z, (double)v.W};
         public static float[] ToSingles(this Vector3 v) => new float[] {v.X, v.Y, v.Z};
 
         public static Vector3 ToVector3(this IReadOnlyList<double> value)
