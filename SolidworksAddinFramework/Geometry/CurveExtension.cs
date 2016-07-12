@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using Accord.Math.Optimization;
 using AForge;
-using MathNet.Numerics;
-using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 
-namespace SolidworksAddinFramework
+namespace SolidworksAddinFramework.Geometry
 {
     public struct PointParam
     {

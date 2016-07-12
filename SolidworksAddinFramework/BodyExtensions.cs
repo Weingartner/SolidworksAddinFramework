@@ -92,8 +92,9 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc = null, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
+            doc = doc ?? (IModelDoc2)SwAddinBase.Active.SwApp.ActiveDoc;
             c = c ?? Color.Yellow;
             var colorref = ColorTranslator.ToWin32(c.Value);
             body.Display3(doc, colorref, (int) opt);

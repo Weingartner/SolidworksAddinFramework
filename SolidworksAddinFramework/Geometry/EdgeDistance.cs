@@ -1,7 +1,4 @@
-using SolidworksAddinFramework.Geometry;
-using SolidWorks.Interop.sldworks;
-
-namespace SolidworksAddinFramework
+namespace SolidworksAddinFramework.Geometry
 {
     public struct EdgeDistance
     {

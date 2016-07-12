@@ -203,6 +203,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="Geometry\BSpline.cs" />
+    <Compile Include="Geometry\BSpline2D.cs" />
+    <Compile Include="Geometry\BSpline3D.cs" />
+    <Compile Include="Geometry\BSplineFace.cs" />
+    <Compile Include="Geometry\BSplineSurface.cs" />
+    <Compile Include="Geometry\CurveExtension.cs" />
+    <Compile Include="Geometry\EdgeDistance.cs" />
+    <Compile Include="Geometry\FaceExtensions.cs" />
+    <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
     <Compile Include="NotifyingInterpolatable.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
@@ -212,6 +221,7 @@
     <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
+    <Compile Include="Packing.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
@@ -220,17 +230,14 @@
     <Compile Include="ComponentExtensions.cs" />
     <Compile Include="ComWangling.cs" />
     <Compile Include="CooperativeTask.cs" />
-    <Compile Include="CurveExtension.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
-    <Compile Include="EdgeDistance.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
     <Compile Include="EventHandlers\DoubleBuffer.cs" />
     <Compile Include="EventHandlers\GLDoubleBuffer.cs" />
     <Compile Include="EventHandlers\OpenGlRenderer.cs" />
     <Compile Include="EventHandlers\OpenGL.cs" />
-    <Compile Include="FaceExtensions.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="FeatureMgrViewObservables.cs" />
@@ -300,8 +307,6 @@
     <Compile Include="StringExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
-    <Compile Include="SwBSplineParams .cs" />
-    <Compile Include="BSplineSurface.cs" />
     <Compile Include="SwEq.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />

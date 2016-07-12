@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using MathNet.Numerics.LinearAlgebra.Double;
 using OpenTK.Graphics.OpenGL;
+using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl

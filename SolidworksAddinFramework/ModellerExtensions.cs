@@ -40,6 +40,13 @@ namespace SolidworksAddinFramework
             var array = center.ToDoubles().Concat(axis.ToDoubles()).Concat(new[] {baseRadius, topRadius, height}).ToArray();
             return (IBody2) m.CreateBodyFromCone(array);
         }
+        public static IBody2 CreateCylinder
+            (this IModeler m, double radius, double height)
+        {
+            var center = Vector3.Zero;
+            var axis = Vector3.UnitZ;
+            return CreateBodyFromCylTs(m, center, axis, radius, height);
+        }
 
         public static IBody2 CreateCone
             (this IModeler m, double baseRadius, double topRadius, double height)
@@ -138,6 +145,17 @@ namespace SolidworksAddinFramework
             var uvLow = surf.GetClosestPointOnTs(low);
             var uvHigh = surf.GetClosestPointOnTs(high);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
+        }
+        public static IBody2 CreateCirclularSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, float r)
+        {
+            var surf = (Surface) modeler.CreatePlanarSurface(center.ToDoubles(), vNormal.ToDoubles());
+            var startPoint = center + vNormal.Orthogonal().Unit()*r;
+            var endPoint = startPoint;
+            var arc =
+                (Curve)
+                    modeler.CreateArc
+                        (center.ToDoubles(), vNormal.ToDoubles(), (float) r, startPoint.ToDoubles(), endPoint.ToDoubles());
+            return (IBody2) surf.CreateTrimmedSheet(new[] {arc});
         }
 
         public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf, IMathPoint p0, IMathPoint p1)

@@ -1,11 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Windows.Markup;
 using JetBrains.Annotations;
 using SolidWorks.Interop.sldworks;
 
-namespace SolidworksAddinFramework
+namespace SolidworksAddinFramework.Geometry
 {
     public class BSplineSurface : IEquatable<BSplineSurface>
     {
@@ -121,12 +121,21 @@ namespace SolidworksAddinFramework
             };
 
 
-            return (Surface) SwAddinBase.Active.Modeler
+            var bsplineSurface = (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
                 ( props
                     , KnotsU
                     , KnotsV
                     , swControlPointList);
+
+            Debug.Assert(bsplineSurface != null);
+            var p = bsplineSurface.Parameterization2();
+            Debug.Assert(Math.Abs(p.UMax - KnotsU.Last()) < 1e-9);
+            Debug.Assert(Math.Abs(p.UMin - KnotsU.First()) < 1e-9);
+            Debug.Assert(Math.Abs(p.VMax - KnotsV.Last()) < 1e-9);
+            Debug.Assert(Math.Abs(p.VMin - KnotsV.First()) < 1e-9);
+
+            return bsplineSurface;
         }
     }
 

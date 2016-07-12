@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 
-namespace SolidworksAddinFramework
+namespace SolidworksAddinFramework.Geometry
 {
     public static class FaceExtensions
     {
