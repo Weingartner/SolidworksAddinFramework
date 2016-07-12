@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using FluentAssertions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -91,9 +92,9 @@ namespace SolidworksAddinFramework.Spec
 
         }
         [SolidworksFact]
-        public void CanRebuildABox ()
+        public async Task CanRebuildABox ()
         {
-            CreatePartDoc((modelDoc,yielder) =>
+            await CreatePartDoc(async (modelDoc,yielder) =>
             {
                 var box = Modeler.CreateBox(Vector3.Zero, Vector3.UnitZ, 0.5, 0.6, 0.7);
                 var faces = box.GetFaces().CastArray<IFace2>();
@@ -101,11 +102,9 @@ namespace SolidworksAddinFramework.Spec
                     .Select
                     (face =>
                     {
-                        var faceParams = face
-                            .ToBSplineFace(1e-5)
+                        var faceParams = BSplineFace.Create(face)
                             .TransformSurfaceControlPoints
-                              (ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W))
-                              ,ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W)).ToArray());
+                              (ctrlPts => ctrlPts.Select(v => new Vector4(v.X+1, v.Y, v.Z, v.W)));
 
                         return faceParams.ToSheetBody();
                     })
@@ -125,6 +124,9 @@ namespace SolidworksAddinFramework.Spec
                 body.Should().NotBeEmpty();
 
                 yielder(body.DisplayUndoable(modelDoc));
+
+                await PauseTestExecution();
+
 
 
 

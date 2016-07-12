@@ -11,32 +11,32 @@ namespace SolidworksAddinFramework
     {
         public Vector4[,] ControlPointList { get; }
 
-        public int SwOrderU { get; }
+        public int OrderU { get; }
 
-        public int SwOrderV { get; }
+        public int OrderV { get; }
 
-        public double[] KnotVectorU { get; }
+        public double[] KnotsU { get; }
 
-        public double[] KnotVectorV { get; }
-        public BSplineSurface([NotNull] Vector4[,] controlPointList, int swOrderU, int swOrderV,
-            [NotNull] double[] knotVectorU, [NotNull] double[] knotVectorV)
+        public double[] KnotsV { get; }
+        public BSplineSurface([NotNull] Vector4[,] controlPointList, int orderU, int orderV,
+            [NotNull] double[] knotsU, [NotNull] double[] knotsV)
         {
 
             if (controlPointList == null) throw new ArgumentNullException(nameof(controlPointList));
-            if (knotVectorU == null) throw new ArgumentNullException(nameof(knotVectorU));
-            if (knotVectorV == null) throw new ArgumentNullException(nameof(knotVectorV));
+            if (knotsU == null) throw new ArgumentNullException(nameof(knotsU));
+            if (knotsV == null) throw new ArgumentNullException(nameof(knotsV));
 
             ControlPointList = controlPointList;
-            SwOrderU = swOrderU;
-            SwOrderV = swOrderV;
-            KnotVectorU = knotVectorU;
-            KnotVectorV = knotVectorV;
+            OrderU = orderU;
+            OrderV = orderV;
+            KnotsU = knotsU;
+            KnotsV = knotsV;
         }
 
         public BSplineSurface WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
         {
             var mod = converter(ControlPointList);
-            return new BSplineSurface(mod, SwOrderU,SwOrderV,KnotVectorU,KnotVectorV);
+            return new BSplineSurface(mod, OrderU,OrderV,KnotsU,KnotsV);
         }
 
         #region equality
@@ -45,11 +45,11 @@ namespace SolidworksAddinFramework
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return ControlPointList.Cast<Vector4>().SequenceEqual(other.ControlPointList.Cast<Vector4>())
-                && KnotVectorU.SequenceEqual(other.KnotVectorU) 
-                && KnotVectorV.SequenceEqual(other.KnotVectorV) 
+                && KnotsU.SequenceEqual(other.KnotsU) 
+                && KnotsV.SequenceEqual(other.KnotsV) 
 
-                && SwOrderU == other.SwOrderU 
-                && SwOrderV == other.SwOrderV;
+                && OrderU == other.OrderU 
+                && OrderV == other.OrderV;
         }
 
         public override bool Equals(object obj)
@@ -65,10 +65,10 @@ namespace SolidworksAddinFramework
             unchecked
             {
                 var hashCode = ControlPointList.Cast<Vector4>().GetHashCode(v=>v.GetHashCode());
-                hashCode = (hashCode*397) ^ KnotVectorU.GetHashCode(v=>v.GetHashCode());
-                hashCode = (hashCode*397) ^ KnotVectorV.GetHashCode(v=>v.GetHashCode());
-                hashCode = (hashCode*397) ^ SwOrderU;
-                hashCode = (hashCode*397) ^ SwOrderV;
+                hashCode = (hashCode*397) ^ KnotsU.GetHashCode(v=>v.GetHashCode());
+                hashCode = (hashCode*397) ^ KnotsV.GetHashCode(v=>v.GetHashCode());
+                hashCode = (hashCode*397) ^ OrderU;
+                hashCode = (hashCode*397) ^ OrderV;
                 return hashCode;
             }
         }
@@ -91,8 +91,8 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public ISurface ToSurface ()
         {
-            var vOrder = BitConverter.GetBytes(SwOrderV);
-            var uOrder = BitConverter.GetBytes(SwOrderU);
+            var vOrder = BitConverter.GetBytes(OrderV);
+            var uOrder = BitConverter.GetBytes(OrderU);
 
             var swControlPointList = ControlPointList
                 .EnumerateColumnWise()
@@ -104,9 +104,11 @@ namespace SolidworksAddinFramework
 
             var numUCtrPts = BitConverter.GetBytes(uLength);
             var numVCtrPts = BitConverter.GetBytes(vLength);
+
             //TODO: find out what periodicity means in this context 
             var uPeriodicity = BitConverter.GetBytes(0);
             var vPeriodicity = BitConverter.GetBytes(0);
+
             var dimControlPoints = BitConverter.GetBytes(4);
             var unusedParameter = BitConverter.GetBytes(0);
 
@@ -122,8 +124,8 @@ namespace SolidworksAddinFramework
             return (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
                 ( props
-                    , KnotVectorU
-                    , KnotVectorV
+                    , KnotsU
+                    , KnotsV
                     , swControlPointList);
         }
     }
@@ -170,10 +172,10 @@ namespace SolidworksAddinFramework
 
             return new BSplineSurface
                 ( controlPointList: controlPointArray
-                    ,swOrderU: surfParams.UOrder
-                    ,swOrderV: surfParams.VOrder
-                    ,knotVectorU: uKnotVector
-                    ,knotVectorV: vKnotVector);
+                    ,orderU: surfParams.UOrder
+                    ,orderV: surfParams.VOrder
+                    ,knotsU: uKnotVector
+                    ,knotsV: vKnotVector);
 
 
         }
