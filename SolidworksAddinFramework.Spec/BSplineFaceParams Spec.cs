@@ -141,50 +141,53 @@ namespace SolidworksAddinFramework.Spec
 
         }
 
+        /// <summary>
+        /// Demonstrate extracting a bspline face from a disc and then
+        /// reconstructing that disc using the bspline face. Shows
+        /// roundtripping the b-surface and trim loop extraction
+        /// </summary>
+        /// <returns></returns>
         [SolidworksFact]
         public async Task CanRebuildACirclularSheet()
         {
             await CreatePartDoc(async (modelDoc,yielder) =>
             {
-                var box = Modeler.CreateCirclularSheet(Vector3.Zero, Vector3.UnitZ, 2);
-                var faces = box.GetFaces().CastArray<IFace2>();
-                var sheets = faces
-                    .Select
-                    (face =>
-                    {
-                        var faceParams = BSplineFace.Create(face);
 
-                        return faceParams.ToSheetBody();
-                    })
-                    .ToArray();
+                var disc0 = Modeler.CreateCirclularSheet
+                    ( center: Vector3.Zero
+                    , vNormal: Vector3.UnitZ
+                    , radius: 2
+                    );
 
-                using(box.DisplayUndoable(modelDoc)) {
+                // Display the original sheet. Visually verify it is ok.
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (disc0.DisplayUndoable(modelDoc))
                     await PauseTestExecution();
-                };
 
-                //foreach (var sheet in sheets)
-                //{
-                //    yielder(sheet.DisplayUndoable(modelDoc));
-                //}
+                // The sheet should only have one face. Extract it
+                var faces = disc0.GetFaces().CastArray<IFace2>();
+                faces.Length.Should().Be(1);
+                var face = faces[0];
 
+                // Convert the solidworks face to a bspline face
+                var bsplineFace = BSplineFace.Create(face);
 
-                var error = (int)swSheetSewingError_e.swSewingOk;
-                var body = Modeler
-                    .CreateBodiesFromSheets2(sheets, (int)swSheetSewingOption_e.swSewToSolid, 1e-5, ref error)
-                    .CastArray<IBody2>();
+                // Convert the bspline face back to a sheet body
+                var disc1 = bsplineFace.ToSheetBody();
 
-                body.Should().NotBeEmpty();
-
-                yielder(body.DisplayUndoable(modelDoc));
+                // Display the recovered sheet. Visually verify it is ok
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (disc1.DisplayUndoable(modelDoc))
+                    await PauseTestExecution();
 
                 await PauseTestExecution();
-
-
-
 
             });
 
         }
+
         [SolidworksFact]
         public async Task CanRebuildABox ()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Accord;
 
@@ -24,6 +25,29 @@ namespace SolidworksAddinFramework
 
                 }
             }
+        }
+
+        /// <summary>
+        /// Reshape a 1D array into a 2D array. The array is filled columnwise
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="uCount"></param>
+        /// <param name="vCount"></param>
+        /// <returns></returns>
+        public static T[,] Reshape<T>(this IReadOnlyList<T> array , int uCount, int vCount)
+        {
+            Debug.Assert(array.Count == uCount*vCount);
+
+            var array2D = new T[uCount, vCount];
+            for (var u = 0; u < uCount; u++)
+            {
+                for (var v = 0; v < vCount; v++)
+                {
+                    array2D[u, v] = array[v*uCount + u];
+                }
+            }
+            return array2D;
         }
 
         /// <summary>

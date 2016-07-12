@@ -26,12 +26,16 @@ namespace SolidworksAddinFramework.Geometry
         {
             var propsDouble = PropsDouble;
             var knots = KnotVectorU;
-            var ctrlPtCoords = ControlPoints.SelectMany(p => Vector3Extensions.ToDoubles((Vector3) p)).ToArray();
+            var ctrlPtCoords = ControlPoints.SelectMany(p => p.ToDoubles()).ToArray();
+
+            #region debug
             var param = surface.Parameterization2();
             Debug.Assert(ControlPoints.All(c=>
                 c.X < param.UMax && c.X > param.UMin 
                 && c.Y < param.VMax && c.Y > param.VMin
                 ));
+            #endregion
+
             var pCurve = (ICurve) SwAddinBase.Active.Modeler.CreatePCurve(surface, propsDouble, knots, ctrlPtCoords);
             Debug.Assert(pCurve!=null);
             return pCurve;

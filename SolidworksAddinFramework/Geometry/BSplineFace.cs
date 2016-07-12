@@ -73,13 +73,13 @@ namespace SolidworksAddinFramework.Geometry
                         .Select(ToRationalVector3)
                         .ToList();
 
-                    return new {info.info.isPeriodic, info.knots, info.info.order, ctrlPoints};
+                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.info.order, info.info.isPeriodic);
 
                 })
                 .ToArray();
 
 
-            var loops = curvesPerLoopLookup
+            var bLoops = curvesPerLoopLookup
                 .Scan(new {start = 0, step = 0}, (acc, count) => new {start = acc.start + acc.step, step = count})
                 .Skip(1)
                 .Select(o => trimCurves.ToArraySegment(o.start, o.step).ToArray())
@@ -109,25 +109,15 @@ namespace SolidworksAddinFramework.Geometry
                 .Select(ToRationalVector4)
                 .ToList();
 
-            // packed doubles 8
+            // packed doubles 8 
+            // TODO handle the case for multiple surfaces
             var indexFlags = reader.ReadDouble().DoubleToInteger().Map((nSurface, index) => new {nSurface, index});
 
-            var ctrlPointsArray = new Vector4[uvNumCtrlPoints.u, uvNumCtrlPoints.v];
-            for (int u = 0; u < uvNumCtrlPoints.u; u++)
-            {
-                for (int v = 0; v < uvNumCtrlPoints.v; v++)
-                {
-                    ctrlPointsArray[u, v] = surfaceCtrlPoints[v*uvNumCtrlPoints.u + u];
-                }
-            }
+            var ctrlPointsArray = surfaceCtrlPoints.Reshape(uvNumCtrlPoints.u, uvNumCtrlPoints.v);
 
-            var surface = new BSplineSurface(ctrlPointsArray,uvOrder.u, uvOrder.v,uKnots, vKnots);
-            var loops2 = loops
-                .Select
-                (loop => loop.Select(c => new BSpline2D(c.ctrlPoints.ToArray(), c.knots.ToArray(), c.order, c.isPeriodic)).ToList())
-                .ToList();
+            var bSurface = new BSplineSurface(ctrlPointsArray,uvOrder.u, uvOrder.v,uKnots, vKnots);
 
-            return new BSplineFace(surface, loops2);
+            return new BSplineFace(bSurface, bLoops);
 
         }
 
