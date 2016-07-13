@@ -752,7 +752,7 @@ namespace SolidworksAddinFramework.Spec
             }.SelectMany(p => p).ToArray();
 
             var d0 = BitConverter.ToDouble(bytes, 0);
-            var d1 = BitConverter.ToDouble(bytes, 4);
+            var d1 = BitConverter.ToDouble(bytes, 8);
 
             var propsDouble = new[] {d0, d1};
             var pCurve = (ICurve) modeler.CreatePCurve(surface, propsDouble, knots, ctrlPts);
