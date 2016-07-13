@@ -73,7 +73,7 @@ namespace SolidworksAddinFramework.Geometry
             if (isPeriodic)
                 ConvertToNonPeriodic(ref controlPoints4D, ref knotArray, degree);
 
-            return new BSpline3D(controlPoints4D, knotArray, order, isPeriodic);
+            return new BSpline3D(controlPoints4D, knotArray, order, isPeriodic, isRational: dimension==4);
         }
 
 

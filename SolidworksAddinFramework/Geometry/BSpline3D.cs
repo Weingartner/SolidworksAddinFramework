@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using JetBrains.Annotations;
@@ -8,8 +10,12 @@ namespace SolidworksAddinFramework.Geometry
 {
     public class BSpline3D : BSpline<Vector4>
     {
-        public BSpline3D([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic) : base(controlPoints, knotVectorU, order, isPeriodic)
+        public BSpline3D([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational) : base(controlPoints, knotVectorU, order, isPeriodic, isRational)
         {
+            if(!IsRational)
+            {
+                Debug.Assert(controlPoints.All(c => Math.Abs(c.W - 1.0) < 1e-9));
+            }
         }
         public ICurve ToCurve()
         {
@@ -23,5 +29,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             return t.ToDoubles();
         }
+
+        public override int Dimension => 4;
     }
 }

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace SolidworksAddinFramework.Geometry
 {
-    public class BSpline<T> : IEquatable<BSpline<T>>
+    public abstract class BSpline<T> : IEquatable<BSpline<T>>
         where T : IEquatable<T>
     {
         /// <summary>
@@ -26,11 +26,18 @@ namespace SolidworksAddinFramework.Geometry
 
         public bool IsPeriodic { get; }
 
+        /// <summary>
+        /// The dimension of the control point
+        /// </summary>
+        public abstract int Dimension { get; }
+
+        public bool IsRational { get; }
+
         public int Order { get; }
 
         public double[] KnotVectorU { get; }
 
-        public BSpline([NotNull] T[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic)
+        public BSpline([NotNull] T[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational)
         {
 
             if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
@@ -39,6 +46,7 @@ namespace SolidworksAddinFramework.Geometry
             ControlPoints = controlPoints;
             Order = order;
             IsPeriodic = isPeriodic;
+            IsRational = isRational;
             KnotVectorU = knotVectorU;
         }
 
@@ -87,11 +95,10 @@ namespace SolidworksAddinFramework.Geometry
         {
             get
             {
-                int dimension = 3;
                 int order = (short) Order;
                 int numCtrlPoints = (short) ControlPoints.Length;
                 int periodicity = (short) (IsPeriodic ? 1 : 0);
-                var propsDouble = new[] {dimension, order, numCtrlPoints, periodicity}.ToDouble();
+                var propsDouble = new[] {Dimension, order, numCtrlPoints, periodicity}.ToDouble();
                 return propsDouble;
             }
         }

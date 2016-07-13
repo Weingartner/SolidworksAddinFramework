@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -12,8 +13,10 @@ namespace SolidworksAddinFramework.Geometry
     /// </summary>
     public class BSpline2D : BSpline<Vector3>
     {
-        public BSpline2D([NotNull] Vector3[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic) : base(controlPoints, knotVectorU, order, isPeriodic)
+        public BSpline2D([NotNull] Vector3[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational) : base(controlPoints, knotVectorU, order, isPeriodic, isRational)
         {
+            if(!isRational) //  Non rational should have all W ( Z ) be 1.0
+                Debug.Assert(controlPoints.All(c=>Math.Abs(c.Z - 1) < 1e-9));
         }
 
         /// <summary>
@@ -26,7 +29,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             var propsDouble = PropsDouble;
             var knots = KnotVectorU;
-            var ctrlPtCoords = ControlPoints.SelectMany(p => p.ToDoubles()).ToArray();
+            var ctrlPtCoords = ControlPoints.SelectMany(p => p.ToDoubles().Take(Dimension)).ToArray();
 
             #region debug
             var param = surface.Parameterization2();
@@ -42,9 +45,6 @@ namespace SolidworksAddinFramework.Geometry
         }
 
 
-        public double[] ToDoubles(Vector3 t)
-        {
-            return t.ToDoubles();
-        }
+        public override int Dimension => 3;
     }
 }

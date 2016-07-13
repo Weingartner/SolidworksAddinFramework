@@ -73,7 +73,7 @@ namespace SolidworksAddinFramework.Geometry
                         .Select(ToRationalVector3)
                         .ToList();
 
-                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.order, info.isPeriodic);
+                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.order, info.isPeriodic, info.dimension==3);
 
                 })
                 .ToArray();
