@@ -37,7 +37,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             var start = 0;
 
-            var packedData = swFace.GetTrimCurves2(true, false).CastArray<double>();
+            var packedData = swFace.GetTrimCurves2(WantCubic: true, WantNRational: false).CastArray<double>();
             var reader = new GetTrimCurves2DataReader(packedData);
 
             // Packed Double 1
@@ -59,7 +59,7 @@ namespace SolidworksAddinFramework.Geometry
                 (info =>
                 {
                     var knots = reader.Read(info.order + info.numCtrlPoints).ToList();
-                    return new {info, knots};
+                    return new {info.order,info.isPeriodic, info.dimension, info.isRational, info.numCtrlPoints, knots};
                 })
                 .ToList();
 
@@ -68,12 +68,12 @@ namespace SolidworksAddinFramework.Geometry
                 (info =>
                 {
                     var ctrlPoints = reader
-                        .Read(info.info.numCtrlPoints*info.info.dimension)
-                        .Buffer(info.info.dimension, info.info.dimension)
+                        .Read(info.numCtrlPoints*info.dimension)
+                        .Buffer(info.dimension, info.dimension)
                         .Select(ToRationalVector3)
                         .ToList();
 
-                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.info.order, info.info.isPeriodic);
+                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.order, info.isPeriodic);
 
                 })
                 .ToArray();
