@@ -31,8 +31,8 @@ namespace SolidworksAddinFramework.Geometry
             #region debug
             var param = surface.Parameterization2();
             Debug.Assert(ControlPoints.All(c=>
-                c.X < param.UMax && c.X > param.UMin 
-                && c.Y < param.VMax && c.Y > param.VMin
+                c.X <= param.UMax && c.X >= param.UMin 
+                && c.Y <= param.VMax && c.Y >= param.VMin
                 ));
             #endregion
 
