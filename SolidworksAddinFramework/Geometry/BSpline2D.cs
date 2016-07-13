@@ -45,6 +45,6 @@ namespace SolidworksAddinFramework.Geometry
         }
 
 
-        public override int Dimension => 3;
+        public override int Dimension => IsRational ? 3 : 2;
     }
 }

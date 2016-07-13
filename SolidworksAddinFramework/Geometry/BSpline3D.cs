@@ -30,6 +30,6 @@ namespace SolidworksAddinFramework.Geometry
             return t.ToDoubles();
         }
 
-        public override int Dimension => 4;
+        public override int Dimension => IsRational ? 4 : 3;
     }
 }
