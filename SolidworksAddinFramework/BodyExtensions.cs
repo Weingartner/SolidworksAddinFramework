@@ -287,6 +287,18 @@ namespace SolidworksAddinFramework
             
         }
 
+        public static T SaveAsIges<T>(this IBody2 body, bool hidden, Func<Stream, T> selector)
+        {
+            T r = default(T);
+            SaveAsIges
+                (body,
+                    stream =>
+                    {
+                        r = selector(stream);
+                    },hidden);
+            return r;
+        }
+
         /// <summary>
         /// Load the iges format of the body from the stream
         /// </summary>
@@ -324,6 +336,11 @@ namespace SolidworksAddinFramework
             SldWorks app = SwAddinBase.Active.SwApp;
 
             var doc = app.CreateHiddenDocument(hidden: hidden);
+
+            doc.Extension.SetUserPreferenceInteger
+                ((int)(swUserPreferenceIntegerValue_e.swUnitSystem)
+                , 0
+                , ((int)(swUnitSystem_e.swUnitSystem_MKS)));
 
             try
             {
