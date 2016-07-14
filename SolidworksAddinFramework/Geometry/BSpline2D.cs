@@ -39,6 +39,8 @@ namespace SolidworksAddinFramework.Geometry
                 ));
             #endregion
 
+            Debug.Assert(knots.Length == ControlPoints.Length + Order);
+
             var pCurve = (ICurve) SwAddinBase.Active.Modeler.CreatePCurve(surface, propsDouble, knots, ctrlPtCoords);
             Debug.Assert(pCurve!=null);
             return pCurve;
