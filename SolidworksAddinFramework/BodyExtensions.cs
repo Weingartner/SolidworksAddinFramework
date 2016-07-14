@@ -304,7 +304,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static IBody2 LoadAsIges(Stream stream)
+        public static List<IBody2> LoadBodiesAsIges(Stream stream)
         {
             var igesFile = GetTempFilePathWithExtension(".igs");
             using (var ostream = File.OpenWrite(igesFile))
@@ -318,10 +318,10 @@ namespace SolidworksAddinFramework
                 Debug.Assert(newPartDoc!=null);
 
                 var loadedBody =
-                    newPartDoc.GetBodies2((int) swBodyType_e.swAllBodies, false).CastArray<IBody2>().First();
-                Debug.Assert(loadedBody!=null);
+                    newPartDoc.GetBodies2((int) swBodyType_e.swAllBodies, false).CastArray<IBody2>().ToList();
+                Debug.Assert(loadedBody.Count > 0);
 
-                return loadedBody.CopyTs();
+                return loadedBody.Select(p => p.CopyTs()).ToList();
             }
             finally
             {

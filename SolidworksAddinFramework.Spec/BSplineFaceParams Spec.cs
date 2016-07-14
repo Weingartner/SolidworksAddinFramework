@@ -790,7 +790,7 @@ namespace SolidworksAddinFramework.Spec
                 mStream.Position = 0;
             }, false);
 
-            var loadedBody = BodyExtensions.LoadAsIges(mStream);
+            var loadedBody = BodyExtensions.LoadBodiesAsIges(mStream).First();
 
             loadedBody.Should().NotBeNull();
             var b0 = disc0.GetBodyBoxTs();
