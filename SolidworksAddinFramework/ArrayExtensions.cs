@@ -114,5 +114,16 @@ namespace SolidworksAddinFramework
         {
             ts.Cast<T>().ForEach(action);
         }
+
+        public static void Fill<T>(this T[,] ts, T value)
+        {
+            for (int u = 0; u < ts.GetLength(0); u++)
+            {
+                for (int v = 0; v < ts.GetLength(1); v++)
+                {
+                    ts[u, v] = value;
+                }
+            }
+        }
     }
 }
