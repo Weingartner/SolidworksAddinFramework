@@ -62,10 +62,10 @@ namespace SolidworksAddinFramework
         {
             try
             {
-                if(!visible)
+                if (!visible)
                     sldWorks.DocumentVisible(false, (int)type);
                 var spec = (IDocumentSpecification)sldWorks.GetOpenDocSpec(toolFile);
-                if(!visible)
+                if (!visible)
                 {
                     spec.Silent = true;
                     spec.ReadOnly = true;
@@ -77,13 +77,85 @@ namespace SolidworksAddinFramework
             }
             finally
             {
-                if(!visible)
+                if (!visible)
                     sldWorks.DocumentVisible
                         (true,
                             (int)
                                 type);
 
             }
+        }
+
+        /// <summary>
+        /// Tries to load an iges file invisibly. Throws an exception if it doesn't work.
+        /// </summary>
+        /// <param name="sldWorks"></param>
+        /// <param name="igesFile"></param>
+        /// <param name="visible"></param>
+        /// <returns></returns>
+        public static ModelDoc2 LoadIgesInvisible(this ISldWorks sldWorks, string igesFile, bool visible = false)
+        {
+            var swDocPart = (int)swDocumentTypes_e.swDocPART;
+
+            try
+            {
+                if (!visible)
+                    sldWorks.DocumentVisible(false, swDocPart);
+
+                ImportIgesData swImportData =
+                    (ImportIgesData)SwAddinBase.Active.SwApp.GetImportFileData(igesFile);
+
+                int err = 0;
+                var newDoc = SwAddinBase.Active.SwApp.LoadFile4(igesFile, "r", swImportData, ref err);
+                if (err != 0)
+                    throw new Exception(@"Unable to load file {igesFile");
+
+                return newDoc;
+            }
+            finally
+            {
+                if (!visible)
+                    sldWorks.DocumentVisible
+                        (true,
+                            swDocPart);
+
+            }
+        }
+
+        public static ModelDoc2 CreateHiddenDocument
+            (this ISldWorks sldWorks, bool hidden = true, swDocumentTypes_e type = swDocumentTypes_e.swDocPART)
+        {
+            try
+            {
+
+                if (hidden)
+                    sldWorks.DocumentVisible(false, (int)type);
+
+                var partTemplateName = sldWorks.GetUserPreferenceStringValue((int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
+                var doc = (ModelDoc2)sldWorks.NewDocument(partTemplateName, (int)swDwgPaperSizes_e.swDwgPaperA4size, 1, 1);
+                doc.Visible = false;
+
+                /*
+                ModelView myModelView = null;
+                myModelView = ((ModelView)(doc.ActiveView));
+                myModelView.FrameLeft = 0;
+                myModelView.FrameTop = 0;
+                myModelView = ((ModelView)(doc.ActiveView));
+
+                myModelView.FrameState = ((int)(swWindowState_e.swWindowMinimized));
+                */
+                return doc;
+            }
+            finally
+            {
+                if (hidden)
+                    sldWorks.DocumentVisible
+                        (true,
+                            (int)
+                                type);
+
+            }
+
         }
     }
 }

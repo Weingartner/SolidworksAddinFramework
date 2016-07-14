@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reactive.Disposables;
@@ -254,6 +255,117 @@ namespace SolidworksAddinFramework
 
             var curve = modeler.MergeCurves(innerCurves);
             return Prelude.Optional(curve);
+        }
+        private static string GetTempFilePathWithExtension(string extension)
+        {
+            var path = Path.GetTempPath();
+            var fileName = Guid.NewGuid().ToString() + extension;
+            return Path.Combine(path, fileName);
+        }
+
+        /// <summary>
+        /// Save the iges format of the body into the stream
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="handler"></param>
+        /// <param name="hidden"></param>
+        public static void SaveAsIges(this IBody2 body, Action<Stream> handler, bool hidden)
+        {
+            var igesFile = GetTempFilePathWithExtension(".igs");
+            try
+            {
+                SaveAsIges(body, igesFile, hidden);
+                using (var stream = File.OpenRead(igesFile))
+                {
+                    handler(stream);
+                };
+            }
+            finally
+            {
+                File.Delete(igesFile);
+            }
+            
+        }
+
+        /// <summary>
+        /// Load the iges format of the body from the stream
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static IBody2 LoadAsIges(Stream stream)
+        {
+            var igesFile = GetTempFilePathWithExtension(".igs");
+            using (var ostream = File.OpenWrite(igesFile))
+            {
+                stream.CopyTo(ostream);
+            }
+            var doc = SwAddinBase.Active.SwApp.LoadIgesInvisible(igesFile);
+            try
+            {
+                var newPartDoc = (PartDoc) doc;
+                Debug.Assert(newPartDoc!=null);
+
+                var loadedBody =
+                    newPartDoc.GetBodies2((int) swBodyType_e.swAllBodies, false).CastArray<IBody2>().First();
+                Debug.Assert(loadedBody!=null);
+
+                return loadedBody.CopyTs();
+            }
+            finally
+            {
+                SwAddinBase.Active.SwApp.QuitDoc(doc.GetTitle());
+                
+            }
+        }
+
+        public static void SaveAsIges(this IBody2 body, string igesFile, bool hidden = false)
+        {
+
+            SldWorks app = SwAddinBase.Active.SwApp;
+
+            var doc = app.CreateHiddenDocument(hidden: hidden);
+
+            try
+            {
+                var partDoc = (PartDoc)doc;
+
+                partDoc.CreateFeatureFromBody3(body, false, 0);
+
+                int errorsi = 0;
+                int warningsi = 0;
+
+                app.ActivateDoc3
+                    (doc.GetTitle(), false, (int)swRebuildOnActivation_e.swRebuildActiveDoc, ref errorsi);
+
+
+                // http://help.solidworks.com/2013/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IModelDocExtension~SaveAs.html
+                // Note the doc says:
+                // To save as an IGES, STL, or STEP file, the document to convert must be the active document. Before calling this method:
+                // Call ISldWorks::ActivateDoc3 to make the document to convert the active document.
+                // Call ISldWorks::ActiveDoc to get the active document.
+
+                var status = ((IModelDoc2) doc) // Note that this does not return the correct doc if the doc is hidden
+                    .Extension
+                    .SaveAs
+                        ( igesFile
+                        , (int)swSaveAsVersion_e.swSaveAsCurrentVersion
+                        , (int)swSaveAsOptions_e.swSaveAsOptions_Silent
+                        , null
+                        , ref errorsi
+                        , ref warningsi
+                        );
+
+                if(!status)
+                    throw new Exception($"Failed to save {igesFile}. Got error bitmask {errorsi}");
+
+            }
+            finally
+            {
+                app.QuitDoc(doc.GetTitle());
+                
+            }
+
+
         }
     }
     

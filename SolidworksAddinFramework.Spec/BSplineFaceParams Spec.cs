@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
+using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Xunit;
 using XUnit.Solidworks.Addin;
 using SwBSplineParamsExtensions = SolidworksAddinFramework.Geometry.SwBSplineParamsExtensions;
 
@@ -761,6 +764,52 @@ namespace SolidworksAddinFramework.Spec
 
 
         }
+
+        /// <summary>
+        /// Demonstrate serializing a body to an iges stream. It's
+        /// a total hack in the way it's done but as long as it works
+        /// for the moment then I am happy.
+        /// </summary>
+        /// <returns></returns>
+        [SolidworksFact]
+        public void CanRoundTripIgesViaStreams ()
+        {
+
+            var disc0 = Modeler.CreateCirclularSheet
+                (center: Vector3.Zero
+                    ,
+                    vNormal: Vector3.UnitZ
+                    ,
+                    radius: 2
+                );
+
+            var mStream = new MemoryStream();
+            disc0.SaveAsIges(stream =>
+            {
+                stream.CopyTo(mStream);
+                mStream.Position = 0;
+            }, false);
+
+            var loadedBody = BodyExtensions.LoadAsIges(mStream);
+
+            loadedBody.Should().NotBeNull();
+            var b0 = disc0.GetBodyBoxTs();
+            var b1 = loadedBody.GetBodyBoxTs();
+
+            b0.P0.X.Should().BeApproximately(b1.P0.X, 1e-5f);
+            b0.P0.Y.Should().BeApproximately(b1.P0.Y, 1e-5f);
+            b0.P0.Z.Should().BeApproximately(b1.P0.Z, 1e-5f);
+
+            b0.P1.X.Should().BeApproximately(b1.P1.X, 1e-5f);
+            b0.P1.Y.Should().BeApproximately(b1.P1.Y, 1e-5f);
+            b0.P1.Z.Should().BeApproximately(b1.P1.Z, 1e-5f);
+
+
+        }
+
+
+
+        [SolidworksFact]
         public async Task CanRebuildABox ()
         {
             await CreatePartDoc(async (modelDoc,yielder) =>
