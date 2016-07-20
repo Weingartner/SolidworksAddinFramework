@@ -637,7 +637,11 @@ namespace SolidworksAddinFramework
             return ControlHolder.Create(@group, box, d0, d1);
         }
 
-        private static IDisposable TwoWayBind<TSource, TTarget>(IObservable<TSource> sourceObservable, Func<TSource, IDisposable> onSourceChanged, IObservable<TTarget> targetObservable, Action<TTarget> onTargetChanged)
+        private static IDisposable TwoWayBind<TSource, TTarget>
+            ( IObservable<TSource> sourceObservable
+            , Func<TSource, IDisposable> onSourceChanged
+            , IObservable<TTarget> targetObservable
+            , Action<TTarget> onTargetChanged)
         {
             var canSetSelectionSubject = new BehaviorSubject<bool>(true);
             var d0 = targetObservable
