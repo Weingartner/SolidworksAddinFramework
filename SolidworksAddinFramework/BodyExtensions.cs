@@ -22,6 +22,8 @@ namespace SolidworksAddinFramework
 {
     public static class BodyExtensions
     {
+        private static string ExportGeometryFileExtension = ".igs";
+
         public static IBody2 Add(this IEnumerable<IBody2> bodies)
         {
             return bodies.Aggregate((a, acc) => a.Add(acc).Bodies[0]);
@@ -274,7 +276,7 @@ namespace SolidworksAddinFramework
         /// <param name="hidden"></param>
         public static void SaveAsIges(this IBody2 body, Action<Stream> handler, bool hidden)
         {
-            var igesFile = GetTempFilePathWithExtension(".igs");
+            var igesFile = GetTempFilePathWithExtension(ExportGeometryFileExtension);
             try
             {
                 SaveAsIges(body, igesFile, hidden);
@@ -309,7 +311,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static List<IBody2> LoadBodiesAsIges(Stream stream)
         {
-            var igesFile = GetTempFilePathWithExtension(".igs");
+            var igesFile = GetTempFilePathWithExtension(ExportGeometryFileExtension);
             using (var ostream = File.OpenWrite(igesFile))
             {
                 stream.CopyTo(ostream);
