@@ -13,6 +13,16 @@ namespace SolidworksAddinFramework.Geometry
     /// </summary>
     public struct Range3Single 
     {
+        public static bool operator ==(Range3Single left, Range3Single right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Range3Single left, Range3Single right)
+        {
+            return !left.Equals(right);
+        }
+
         public Vector3 P0 { get; }
 
         public Vector3 P1 { get; }
@@ -71,6 +81,26 @@ namespace SolidworksAddinFramework.Geometry
             action(v);
             v = new Vector3(XMax, YMax, ZMax);
             action(v);
+        }
+
+        public bool Equals(Range3Single other)
+        {
+            return P0.Equals(other.P0) && P1.Equals(other.P1);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+            return obj is Range3Single && Equals((Range3Single) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (P0.GetHashCode()*397) ^ P1.GetHashCode();
+            }
         }
 
 
