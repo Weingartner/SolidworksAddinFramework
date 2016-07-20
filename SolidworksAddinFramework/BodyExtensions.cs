@@ -62,6 +62,9 @@ namespace SolidworksAddinFramework
             if (body == null) throw new ArgumentNullException(nameof(body));
             if (tool == null) throw new ArgumentNullException(nameof(tool));
 
+            tool = tool.CopyTs();
+            body = body.CopyTs();
+
             int error;
             var objects = (object[]) body.Operations2((int) type, tool, out error);
             if(objects==null)
