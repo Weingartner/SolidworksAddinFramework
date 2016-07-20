@@ -20,7 +20,9 @@
                 <TextBlock Text="{Binding Index}" Grid.Column="1"
                        FontWeight="Bold" Margin="0,0,2,0" />
 
-                <TextBlock Text="{Binding Message}" Grid.Column="2"
+                <TextBox 
+                    IsReadOnly="True"
+                    Text="{Binding Message}" Grid.Column="2"
                        TextWrapping="Wrap"/>
             </Grid>
         </DataTemplate>

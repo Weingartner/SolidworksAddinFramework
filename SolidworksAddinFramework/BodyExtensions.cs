@@ -312,6 +312,7 @@ namespace SolidworksAddinFramework
         public static List<IBody2> LoadBodiesAsIges(Stream stream)
         {
             var igesFile = GetTempFilePathWithExtension(ExportGeometryFileExtension);
+            LogViewer.Log($"Loading iges file {igesFile} into Solidworks");
             using (var ostream = File.OpenWrite(igesFile))
             {
                 stream.CopyTo(ostream);
