@@ -16,10 +16,10 @@ using Weingartner.Json.Migration;
 namespace SolidworksAddinFramework
 {
     [DataContract]
-    [Migratable("892617508")]
+    [Migratable("-1379116177")]
     public class SelectionData
     {
-        private static bool Equals(IEnumerable<ObjectId> o1, IEnumerable<ObjectId> o2) => o1.SequenceEqual(o2);
+        private static bool Equals(HashSet<ObjectId> o1, HashSet<ObjectId> o2) => o1.SetEquals(o2);
 
         private bool Equals(SelectionData other)
         {
@@ -46,7 +46,7 @@ namespace SolidworksAddinFramework
         public override string ToString() => $"{ObjectIds.Count} selections, Mark {Mark}";
 
         [DataMember]
-        public IReadOnlyList<ObjectId> ObjectIds { get; }
+        public HashSet<ObjectId> ObjectIds { get; }
 
         [DataMember]
         public int Mark { get; }
@@ -59,7 +59,7 @@ namespace SolidworksAddinFramework
                 .Distinct()
                 .ToList();
 
-            ObjectIds = new ReadOnlyCollection<ObjectId>(distinctObjectIds);
+            ObjectIds = new HashSet<ObjectId>(distinctObjectIds);
             Mark = mark;
         }
 
@@ -76,6 +76,12 @@ namespace SolidworksAddinFramework
                 if (data == null) throw new ArgumentNullException(nameof(data));
 
                 _Data = data.ToArray();
+            }
+
+
+            public override string ToString()
+            {
+                return BitConverter.ToString(_Data);
             }
 
             private static bool Equals(IEnumerable<byte> o1, IEnumerable<byte> o2) => o1.SequenceEqual(o2);
