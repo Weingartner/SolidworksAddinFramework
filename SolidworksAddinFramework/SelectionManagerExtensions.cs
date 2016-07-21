@@ -52,12 +52,15 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IReadOnlyList<object> GetSelectedObjects(this ISelectionMgr selMgr, Func<swSelectType_e, int, bool> filter)
         {
-            filter = filter ?? ((type,mark)=> true);
-
             return selMgr.GetObjectSelections()
                 .Where(o => filter(o.Type, o.Mark))
                 .Select(o => o.Object)
                 .ToList();
+        }
+
+        public static IReadOnlyList<object> GetAllSelectedObjects(this ISelectionMgr selMgr)
+        {
+            return selMgr.GetSelectedObjects((t, m) => true);
         }
 
         public static IDisposable DeselectAllUndoable(this ISelectionMgr selMgr)
