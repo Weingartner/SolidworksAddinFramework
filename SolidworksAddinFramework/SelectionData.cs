@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -10,19 +10,20 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static LanguageExt.Prelude;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using Weingartner.Json.Migration;
 
 namespace SolidworksAddinFramework
 {
     [DataContract]
-    [Migratable("-1902072732")]
+    [Migratable("892617508")]
     public class SelectionData
     {
-        private static bool Equals(IImmutableSet<ObjectId> o1, IImmutableSet<ObjectId> o2) => o1.SetEquals(o2);
+        private static bool Equals(IEnumerable<ObjectId> o1, IEnumerable<ObjectId> o2) => o1.SequenceEqual(o2);
 
         private bool Equals(SelectionData other)
         {
-            return Equals(_ObjectIds, other._ObjectIds) && Mark == other.Mark;
+            return Equals(ObjectIds, other.ObjectIds) && Mark == other.Mark;
         }
 
         public override bool Equals(object obj)
@@ -36,29 +37,29 @@ namespace SolidworksAddinFramework
             return Equals((SelectionData) obj);
         }
 
-        private static int GetHashCodeOfSet(IEnumerable<ObjectId> a) => a.Sum(v => v.GetHashCode());
+        private static int GetHashCode(IEnumerable<ObjectId> a) => a.GetHashCode(v => v.GetHashCode());
 
-        public override int GetHashCode() => ObjectExtensions.GetHashCode(GetHashCodeOfSet(ObjectIds), Mark);
+        public override int GetHashCode() => ObjectExtensions.GetHashCode(GetHashCode(ObjectIds), Mark);
 
         public static readonly SelectionData Empty = new SelectionData(Enumerable.Empty<ObjectId>(), -1);
 
         public override string ToString() => $"{ObjectIds.Count} selections, Mark {Mark}";
 
-        private readonly IImmutableSet<ObjectId> _ObjectIds;
         [DataMember]
-        public IReadOnlyCollection<ObjectId> ObjectIds => _ObjectIds;
+        public IReadOnlyList<ObjectId> ObjectIds { get; }
 
         [DataMember]
         public int Mark { get; }
 
         public bool IsEmpty => ObjectIds.Count == 0;
 
-        [JsonConstructor]
         public SelectionData(IEnumerable<ObjectId> objectIds, int mark)
         {
-            _ObjectIds = objectIds
+            var distinctObjectIds = objectIds
                 .Distinct()
-                .ToImmutableHashSet();
+                .ToList();
+
+            ObjectIds = new ReadOnlyCollection<ObjectId>(distinctObjectIds);
             Mark = mark;
         }
 
