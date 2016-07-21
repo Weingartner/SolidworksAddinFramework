@@ -236,6 +236,14 @@ namespace SolidworksAddinFramework.Geometry
             var d = curve.Domain()[0];
             return curve.PointAt(d);
         }
+        public static double[] CurveBoundsDoubleArray(this ICurve curve)
+        {
+            var start = curve.StartPoint();
+            var end = curve.EndPoint();
+            return curve.GetClosestPointOn(start.X, start.Y, start.Z).CastArray<double>().Take(3)
+                    .Concat(curve.GetClosestPointOn(end.X,end.Y,end.Z).CastArray<double>().Take(3))
+                    .ToArray();
+        }
         public static List<Vector3> EndPoint(this ICurve curve, int derivatives )
         {
             var d = curve.Domain()[1];
