@@ -70,14 +70,17 @@ namespace SolidworksAddinFramework
                 .Select(e => sm.GetSelectedObjects(filter));
         }
 
-        public static void AddSelections(this IModelDoc2 doc, int mark, IEnumerable<object> objects)
+        public static void AddSelections(this IModelDoc2 doc, int mark, IReadOnlyCollection<object> objects)
         {
             var selectionMgr = (ISelectionMgr) doc.SelectionManager;
             var selectData = selectionMgr.CreateSelectData();
             selectData.Mark = mark;
 
-            var count = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(objects), true, selectData);
-            //var count = selectionMgr.AddSelectionListObjects(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), selectData);
+            var before = selectionMgr.GetAllSelectedObjects().Count;
+            var after = doc.Extension.MultiSelect2(ComWangling.ObjectArrayToDispatchWrapper(objects), true, selectData);
+            //var after = selectionMgr.AddSelectionListObjects(ComWangling.ObjectArrayToDispatchWrapper(o.Objects), selectData);
+            var selectionCount = after - before;
+            Debug.Assert(selectionCount == objects.Count, $"Tried to select {objects.Count} objects, selected only {selectionCount}");
         }
 
         /// <summary>
@@ -85,62 +88,56 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="selections"></param>
-        public static IDisposable AddSelections(this IModelDoc2 doc, IReadOnlyCollection<SelectionData> selections)
+        public static void AddSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selections)
         {
-            {
-                var selectionMgr = (ISelectionMgr) doc.SelectionManager;
-                var selectedObjects = selectionMgr
-                    .GetSelectedObjects((_, __) => true)
-                    .ToList();
-                selections
-                    .GroupBy(p => p.Mark)
-                    .Select(p =>
-                    {
-                        var objects = p
-                            .SelectMany(selectionData => selectionData
-                                .GetObjects(doc)
-                                .Except(selectedObjects))
-                            .ToArray();
-                        return new { Mark = p.Key, Objects = objects };
-                    })
-                    .Where(p => p.Objects.Length > 0)
-                    .ForEach(o => doc.AddSelections(o.Mark, o.Objects));
-            }
-
-            return Disposable.Create(() => doc.ClearSelections(selections));
+            var selectionMgr = (ISelectionMgr) doc.SelectionManager;
+            var selectedObjects = selectionMgr.GetAllSelectedObjects();
+            selections
+                .GroupBy(p => p.Mark)
+                .Select(p =>
+                {
+                    var objects = p
+                        .SelectMany(selectionData => selectionData
+                            .GetObjects(doc)
+                            .Except(selectedObjects))
+                        .ToArray();
+                    return new {Mark = p.Key, Objects = objects};
+                })
+                .Where(p => p.Objects.Length > 0)
+                .ForEach(o => doc.AddSelections(o.Mark, o.Objects));
         }
 
-        public static void ClearSelections(this IModelDoc2 doc, IReadOnlyCollection<SelectionData> selections)
+        public static void AddSelectionsFromModel(this IModelDoc2 doc, object model)
+        {
+            var selections = SelectionDataExtensions.GetSelectionsFromModel(model).ToList();
+            doc.AddSelections(selections);
+        }
+
+        public static void AddSelection(this IModelDoc2 doc, SelectionData selection)
+        {
+            doc.AddSelections(new[] { selection });
+        }
+
+        public static void ClearSelections(this IModelDoc2 doc, IEnumerable<SelectionData> selections)
         {
             var selectionMgr = (ISelectionMgr)doc.SelectionManager;
-            var objectSelections = selectionMgr
-                .GetObjectSelections()
-                .ToList();
             selections
                 .SelectMany(s => s.GetObjects(doc))
                 .ForEach(obj =>
                 {
-                    var selection = objectSelections.SingleOrDefault(o => o.Object == obj);
+                    var selection = selectionMgr
+                        .GetObjectSelections()
+                        .SingleOrDefault(o => o.Object == obj);
                     if (selection == null) return;
 
                     var isDeselected = selectionMgr.DeSelect2(selection.Index, SelectionManagerExtensions.AnyMark) == 1;
+                    Debug.Assert(isDeselected, "Couldn't deselect object");
                 });
         }
 
         public static void ClearSelection(this IModelDoc2 doc, SelectionData selection)
         {
             doc.ClearSelections(new[] { selection });
-        }
-
-        public static IDisposable AddSelectionsFromModel(this IModelDoc2 doc, object model)
-        {
-            var selections = SelectionDataExtensions.GetSelectionsFromModel(model).ToList();
-            return doc.AddSelections(selections);
-        }
-
-        public static IDisposable AddSelection(this IModelDoc2 doc, SelectionData selection)
-        {
-            return doc.AddSelections(new[] { selection });
         }
 
         public static IEnumerable<object> GetSelectedObjectsFromModel(this IModelDoc2 doc, object model)

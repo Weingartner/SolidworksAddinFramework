@@ -55,12 +55,16 @@ namespace SolidworksAddinFramework
 
         public SelectionData(IEnumerable<ObjectId> objectIds, int mark)
         {
-            var distinctObjectIds = objectIds
-                .Distinct()
-                .ToList();
-
-            ObjectIds = new ReadOnlyCollection<ObjectId>(distinctObjectIds);
+            ObjectIds = new ReadOnlyCollection<ObjectId>(objectIds.ToList());
             Mark = mark;
+        }
+
+        public static SelectionData Create(IEnumerable<object> objects, int mark, IModelDoc2 doc)
+        {
+            var objectIds = objects
+                .Select(doc.GetPersistReference)
+                .Select(id => new ObjectId(id));
+            return new SelectionData(objectIds, mark);
         }
 
         [DataContract]
@@ -150,14 +154,6 @@ namespace SolidworksAddinFramework
                 select fun(()=> o().DirectCast<T>());
         }
 
-        public static SelectionData SetObjects(this SelectionData selectionData, IEnumerable<object> objects, IModelDoc2 doc)
-        {
-            var objectIds = objects
-                .Select(doc.GetPersistReference)
-                .Select(id => new SelectionData.ObjectId(id));
-            return new SelectionData(objectIds, selectionData.Mark);
-        }
-
         public static IEnumerable<SelectionData> GetSelectionsFromModel(object model)
         {
             return model
@@ -166,6 +162,11 @@ namespace SolidworksAddinFramework
                 .Where(p => p.PropertyType == typeof (SelectionData))
                 .Select(p => p.GetValue(model))
                 .Cast<SelectionData>();
+        }
+
+        public static SelectionData WithObjectIds(this SelectionData selectionData, IEnumerable<SelectionData.ObjectId> objectIds)
+        {
+            return new SelectionData(objectIds, selectionData.Mark);
         }
     }
 }

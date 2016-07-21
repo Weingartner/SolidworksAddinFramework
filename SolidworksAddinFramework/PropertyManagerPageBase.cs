@@ -622,57 +622,84 @@ namespace SolidworksAddinFramework
             Action<IPropertyManagerPageSelectionbox> config,
             Action onFocus)
         {
+            var d = new CompositeDisposable();
+
             var id = NextId();
             var box = @group.CreateSelectionBox(id, caption, tip);
             config(box);
-            box.SetSelectionFilters( selectType );
-            var d0 = SelectionBoxFocusChangedObservable(id).Subscribe(_ => onFocus());
+            box.SetSelectionFilters(selectType);
 
-            var d1 = TwoWayBind(
-                sourceObservable: model.WhenAnyValue(propertyExpr),
-                onSourceChanged: s => ModelDoc.AddSelection(s),
-                targetObservable: SelectionChangedObservable(id),
-                onTargetChanged: _ => SetSelection(box, selectType, model, propertyExpr)
-            );
-            return ControlHolder.Create(@group, box, d0, d1);
+            SelectionBoxFocusChangedObservable(id)
+                .Subscribe(_ => onFocus())
+                .DisposeWith(d);
+
+            var canSetSelectionSubject = new BehaviorSubject<bool>(true).DisposeWith(d);
+            Func<IDisposable> startTransaction = () =>
+            {
+                canSetSelectionSubject.OnNext(false);
+                return Disposable.Create(() => canSetSelectionSubject.OnNext(true));
+            };
+            BindFromSource(model, propertyExpr, startTransaction)
+                .DisposeWith(d);
+
+            var inTransactionObservable = canSetSelectionSubject.AsObservable();
+            BindFromTarget(selectType, model, propertyExpr, id, inTransactionObservable, box)
+                .DisposeWith(d);
+
+            return ControlHolder.Create(@group, box, d);
         }
 
-        private static IDisposable TwoWayBind<TSource, TTarget>
-            ( IObservable<TSource> sourceObservable
-            , Func<TSource, IDisposable> onSourceChanged
-            , IObservable<TTarget> targetObservable
-            , Action<TTarget> onTargetChanged)
+        private IDisposable BindFromSource<TModel>(TModel model, Expression<Func<TModel, SelectionData>> propertyExpr, Func<IDisposable> startTransaction)
         {
-            var canSetSelectionSubject = new BehaviorSubject<bool>(true);
-            var d0 = targetObservable
-                .CombineLatest(canSetSelectionSubject, (value, canUpdateSource) => new {value, canUpdateSource})
-                .Where(p => p.canUpdateSource)
-                .Select(p => p.value)
-                .Subscribe(onTargetChanged);
-
-            var disposable = new SerialDisposable(); //don't add to CompositeDisposable because we want to keep the last selection
-            var d1 = sourceObservable
-                .Subscribe(s =>
+            return model.WhenAnyValue(propertyExpr)
+                .Buffer(2, 1)
+                .Where(b => b.Count == 2)
+                .Select(b =>
                 {
-                    canSetSelectionSubject.OnNext(false);
-                    using (Disposable.Create(() => canSetSelectionSubject.OnNext(true)))
+                    Debug.Assert(b[0].Mark == b[1].Mark);
+
+                    var previous = b[0].ObjectIds.ToList();
+                    var current = b[1].ObjectIds.ToList();
+                    var sections = Diff.CalculateSections(previous, current);
+                    var alignedElements = Diff
+                        .AlignElements(previous, current, sections,
+                            new BasicInsertDeleteDiffElementAligner<SelectionData.ObjectId>())
+                        .ToList();
+                    var oldObjectIds = alignedElements
+                        .Where(e => e.Operation == DiffOperation.Delete || e.Operation == DiffOperation.Replace)
+                        .Select(e => e.ElementFromCollection1.Value);
+                    
+                    var newObjectIds = alignedElements
+                        .Where(e => e.Operation == DiffOperation.Insert || e.Operation == DiffOperation.Replace)
+                        .Select(e => e.ElementFromCollection2.Value);
+
+                    return new { oldSelectionData = b[0], oldObjectIds, newSelectionData = b[1], newObjectIds };
+                })
+                .Subscribe(o =>
+                {
+                    using (startTransaction())
                     {
-                        disposable.Disposable = Disposable.Empty;
-                        disposable.Disposable = onSourceChanged(s);
+                        ModelDoc.ClearSelection(o.oldSelectionData.WithObjectIds(o.oldObjectIds));
+                        ModelDoc.AddSelection(o.newSelectionData.WithObjectIds(o.newObjectIds));
                     }
                 });
-            return new CompositeDisposable(canSetSelectionSubject, d0, d1);
+        }
+
+        private IDisposable BindFromTarget<TModel>(swSelectType_e[] selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr, int id, IObservable<bool> inTransactionObservable, IPropertyManagerPageSelectionbox box)
+        {
+            return SelectionChangedObservable(id)
+                .CombineLatest(inTransactionObservable, (_, canSetSelection) => canSetSelection)
+                .Where(v => v)
+                .Subscribe(_ => SetSelection(box, selectType, model, propertyExpr));
         }
 
         private void SetSelection<TModel>(IPropertyManagerPageSelectionbox box, swSelectType_e[] selectType, TModel model, Expression<Func<TModel, SelectionData>> propertyExpr)
         {
-            var selectionManager = (ISelectionMgr)ModelDoc.SelectionManager;
+            var selectionManager = (ISelectionMgr) ModelDoc.SelectionManager;
 
-            var selectedItems = selectionManager
-                .GetSelectedObjects((type, mark) => selectType.Any(st => type == st) && box.Mark == mark);
+            var selectedItems = selectionManager.GetSelectedObjects((type, mark) => selectType.Any(st => type == st) && box.Mark == mark);
             var expressionChain = ReactiveUI.Reflection.Rewrite(propertyExpr.Body).GetExpressionChain().ToList();
-            var newSelection = new SelectionData(Enumerable.Empty<SelectionData.ObjectId>(), box.Mark)
-                .SetObjects(selectedItems, ModelDoc);
+            var newSelection = SelectionData.Create(selectedItems, box.Mark, ModelDoc);
             ReactiveUI.Reflection.TrySetValueToPropertyChain(model, expressionChain, newSelection);
         }
 
