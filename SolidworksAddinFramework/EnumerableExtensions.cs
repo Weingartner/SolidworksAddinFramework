@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using LanguageExt;
@@ -104,6 +105,40 @@ namespace SolidworksAddinFramework
 
         public static IEnumerable<T> EndWith<T>(this IEnumerable<T> e, T item) =>
             e.Concat(new[] {item});
+
+        public static IEnumerable<IList<T>> Paired<T>(this IEnumerable<T> e)
+        {
+            return  e
+                .Buffer(2, 1)
+                .Where(p => p.Count == 2);
+        }
+
+        /// <summary>
+        /// Return the cumlative application of the function
+        /// on the input sequence starting with a seed
+        /// value. Note the seed value will be returned
+        /// as the first element of th output sequence.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="This"></param>
+        /// <param name="initial"></param>
+        /// <param name="fn"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> CummulativeAggregate<T, U>
+            (this IEnumerable<U> This
+            , T initial
+            , Func<T, U, T> fn
+            )
+        {
+            yield return initial;
+            foreach (var item in This)
+            {
+                initial = fn(initial, item);
+                yield return initial;
+            }
+        }
+
 
     }
 }
