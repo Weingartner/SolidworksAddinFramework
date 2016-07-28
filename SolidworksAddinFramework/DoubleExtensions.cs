@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -223,6 +224,12 @@ namespace Weingartner.Numerics
             return new decimal(bits);
         }
 
+        public static double Blend(this double v0, double v1, double blend)
+        {
+            Debug.Assert(blend>=0);
+            Debug.Assert(blend<=1);
+            return v0 + blend*(v1-v0);
+        }
 
     }
 }
