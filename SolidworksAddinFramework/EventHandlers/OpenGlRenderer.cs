@@ -3,8 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
+using JetBrains.Annotations;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Events;
@@ -86,7 +88,8 @@ namespace SolidworksAddinFramework
             if (mv == null)
                 throw new ArgumentNullException(nameof(mv));
 
-            GLDoubleBuffer = new GLDoubleBuffer(mv);
+            _GlDoubleBuffer = new GLDoubleBuffer(mv);
+            _Scheduler = DispatcherScheduler.Current;
 
             _MView = mv;
 
@@ -95,7 +98,7 @@ namespace SolidworksAddinFramework
             {
                 var time = DateTime.Now;
                 var layers =
-                    GLDoubleBuffer.Front.GroupBy(o => o.Value.Item1)
+                    _GlDoubleBuffer.Front.GroupBy(o => o.Value.Item1)
                         .OrderBy(o => o.Key)
                         .Select(o => new {Index = o.Key, Renderables = o.Select(q => q.Value.Item2).ToList()})
                         .ToList();
@@ -111,7 +114,8 @@ namespace SolidworksAddinFramework
             });
         }
 
-        private readonly GLDoubleBuffer GLDoubleBuffer;
+        private readonly GLDoubleBuffer _GlDoubleBuffer;
+        private readonly IScheduler _Scheduler;
 
         private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
         {
@@ -120,13 +124,13 @@ namespace SolidworksAddinFramework
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
-            GLDoubleBuffer.Update(b => b.SetItem(renderable, Tuple.Create(layer, renderable)));
+            _GlDoubleBuffer.Update(b => b.SetItem(renderable, Tuple.Create(layer, renderable)));
 
             Redraw(doc);
 
             return Disposable.Create(() =>
             {
-                GLDoubleBuffer.Update(btr =>
+                _GlDoubleBuffer.Update(btr =>
                 {
                     if (btr.ContainsKey(renderable))
                     {
@@ -151,7 +155,7 @@ namespace SolidworksAddinFramework
                 .IfSome(renderer =>
                 {
                     var activeView = (IModelView) doc.ActiveView;
-                    if (renderer.GLDoubleBuffer.FrontIsActive)
+                    if (renderer._GlDoubleBuffer.FrontIsActive)
                         activeView.GraphicsRedraw(null);
                 });
         }
@@ -188,34 +192,35 @@ namespace SolidworksAddinFramework
             _Disposable.Dispose();
         }
 
-
-        public static IDisposable DeferRedraw(IModelDoc2 doc, Func<IDisposable> fn  )
+        private IDisposable DeferRedraw(Func<GLDoubleBuffer, IDisposable> action)
         {
-            if (doc == null)
-                throw new ArgumentNullException(nameof(doc));
-            if (fn == null)
-                throw new ArgumentNullException(nameof(fn));
+            return new ScheduledDisposable(_Scheduler, action(_GlDoubleBuffer));
+        }
 
+        private static IDisposable DeferRedraw([NotNull] IModelDoc2 doc, [NotNull] Func<GLDoubleBuffer, IDisposable> action)
+        {
+            if (doc == null) throw new ArgumentNullException(nameof(doc));
+            if (action == null) throw new ArgumentNullException(nameof(action));
 
-            return  ((IReadOnlyDictionary<IModelDoc2,OpenGlRenderer>) Lookup)
+            return ((IReadOnlyDictionary<IModelDoc2, OpenGlRenderer>) Lookup)
                 .TryGetValue(doc)
-                .Match
-                    ( v=>v.GLDoubleBuffer.RunWithBackBuffer(fn)
-                    , ()=>Disposable.Empty
-                    );
+                .Match(
+                    v => v.DeferRedraw(action),
+                    () => Disposable.Empty
+                );
+        }
+
+        public static IDisposable DeferRedraw(IModelDoc2 doc, [NotNull] Func<IDisposable> fn)
+        {
+            if (fn == null) throw new ArgumentNullException(nameof(fn));
+
+            Func<GLDoubleBuffer, IDisposable> getDisposable = p => p.RunWithBackBuffer(fn);
+            return DeferRedraw(doc, getDisposable);
         }
 
         public static IDisposable DeferRedraw(IModelDoc2 doc)
         {
-            if (doc == null)
-                throw new ArgumentNullException(nameof(doc));
-
-            return  ((IReadOnlyDictionary<IModelDoc2,OpenGlRenderer>) Lookup)
-                .TryGetValue(doc)
-                .Match
-                    ( v=>v.GLDoubleBuffer.SwitchToBackBufferTemporarily()
-                    , ()=>Disposable.Empty
-                    );
+            return DeferRedraw(doc, b => b.SwitchToBackBufferTemporarily());
         }
 
     }
