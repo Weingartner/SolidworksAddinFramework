@@ -8,7 +8,7 @@ namespace SolidworksAddinFramework.EventHandlers
     {
         private readonly Thread _InitialThread;
 
-        public DoubleBuffer(T t)
+        protected DoubleBuffer(T t)
         {
             Back = t;
             Front = t;
