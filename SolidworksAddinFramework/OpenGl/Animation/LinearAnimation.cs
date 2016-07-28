@@ -21,9 +21,19 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public Matrix4x4 Transform( TimeSpan deltaTime)
         {
-            var beta = deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
+            var beta = DeltaTimeToBlend(deltaTime);
 
             return BlendTransform(beta);
+        }
+
+        private double DeltaTimeToBlend(TimeSpan deltaTime)
+        {
+            return deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
+        }
+
+        public void Notify(TimeSpan deltaTime)
+        {
+            From.Notify(To, DeltaTimeToBlend(deltaTime));
         }
 
         public Matrix4x4 BlendTransform(double beta)

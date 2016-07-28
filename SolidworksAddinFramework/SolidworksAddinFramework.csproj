@@ -213,7 +213,6 @@
     <Compile Include="Geometry\FaceExtensions.cs" />
     <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
-    <Compile Include="NotifyingInterpolatable.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
     <Compile Include="OpenGl\Animation\AnimatorBase.cs" />

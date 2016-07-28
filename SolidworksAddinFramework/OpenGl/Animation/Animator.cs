@@ -49,6 +49,8 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
             var currentTransform = currentSection.Section.Transform(t - startTime);
 
+            currentSection.Section.Notify(t-startTime);
+
             foreach (var child in _Children)
             {
                 child.ApplyTransform(currentTransform);

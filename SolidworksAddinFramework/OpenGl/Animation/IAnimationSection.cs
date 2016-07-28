@@ -13,5 +13,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         /// <param name="deltaTime">time from the begining of the start of this section</param>
         /// <returns></returns>
         Matrix4x4 Transform(TimeSpan deltaTime);
+
+        void Notify(TimeSpan deltaTime);
     }
 }
