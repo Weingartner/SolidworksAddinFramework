@@ -656,8 +656,6 @@ namespace SolidworksAddinFramework
                 .Where(b => b.Count == 2)
                 .Select(b =>
                 {
-                    Debug.Assert(b[0].Mark == b[1].Mark);
-
                     var previous = b[0].ObjectIds.ToList();
                     var current = b[1].ObjectIds.ToList();
                     var sections = Diff.CalculateSections(previous, current);
