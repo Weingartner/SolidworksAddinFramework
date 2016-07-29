@@ -44,6 +44,8 @@ namespace SolidworksAddinFramework.OpenGl
 
         private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
 
+        public static Mesh Empty = new Mesh(Color.Black, false, Enumerable.Empty<TriangleWithNormals>());
+
         public Mesh(Color color, bool isSolid,
             [NotNull] IEnumerable<TriangleWithNormals> tris, IReadOnlyList<Edge3> edges = null)
         {
