@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Markup;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -39,6 +43,51 @@ namespace SolidworksAddinFramework
                 
             }
         }
+
+        internal class Group<TKey,TValue> : IGrouping<TKey, TValue>
+        {
+            private readonly ImmutableList<TValue> Values;
+
+            public Group(TKey key, ImmutableList<TValue> values)
+            {
+                Values = values;
+                Key = key;
+            }
+
+            public IEnumerator<TValue> GetEnumerator()
+            {
+                return Values.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public TKey Key { get; }
+        }
+
+        public static IEnumerable<IGrouping<TKey, TValue>> GroupAdjacent<TValue, TKey>(this IEnumerable<TValue> e,
+            Func<TValue, TKey> keySelector)
+        {
+            var list = new List<TValue>();
+            var currentKey = Option<TKey>.None; 
+            foreach (var value in e)
+            {
+                var key = keySelector(value);
+                if (key != currentKey)
+                {
+                    if (!currentKey.IsNone)
+                        yield return new Group<TKey, TValue>(currentKey.__Value__(), list.ToImmutableList());
+                    list = new List<TValue>();
+                    currentKey = key;
+                }
+                list.Add(value);
+            }
+            if (!currentKey.IsNone)
+                yield return new Group<TKey, TValue>(currentKey.__Value__(), list.ToImmutableList());
+            
+        } 
 
         /// <summary>
         /// Switch the dimensions in IEnumerable of IEnumerable. Assumes

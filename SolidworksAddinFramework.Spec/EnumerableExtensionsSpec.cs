@@ -37,6 +37,25 @@ namespace SolidworksAddinFramework.Spec
             r.Count.Should().Be(3);
 
         }
+
+        [Fact]
+        public void GroupAdjacentShouldWork()
+        {
+            var e = new[] {0, 0, 1, 1, 2, 3, 4, 2, 2, 2, 7, 9};
+            var result = e
+                .GroupAdjacent(v => v)
+                .ToList();
+
+            result.Count.Should().Be(8);
+            result[0].Should().Equal(0, 0);
+            result[1].Should().Equal(1, 1);
+            result[2].Should().Equal(2);
+            result[3].Should().Equal(3);
+            result[4].Should().Equal(4);
+            result[5].Should().Equal(2, 2, 2);
+            result[6].Should().Equal(7);
+            result[7].Should().Equal(9);
+        }
     }
 
 }
