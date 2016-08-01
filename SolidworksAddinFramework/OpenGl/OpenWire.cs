@@ -13,23 +13,24 @@ namespace SolidworksAddinFramework.OpenGl
     public abstract class Wire : RenderableBase
     {
         private IReadOnlyList<Vector3> _Points;
-        private readonly float _Thickness;
         private readonly PrimitiveType _Mode;
-        private Color _Color;
+        public float Thickness { get; set; }
+
+        public Color Color { get; set; }
 
         protected Wire(IEnumerable<Vector3> points, float thickness, PrimitiveType mode, Color color)
         {
             _Points = points.ToList();
-            _Thickness = thickness;
+            Thickness = thickness;
             _Mode = mode;
-            _Color = color;
+            Color = color;
             UpdateBoundingSphere(_Points);
         }
 
         public override void Render(DateTime time)
         {
-            using (ModernOpenGl.SetLineWidth(_Thickness))
-            using (ModernOpenGl.SetColor(_Color, ShadingModel.Smooth, solidBody:false))
+            using (ModernOpenGl.SetLineWidth(Thickness))
+            using (ModernOpenGl.SetColor(Color, ShadingModel.Smooth, solidBody:false))
             using (ModernOpenGl.Begin(_Mode))
             {
                 _Points.ForEach(p=>p.GLVertex3());
