@@ -46,20 +46,9 @@ namespace SolidworksAddinFramework.Wpf
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                int count = AssociatedObject.Items.Count;
-                if (count == 0)
-                    return;
-
-                var item = AssociatedObject.Items[count - 1];
-
-                var frameworkElement =
-                    AssociatedObject.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
-                if (frameworkElement == null) return;
-
-                frameworkElement.BringIntoView();
-            }
+            AssociatedObject.Items.MoveCurrentToLast();
+            if(AssociatedObject.Items.Count>0)
+                AssociatedObject.ScrollIntoView(AssociatedObject.Items.CurrentItem);
         }
     }
 }
