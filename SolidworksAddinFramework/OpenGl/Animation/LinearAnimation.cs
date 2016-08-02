@@ -31,11 +31,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             return deltaTime.TotalMilliseconds/Duration.TotalMilliseconds;
         }
 
-        public void Notify(TimeSpan deltaTime)
-        {
-            From.Notify(To, DeltaTimeToBlend(deltaTime));
-        }
-
         public Matrix4x4 BlendTransform(double beta)
         {
             Debug.Assert(beta>=0 && beta<=1);
