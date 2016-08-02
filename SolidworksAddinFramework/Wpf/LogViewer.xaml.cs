@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
@@ -19,19 +22,35 @@ namespace SolidworksAddinFramework.Wpf
         {
             InitializeComponent();
             DataContext = LogEntries = new ObservableCollection<LogEntry>();
+
         }
 
-        private static Lazy<LogViewer> Window = new Lazy<LogViewer>(() =>
-        {
-            var viewer = new LogViewer();
-            viewer.Show();
-            return viewer;
-        }); 
+        private static Lazy<LogViewer> Window = new Lazy<LogViewer>(() => CreateLogViewer().Result); 
 
         public static void Log(LogEntry entry)
         {
             var window = Window.Value;
             window.Dispatcher.Invoke(()=> window.LogEntries.Add(entry));
+        }
+
+        public static Task<LogViewer> CreateLogViewer()
+        {
+            var tcs = new TaskCompletionSource<LogViewer>();
+            var thread = new Thread(() =>
+            {
+                // Set up the SynchronizationContext so that any awaits
+                // resume on the STA thread as they would in a GUI app.
+                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext());
+                var viewer = new LogViewer();
+                viewer.Show();
+                tcs.SetResult(viewer);
+                Dispatcher.Run();
+            });
+            thread.Name = "LoggerThread";
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            return tcs.Task;
         }
 
         private static int CurrentIndex = 0;

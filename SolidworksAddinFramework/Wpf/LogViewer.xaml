@@ -68,7 +68,7 @@
         <TextBlock Text="{Binding Count, StringFormat='{}{0} Items'}"
                DockPanel.Dock="Top"/>
 
-        <ListBox ItemsSource="{Binding}">
+        <ListBox x:Name="ListBox" ItemsSource="{Binding}">
             <i:Interaction.Behaviors>
                 <local:ScrollOnNewItem/>
             </i:Interaction.Behaviors>
