@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Numerics;
-using System.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
@@ -14,13 +12,11 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public override ImmutableList<IAnimationSection> Sections { get; }
         private readonly ImmutableList<IRenderable> _Children;
-        private readonly IObserver<AnimationData> _RenderObserver;
 
-        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children, IObserver<AnimationData> renderObserver)
+        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children)
         {
             Sections = sections;
             _Children = children;
-            _RenderObserver = renderObserver ?? Observer.Create<AnimationData>(_ => {});
         }
 
         public override void OnStart(DateTime startTime)
@@ -54,8 +50,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 child.ApplyTransform(currentTransform);
                 child.Render(t);
             }
-
-            _RenderObserver.OnNext(new AnimationData(currentSection.Section));
         }
     }
 }
