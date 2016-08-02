@@ -701,12 +701,12 @@ namespace SolidworksAddinFramework
             ReactiveUI.Reflection.TrySetValueToPropertyChain(model, expressionChain, newSelection);
         }
 
-        protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick)
+        protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick, Func<IPropertyManagerPageButton,IDisposable> config = null)
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateButton(@group, id, caption, tip);
             var d0 = ButtonPressedObservable(id).Subscribe(_ => onClick());
-            return ControlHolder.Create(@group, box, d0);
+            return ControlHolder.Create(@group, box, d0,config?.Invoke(box) ?? Disposable.Empty);
         }
 
         protected IDisposable CreateSlider<T, TProp>(
