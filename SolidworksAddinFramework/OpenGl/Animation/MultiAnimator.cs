@@ -25,7 +25,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             if (_Animators.Count == 0) return;
 
             _ReferenceTime = startTime;
-            var animatorStartTime = _ReferenceTime = startTime;
+            var animatorStartTime = _ReferenceTime;
             foreach (var animator in _Animators)
             {
                 animator.OnStart(animatorStartTime);
