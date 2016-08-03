@@ -39,6 +39,15 @@ namespace SolidworksAddinFramework
         }
 
         /// <summary>
+        /// Invokes the action if it is there.
+        /// </summary>
+        /// <param name="a"></param>
+        public static void Invoke(this Option<Action> a)
+        {
+            a.IfSome(fn => fn());
+        }
+
+        /// <summary>
         /// Fluent version Optional
         /// </summary>
         /// <typeparam name="T"></typeparam>
