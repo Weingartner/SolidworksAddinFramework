@@ -44,6 +44,26 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(s,d);
 
         }
+        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Func<T, Task<IDisposable>> fn, Action<Exception> errHandler)
+        {
+            var d = new SerialDisposable();
+
+            var s = o.Subscribe(v =>
+            {
+                d.Disposable = Disposable.Empty;
+                var task =  fn(v) ?? Task.FromResult(Disposable.Empty);
+                d.Disposable = Transform(task);
+            }, onError:errHandler);
+
+            return new CompositeDisposable(s,d);
+
+        }
+
+        static IDisposable Transform(Task<IDisposable> d)
+        {
+            return Disposable.Create(async () => (await d).Dispose());
+        }
+
 
         /// <summary>
         /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using SolidworksAddinFramework.Events;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.Exceptional.Reactive;
 
 namespace SolidworksAddinFramework
 {
@@ -28,16 +29,17 @@ namespace SolidworksAddinFramework
 
         public static IDisposable DoWithOpenDoc(this SldWorks swApp, Func<IModelDoc2, IDisposable> action)
         {
-            return swApp.DocOpenObservable()
-                .SelectMany(doc =>
+            return swApp
+                .DocOpenObservable()
+                .ToObservableExceptional()
+                .SubscribeDisposable(async doc =>
                 {
                     var disposable = action(doc);
-                    return doc
+                    await doc
                         .DestroyNotify2Observable()
-                        .FirstAsync()
-                        .Select(_ => disposable);
-                })
-                .Subscribe(disposable => disposable.Dispose());
+                        .FirstAsync();
+                    return disposable;
+                }, err=>err.Show());
         }
 
         public static IDisposable DoWithOpenDoc(this SldWorks swApp, Action<IModelDoc2, Action<IDisposable>> action)
