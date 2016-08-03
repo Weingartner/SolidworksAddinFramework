@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Immutable;
 using System.Reactive.Disposables;
+using System.Runtime.InteropServices;
 using SolidworksAddinFramework.EventHandlers;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
@@ -18,12 +20,24 @@ namespace SolidworksAddinFramework
 
         public override void OnSwitchToFront()
         {
-            _ModelView.GraphicsRedraw(null);
+            Redraw();
         }
 
         public override void OnSwitchToBack()
         {
-            _ModelView.GraphicsRedraw(null);
+            Redraw();
+        }
+
+        private void Redraw()
+        {
+            try
+            {
+                _ModelView.GraphicsRedraw(null);
+            }
+            catch (COMException e)
+            {
+                LogViewer.Log($"Exception was expected '{e.Message}' but logging it anyway");
+            }
         }
 
         public T RunWithBackBuffer<T>(Func<T> fn)
