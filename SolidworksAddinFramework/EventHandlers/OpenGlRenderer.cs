@@ -128,7 +128,7 @@ namespace SolidworksAddinFramework
 
             Redraw(doc);
 
-            return Disposable.Create(() =>
+            var d = Disposable.Create(() =>
             {
                 _GlDoubleBuffer.Update(btr =>
                 {
@@ -143,6 +143,7 @@ namespace SolidworksAddinFramework
                 });
                 Redraw(doc);
             });
+            return new ScheduledDisposable(DispatcherScheduler.Current, d);
         }
 
         private static void Redraw(IModelDoc2 doc)
