@@ -39,9 +39,6 @@ namespace SolidworksAddinFramework
                 , IModelDoc2 modelDoc
                 , T data) : this(name, optionsE, swApp, modelDoc, new ReactiveTransaction<T>(data))
         {
-            this.WhenAnyValue(p => p.IsValid)
-                .Where(_ => Page != null)
-                .Subscribe(isValid => Page.EnableButton((int)swPropertyManagerPageButtons_e.swPropertyManagerPageButton_Ok, isValid));
         }
 
         protected override void OnShow()
@@ -70,11 +67,5 @@ namespace SolidworksAddinFramework
             base.OnUndo();
         }
 
-        bool _IsValid;
-        public bool IsValid 
-        {
-            get { return _IsValid; }
-            set { this.RaiseAndSetIfChanged(ref _IsValid, value); }
-        }
     }
 }

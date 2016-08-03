@@ -34,6 +34,19 @@ namespace SolidworksAddinFramework
         private readonly CompositeDisposable _Disposable = new CompositeDisposable();
         private IDisposable _Deselect;
 
+        /// <summary>
+        /// We default to true so that in the absense of any explicit validation
+        /// the accept button on the property manager page is always on
+        /// </summary>
+        bool _IsValid = true;
+        public bool IsValid 
+        {
+            get { return _IsValid; }
+            set { this.RaiseAndSetIfChanged(ref _IsValid, value); }
+        }
+
+        protected BehaviorSubject<Unit> ValidationSubject = new BehaviorSubject<Unit>(Unit.Default);
+
         protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
         {
 
@@ -45,6 +58,7 @@ namespace SolidworksAddinFramework
 
         private readonly Subject<Unit> _ShowSubject = new Subject<Unit>();
         public IObservable<Unit> ShowObservable => _ShowSubject.AsObservable(); 
+
         /// <summary>
         /// Creates a new SolidWorks property manager page, adds controls, and shows the page.
         /// </summary>
@@ -75,6 +89,15 @@ namespace SolidworksAddinFramework
 
                 Page.Show();
 
+                // Force validation of the page
+                ValidationSubject.OnNext(Unit.Default);
+
+                var d  = this.WhenAnyValue(p => p.IsValid)
+                    .Subscribe(isValid => Page.EnableButton((int)swPropertyManagerPageButtons_e.swPropertyManagerPageButton_Ok, isValid));
+
+                DisposeOnClose(d);
+
+
                 AddSelections();
             }
         }
@@ -102,7 +125,7 @@ namespace SolidworksAddinFramework
         /// The instance of the real solid works property manager page. You will still have to call some
         /// methods on this. Not all magic is done automatically.
         /// </summary>
-        public IPropertyManagerPage2 Page { get; set; }
+        public IPropertyManagerPage2 Page { get; private set; }
 
 
         private readonly Subject<Unit> _AfterActivation = new Subject<Unit>();
