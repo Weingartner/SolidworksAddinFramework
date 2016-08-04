@@ -19,7 +19,7 @@ namespace SolidworksAddinFramework.Spec
             var scheduler = new TestScheduler();
             var disposables = new List<BooleanDisposable>();
             var list = new CompositeDisposable();
-            var sub = scheduler.CreateColdObservable(
+            scheduler.CreateColdObservable(
                 new Recorded<Notification<long>>(100, Notification.CreateOnNext(0L)),
                 new Recorded<Notification<long>>(200, Notification.CreateOnNext(1L)),
                 new Recorded<Notification<long>>(300, Notification.CreateOnNext(2L)),
