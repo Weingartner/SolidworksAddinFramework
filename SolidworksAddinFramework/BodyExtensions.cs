@@ -15,6 +15,7 @@ using LanguageExt;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
