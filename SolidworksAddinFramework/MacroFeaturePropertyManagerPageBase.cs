@@ -10,7 +10,7 @@ namespace SolidworksAddinFramework
         where TMacroFeature : MacroFeatureBase<TMacroFeature,TData>
     {
         protected MacroFeaturePropertyManagerPageBase(IEnumerable<swPropertyManagerPageOptions_e> options,TMacroFeature macroFeature) 
-            : base(macroFeature.FeatureName, options, macroFeature.SwApp, macroFeature.ModelDoc)
+            : base(macroFeature.FeatureName, options, macroFeature.ModelDoc)
         {
             MacroFeature = macroFeature;
         }

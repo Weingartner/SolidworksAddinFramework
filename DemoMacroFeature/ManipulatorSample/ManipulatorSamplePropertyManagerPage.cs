@@ -30,7 +30,7 @@ namespace DemoMacroFeatures.ManipulatorSample
 
 
         public ManipulatorSamplePropertyManagerPage(ISldWorks swApp, IModelDoc2 modelDoc) 
-            : base("Manipulator Sample", Options, swApp, modelDoc)
+            : base("Manipulator Sample", Options, modelDoc)
         {
         }
 

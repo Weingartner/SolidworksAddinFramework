@@ -20,7 +20,7 @@ namespace SolidworksAddinFramework
                 , IEnumerable<swPropertyManagerPageOptions_e> optionsE
                 , ISldWorks swApp
                 , IModelDoc2 modelDoc
-                , T data) : base(name, optionsE, swApp, modelDoc, data)
+                , T data) : base(name, optionsE, modelDoc, data)
         {
         }
 

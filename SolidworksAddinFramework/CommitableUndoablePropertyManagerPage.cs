@@ -24,20 +24,18 @@ namespace SolidworksAddinFramework
 
         private CommitableUndoablePropertyManagerPage(string name
             , IEnumerable<swPropertyManagerPageOptions_e> optionsE
-            , ISldWorks swApp
             , IModelDoc2 modelDoc
             , ReactiveTransaction<T> transaction)
-            : base(name, optionsE.Concat(new[] { swPropertyManagerPageOptions_e.swPropertyManagerOptions_UndoButton }), swApp, modelDoc, transaction.Data)
+            : base(name, optionsE.Concat(new[] { swPropertyManagerPageOptions_e.swPropertyManagerOptions_UndoButton }), modelDoc, transaction.Data)
         {
             _Transaction = transaction;
         }
 
         protected CommitableUndoablePropertyManagerPage
-            (string name
-                , IEnumerable<swPropertyManagerPageOptions_e> optionsE
-                , ISldWorks swApp
-                , IModelDoc2 modelDoc
-                , T data) : this(name, optionsE, swApp, modelDoc, new ReactiveTransaction<T>(data))
+            ( string name
+            , IEnumerable<swPropertyManagerPageOptions_e> optionsE
+            , IModelDoc2 modelDoc
+            , T data) : this(name, optionsE, modelDoc, new ReactiveTransaction<T>(data))
         {
         }
 

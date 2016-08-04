@@ -47,10 +47,10 @@ namespace SolidworksAddinFramework
 
         protected BehaviorSubject<Unit> ValidationSubject = new BehaviorSubject<Unit>(Unit.Default);
 
-        protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, ISldWorks swApp, IModelDoc2 modelDoc)
+        protected PropertyManagerPageBase(string name, IEnumerable<swPropertyManagerPageOptions_e> optionsE, IModelDoc2 modelDoc)
         {
 
-            SwApp = swApp;
+            SwApp = SwAddinBase.Active.SwApp;
             ModelDoc = modelDoc;
             _Name = name;
             _OptionsE = optionsE;

@@ -14,10 +14,8 @@ namespace SolidworksAddinFramework
 
         protected ReactiveObjectPropertyManagerPageBase
             (string name
-                , IEnumerable<swPropertyManagerPageOptions_e> optionsE
-                , ISldWorks swApp
-                , IModelDoc2 modelDoc
-                , T data) : base(name, optionsE, swApp, modelDoc)
+                , IEnumerable<swPropertyManagerPageOptions_e> optionsE, IModelDoc2 modelDoc
+                , T data) : base(name, optionsE, modelDoc)
         {
             Data = data;
         }
