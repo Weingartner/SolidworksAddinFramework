@@ -80,6 +80,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Reactive.Testing">
+      <HintPath>$(SolutionDir)packages\Rx-Testing.2.2.5\lib\net45\Microsoft.Reactive.Testing.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -160,6 +163,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisposableExtensionsSpec.cs" />
     <Compile Include="EnumerableExtensionsSpec.cs" />
     <Compile Include="Geometry\PlanePolygonSpec.cs" />
     <Compile Include="GetTrimCurves2DataReaderSpec.cs" />

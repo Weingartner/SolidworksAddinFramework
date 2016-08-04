@@ -44,26 +44,6 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(s,d);
 
         }
-        public static IDisposable SubscribeDisposable<T>(this IObservableExceptional<T> o, Func<T, Task<IDisposable>> fn, Action<Exception> errHandler)
-        {
-            var d = new SerialDisposable();
-
-            var s = o.Subscribe(v =>
-            {
-                d.Disposable = Disposable.Empty;
-                var task =  fn(v) ?? Task.FromResult(Disposable.Empty);
-                d.Disposable = Transform(task);
-            }, onError:errHandler);
-
-            return new CompositeDisposable(s,d);
-
-        }
-
-        static IDisposable Transform(Task<IDisposable> d)
-        {
-            return Disposable.Create(async () => (await d).Dispose());
-        }
-
 
         /// <summary>
         /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
@@ -285,7 +265,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IObservable<Unit> SelectAsync<TIn>(this IObservable<TIn> o, Func<TIn, CancellationToken, Task> selector)
         {
-            Func<TIn,CancellationToken,Task<Unit>> wrapper =
+            Func<TIn, CancellationToken, Task<Unit>> wrapper =
                 async (t, token) =>
                 {
                     await selector(t, token);
@@ -313,7 +293,7 @@ namespace SolidworksAddinFramework
         /// 
         /// This will also raise a message box if an exception is thrown downstream.
         /// </summary>
-        public static IObservableExceptional<U> ObserveOnSolidworksThread<T,U>(this IObservableExceptional<T> source, Func<T,CancellationToken,U> selector )
+        public static IObservableExceptional<U> ObserveOnSolidworksThread<T,U>(this IObservableExceptional<T> source, Func<T, CancellationToken, U> selector )
         {
             return source
                 .StartWith(default(T))
@@ -328,7 +308,7 @@ namespace SolidworksAddinFramework
                 .ObserveOn(UiDispatcherScheduler.Default)
                 .Select(b => selector(b.s, b.cts.Token));
         }
-        public static IObservableExceptional<Task> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source, Func<T,CancellationToken,Task> selector )
+        public static IObservableExceptional<Task> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source, Func<T, CancellationToken, Task> selector )
         {
             return source
                 .StartWith(default(T))
@@ -492,6 +472,20 @@ namespace SolidworksAddinFramework
         {
             obs.Connect().DisposeWith(d);
             return obs;
+        }
+
+        public static IObservable<TResult> SelectDisposable<T, TDisposable, TResult>(
+            this IObservable<T> obs,
+            CompositeDisposable d,
+            Func<T, TDisposable> disposableSelector,
+            Func<T, TDisposable, TResult> resultSelector)
+            where TDisposable : IDisposable
+        {
+            return obs.Select(p =>
+            {
+                var disposable = disposableSelector(p).DisposeWith(d);
+                return resultSelector(p, disposable);
+            });
         }
     }
 }
