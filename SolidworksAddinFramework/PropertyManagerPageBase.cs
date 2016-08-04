@@ -384,6 +384,30 @@ namespace SolidworksAddinFramework
             var d = ListBoxSelectionObservable(id).Subscribe(set);
             return ControlHolder.Create(@group, list, d);
         }
+
+        protected IDisposable CreateComboBox<TEnum, TModel>(
+            IPropertyManagerPageGroup @group,
+            string caption,
+            string tip,
+            Func<TEnum, string> itemToStringFn,
+            TModel model,
+            Expression<Func<TModel, TEnum>> selectedItemExpression,
+            Action<IPropertyManagerPageCombobox> config = null)
+        {
+            var items = Enum.GetValues(typeof (TEnum))
+                .CastArray<TEnum>()
+                .ToCompositeList();
+            return CreateComboBox(group,
+                caption,
+                tip,
+                items,
+                EqualityComparer<TEnum>.Default,
+                itemToStringFn,
+                model,
+                selectedItemExpression,
+                config);
+        }
+
         protected IDisposable CreateComboBox<T, TModel>(
             IPropertyManagerPageGroup @group,
             string caption,
