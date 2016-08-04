@@ -33,6 +33,11 @@ namespace SolidworksAddinFramework.Wpf
             window.Dispatcher.Invoke(()=> window.LogEntries.Add(entry));
         }
 
+        public static void Invoke(Action a)
+        {
+            Window.Value.Dispatcher.Invoke(a);
+        }
+
         public static Task<LogViewer> CreateLogViewer()
         {
             var tcs = new TaskCompletionSource<LogViewer>();

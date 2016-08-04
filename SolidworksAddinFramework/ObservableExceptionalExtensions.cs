@@ -8,6 +8,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using LanguageExt;
 using ReactiveUI;
+using SolidworksAddinFramework.Wpf;
 using Weingartner.Exceptional;
 using Weingartner.Exceptional.Async;
 using Weingartner.Exceptional.Reactive;
@@ -49,6 +50,14 @@ namespace SolidworksAddinFramework
                 .Select(v => v.SelectMany(e0 => e0))
                 .ToObservableExceptional();
         }
-        public static void Show(this Exception e) => new ExceptionReporting.ExceptionReporter().Show(e);
+        public static void Show(this Exception e)
+        {
+            // Exceptions viewer must be shown on STA thread.
+            LogViewer.Invoke(()=>
+            {
+                var exceptionReporter = new ExceptionReporting.ExceptionReporter();
+                exceptionReporter.Show(e);
+            });
+        }
     }
 }
