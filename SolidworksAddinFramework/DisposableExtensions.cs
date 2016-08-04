@@ -35,10 +35,15 @@ namespace SolidworksAddinFramework
                 container.Add(disposable);
             return disposable;
         }
-        public static void DisposeWith<T>(this IEnumerable<T> disposable, CompositeDisposable container)
+        public static void DisposeEnumerableWith<T>(this IEnumerable<T> disposable, CompositeDisposable container)
             where T : IDisposable
         {
             disposable?.ForEach(d=>container.Add(d));
+        }
+        public static void DisposeEnumerable<T>(this IEnumerable<T> disposable)
+            where T : IDisposable
+        {
+            disposable?.ForEach(d=>d.Dispose());
         }
 
         public static IDisposable DisposeOn(this IDisposable d, IScheduler s )=>
