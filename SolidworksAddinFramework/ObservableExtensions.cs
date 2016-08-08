@@ -463,6 +463,11 @@ namespace SolidworksAddinFramework
             return q.SelectMany(o => o.Match(EnumerableEx.Return, Enumerable.Empty<T>));
         }
 
+        public static IObservableExceptional<T> WhereIsSome<T>(this IObservableExceptional<Option<T>> q)
+        {
+            return q.SelectMany(o => o.Match(ObservableExceptional.Return, ObservableExceptional.Empty<T>));
+        }
+
         public static IObservable<Unit> Ignore<T>(this IObservable<T> obs)
         {
             return obs.Select(_ => Unit.Default);
