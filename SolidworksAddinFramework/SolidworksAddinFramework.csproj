@@ -203,6 +203,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayExtensions.cs" />
+    <Compile Include="EditorView\Editor.cs" />
+    <Compile Include="EditorView\EditorEmpty.cs" />
+    <Compile Include="EditorView\IEditable.cs" />
+    <Compile Include="EditorView\IEditor.cs" />
+    <Compile Include="EditorView\ReactiveEditCommand.cs" />
     <Compile Include="Geometry\BSpline.cs" />
     <Compile Include="Geometry\BSpline2D.cs" />
     <Compile Include="Geometry\BSpline3D.cs" />

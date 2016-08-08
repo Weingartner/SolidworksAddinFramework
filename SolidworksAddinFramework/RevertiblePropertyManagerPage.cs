@@ -26,7 +26,7 @@ namespace SolidworksAddinFramework
 
         protected override void OnShow()
         {
-            OnCommit();
+            CloneData();
         }
 
         protected override void OnCancel()
@@ -38,6 +38,11 @@ namespace SolidworksAddinFramework
         }
 
         protected override void OnCommit()
+        {
+            CloneData();
+        }
+
+        private void CloneData()
         {
             _Original = Json.Clone(Data);
         }

@@ -7,10 +7,14 @@ using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using DiffLib;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using SolidworksAddinFramework.EditorView;
 using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -26,7 +30,7 @@ namespace SolidworksAddinFramework
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase : ReactiveObject, IPropertyManagerPage2Handler9, IDisposable
+    public abstract class PropertyManagerPageBase : ReactiveObject, IPropertyManagerPage2Handler9, IEditor
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
@@ -142,14 +146,12 @@ namespace SolidworksAddinFramework
             _Deselect.Dispose();
         }
 
-        protected abstract void OnClose(swPropertyManagerPageCloseReasons_e reason);
+        protected readonly TaskCompletionSource<bool> _CloseTaskSource = new TaskCompletionSource<bool>();
+        public Task<bool> Closed => _CloseTaskSource.Task;
 
-        private readonly Subject<Unit> _AfterCloseSubject = new Subject<Unit>();
-        public IObservable<Unit> AfterCloseObservable => _AfterCloseSubject.AsObservable(); 
         public void AfterClose()
         {
             Page = null;
-            _AfterCloseSubject.OnNext(Unit.Default);
         }
 
         public virtual bool OnHelp()
@@ -863,6 +865,52 @@ namespace SolidworksAddinFramework
                                     });
                         });
                 });
+        }
+
+        [Reactive]
+        public bool IsEditing { get; private set; }
+
+        public async Task<bool> Edit()
+        {
+            try
+            {
+                IsEditing = true;
+                Show();
+                return await Closed;
+            }
+            finally
+            {
+                IsEditing = false;
+            }
+        }
+
+        protected virtual void OnClose(swPropertyManagerPageCloseReasons_e reason)
+        {
+            switch (reason)
+            {
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UnknownReason:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_UserEscape:
+                    OnCancel();
+                    _CloseTaskSource.SetResult(false);
+                    break;
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Okay:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Apply:
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Closed: // renders as green tick, so I guess it means "save"
+                case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_ParentClosed: // don't know what this is, maybe it applies to `swPropertyManagerPageOptions_e .swPropertyManagerOptions_MultiplePages`
+                default:
+                    OnCommit();
+                    _CloseTaskSource.SetResult(true);
+                    break;
+            }
+        }
+
+        protected virtual void OnCommit()
+        {
+        }
+
+        protected virtual void OnCancel()
+        {
         }
     }
 
