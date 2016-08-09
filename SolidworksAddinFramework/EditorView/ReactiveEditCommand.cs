@@ -5,8 +5,10 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using SolidworksAddinFramework.Wpf;
 
 namespace SolidworksAddinFramework.EditorView
 {
@@ -14,16 +16,16 @@ namespace SolidworksAddinFramework.EditorView
     {
         public Func<IEditor> CreateEditor { get; }
         public IObservable<bool> CanExecute { get; }
-        public IScheduler Scheduler { get; }
+        public IScheduler EditorScheduler { get; }
 
         public ReactiveEditCommand(
             Func<IEditor> createEditor,
             IObservable<bool> canExecute,
-            IScheduler scheduler)
+            IScheduler editorScheduler)
         {
             CreateEditor = createEditor;
             CanExecute = canExecute;
-            Scheduler = scheduler;
+            EditorScheduler = editorScheduler;
         }
 
         public static ReactiveEditCommand Create(Func<IEditor> createEditor)
@@ -31,13 +33,13 @@ namespace SolidworksAddinFramework.EditorView
             return new ReactiveEditCommand(
                 createEditor,
                 Observable.Return(true),
-                DispatcherScheduler.Current);
+                UiDispatcherScheduler.Default);
         }
     }
 
     public static class ReactiveEditCommandExtensions
     {
-        public static ReactiveCommand<Unit> RegisterWith(
+        public static IReactiveCommand RegisterWith(
             this ReactiveEditCommand command,
             ISerialCommandController serialCommandController)
         {
@@ -47,7 +49,7 @@ namespace SolidworksAddinFramework.EditorView
 
     public interface ISerialCommandController : INotifyPropertyChanged
     {
-        ReactiveCommand<Unit> Register(ReactiveEditCommand command);
+        IReactiveCommand Register(ReactiveEditCommand command);
     }
 
     /// <summary>
@@ -57,14 +59,26 @@ namespace SolidworksAddinFramework.EditorView
     {
         [Reactive] public bool CanEdit { get; private set; } = true;
 
-        public ReactiveCommand<Unit> Register(ReactiveEditCommand commandSpec)
+        public IReactiveCommand Register(ReactiveEditCommand commandSpec)
         {
             var canExecute = this.WhenAnyValue(p => p.CanEdit)
-                .CombineLatest(commandSpec.CanExecute, (a, b) => a && b);
-            var command = ReactiveCommand.CreateAsyncTask(
-                canExecute,
-                o => ExecuteEditor(commandSpec.CreateEditor()),
-                commandSpec.Scheduler);
+                .CombineLatest(commandSpec.CanExecute, (a, b) => a && b)
+                .ObserveOnDispatcher();
+            var command = ReactiveCommand.Create(canExecute);
+            command
+                .ObserveOn(commandSpec.EditorScheduler)
+                .Subscribe(async _ =>
+                {
+                    try
+                    {
+                        var editor = commandSpec.CreateEditor();
+                        await ExecuteEditor(editor);
+                    }
+                    catch (Exception e)
+                    {
+                        e.Show();
+                    }
+                });
             return command;
         }
 
