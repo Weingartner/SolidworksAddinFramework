@@ -50,6 +50,7 @@ namespace SolidworksAddinFramework.EditorView
     public interface ISerialCommandController : INotifyPropertyChanged
     {
         IReactiveCommand Register(ReactiveEditCommand command);
+        bool CanEdit { get; }
     }
 
     /// <summary>
