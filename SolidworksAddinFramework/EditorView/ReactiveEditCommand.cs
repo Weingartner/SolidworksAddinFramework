@@ -1,110 +1,84 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
-using Weingartner.ReactiveCompositeCollections.Annotations;
 
 namespace SolidworksAddinFramework.EditorView
 {
-    public class ReactiveEditCommand : ReactiveObject, IDisposable
+    public class ReactiveEditCommand
     {
-        public ReactiveCommand<IEditor> Command { get; }
-        private readonly CompositeDisposable _Disposable = new CompositeDisposable();
+        public Func<IEditor> CreateEditor { get; }
+        public IObservable<bool> CanExecute { get; }
+        public IScheduler Scheduler { get; }
 
         public ReactiveEditCommand(
             Func<IEditor> createEditor,
-            ISerialCommandController serialCommandController,
+            IObservable<bool> canExecute,
             IScheduler scheduler)
         {
-            Command = ReactiveCommand.CreateAsyncTask(
-                    this.WhenAnyValue(p => p.CanEdit),
-                    _ => Task.FromResult(createEditor()),
-                    scheduler
-                )
-                .DisposeWith(_Disposable);
-
-            serialCommandController
-                .Register(this)
-                .DisposeWith(_Disposable);
+            CreateEditor = createEditor;
+            CanExecute = canExecute;
+            Scheduler = scheduler;
         }
 
-        [Reactive]
-        public bool CanEdit { get; set; }
-
-        public void Dispose()
+        public static ReactiveEditCommand Create(Func<IEditor> createEditor)
         {
-            _Disposable.Dispose();
-            Command.Dispose();
-        }
-
-        public static ReactiveEditCommand Create(
-            Func<IEditor> createEditor,
-            ISerialCommandController serialCommandController)
-        {
-            return new ReactiveEditCommand(createEditor, serialCommandController, DispatcherScheduler.Current);
+            return new ReactiveEditCommand(
+                createEditor,
+                Observable.Return(true),
+                DispatcherScheduler.Current);
         }
     }
 
-    public interface ISerialCommandController
+    public static class ReactiveEditCommandExtensions
     {
-        IDisposable Register(ReactiveEditCommand command);
+        public static ReactiveCommand<Unit> RegisterWith(
+            this ReactiveEditCommand command,
+            ISerialCommandController serialCommandController)
+        {
+            return serialCommandController.Register(command);
+        }
+    }
+
+    public interface ISerialCommandController : INotifyPropertyChanged
+    {
+        ReactiveCommand<Unit> Register(ReactiveEditCommand command);
     }
 
     /// <summary>
     /// Allows only one edit command to be valid at a time
     /// </summary>
-    public class SerialCommandController : ISerialCommandController
+    public class SerialCommandController : ReactiveObject, ISerialCommandController
     {
-        private readonly List<ReactiveEditCommand> _Commands = new List<ReactiveEditCommand>();
-        public IDisposable Register(ReactiveEditCommand command)
+        [Reactive] public bool CanEdit { get; private set; } = true;
+
+        public ReactiveCommand<Unit> Register(ReactiveEditCommand commandSpec)
         {
-            var d = new CompositeDisposable();
-
-            command.CanEdit = true;
-            AddCommand(command)
-                .DisposeWith(d);
-
-            command.Command
-                .Subscribe(async editor => await ExecuteEditor(editor))
-                .DisposeWith(d);
-
-            return d;
-        }
-
-        private IDisposable AddCommand(ReactiveEditCommand command)
-        {
-            _Commands.Add(command);
-            return Disposable.Create(() => _Commands.Remove(command));
+            var canExecute = this.WhenAnyValue(p => p.CanEdit)
+                .CombineLatest(commandSpec.CanExecute, (a, b) => a && b);
+            var command = ReactiveCommand.CreateAsyncTask(
+                canExecute,
+                o => ExecuteEditor(commandSpec.CreateEditor()),
+                commandSpec.Scheduler);
+            return command;
         }
 
         private async Task ExecuteEditor(IEditor editor)
         {
             try
             {
-                DisableCommands();
+                CanEdit = false;
                 await editor.Edit();
             }
             finally
             {
-                EnableCommands();
+                CanEdit = true;
             }
-        }
-
-        private void EnableCommands()
-        {
-            _Commands.ForEach(c => c.CanEdit = true);
-        }
-
-        private void DisableCommands()
-        {
-            _Commands.ForEach(c => c.CanEdit = false);
         }
     }
 }
