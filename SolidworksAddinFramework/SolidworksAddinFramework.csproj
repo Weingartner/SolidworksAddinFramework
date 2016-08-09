@@ -208,6 +208,7 @@
     <Compile Include="EditorView\IEditable.cs" />
     <Compile Include="EditorView\IEditor.cs" />
     <Compile Include="EditorView\ReactiveEditCommand.cs" />
+    <Compile Include="EditorView\SerialCommandController.cs" />
     <Compile Include="Geometry\BSpline.cs" />
     <Compile Include="Geometry\BSpline2D.cs" />
     <Compile Include="Geometry\BSpline3D.cs" />
@@ -314,7 +315,7 @@
     <Compile Include="SwEq.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
-    <Compile Include="UiDispatcherScheduler.cs" />
+    <Compile Include="SolidworksSchedular.cs" />
     <Compile Include="Wpf\LogEntry.cs" />
     <Compile Include="Wpf\ScrollOnNewItem.cs" />
     <Compile Include="Wpf\LogViewer.xaml.cs">

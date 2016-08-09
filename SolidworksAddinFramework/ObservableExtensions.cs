@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -22,6 +23,7 @@ namespace SolidworksAddinFramework
 {
     public static class ObservableExtensions
     {
+
         #region SubscribeDisposable
         /// <summary>
         /// Subscribes to the observable sequence and manages the disposables with a serial disposable. That
@@ -305,7 +307,7 @@ namespace SolidworksAddinFramework
                     b[0].cts.Cancel();
                     return b[1];
                 })
-                .ObserveOn(UiDispatcherScheduler.Default)
+                .ObserveOn(SolidworksSchedular.Default)
                 .Select(b => selector(b.s, b.cts.Token));
         }
         public static IObservableExceptional<Task> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source, Func<T, CancellationToken, Task> selector )
@@ -319,7 +321,7 @@ namespace SolidworksAddinFramework
                     b[0].cts.Cancel();
                     return b[1];
                 })
-                .ObserveOn(UiDispatcherScheduler.Default)
+                .ObserveOn(SolidworksSchedular.Default)
                 .Select(async b =>
                 {
                     try
@@ -339,7 +341,7 @@ namespace SolidworksAddinFramework
 
         public static IObservableExceptional<T> ObserveOnSolidworksThread<T>(this IObservableExceptional<T> source) =>
             source
-            .ObserveOn(UiDispatcherScheduler.Default);
+            .ObserveOn(SolidworksSchedular.Default);
 
         /// <summary>
         /// A helper for attaching observables to solidworks events with delegates that have <![CDATA[Func<T>]]> type signitures.

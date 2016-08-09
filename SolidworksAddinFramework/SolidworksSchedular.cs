@@ -11,7 +11,7 @@ namespace SolidworksAddinFramework
     ///
     /// Borrowed from https://github.com/runceel/ReactiveProperty/blob/a97c47eafce04ecabebda548d7461304d90bd74c/Source/ReactiveProperty.Portable-NET45%2BWINRT%2BWP8/UIDispatcherScheduler.cs
     /// </summary>
-    public static class UiDispatcherScheduler
+    public static class SolidworksSchedular
     {
         private static Lazy<SynchronizationContextScheduler> DefaultScheduler { get; } =
             new Lazy<SynchronizationContextScheduler>(() =>
