@@ -11,6 +11,18 @@ using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework.Geometry
 {
+    public struct PointParamAndDepth
+    {
+        public readonly PointParam PointPar;
+        public readonly double Depth;
+
+        public PointParamAndDepth(PointParam pointPar, double depth)
+        {
+            PointPar = pointPar;
+            Depth = depth;
+        }
+    }
+
     public struct PointParam
     {
         public readonly Vector3 Point;
