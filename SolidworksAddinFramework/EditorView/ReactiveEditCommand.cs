@@ -15,19 +15,24 @@ namespace SolidworksAddinFramework.EditorView
 {
     public class ReactiveEditCommand : ReactiveObject, IDisposable
     {
-        public IEditor Editor => _CreateEditor();
         public ReactiveCommand<IEditor> Command { get; }
-        private readonly Func<IEditor> _CreateEditor;
-        private IDisposable _Disposable;
+        private readonly CompositeDisposable _Disposable = new CompositeDisposable();
 
-        public ReactiveEditCommand(Func<IEditor> createEditor, ISerialCommandController serialCommandController, IScheduler schedular = null)
+        public ReactiveEditCommand(
+            Func<IEditor> createEditor,
+            ISerialCommandController serialCommandController,
+            IScheduler scheduler)
         {
-            _CreateEditor = createEditor;
-            Command = ReactiveCommand.CreateAsyncTask
-                (this.WhenAnyValue(p => p.CanEdit)
-                    ,_=>Task.FromResult(createEditor())
-                    ,schedular ?? UiDispatcherScheduler.Default);
-            _Disposable = serialCommandController.Register(this);
+            Command = ReactiveCommand.CreateAsyncTask(
+                    this.WhenAnyValue(p => p.CanEdit),
+                    _ => Task.FromResult(createEditor()),
+                    scheduler
+                )
+                .DisposeWith(_Disposable);
+
+            serialCommandController
+                .Register(this)
+                .DisposeWith(_Disposable);
         }
 
         [Reactive]
@@ -39,6 +44,12 @@ namespace SolidworksAddinFramework.EditorView
             Command.Dispose();
         }
 
+        public static ReactiveEditCommand Create(
+            Func<IEditor> createEditor,
+            ISerialCommandController serialCommandController)
+        {
+            return new ReactiveEditCommand(createEditor, serialCommandController, DispatcherScheduler.Current);
+        }
     }
 
     public interface ISerialCommandController
@@ -51,36 +62,49 @@ namespace SolidworksAddinFramework.EditorView
     /// </summary>
     public class SerialCommandController : ISerialCommandController
     {
-        List<ReactiveEditCommand> Commands = new List<ReactiveEditCommand>();
+        private readonly List<ReactiveEditCommand> _Commands = new List<ReactiveEditCommand>();
         public IDisposable Register(ReactiveEditCommand command)
         {
-            command.CanEdit = true;
-            Commands.Add(command);
-            command.Command.Subscribe
-                (async editor =>
-                {
-                    try
-                    {
-                        DisableCommands();
-                        await editor.Edit();
-                    }
-                    finally
-                    {
-                        EnableCommands();
-                    }
-                });
+            var d = new CompositeDisposable();
 
-            return Disposable.Create(() => Commands.Remove(command));
+            command.CanEdit = true;
+            AddCommand(command)
+                .DisposeWith(d);
+
+            command.Command
+                .Subscribe(async editor => await ExecuteEditor(editor))
+                .DisposeWith(d);
+
+            return d;
+        }
+
+        private IDisposable AddCommand(ReactiveEditCommand command)
+        {
+            _Commands.Add(command);
+            return Disposable.Create(() => _Commands.Remove(command));
+        }
+
+        private async Task ExecuteEditor(IEditor editor)
+        {
+            try
+            {
+                DisableCommands();
+                await editor.Edit();
+            }
+            finally
+            {
+                EnableCommands();
+            }
         }
 
         private void EnableCommands()
         {
-            Commands.ForEach(c => c.CanEdit = true);
+            _Commands.ForEach(c => c.CanEdit = true);
         }
 
         private void DisableCommands()
         {
-            Commands.ForEach(c => c.CanEdit = false);
+            _Commands.ForEach(c => c.CanEdit = false);
         }
     }
 }
