@@ -29,9 +29,7 @@ namespace SolidworksAddinFramework.EditorView
                 {
                     try
                     {
-                        var editor = commandSpec.CreateEditor();
-                        var o = commandSpec.Editable;
-                        await ExecuteEditor(editor,o);
+                        await ExecuteEditor(commandSpec);
                     }
                     catch (Exception e)
                     {
@@ -42,11 +40,12 @@ namespace SolidworksAddinFramework.EditorView
         }
 
 
-        private async Task ExecuteEditor(IEditor editor, object o)
+        private async Task ExecuteEditor(ReactiveEditCommand commandSpec)
         {
+            var editor = commandSpec.CreateEditor();
             try
             {
-                Editing = Some(o);
+                Editing = Some(commandSpec.Editable);
                 await editor.Edit();
             }
             finally
