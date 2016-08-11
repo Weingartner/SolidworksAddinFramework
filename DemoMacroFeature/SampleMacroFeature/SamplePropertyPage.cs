@@ -70,7 +70,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
                     MacroFeature.Database.WhenAnyValue(p => p.Body).ToObservableExceptional().Where(p => !p.IsEmpty),
                     (alpha, selection) => new { alpha, selection }
                 )
-                .Select(o =>
+                .SelectOptionalFlatten(o =>
                 {
                     return from bodyFn in o.selection.GetSingleObject<IBody2>(ModelDoc)
                            let newBody = (IBody2) bodyFn().Copy()

@@ -132,7 +132,7 @@ namespace DemoMacroFeatures.ManipulatorSample
             return _Model.WhenAnyValue(p => p.Body)
                 .ToObservableExceptional()
                 .Where(p => !p.IsEmpty)
-                .Select(p => p.GetSingleObject<IBody2>(ModelDoc));
+                .SelectOptionalFlatten(p => p.GetSingleObject<IBody2>(ModelDoc));
         }
 
         protected override void OnClose(swPropertyManagerPageCloseReasons_e reason)
