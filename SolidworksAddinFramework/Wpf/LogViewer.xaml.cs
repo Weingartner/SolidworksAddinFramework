@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,6 +10,10 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using ReactiveUI;
+using ReactiveUI.Events;
+using Weingartner.ReactiveCompositeCollections;
+using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework.Wpf
 {
@@ -16,12 +22,22 @@ namespace SolidworksAddinFramework.Wpf
     /// </summary>
     public partial class LogViewer
     {
-        public ObservableCollection<LogEntry> LogEntries { get; set; }
+        public CompositeSourceList<LogEntry> LogEntries { get; set; }
 
         public LogViewer()
         {
             InitializeComponent();
-            DataContext = LogEntries = new ObservableCollection<LogEntry>();
+            LogEntries = new CompositeSourceList<LogEntry>();
+
+            ClearButton.Events().MouseUp
+                .Subscribe(_ => ClearAll());
+
+            var filteredEntries =
+                LogEntries.Where
+                    (this.WhenAnyValue(p => p.FilterText.Text).Select(str =>fun((LogEntry v) => v.Message.Contains(str))))
+                    .CreateObservableCollection(EqualityComparer<LogEntry>.Default);
+
+            MainPanel.DataContext = filteredEntries;
 
         }
 
@@ -31,6 +47,11 @@ namespace SolidworksAddinFramework.Wpf
         {
             var window = Window.Value;
             window.Dispatcher.Invoke(()=> window.LogEntries.Add(entry));
+        }
+
+        public void ClearAll()
+        {
+            LogEntries.RemoveRange(LogEntries.Source);
         }
 
         public static void Invoke(Action a)
