@@ -67,7 +67,7 @@ namespace SolidworksAddinFramework
 
         public static void WriteAllText(this IStream stream, string text)
         {
-            var bytes = Encoding.GetBytes(text);
+            var bytes = text != null ? Encoding.GetBytes(text) : new byte[0];
             var bytesWrittenBuffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(int)));
             stream.Write(bytes, bytes.Length, bytesWrittenBuffer);
             var bytesWritten = Marshal.ReadInt32(bytesWrittenBuffer);
