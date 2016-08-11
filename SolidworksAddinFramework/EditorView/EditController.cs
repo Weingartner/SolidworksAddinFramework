@@ -14,7 +14,7 @@ namespace SolidworksAddinFramework.EditorView
     /// </summary>
     public class EditController : ReactiveObject, ISerialCommandController
     {
-        [Reactive] public Option<object> Editing { get; private set; } = true;
+        [Reactive] public Option<object> Editing { get; private set; } = None;
 
         public IReactiveCommand Register(ReactiveEditCommand commandSpec, IScheduler scheduler)
         {
