@@ -42,7 +42,7 @@ namespace SolidworksAddinFramework
         /// <param name="o"></param>
         /// <param name="sel"></param>
         /// <returns></returns>
-        public static IObservableExceptional<T> Select<T, U>(this IObservableExceptional<U> o, Func<U, Option<T>> sel)
+        public static IObservableExceptional<T> SelectOptionalFlatten<T, U>(this IObservableExceptional<U> o, Func<U, Option<T>> sel)
         {
             return o
                 .Select(v => sel(v).ToExceptional())
