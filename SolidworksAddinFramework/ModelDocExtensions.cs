@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using LanguageExt;
 using LanguageExt.Parsec;
@@ -435,7 +436,7 @@ namespace SolidworksAddinFramework
                 },()=>false);
         }
 
-        public static Option<KeyValuePair<int,SwEq>> GetGlobal(this IModelDoc2 doc, string name)
+        public static Option<KeyValuePair<int, SwEq>> GetGlobal(this IModelDoc2 doc, string name)
         {
             return doc.GetGlobals().FirstOrDefault(g => g.Value.Id == name);
         }
@@ -546,6 +547,40 @@ namespace SolidworksAddinFramework
         }
 
 
+        public static void WriteStorage(this IModelDoc2 doc, string selectionStorageId, string data)
+        {
+            using (var stream = doc.OpenStreamForWriting(selectionStorageId))
+            {
+                stream.Resource?.WriteAllText(data);
+            }
+        }
+
+        public static void ReadStorage(this IModelDoc2 doc, string storageId, Action<string> action)
+        {
+            using (var stream = doc.OpenStreamForReading(storageId))
+            {
+                var storage = stream.Resource;
+                var data = storage?.ReadAllText();
+                action(data);
+            }
+        }
+
+        public static ResourceDisposable<IStream> OpenStreamForWriting(this IModelDoc2 doc, string storageId)
+        {
+            return OpenStream(doc, storageId, isStoring: true);
+        }
+
+        public static ResourceDisposable<IStream> OpenStreamForReading(this IModelDoc2 doc, string storageId)
+        {
+            return OpenStream(doc, storageId, isStoring: false);
+        }
+
+        private static ResourceDisposable<IStream> OpenStream(IModelDoc2 doc, string storageId, bool isStoring)
+        {
+            var obj = doc.IGet3rdPartyStorage(storageId, IsStoring: isStoring);
+            var closeStream = Disposable.Create(() => doc.IRelease3rdPartyStorage(storageId));
+            return ResourceDisposable.Create((IStream) obj, closeStream);
+        }
     }
 
     public static class ParserExt
