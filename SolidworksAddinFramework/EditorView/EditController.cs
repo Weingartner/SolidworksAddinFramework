@@ -2,6 +2,8 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using LanguageExt;
+using static LanguageExt.Prelude;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -10,14 +12,14 @@ namespace SolidworksAddinFramework.EditorView
     /// <summary>
     /// Allows only one edit command to be valid at a time
     /// </summary>
-    public class SerialCommandController : ReactiveObject, ISerialCommandController
+    public class EditController : ReactiveObject, ISerialCommandController
     {
-        [Reactive] public bool CanEdit { get; private set; } = true;
+        [Reactive] public Option<object> Editing { get; private set; } = true;
 
         public IReactiveCommand Register(ReactiveEditCommand commandSpec, IScheduler scheduler)
         {
-            var canExecute = this.WhenAnyValue(p => p.CanEdit)
-                .CombineLatest(commandSpec.CanExecute, (a, b) => a && b)
+            var canExecute = this.WhenAnyValue(p => p.Editing)
+                .CombineLatest(commandSpec.CanExecute, (a, b) => a.IsNone && b)
                 .ObserveOn(scheduler);
 
             var command = ReactiveCommand.Create(canExecute);
@@ -28,7 +30,8 @@ namespace SolidworksAddinFramework.EditorView
                     try
                     {
                         var editor = commandSpec.CreateEditor();
-                        await ExecuteEditor(editor);
+                        var o = commandSpec.Editable;
+                        await ExecuteEditor(editor,o);
                     }
                     catch (Exception e)
                     {
@@ -38,16 +41,17 @@ namespace SolidworksAddinFramework.EditorView
             return command;
         }
 
-        private async Task ExecuteEditor(IEditor editor)
+
+        private async Task ExecuteEditor(IEditor editor, object o)
         {
             try
             {
-                CanEdit = false;
+                Editing = Some(o);
                 await editor.Edit();
             }
             finally
             {
-                CanEdit = true;
+                Editing = None;
             }
         }
     }
