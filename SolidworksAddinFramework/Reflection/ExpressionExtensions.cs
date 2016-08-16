@@ -48,6 +48,10 @@ namespace SolidworksAddinFramework.Reflection
         {
             return new SelectorProxy<T,TProperty>(expression, t);
         }
+        public static ISelectorProxy<TProperty> GetProxy<T, TProperty>(this T t,Expression<Func<T, TProperty>> expression)
+        {
+            return new SelectorProxy<T,TProperty>(expression, t);
+        }
 
         public interface ISelectorProxy<U>
         {
