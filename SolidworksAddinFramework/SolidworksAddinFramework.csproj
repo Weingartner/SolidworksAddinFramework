@@ -192,12 +192,12 @@
       <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6025.19568\lib\net461\Weingartner.Exceptional.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Weingartner.Json.Migration, Version=0.8.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.8\lib\net45\Weingartner.Json.Migration.dll</HintPath>
+    <Reference Include="Weingartner.Json.Migration, Version=0.8.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.9\lib\net45\Weingartner.Json.Migration.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Weingartner.Json.Migration.Common, Version=0.8.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.8\lib\net45\Weingartner.Json.Migration.Common.dll</HintPath>
+    <Reference Include="Weingartner.Json.Migration.Common, Version=0.8.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.9\lib\net45\Weingartner.Json.Migration.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
