@@ -76,7 +76,7 @@
                DockPanel.Dock="Top"/>
 
         <DockPanel DockPanel.Dock="Bottom">
-            <Button DockPanel.Dock="Left"  x:Name="ClearButton"/>
+            <Button DockPanel.Dock="Left" x:Name="ClearButton" Content="Clear"/>
             <TextBox x:Name="FilterText"/>
         </DockPanel>
 

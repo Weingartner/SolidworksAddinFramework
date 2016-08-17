@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,16 +30,29 @@ namespace SolidworksAddinFramework.Wpf
             InitializeComponent();
             LogEntries = new CompositeSourceList<LogEntry>();
 
-            ClearButton.Events().MouseUp
-                .Subscribe(_ => ClearAll());
+            this.LoadUnloadHandler(() =>
+            {
+                var d = new CompositeDisposable();
+                ClearButton
+                    .Events()
+                    .PreviewMouseUp
+                    .Subscribe(_ => ClearAll())
+                    .DisposeWith(d);
 
-            var filteredEntries =
-                LogEntries.Where
-                    (this.WhenAnyValue(p => p.FilterText.Text).Select(str =>fun((LogEntry v) => v.Message.Contains(str))))
-                    .CreateObservableCollection(EqualityComparer<LogEntry>.Default);
+                var filteredEntries =
+                    LogEntries
+                        .Where(this.WhenAnyValue(p => p.FilterText.Text)
+                            .Select(str => fun((LogEntry v) => v.Message.Contains(str)))
+                        )
+                        .CreateObservableCollection(EqualityComparer<LogEntry>.Default)
+                        .DisposeWith(d);
 
-            MainPanel.DataContext = filteredEntries;
+                MainPanel.DataContext = filteredEntries;
+                Disposable.Create(() => MainPanel.DataContext = null)
+                    .DisposeWith(d);
 
+                return (IDisposable) d;
+            });
         }
 
         private static Lazy<LogViewer> Window = new Lazy<LogViewer>(() => CreateLogViewer().Result); 
