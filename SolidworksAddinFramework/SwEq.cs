@@ -181,11 +181,29 @@ namespace SolidworksAddinFramework
         }
 
 
-        public override string ToString() => $@"""{Id}""={GetValUnits()}";
-        public string ToLongString() => $@"{Id.CamelCaseToHumanReadable()} = {GetValUnits()}";
-        public string ToShortString() => $@"{Id.Abbreviate()} = {GetValUnits(3)}";
+        public override string ToString() => $@"""{Id}""={ToStringWithSignificantDigits()}";
+        public string ToLongString() => $@"{Id.CamelCaseToHumanReadable()} = {ToStringWithDecimalPlaces()}";
+        public string ToShortString() => $@"{Id.Abbreviate()} = {ToStringWithDecimalPlaces()}";
 
-        public string GetValUnits(int sigFigs = 0)
+        public string ToStringWithSignificantDigits(int sigFigs = 0)
+        {
+            var scaled = GetScaledValue();
+
+            var str = sigFigs == 0 
+                ? scaled.ToString()
+                : ((decimal) scaled).RoundToSignificantDigits((short)sigFigs).ToString(CultureInfo.InvariantCulture);
+            return $"{str}{SolidWorksUnits}";
+        }
+
+        public string ToStringWithDecimalPlaces(int decimalPlaces = 2)
+        {
+            var scaled = GetScaledValue();
+
+            var str = scaled.ToString("F" + decimalPlaces);
+            return $"{str}{SolidWorksUnits}";
+        }
+
+        private double GetScaledValue()
         {
             var scaled = 0.0;
             switch (SolidWorksUnits)
@@ -226,10 +244,7 @@ namespace SolidworksAddinFramework
                 default:
                     throw new Exception($"Not supported {SolidWorksUnits}");
             }
-
-            var str = sigFigs == 0 
-                ? scaled.ToString() : ((decimal) scaled).RoundToSignificantDigits((short)sigFigs).ToString(CultureInfo.InvariantCulture);
-            return $"{str}{SolidWorksUnits}";
+            return scaled;
         }
     }
 }
