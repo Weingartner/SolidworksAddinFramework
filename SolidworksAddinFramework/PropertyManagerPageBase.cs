@@ -30,7 +30,7 @@ namespace SolidworksAddinFramework
     /// </summary>
     /// <typeparam name="TMacroFeature">The type of the macro feature this page is designed for</typeparam>
     [ComVisible(false)]
-    public abstract class PropertyManagerPageBase : ReactiveObject, IPropertyManagerPage2Handler9, IEditor
+    public abstract class PropertyManagerPageBase : ReactiveObject, IPropertyManagerPage2Handler9, IEditor, IDisposable
     {
         public readonly ISldWorks SwApp;
         private readonly string _Name;
@@ -68,42 +68,35 @@ namespace SolidworksAddinFramework
         /// </summary>
         public virtual void Show()
         {
-            using (Disposable.Create(() => _ShowSubject.OnNext(Unit.Default)))
+            var options = _OptionsE.Aggregate(0, (acc, v) => (int)v | acc);
+            var errors = 0;
+            _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
+            var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options,
+                _PropertyManagerPage2Handler9Wrapper, ref errors);
+
+            if (errors != (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
             {
-                if (Page != null)
-                {
-                    Page.Show();
-                    return;
-                }
-
-                var options = _OptionsE.Aggregate(0, (acc, v) => (int)v | acc);
-                var errors = 0;
-                _PropertyManagerPage2Handler9Wrapper = new PropertyManagerPage2Handler9Wrapper(this);
-                var propertyManagerPage = SwApp.CreatePropertyManagerPage(_Name, options,
-                    _PropertyManagerPage2Handler9Wrapper, ref errors);
-
-                Page = (IPropertyManagerPage2)propertyManagerPage;
-                if (errors != (int)swPropertyManagerPageStatus_e.swPropertyManagerPage_Okay)
-                {
-                    throw new Exception("Unable to Create PMP");
-                }
-                var selectionMgr = (ISelectionMgr)ModelDoc.SelectionManager;
-                _Deselect = selectionMgr.DeselectAllUndoable();
-                AddControls();
-
-                Page.Show();
-
-                // Force validation of the page
-                ValidationSubject.OnNext(Unit.Default);
-
-                var d  = this.WhenAnyValue(p => p.IsValid)
-                    .Subscribe(isValid => Page.EnableButton((int)swPropertyManagerPageButtons_e.swPropertyManagerPageButton_Ok, isValid));
-
-                DisposeOnClose(d);
-
-
-                AddSelections();
+                throw new Exception("Unable to Create PMP");
             }
+            Page = (IPropertyManagerPage2)propertyManagerPage;
+
+            var selectionMgr = (ISelectionMgr)ModelDoc.SelectionManager;
+            _Deselect = selectionMgr.DeselectAllUndoable();
+            AddControls();
+
+            Page.Show();
+
+            // Force validation of the page
+            ValidationSubject.OnNext(Unit.Default);
+
+            var d  = this.WhenAnyValue(p => p.IsValid)
+                .Subscribe(isValid => Page.EnableButton((int)swPropertyManagerPageButtons_e.swPropertyManagerPageButton_Ok, isValid));
+
+            DisposeOnClose(d);
+
+            AddSelections();
+
+            _ShowSubject.OnNext(Unit.Default);
         }
 
         protected void DisposeOnClose(IDisposable disposable)
@@ -141,9 +134,7 @@ namespace SolidworksAddinFramework
 
         public void OnClose(int reason)
         {
-            _Disposable.Clear();
             OnClose((swPropertyManagerPageCloseReasons_e) reason);
-            _Deselect.Dispose();
         }
 
         protected readonly TaskCompletionSource<bool> _CloseTaskSource = new TaskCompletionSource<bool>();
@@ -787,11 +778,10 @@ namespace SolidworksAddinFramework
             return _NextId;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             Page?.Close(true);
         }
-
 
         protected static void ConfigAngleNumberBox(IPropertyManagerPageNumberbox config)
         {
@@ -886,6 +876,7 @@ namespace SolidworksAddinFramework
 
         protected virtual void OnClose(swPropertyManagerPageCloseReasons_e reason)
         {
+            _Disposable.Dispose();
             switch (reason)
             {
                 case swPropertyManagerPageCloseReasons_e.swPropertyManagerPageClose_Cancel:
@@ -903,6 +894,7 @@ namespace SolidworksAddinFramework
                     _CloseTaskSource.SetResult(true);
                     break;
             }
+            _Deselect.Dispose();
         }
 
         protected virtual void OnCommit()
