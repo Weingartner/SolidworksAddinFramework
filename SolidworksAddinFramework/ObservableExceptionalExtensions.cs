@@ -24,7 +24,7 @@ namespace SolidworksAddinFramework
 
     public static class ObservableExceptionalExtensions
     {
-        public static IObservableExceptional<T> ToObservableExceptional<T>(this IObservable<Option<T>> o)
+        public static IObservableExceptional<T> ToObservableExceptionalFlatten<T>(this IObservable<Option<T>> o)
         {
             return o.Select(ToExceptional).ToObservableExceptional();
         }
