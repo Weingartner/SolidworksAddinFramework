@@ -11,7 +11,8 @@ namespace SolidworksAddinFramework
             Converters =
             {
                 new MigrationConverter(new VerifyingJsonDataMigrator(new HashBasedDataMigrator<JToken>(new JsonVersionUpdater())))
-            }
+            },
+            ObjectCreationHandling = ObjectCreationHandling.Replace
         };
 
         public static T Clone<T>(T tool)
