@@ -253,8 +253,8 @@
       <Name>System.XML</Name>
     </Reference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Weingartner.Exceptional, Version=1.4.6025.19568, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6025.19568\lib\net461\Weingartner.Exceptional.dll</HintPath>
+    <Reference Include="Weingartner.Exceptional, Version=1.4.6075.17448, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6075.17448\lib\net461\Weingartner.Exceptional.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
