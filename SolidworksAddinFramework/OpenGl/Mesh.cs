@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
         private readonly IReadOnlyList<Edge3> _OriginalEdgeVertices;
-        public Color Color { get; }
+        public Color Color { get; set; }
         private bool _IsSolid;
 
         private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
