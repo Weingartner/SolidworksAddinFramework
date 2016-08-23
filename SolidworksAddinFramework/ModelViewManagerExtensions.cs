@@ -14,8 +14,8 @@ namespace SolidworksAddinFramework
             {
                 throw new Exception("Error while creating section view.");
             }
-            // TODO `modelViewManager.RemoveSectionView` always returns `false` and doesn't remove the section view
-            // In 2011 this seems to have worked (see https://forum.solidworks.com/thread/47641)
+            // TODO `modelViewManager.RemoveSectionView` returns `false` and doesn't remove the section view
+            // when `SectionViewData::GraphicsOnlySection` is `true`
             return Disposable.Create(() => modelViewManager.RemoveSectionView());
         }
     }
