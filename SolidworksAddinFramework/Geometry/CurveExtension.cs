@@ -433,7 +433,12 @@ namespace SolidworksAddinFramework.Geometry
                 .ToList();
         }
 
-        public static void GetPlanePoints(this ICurve curve, double position, out Vector3 pNormal, out Vector3 pCurve, out Vector3 pAxis)
+        public static void GetPlanePoints
+            ( this ICurve curve
+            , double position
+            , out Vector3 pNormal
+            , out Vector3 pCurve
+            , out Vector3 pAxis)
         {
             var pCurvePoint = curve.PointTangentAt(position);
 
