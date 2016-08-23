@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using LanguageExt;
+using Weingartner.Exceptional;
 using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework
@@ -56,6 +57,11 @@ namespace SolidworksAddinFramework
         public static Option<T> ToOption<T>(this T obj)
         {
             return Optional(obj);
+        }
+
+        public static Option<T> ToOption<T>(this IExceptional<T> obj)
+        {
+            return obj.Match(Some, _ => None);
         }
     }
 }
