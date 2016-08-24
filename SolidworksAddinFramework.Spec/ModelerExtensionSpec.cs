@@ -21,10 +21,6 @@ namespace SolidworksAddinFramework.Spec
 {
     public class ModelerExtensionSpec : SolidWorksSpec
     {
-        private static IModeler Modeler => (IModeler)SwApp.GetModeler();
-        private static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
-
-
         public static IEnumerable<object[]> TrimLineTestData => new[]
         {
             new object[] {new[] {0f, 0f, 0f}, new[] {1f, 1f, 1f}},

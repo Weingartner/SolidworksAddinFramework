@@ -10,11 +10,6 @@ namespace SolidworksAddinFramework.Spec.opengl
 {
     public class MeshRenderSpec : SolidWorksSpec
     {
-        private static IModeler Modeler => (IModeler)SwApp.GetModeler();
-
-        private static IMathUtility MathUtility => (IMathUtility)SwApp.GetMathUtility();
-
-
         [SolidworksFact]
         public void RenderFaceShouldWork()
         {

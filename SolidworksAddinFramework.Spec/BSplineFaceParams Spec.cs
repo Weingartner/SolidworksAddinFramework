@@ -192,7 +192,7 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [SolidworksFact]
-        public async Task CanSpecifyTrimLoopsManually()
+        public void CanSpecifyTrimLoopsManually()
         {
             #region data
 

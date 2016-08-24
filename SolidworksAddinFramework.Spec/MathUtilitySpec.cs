@@ -17,8 +17,6 @@ namespace SolidworksAddinFramework.Spec
 {
     public class MathUtilitySpec : SolidWorksSpec
     {
-        public IMathUtility MathUtility =>  (IMathUtility) SwApp.GetMathUtility();
-
         public static IEnumerable<object[]> TestData
         {
             get
