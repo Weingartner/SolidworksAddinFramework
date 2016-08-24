@@ -119,11 +119,15 @@ namespace XUnit.Solidworks.Addin
 
         public static async Task PauseTestExecution()
         {
+#if DEBUG
             CanContinueTestExecution = true;
             using (Disposable.Create(() => CanContinueTestExecution = false))
             {
                 await Subject.FirstAsync();
             }
+#else
+            await Task.CompletedTask;
+#endif
         }
     }
 }
