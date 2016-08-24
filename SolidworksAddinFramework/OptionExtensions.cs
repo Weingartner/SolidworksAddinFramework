@@ -63,5 +63,10 @@ namespace SolidworksAddinFramework
         {
             return obj.Match(Some, _ => None);
         }
+
+        public static Option<T> BindNone<T>(this Option<T> o, Func<Option<T>> fn)
+        {
+            return o.Match(Some, fn);
+        }
     }
 }
