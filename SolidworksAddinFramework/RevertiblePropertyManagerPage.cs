@@ -15,12 +15,11 @@ namespace SolidworksAddinFramework
     {
         private T _Original;
 
-        protected RevertiblePropertyManagerPage
-            (string name
-                , IEnumerable<swPropertyManagerPageOptions_e> optionsE
-                , ISldWorks swApp
-                , IModelDoc2 modelDoc
-                , T data) : base(name, optionsE, modelDoc, data)
+        protected RevertiblePropertyManagerPage(
+            string name,
+            IEnumerable<swPropertyManagerPageOptions_e> optionsE,
+            IModelDoc2 modelDoc,
+            T data) : base(name, optionsE, modelDoc, data)
         {
         }
 
