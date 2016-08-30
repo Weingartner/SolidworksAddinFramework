@@ -86,6 +86,14 @@ namespace SolidworksAddinFramework.Geometry
                 throw new ArgumentException("should be of length 2", nameof(source));
             return new PointDirection3(s[0],s[1]);
         }
-        
+
+        public static double ApproximateLeadAngle(PointDirection3 pointTangent)
+        {
+            var zOffset = pointTangent.Direction.Z;
+            var zOffsetPoint = pointTangent.Point + new Vector3(0, 0, zOffset);
+            var tangentOffsetPoint = pointTangent.Point + pointTangent.Direction;
+            var xyOffset = (tangentOffsetPoint-zOffsetPoint).Length();
+            return Math.Atan2(zOffset, xyOffset);
+        }
     }
 }

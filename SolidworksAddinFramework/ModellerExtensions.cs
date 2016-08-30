@@ -146,7 +146,11 @@ namespace SolidworksAddinFramework
             var uvHigh = surf.GetClosestPointOnTs(high);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
-        public static IBody2 CreateCirclularSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, double radius)
+        public static IBody2 CreateCirclularSheet
+            ( this IModeler modeler
+            , Vector3 center
+            , Vector3 vNormal
+            , double radius)
         {
             var math = SwAddinBase.Active.Math;
             var centerSw = center.ToSwMathPoint(math);
@@ -164,12 +168,15 @@ namespace SolidworksAddinFramework
             var startPointDbls = startPoint.ArrayData;
 
             
-            var arco =
-                    modeler.CreateArc
+            var arco = modeler.CreateArc
                         (centerDbls, vNormalDbls, radius, startPointDbls, startPointDbls);
 
             var arc = (Curve) arco;
-            return (IBody2) surf.CreateTrimmedSheet(new[] {arc});
+            var arcStartPoint = arc.StartPoint();
+            var arcEndPoint = arc.EndPoint();
+
+            var trimmedArc = arc.CreateTrimmedCurve2(arcStartPoint.X,arcStartPoint.Y,arcStartPoint.Z,arcEndPoint.X,arcEndPoint.Y,arcEndPoint.Z);
+            return (IBody2) surf.CreateTrimmedSheet(new[] {trimmedArc});
         }
 
         public static IBody2 CreateSheetFromSurface(this IModeler modeler, ISurface surf, IMathPoint p0, IMathPoint p1)

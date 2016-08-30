@@ -18,6 +18,7 @@ using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -194,6 +195,13 @@ namespace SolidworksAddinFramework
         public static IBody2 CopyTs(this IBody2 tool)
         {
             return (IBody2) tool.Copy();
+        }
+
+        public static double GetMaxXyBodyRadius(this IBody2 body)
+        {
+            var crossSectionCurves = body.GetXzCrossSectionCurves();
+            return crossSectionCurves
+                .Max(c => c.GetPointsByLength(1e-2).Max(p => p.Point.To2D().Length()));
         }
 
         public static List<ICurve> GetXzCrossSectionCurves(this IBody2 body)
