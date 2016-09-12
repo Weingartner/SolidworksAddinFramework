@@ -137,12 +137,18 @@ namespace SolidworksAddinFramework
         /// </summary>
         public static string Path<Type>()
         {
-                var Assembly = typeof(Type).Assembly;
-                var codeBase = Assembly.CodeBase;
-                var uri = new UriBuilder(codeBase);
-                var path = Uri.UnescapeDataString(uri.Path);
-                var dir = System.IO.Path.GetDirectoryName(path);
-                return dir;
+            var type = typeof(Type);
+            return Path(type);
+        }
+
+        public static string Path(Type type)
+        {
+            var assembly = type.Assembly;
+            var codeBase = assembly.CodeBase;
+            var uri = new UriBuilder(codeBase);
+            var path = Uri.UnescapeDataString(uri.Path);
+            var dir = System.IO.Path.GetDirectoryName(path);
+            return dir;
         }
 
         /// <summary>

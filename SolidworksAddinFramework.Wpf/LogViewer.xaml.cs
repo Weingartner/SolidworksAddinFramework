@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
+using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using ReactiveUI;
-using ReactiveUI.Events;
 using Weingartner.ReactiveCompositeCollections;
+using Weingartner.Wpf.Common;
 using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework.Wpf
@@ -30,29 +26,27 @@ namespace SolidworksAddinFramework.Wpf
             InitializeComponent();
             LogEntries = new CompositeSourceList<LogEntry>();
 
-            this.LoadUnloadHandler(() =>
-            {
-                var d = new CompositeDisposable();
-                ClearButton
-                    .Events()
-                    .PreviewMouseUp
-                    .Subscribe(_ => ClearAll())
-                    .DisposeWith(d);
+            this.LoadUnloadHandler(() => Init());
+        }
 
-                var filteredEntries =
-                    LogEntries
-                        .Where(this.WhenAnyValue(p => p.FilterText.Text)
-                            .Select(str => fun((LogEntry v) => v.Message.Contains(str)))
-                        )
-                        .CreateObservableCollection(EqualityComparer<LogEntry>.Default)
-                        .DisposeWith(d);
+        private IEnumerable<IDisposable> Init()
+        {
+            var d = new CompositeDisposable();
+            yield return ClearButton
+                .Events()
+                .PreviewMouseUp
+                .Subscribe(_ => ClearAll());
 
-                MainPanel.DataContext = filteredEntries;
-                Disposable.Create(() => MainPanel.DataContext = null)
-                    .DisposeWith(d);
+            var filteredEntries =
+                LogEntries
+                    .Where(this.WhenAnyValue(p => p.FilterText.Text)
+                        .Select(str => fun((LogEntry v) => v.Message.Contains(str)))
+                    )
+                    .CreateObservableCollection(EqualityComparer<LogEntry>.Default);
+            yield return filteredEntries;
 
-                return (IDisposable) d;
-            });
+            MainPanel.DataContext = filteredEntries;
+            yield return Disposable.Create(() => MainPanel.DataContext = null);
         }
 
         private static Lazy<LogViewer> Window = new Lazy<LogViewer>(() => CreateLogViewer().Result); 

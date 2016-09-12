@@ -317,29 +317,11 @@
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
     <Compile Include="SolidworksSchedular.cs" />
-    <Compile Include="Wpf\LogEntry.cs" />
-    <Compile Include="Wpf\ScrollOnNewItem.cs" />
-    <Compile Include="Wpf\LogViewer.xaml.cs">
-      <DependentUpon>LogViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Wpf\SelectionControl.xaml.cs">
-      <DependentUpon>SelectionControl.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Wpf\LogViewer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Wpf\SelectionControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ExceptionReporter.WinForms.xml" />
@@ -359,6 +341,12 @@
   <ItemGroup>
     <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Common.dll" />
     <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Roslyn.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
+      <Project>{f2cc02b7-8c1a-4b28-8b53-0aed3f51fa98}</Project>
+      <Name>SolidworksAddinFramework.Wpf</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />
