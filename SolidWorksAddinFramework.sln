@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidworksAddinFramework", "SolidworksAddinFramework\SolidworksAddinFramework.csproj", "{FE89110C-7405-4070-AB58-C83C12CE6CA5}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoMacroFeature", "DemoMacroFeature\DemoMacroFeature.csproj", "{A67399BE-AAF7-433F-8F72-9B0424C5BE67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoMacroFeatures.Spec", "DemoMacroFeature.Spec\DemoMacroFeatures.Spec.csproj", "{117A5363-F5AF-462B-8769-C2733132EF2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidworksAddinFramework.Wpf", "SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj", "{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{117A5363-F5AF-462B-8769-C2733132EF2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
