@@ -159,6 +159,7 @@ namespace SolidworksAddinFramework.Spec
                 var disc0 = Modeler.CreateCirclularSheet
                     ( center: Vector3.Zero
                     , vNormal: Vector3.UnitZ
+                    , vRef: Vector3.UnitX
                     , radius: 2
                     );
 
@@ -777,10 +778,9 @@ namespace SolidworksAddinFramework.Spec
 
             var disc0 = Modeler.CreateCirclularSheet
                 (center: Vector3.Zero
-                    ,
-                    vNormal: Vector3.UnitZ
-                    ,
-                    radius: 2
+                , vNormal: Vector3.UnitZ
+                , vRef: Vector3.UnitX
+                , radius: 2
                 );
 
             var mStream = new MemoryStream();

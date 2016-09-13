@@ -150,17 +150,22 @@ namespace SolidworksAddinFramework
             ( this IModeler modeler
             , Vector3 center
             , Vector3 vNormal
+            , Vector3 vRef
             , double radius)
         {
+            // Should be orthogonal
+            Debug.Assert(vRef.Dot(vNormal)<1e-9);
+
             var math = SwAddinBase.Active.Math;
             var centerSw = center.ToSwMathPoint(math);
             var vNormalSw = vNormal.ToSwMathPoint(math);
-            var vNormalOrthSw = vNormal.Orthogonal().ToSWVector(math).Normalise();
+            var vNormalOrthSw = vRef.ToSWVector(math).Normalise();
 
             var centerDbls = centerSw.ArrayData;
             var vNormalDbls = vNormalSw.ArrayData;
+            var vNormalOrthDbls = vNormalOrthSw.ArrayData;
 
-            var surf = (Surface) modeler.CreatePlanarSurface(centerDbls, vNormalDbls);
+            var surf = (Surface) modeler.CreatePlanarSurface2(centerDbls, vNormalDbls, vNormalOrthDbls);
 
 
             var startPoint = centerSw.AddTs(vNormalOrthSw.ScaleTs(radius));
