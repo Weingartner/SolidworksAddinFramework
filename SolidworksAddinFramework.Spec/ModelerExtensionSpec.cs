@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -59,8 +59,8 @@ namespace SolidworksAddinFramework.Spec
         [SolidworksTheory]
         [MemberData(nameof(TrimLineTestData))]
         public void TrimLineShouldWork
-            (float[] p0
-            , float[] p1)
+            (double[] p0
+            , double[] p1)
         {
             CreatePartDoc(modelDoc =>
             {
@@ -142,7 +142,7 @@ namespace SolidworksAddinFramework.Spec
 
     public class Edge3Spec
     {
-        Vector3 vector(double x, double y, double z)=>new Vector3((float) x,(float) y,(float) z);
+        Vector3 vector(double x, double y, double z)=>new Vector3((double) x,(double) y,(double) z);
 
         [Fact]
         public void ShouldGetTheShortestLine()

@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using JetBrains.Annotations;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;

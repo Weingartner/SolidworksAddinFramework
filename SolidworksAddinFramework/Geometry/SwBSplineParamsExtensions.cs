@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
@@ -63,7 +63,7 @@ namespace SolidworksAddinFramework.Geometry
                         w = p[3];
                     }
 
-                    return new Vector4((float) (x*w), (float) (y*w), (float) (z*w), (float) w);
+                    return new Vector4((double) (x*w), (double) (y*w), (double) (z*w), (double) w);
                 })
                 .ToArray();
 

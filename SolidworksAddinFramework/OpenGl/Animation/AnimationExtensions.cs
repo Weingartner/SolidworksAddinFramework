@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Numerics;
+using System.DoubleNumerics;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {

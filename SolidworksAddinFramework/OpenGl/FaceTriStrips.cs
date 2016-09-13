@@ -6,10 +6,10 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public static class FaceTriStrips
     {
-        public static float[][][] Unpack(float[] packedData)
+        public static double[][][] Unpack(double[] packedData)
         {
             if (packedData == null || packedData.Length == 0)
-                return new float[0][][];
+                return new double[0][][];
 
             var numStrips = (int)ToUnsignedInt32(packedData, 0);
             var vertexPerStrip = Enumerable.Range(1, numStrips)
@@ -33,7 +33,7 @@ namespace SolidworksAddinFramework.OpenGl
             return r;
         }
 
-        private static uint ToUnsignedInt32(float[] data, int i)
+        private static uint ToUnsignedInt32(double[] data, int i)
         {
             return BitConverter.ToUInt32(BitConverter.GetBytes(data[i]), 0);
         }

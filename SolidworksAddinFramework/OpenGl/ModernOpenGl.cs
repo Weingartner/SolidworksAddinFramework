@@ -69,10 +69,10 @@ namespace SolidworksAddinFramework.OpenGl
             return revert;
         }
 
-        public static IDisposable SetLineWidth(float value)
+        public static IDisposable SetLineWidth(double value)
         {
             var currentLineWidth = GL.GetFloat(GetPName.LineWidth);
-            GL.LineWidth(value);
+            GL.LineWidth((float)value);
             return Disposable.Create(() => GL.LineWidth(currentLineWidth));
         }
 

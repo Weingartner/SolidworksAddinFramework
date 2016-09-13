@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Runtime.CompilerServices;
 using LanguageExt;
 
@@ -29,7 +29,7 @@ namespace SolidworksAddinFramework.Geometry
 
         public Vector3 Center => (P0 + P1)/2;
 
-        public Range3Single(float x0, float y0, float z0, float x1, float y1, float z1):this
+        public Range3Single(double x0, double y0, double z0, double x1, double y1, double z1):this
             (new Vector3(x0,y0,z0), new Vector3(x1,y1,z1) )
         {
         }
@@ -104,32 +104,32 @@ namespace SolidworksAddinFramework.Geometry
         }
 
 
-        public readonly float XMin;
-        public readonly float XMax;
-        public float XMid => (XMin + XMax)/2;
+        public readonly double XMin;
+        public readonly double XMax;
+        public double XMid => (XMin + XMax)/2;
 
-        public readonly float YMin;
-        public readonly float YMax;
-        public float YMid => (YMin + YMax)/2;
+        public readonly double YMin;
+        public readonly double YMax;
+        public double YMid => (YMin + YMax)/2;
 
-        public readonly float ZMin;
-        public readonly float ZMax;
-        public float ZMid => (ZMin + ZMax)/2; 
+        public readonly double ZMin;
+        public readonly double ZMax;
+        public double ZMid => (ZMin + ZMax)/2; 
 
         public RangeSingle XRange => new RangeSingle(XMin,XMax); 
         public RangeSingle YRange => new RangeSingle(YMin, YMax);
         public RangeSingle ZRange => new RangeSingle(ZMin, ZMax);
 
-        public float Dx => XMax - XMin;
-        public float Dy => YMax - YMin;
-        public float Dz => ZMax - ZMin;
+        public double Dx => XMax - XMin;
+        public double Dy => YMax - YMin;
+        public double Dz => ZMax - ZMin;
 
         public bool Inside(Vector3 p)
         {
             return Between(p.X, XMin, XMax)&&Between(p.Y,YMin,YMax)&& Between(p.Z, ZMin, ZMax);
         }
 
-        private bool Between(float v, float lower, float upper)
+        private bool Between(double v, double lower, double upper)
         {
             return v >= lower && v < upper;
         }
@@ -138,12 +138,12 @@ namespace SolidworksAddinFramework.Geometry
         /// <summary>
         /// return the value minimum dimension from Dx, Dy, Dz
         /// </summary>
-        public float MinDim => Math.Min(Math.Min(Dx, Dy), Dz);
-        public float MaxDim => Math.Max(Math.Max(Dx, Dy), Dz);
+        public double MinDim => Math.Min(Math.Min(Dx, Dy), Dz);
+        public double MaxDim => Math.Max(Math.Max(Dx, Dy), Dz);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Adjust(Vector3 vertex, ref float xmin, ref float xmax, ref float ymin, ref float ymax, ref float zmin,
-            ref float zmax)
+        private static void Adjust(Vector3 vertex, ref double xmin, ref double xmax, ref double ymin, ref double ymax, ref double zmin,
+            ref double zmax)
         {
             xmin = Math.Min(xmin, vertex.X);
             xmax = Math.Max(xmax, vertex.X);
@@ -181,13 +181,13 @@ namespace SolidworksAddinFramework.Geometry
 
         public static Range3Single FromVertices(IReadOnlyList<Vector3> vertices)
         {
-            var xmin = Single.MaxValue;
-            var ymin = Single.MaxValue;
-            var zmin = Single.MaxValue;
+            var xmin = double.MaxValue;
+            var ymin = double.MaxValue;
+            var zmin = double.MaxValue;
 
-            var xmax = Single.MinValue;
-            var ymax = Single.MinValue;
-            var zmax = Single.MinValue;
+            var xmax = double.MinValue;
+            var ymax = double.MinValue;
+            var zmax = double.MinValue;
 
             for (var i = 0; i < vertices.Count; i++)
             {
@@ -201,13 +201,13 @@ namespace SolidworksAddinFramework.Geometry
 
         public class Range3SingleBuilder
         {
-            public float Xmin = Single.MaxValue;
-            public float Ymin = Single.MaxValue;
-            public float Zmin = Single.MaxValue;
+            public double Xmin = double.MaxValue;
+            public double Ymin = double.MaxValue;
+            public double Zmin = double.MaxValue;
 
-            public float Xmax = Single.MinValue;
-            public float Ymax = Single.MinValue;
-            public float Zmax = Single.MinValue;
+            public double Xmax = double.MinValue;
+            public double Ymax = double.MinValue;
+            public double Zmax = double.MinValue;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Update(Vector3 vertex)
@@ -233,13 +233,13 @@ namespace SolidworksAddinFramework.Geometry
 
         public static Range3Single FromTriangle(Triangle triangle)
         {
-            var xmin = Single.MaxValue;
-            var ymin = Single.MaxValue;
-            var zmin = Single.MaxValue;
+            var xmin = double.MaxValue;
+            var ymin = double.MaxValue;
+            var zmin = double.MaxValue;
 
-            var xmax = Single.MinValue;
-            var ymax = Single.MinValue;
-            var zmax = Single.MinValue;
+            var xmax = double.MinValue;
+            var ymax = double.MinValue;
+            var zmax = double.MinValue;
 
             Adjust(triangle.A, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
             Adjust(triangle.B, ref xmin, ref xmax, ref ymin, ref ymax, ref zmin, ref zmax);
@@ -250,13 +250,13 @@ namespace SolidworksAddinFramework.Geometry
         }
         public static Range3Single FromTriangle(IReadOnlyList<Triangle> triangles)
         {
-            var xmin = Single.MaxValue;
-            var ymin = Single.MaxValue;
-            var zmin = Single.MaxValue;
+            var xmin = double.MaxValue;
+            var ymin = double.MaxValue;
+            var zmin = double.MaxValue;
 
-            var xmax = Single.MinValue;
-            var ymax = Single.MinValue;
-            var zmax = Single.MinValue;
+            var xmax = double.MinValue;
+            var ymax = double.MinValue;
+            var zmax = double.MinValue;
 
             for (int j = 0; j < triangles.Count; j++)
             {
@@ -269,7 +269,7 @@ namespace SolidworksAddinFramework.Geometry
             return new Range3Single(new Vector3(xmin,ymin,zmin), new Vector3(xmax, ymax, zmax));
         }
 
-        public Range3Single Scale(float s)
+        public Range3Single Scale(double s)
         {
             s = (s - 1)/2;
             var sx = Dx*s;
@@ -307,10 +307,10 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
-        public Tuple<Vector3, float> BoundingSphere()
+        public Tuple<Vector3, double> BoundingSphere()
         {
             var d = Math.Sqrt(Dx*Dx + Dy*Dy + Dz*Dz);
-            return Prelude.Tuple(Center, (float) d/2);
+            return Prelude.Tuple(Center, (double) d/2);
         }
     }
 }

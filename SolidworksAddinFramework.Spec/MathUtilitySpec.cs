@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Security.Cryptography;
 using System.Text;
 using FluentAssertions;

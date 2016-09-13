@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.OpenGl;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using Accord.Math.Optimization;
 using AForge;
 using SolidworksAddinFramework.OpenGl;
@@ -136,7 +136,7 @@ namespace SolidworksAddinFramework.Geometry
             ,
             Color color
             ,
-            float thickness = 1
+            double thickness = 1
             ,
             int layer = 0
             )
@@ -402,7 +402,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             return ((double[]) curve.GetTessPts(chordTol, lengthTol, startPt, midPt))
                 .Buffer(3, 3)
-                .Select(b => new Vector3((float) b[0], (float) b[1], (float) b[2]));
+                .Select(b => new Vector3((double) b[0], (double) b[1], (double) b[2]));
         }
 
         public static ICurve GetCurveTs(this IEdge edge)

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
@@ -20,7 +20,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static ICurve CreateTrimmedLine(this IModeler modeler, Edge3 edge)
         {
-            Debug.Assert(edge.Delta.Length() > Single.Epsilon);
+            Debug.Assert(edge.Delta.Length() > double.Epsilon);
             var startPoint = new[] {(double)edge.A.X, (double)edge.A.Y,(double)edge.A.Z};
             var dir = edge.Delta.Unit();
             var direction = new[] {(double)dir.X,(double)dir.Y,(double)dir.Z};
@@ -66,7 +66,7 @@ namespace SolidworksAddinFramework
             var arc =
                 (Curve)
                     modeler.CreateArc
-                        (center.ToDoubles(), axis.ToDoubles(), (float) radius, startPoint.ToDoubles(), endPoint.ToDoubles());
+                        (center.ToDoubles(), axis.ToDoubles(), (double) radius, startPoint.ToDoubles(), endPoint.ToDoubles());
 
             var pp0 = arc.GetClosestPointOn(startPoint.X, startPoint.Y, startPoint.Z).CastArray<double>();
             var pp1 = arc.GetClosestPointOn(endPoint.X, endPoint.Y, endPoint.Z).CastArray<double>();
@@ -98,7 +98,7 @@ namespace SolidworksAddinFramework
         }
         public static ICurve CreateTrimmedLine(this IModeler modeler, Vector3 p0, Vector3 v0, double length)
         {
-            v0 = v0.Unit() * (float) length;
+            v0 = v0.Unit() * (double) length;
             var p1 = p0 + v0;
             return CreateTrimmedLine(modeler,p0, p1);
         }
@@ -130,7 +130,7 @@ namespace SolidworksAddinFramework
         /// <param name="p0">Point to project onto surface to find UV bounds</param>
         /// <param name="p1">Point to project onto surface to find UV bounds</param>
         /// <returns></returns>
-        public static IBody2 CreateSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, float r)
+        public static IBody2 CreateSheet(this IModeler modeler, Vector3 center, Vector3 vNormal, double r)
         {
             var surf = (Surface) modeler.CreatePlanarSurface(center.ToDoubles(), vNormal.ToDoubles());
             var mid = surf.GetClosestPointOnTs(center);

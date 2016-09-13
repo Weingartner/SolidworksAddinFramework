@@ -1,4 +1,4 @@
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Runtime.CompilerServices;
 
 namespace SolidworksAddinFramework.Geometry

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.DoubleNumerics;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -88,8 +88,8 @@ namespace SolidworksAddinFramework.Geometry
             var d = Vector3.Dot(u, w);
             var e = Vector3.Dot(v, w);
             var det = a * c - b * b;
-            float sN, sD = det;       // sc = sN / sD, default sD = D >= 0
-            float tN, tD = det;       // tc = tN / tD, default tD = D >= 0
+            double sN, sD = det;       // sc = sN / sD, default sD = D >= 0
+            double tN, tD = det;       // tc = tN / tD, default tD = D >= 0
 
             // compute the line parameters of the two closest points
             if (det < tol)
@@ -151,8 +151,8 @@ namespace SolidworksAddinFramework.Geometry
                 }
             }
             // finally do the division to get sc and tc
-            var sc = (float)(Math.Abs(sN) < tol ? 0.0 : sN / sD);
-            var tc = (float)(Math.Abs(tN) < tol ? 0.0 : tN / tD);
+            var sc = (double)(Math.Abs(sN) < tol ? 0.0 : sN / sD);
+            var tc = (double)(Math.Abs(tN) < tol ? 0.0 : tN / tD);
 
             // get the difference of the two closest points
             var dP = w + (sc * u) - (tc * v);  // =  S1(sc) - e2(tc)
@@ -188,8 +188,8 @@ namespace SolidworksAddinFramework.Geometry
             var d = Vector3.Dot(u1, w);
             var e = Vector3.Dot(u2, w);
             var det = a * c - b * b;
-            float t1, d1 = det;       // sc = sN / sD, default sD = D >= 0
-            float t2, d2 = det;       // tc = tN / tD, default tD = D >= 0
+            double t1, d1 = det;       // sc = sN / sD, default sD = D >= 0
+            double t2, d2 = det;       // tc = tN / tD, default tD = D >= 0
 
             // compute the line parameters of the two closest points
             if (det < tol)
@@ -222,8 +222,8 @@ namespace SolidworksAddinFramework.Geometry
             }
 
             // finally do the division to get sc and tc
-            var c1 = (float)(Math.Abs(t1) < tol ? 0.0 : t1 / d1);
-            var c2 = (float)(Math.Abs(t2) < tol ? 0.0 : t2 / d2);
+            var c1 = (double)(Math.Abs(t1) < tol ? 0.0 : t1 / d1);
+            var c2 = (double)(Math.Abs(t2) < tol ? 0.0 : t2 / d2);
 
             var p1 = c1*u1 + e1.A;
             var p2 = c2*u2 + e2.Point;

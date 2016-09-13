@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Numerics;
+using System.DoubleNumerics;
 using ReactiveUI;
 
 namespace SolidworksAddinFramework.OpenGl.Animation

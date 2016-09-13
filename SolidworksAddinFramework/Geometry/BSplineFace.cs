@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
@@ -133,12 +133,12 @@ namespace SolidworksAddinFramework.Geometry
         private static Vector3 ToRationalVector3(IList<double> data)
         {
             return new Vector3
-                ((float) data[0], (float) data[1], (float) (data.Count == 3 ? data[2] : 1));
+                ((double) data[0], (double) data[1], (double) (data.Count == 3 ? data[2] : 1));
         }
         private static Vector4 ToRationalVector4(IList<double> data)
         {
             return new Vector4
-                ((float) data[0], (float) data[1], (float)data[2], (float) (data.Count == 4 ? data[3] : 1));
+                ((double) data[0], (double) data[1], (double)data[2], (double) (data.Count == 4 ? data[3] : 1));
         }
 
 

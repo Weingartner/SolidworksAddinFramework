@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
-using System.Security.RightsManagement;
+using System.DoubleNumerics;
 using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
@@ -11,11 +10,6 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public static class Vector3Extensions
     {
-        public static Vector3 ToVector3D(this double[] values)
-        {
-            Debug.Assert(values.Length==3);
-            return new Vector3((float) values[0],(float) values[1],(float) values[2]);
-        }
 
         /// <summary>
         /// Performs the perspective transformation to turn a 4D homogeneos coordinate into
@@ -32,9 +26,9 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="v"></param>
         /// <param name="w"></param>
         /// <returns></returns>
-        public static Vector4 ToHomogenous(this Vector3 v, float w) => new Vector4(v*w,w);
+        public static Vector4 ToHomogenous(this Vector3 v, double w) => new Vector4(v*w,w);
 
-        public static Vector3 ToVector3D(this float[] values)
+        public static Vector3 ToVector3D(this double[] values)
         {
             Debug.Assert(values.Length==3);
             return new Vector3(values[0],values[1],values[2]);
@@ -51,7 +45,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public static Vector3 Unit(this Vector3 v) => Vector3.Normalize(v);
 
-        public static float Dot(this Vector3 a, Vector3 other)
+        public static double Dot(this Vector3 a, Vector3 other)
         {
             return Vector3.Dot(a, other);
         }
@@ -75,24 +69,19 @@ namespace SolidworksAddinFramework.OpenGl
         public static Vector3 Orthogonal(this Vector3 v) =>
             Math.Abs(v.X) > Math.Abs(v.Z) ? new Vector3(-v.Y, v.X, 0.0f) : new Vector3(0.0f, -v.Z, v.Y); 
 
-        public static double[] ToDoubles(this Vector3 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z};
-        public static double[] ToDoubles(this Vector4 v) => new double[] {(double)v.X, (double)v.Y, (double)v.Z, (double)v.W};
-        public static float[] ToSingles(this Vector3 v) => new float[] {v.X, v.Y, v.Z};
+        public static double[] ToDoubles(this Vector3 v) => new[] {v.X, v.Y, v.Z};
+        public static double[] ToDoubles(this Vector4 v) => new[] {v.X, v.Y, v.Z, v.W};
+        public static double[] ToSingles(this Vector3 v) => new[] {v.X, v.Y, v.Z};
 
         public static Vector3 ToVector3(this IReadOnlyList<double> value)
         {
             Debug.Assert(value.Count==3);
-            return new Vector3((float) value[0],(float) value[1],(float) value[2]);
+            return new Vector3(value[0],value[1],value[2]);
         }
         public static Vector3 ToVector3(this IList<double> value)
         {
             Debug.Assert(value.Count==3);
-            return new Vector3((float) value[0],(float) value[1],(float) value[2]);
-        }
-        public static Vector3 ToVector3(this double[] value)
-        {
-            Debug.Assert(value.Length>=3);
-            return new Vector3((float) value[0],(float) value[1],(float) value[2]);
+            return new Vector3(value[0],value[1],value[2]);
         }
         public static Vector3 ToVector3(this MathPoint value)
         {
@@ -103,7 +92,7 @@ namespace SolidworksAddinFramework.OpenGl
             return value.ArrayData.CastArray<double>().ToVector3();
         }
 
-        public static Vector3 ToVector3(this float[] value)
+        public static Vector3 ToVector3(this double[] value)
         {
             Debug.Assert(value.Length==3);
             return new Vector3(value[0],value[1],value[2]);
@@ -114,7 +103,7 @@ namespace SolidworksAddinFramework.OpenGl
             return axis.Unit()*Vector3.Dot(point, axis);
         }
 
-        public static Vector3 WithZ(this Vector3 v,float value)=>new Vector3(v.X,v.Y,value);
+        public static Vector3 WithZ(this Vector3 v,double value)=>new Vector3(v.X,v.Y,value);
 
         /// <summary>
         /// Drops the Z value. Effectively a projection on to the XY plane
@@ -130,8 +119,8 @@ namespace SolidworksAddinFramework.OpenGl
         public static Vector3 YComponent(this Vector3 v)=> new Vector3(0,v.Y,0);
         public static Vector3 ZComponent(this Vector3 v)=> new Vector3(0,0,v.Z);
 
-        public static MathPoint ToSwMathPoint(this Vector3 v, IMathUtility m) => m.Point(new double[] {v.X, v.Y, v.Z});
-        public static MathVector ToSWVector(this Vector3 v, IMathUtility m) => m.Vector(new double[] {v.X, v.Y, v.Z});
+        public static MathPoint ToSwMathPoint(this Vector3 v, IMathUtility m) => m.Point(new[] {v.X, v.Y, v.Z});
+        public static MathVector ToSWVector(this Vector3 v, IMathUtility m) => m.Vector(new[] {v.X, v.Y, v.Z});
 
         /// <summary>
         /// Converts to Vector3 and sets the z component to 0.0
@@ -169,14 +158,14 @@ namespace SolidworksAddinFramework.OpenGl
 
     public static class Matrix4x4Extensions
     {
-        public static Matrix4x4 CreateFromAxisAngleOrigin(PointDirection3 p, float angle)
+        public static Matrix4x4 CreateFromAxisAngleOrigin(PointDirection3 p, double angle)
         {
             return
                 Matrix4x4.CreateTranslation(-p.Point)
                 *Matrix4x4.CreateFromAxisAngle(p.Direction.Unit(), angle)
                 *Matrix4x4.CreateTranslation(p.Point);
         }
-        public static Matrix4x4 CreateFromEdgeAngleOrigin(Edge3 p, float angle)
+        public static Matrix4x4 CreateFromEdgeAngleOrigin(Edge3 p, double angle)
         {
             return CreateFromAxisAngleOrigin(new PointDirection3(p.A,p.Delta),angle);
         }

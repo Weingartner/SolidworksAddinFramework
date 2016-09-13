@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using JetBrains.Annotations;
 using SolidWorks.Interop.sldworks;
 
@@ -171,7 +171,7 @@ namespace SolidworksAddinFramework.Geometry
                             if (surfParams.ControlPointDimension == 4)
                                 w = array[3];
 
-                            var ctrlPoint = new Vector4((float) (x*w),(float) (y*w),(float) (z*w),(float) w);
+                            var ctrlPoint = new Vector4((double) (x*w),(double) (y*w),(double) (z*w),(double) w);
 
 
                             controlPointArray[v, u] = ctrlPoint;

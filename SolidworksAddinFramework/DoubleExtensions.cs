@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.DoubleNumerics;
 using System.Linq;
-using System.Numerics;
+using BigInteger = System.Numerics.BigInteger;
 
 namespace Weingartner.Numerics
 {
@@ -20,7 +21,7 @@ namespace Weingartner.Numerics
 
         public static IEnumerable<Vector3> LinSpace(Vector3 start, Vector3 stop, int num, bool endpoint = true)
         {
-            return LinSpace(0, 1, num, endpoint).Select(i => Vector3.Lerp(start, stop, (float) i));
+            return LinSpace(0, 1, num, endpoint).Select(i => Vector3.Lerp(start, stop, (double) i));
         } 
 
         public static List<List<double>> LinSpace(List<double> start, List<double> stop, int num, bool endpoint = true)
@@ -178,7 +179,7 @@ namespace Weingartner.Numerics
         }
 
         public static int CountDigits
-       (BigInteger number) => ((int)BigInteger.Log10(number)) + 1;
+       (System.Numerics.BigInteger number) => ((int)BigInteger.Log10(number)) + 1;
 
         private static readonly BigInteger[] BigPowers10
            = Enumerable.Range(0, 100)

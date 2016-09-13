@@ -1,4 +1,4 @@
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
@@ -43,7 +43,7 @@ namespace DemoMacroFeatures.SampleMacroFeature
             var axisX = Vector3.UnitX;
 
             // Find the point to cut the object
-            center.X = (float) (database.Alpha*box.P0.X + (1 - database.Alpha)*box.P1.X);
+            center.X = (double) (database.Alpha*box.P0.X + (1 - database.Alpha)*box.P1.X);
             var sheet = modeler.CreateSheet(center, axisX, box.MaxDim*2);
 
             var cutResult = body.Cut(sheet);

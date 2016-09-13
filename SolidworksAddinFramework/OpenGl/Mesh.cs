@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AForge;
@@ -83,7 +83,7 @@ namespace SolidworksAddinFramework.OpenGl
             UpdateBoundingSphere(CreateBoundingSphere);
         }
 
-        private Tuple<Vector3, float> CreateBoundingSphere()
+        private Tuple<Vector3, double> CreateBoundingSphere()
         {
             var rangeBuilder = new Range3Single.Range3SingleBuilder();
             var count = TrianglesWithNormals.Count;

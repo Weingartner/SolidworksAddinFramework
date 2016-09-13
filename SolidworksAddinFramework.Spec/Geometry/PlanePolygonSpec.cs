@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
 using Weingartner.Numerics;
@@ -15,7 +15,7 @@ namespace SolidworksAddinFramework.Spec.Geometry
         {
 
             var points = Sequences.LinSpace(0, Math.PI*2, 100)
-                .Select(t => new Vector3((float) Math.Cos(t), (float) Math.Sin(t), 0))
+                .Select(t => new Vector3((double) Math.Cos(t), (double) Math.Sin(t), 0))
                 .ToList();
 
             points.OrientationClosed(Vector3.UnitZ).Should().BeTrue();

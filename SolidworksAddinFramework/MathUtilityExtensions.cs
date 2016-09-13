@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Text;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
@@ -139,7 +139,7 @@ namespace SolidworksAddinFramework
         public static Matrix4x4 ToMatrix4X4(this IMathTransform transform)
         {
             var _ =  new Matrix4x4();
-            var array = transform.ArrayData.CastArray<float>();
+            var array = transform.ArrayData.CastArray<double>();
             var a = array[0];
             var b = array[1];
             var c = array[2];

@@ -1,5 +1,5 @@
 using System;
-using System.Numerics;
+using System.DoubleNumerics;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {

@@ -37,7 +37,7 @@ namespace SolidworksAddinFramework.OpenGl
                 }
         }
 
-        public static void Render(IFace2[] faces, Color color, float lineWidth, bool isSolid)
+        public static void Render(IFace2[] faces, Color color, double lineWidth, bool isSolid)
         {
             using (ModernOpenGl.SetColor(color, ShadingModel.Smooth, solidBody:isSolid))
             using (ModernOpenGl.SetLineWidth(lineWidth))
@@ -45,8 +45,8 @@ namespace SolidworksAddinFramework.OpenGl
                 faces
                     .ForEach(face =>
                     {
-                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(true).CastArray<float>());
-                        var norms = FaceTriStrips.Unpack(face.GetTessTriStripNorms().CastArray<float>());
+                        var strips = FaceTriStrips.Unpack(face.GetTessTriStrips(true).CastArray<double>());
+                        var norms = FaceTriStrips.Unpack(face.GetTessTriStripNorms().CastArray<double>());
                         Debug.Assert(norms.Length == strips.Length);
                         Debug.Assert(norms.Zip(strips, (a, b) => a.Length == b.Length).All(x => x));
                         norms.Zip(strips, (normStrip, pointStrip) => normStrip.Zip(pointStrip, (norm, point) => new { norm, point }))

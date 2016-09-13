@@ -3,7 +3,7 @@
 <#@ assembly name="System.Core" #>
 
 <# Type[] types = new[] {
-    typeof(float), typeof(double), typeof(Int64),
+    typeof(double), typeof(double), typeof(Int64),
     typeof(UInt16), typeof(UInt32), typeof(UInt64)
     };
 #>

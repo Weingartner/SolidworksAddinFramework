@@ -9,18 +9,18 @@ using System.Runtime.CompilerServices;
 namespace SolidworksAddinFramework {
 
     
-    public struct RangeSingle :IEnumerable<Single>
+    public struct RangeSingle :IEnumerable<double>
     {
-        private readonly Single _Min;
-        private readonly Single _Max;
+        private readonly double _Min;
+        private readonly double _Max;
 
         public override string ToString() => $"{_Min}:{_Max}";
 
 
-        public RangeSingle(IEnumerable<Single> values)
+        public RangeSingle(IEnumerable<double> values)
         {
-            _Min = Single.MaxValue;
-            _Max = Single.MinValue;
+            _Min = double.MaxValue;
+            _Max = double.MinValue;
             foreach (var value in values)
             {
                 _Min = Math.Min(value, _Min);
@@ -28,20 +28,20 @@ namespace SolidworksAddinFramework {
             }
         }
 
-        public Single Min
+        public double Min
         {
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _Min; }
         }
 
-        public Single Max
+        public double Max
         {
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _Max; }
         }
 
 
-        public RangeSingle(Single min, Single max)
+        public RangeSingle(double min, double max)
         {
 			Debug.Assert(min <= max);
             _Min = min;
@@ -49,7 +49,7 @@ namespace SolidworksAddinFramework {
 
         }
 
-        public RangeSingle(Single min, Single max, bool checkBounds)
+        public RangeSingle(double min, double max, bool checkBounds)
         {
 			if(checkBounds)
 				Debug.Assert(min <= max);
@@ -59,7 +59,7 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RangeSingle operator +(RangeSingle range, Single value)
+        public static RangeSingle operator +(RangeSingle range, double value)
         {
             // Not implemented with Min Max for performance reasons
             var oldMin = range._Min;
@@ -89,7 +89,7 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RangeSingle Extend(Single value)
+        public RangeSingle Extend(double value)
         {
             var min = value < _Min ? value : _Min;
             var max = value > _Max ? value : _Max;
@@ -98,12 +98,12 @@ namespace SolidworksAddinFramework {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Contains(Single value)
+        public bool Contains(double value)
         {
             return value > _Min && value < _Max;
         }
 
-        public IEnumerator<Single> GetEnumerator()
+        public IEnumerator<double> GetEnumerator()
         {
             yield return _Min;
             yield return _Max;
@@ -115,9 +115,9 @@ namespace SolidworksAddinFramework {
         }
 
         public static RangeSingle MaxRange =>
-            new RangeSingle(Single.MinValue, Single.MaxValue);
+            new RangeSingle(double.MinValue, double.MaxValue);
 		public static RangeSingle MaxRangeInverted => 
-			new RangeSingle(Single.MaxValue, Single.MinValue, false);
+			new RangeSingle(double.MaxValue, double.MinValue, false);
     }
 
 

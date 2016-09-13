@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.DoubleNumerics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
@@ -131,8 +132,8 @@ namespace SolidworksAddinFramework
         {
             var box = (double[]) body.GetBodyBox();
             return new Range3Single(
-                new Vector3((float) box[0], (float) box[1], (float) box[2]), 
-                new Vector3((float) box[3], (float) box[4], (float) box[5]));
+                new Vector3((double) box[0], (double) box[1], (double) box[2]), 
+                new Vector3((double) box[3], (double) box[4], (double) box[5]));
         }
 
         public static bool GetDistance(this IBody2 body0, IBody2 body1, out double[] p0, out double []p1)

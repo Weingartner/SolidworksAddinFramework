@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Numerics;
+using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using SolidWorks.Interop.sldworks;
@@ -28,7 +28,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public abstract void Render(DateTime time);
 
-        public Tuple<Vector3, float> BoundingSphere
+        public Tuple<Vector3, double> BoundingSphere
         {
             get
             {

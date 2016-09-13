@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Numerics;
+using System.DoubleNumerics;
 using JetBrains.Annotations;
 
 namespace SolidworksAddinFramework.Geometry
