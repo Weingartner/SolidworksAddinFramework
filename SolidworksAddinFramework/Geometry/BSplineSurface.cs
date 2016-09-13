@@ -20,6 +20,8 @@ namespace SolidworksAddinFramework.Geometry
 
         public double[] KnotsV { get; }
         public int SurfaceDimension { get; set; }
+        public bool UIsPeriodic { get; set; }
+        public bool VIsPeriodic { get; set; }
 
         public BSplineSurface
             ( [NotNull] Vector4[,] controlPointList
@@ -28,6 +30,8 @@ namespace SolidworksAddinFramework.Geometry
             , [NotNull] double[] knotsU
             , [NotNull] double[] knotsV
             , int surfaceDimension
+            , bool uIsPeriodic
+            , bool vIsPeriodic
             )
         {
 
@@ -41,6 +45,8 @@ namespace SolidworksAddinFramework.Geometry
             KnotsU = knotsU;
             KnotsV = knotsV;
             SurfaceDimension = surfaceDimension;
+            UIsPeriodic = uIsPeriodic;
+            VIsPeriodic = vIsPeriodic;
         }
 
         public BSplineSurface WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
@@ -50,7 +56,7 @@ namespace SolidworksAddinFramework.Geometry
             if(SurfaceDimension==3 && mod.EnumerateColumnWise().Any(v=>v.Z!=1.0) )
                 throw new ArgumentException("This should be a non rational surface");
 
-            return new BSplineSurface(mod, OrderU,OrderV,KnotsU,KnotsV, SurfaceDimension);
+            return new BSplineSurface(mod, OrderU,OrderV,KnotsU,KnotsV, SurfaceDimension, UIsPeriodic, VIsPeriodic);
         }
 
         #region equality
@@ -120,8 +126,8 @@ namespace SolidworksAddinFramework.Geometry
             var numVCtrPts = BitConverter.GetBytes(vLength);
 
             //TODO: find out what periodicity means in this context 
-            var uPeriodicity = BitConverter.GetBytes(0);
-            var vPeriodicity = BitConverter.GetBytes(0);
+            var uPeriodicity = BitConverter.GetBytes(UIsPeriodic ? 1 : 0);
+            var vPeriodicity = BitConverter.GetBytes(VIsPeriodic ? 1 : 0);
 
             var dimControlPoints = BitConverter.GetBytes(SurfaceDimension);
             var unusedParameter = BitConverter.GetBytes(0);
@@ -135,6 +141,8 @@ namespace SolidworksAddinFramework.Geometry
             };
 
 
+            LogViewer.Log("Surface Props"); 
+            LogViewer.Log(props.ToHexString()); 
             var bsplineSurface = (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
                 ( props
@@ -199,9 +207,10 @@ namespace SolidworksAddinFramework.Geometry
                     ,orderV: surfParams.VOrder
                     ,knotsU: uKnotVector
                     ,knotsV: vKnotVector
-                    ,surfaceDimension: surfParams.ControlPointDimension);
-
-
+                    ,surfaceDimension: surfParams.ControlPointDimension
+                    ,uIsPeriodic:surfParams.UPeriodicity
+                    ,vIsPeriodic:surfParams.VPeriodicity
+                    );
         }
     }
 }

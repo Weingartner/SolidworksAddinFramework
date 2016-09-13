@@ -115,7 +115,7 @@ namespace SolidworksAddinFramework.Geometry
 
             var ctrlPointsArray = surfaceCtrlPoints.Reshape(uvNumCtrlPoints.u, uvNumCtrlPoints.v);
 
-            var bSurface = new BSplineSurface(ctrlPointsArray,uvOrder.u, uvOrder.v,uKnots, vKnots, surfaceDimension);
+            var bSurface = new BSplineSurface(ctrlPointsArray,uvOrder.u, uvOrder.v,uKnots, vKnots, surfaceDimension, uvIsPeriodic.u ==1, uvIsPeriodic.v==1);
 
             return new BSplineFace(bSurface, bLoops);
 
