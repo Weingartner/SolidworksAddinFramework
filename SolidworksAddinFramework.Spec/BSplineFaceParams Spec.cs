@@ -27,7 +27,7 @@ namespace SolidworksAddinFramework.Spec
         {
             CreatePartDoc(modelDoc =>
             {
-                var trimCurve = Modeler.CreateTrimmedLine(new Vector3(-0.1f,-0.45f,-7.8f),new Vector3(1.3f,2.7f,3.9f));
+                var trimCurve = Modeler.CreateTrimmedLine(new Vector3(-0.1,-0.45,-7.8),new Vector3(1.3,2.7,3.9));
 
                 var parameters = trimCurve.ToBSpline3D(false);
                 var swCurve = parameters.ToCurve();
@@ -796,13 +796,13 @@ namespace SolidworksAddinFramework.Spec
             var b0 = disc0.GetBodyBoxTs();
             var b1 = loadedBody.GetBodyBoxTs();
 
-            b0.P0.X.Should().BeApproximately(b1.P0.X, 1e-5f);
-            b0.P0.Y.Should().BeApproximately(b1.P0.Y, 1e-5f);
-            b0.P0.Z.Should().BeApproximately(b1.P0.Z, 1e-5f);
+            b0.P0.X.Should().BeApproximately(b1.P0.X, 1e-5);
+            b0.P0.Y.Should().BeApproximately(b1.P0.Y, 1e-5);
+            b0.P0.Z.Should().BeApproximately(b1.P0.Z, 1e-5);
 
-            b0.P1.X.Should().BeApproximately(b1.P1.X, 1e-5f);
-            b0.P1.Y.Should().BeApproximately(b1.P1.Y, 1e-5f);
-            b0.P1.Z.Should().BeApproximately(b1.P1.Z, 1e-5f);
+            b0.P1.X.Should().BeApproximately(b1.P1.X, 1e-5);
+            b0.P1.Y.Should().BeApproximately(b1.P1.Y, 1e-5);
+            b0.P1.Z.Should().BeApproximately(b1.P1.Z, 1e-5);
 
 
         }

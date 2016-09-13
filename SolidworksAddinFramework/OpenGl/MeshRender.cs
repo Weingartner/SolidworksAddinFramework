@@ -17,7 +17,7 @@ namespace SolidworksAddinFramework.OpenGl
         public static void Render(Mesh mesh, Color color, bool isSolid)
         {
             using (ModernOpenGl.SetColor(color, ShadingModel.Smooth, solidBody:isSolid))
-            using (ModernOpenGl.SetLineWidth(2.0f))
+            using (ModernOpenGl.SetLineWidth(2.0))
             using (ModernOpenGl.Begin(PrimitiveType.Triangles))
             {
                 var tris = mesh.TrianglesWithNormals;
@@ -28,7 +28,7 @@ namespace SolidworksAddinFramework.OpenGl
             }
             if (mesh.Edges == null) return;
             using (ModernOpenGl.SetColor(Color.Blue, ShadingModel.Smooth, solidBody:isSolid))
-            using (ModernOpenGl.SetLineWidth(2.0f))
+            using (ModernOpenGl.SetLineWidth(2.0))
             using (ModernOpenGl.Begin(PrimitiveType.Lines))
                 foreach (var v in mesh.Edges)
                 {

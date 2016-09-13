@@ -63,7 +63,7 @@ namespace SolidworksAddinFramework.OpenGl
 
             }
 
-            var color = new[] { value.R / 255f, value.G / 255f, value.B / 255f, value.A / 255f };
+            var color = new[] { value.R / 255d, value.G / 255d, value.B / 255d, value.A / 255d };
             GL.Color4(color);
 
             return revert;

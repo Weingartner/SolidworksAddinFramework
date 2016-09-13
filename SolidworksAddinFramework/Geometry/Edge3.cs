@@ -95,8 +95,8 @@ namespace SolidworksAddinFramework.Geometry
             if (det < tol)
             { 
                 // the lines are almost parallel
-                sN = 0.0f;         // force using point P0 on segment S1
-                sD = 1.0f;         // to prevent possible division by 0.0 later
+                sN = 0.0;         // force using point P0 on segment S1
+                sD = 1.0;         // to prevent possible division by 0.0 later
                 tN = e;
                 tD = c;
             }
@@ -108,7 +108,7 @@ namespace SolidworksAddinFramework.Geometry
                 if (sN < 0.0)
                 {        
                     // sc < 0 => the s=0 edge is visible
-                    sN = 0.0f;
+                    sN = 0.0;
                     tN = e;
                     tD = c;
                 }
@@ -124,10 +124,10 @@ namespace SolidworksAddinFramework.Geometry
             if (tN < 0.0)
             {            
                 // tc < 0 => the t=0 edge is visible
-                tN = 0.0f;
+                tN = 0.0;
                 // recompute sc for this edge
                 if (-d < 0.0)
-                    sN = 0.0f;
+                    sN = 0.0;
                 else if (-d > a)
                     sN = sD;
                 else
@@ -195,8 +195,8 @@ namespace SolidworksAddinFramework.Geometry
             if (det < tol)
             { 
                 // the lines are almost parallel
-                t1 = 0.0f;         // force using point P0 on segment S1
-                d1 = 1.0f;         // to prevent possible division by 0.0 later
+                t1 = 0.0;         // force using point P0 on segment S1
+                d1 = 1.0;         // to prevent possible division by 0.0 later
                 t2 = e;
                 d2 = c;
             }
@@ -208,7 +208,7 @@ namespace SolidworksAddinFramework.Geometry
                 if (t1 < 0.0)
                 {        
                     // sc < 0 => the s=0 edge is visible
-                    t1 = 0.0f;
+                    t1 = 0.0;
                     t2 = e;
                     d2 = c;
                 }

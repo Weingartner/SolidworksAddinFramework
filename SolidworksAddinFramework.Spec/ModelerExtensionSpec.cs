@@ -23,9 +23,9 @@ namespace SolidworksAddinFramework.Spec
     {
         public static IEnumerable<object[]> TrimLineTestData => new[]
         {
-            new object[] {new[] {0f, 0f, 0f}, new[] {1f, 1f, 1f}},
-            new object[] {new[] { 2.92671522E-17f, -0.251327425f, 0.0f }, new[] { 1.56720257f, 1.06371164f, 0.0f }},
-            new object[] {new[] {1.7f, 1.426469f, 0f}, new[] {1.7f, 1.175142f, 0f}},
+            new object[] {new[] {0, 0, 0}, new[] {1, 1, 1}},
+            new object[] {new[] { 2.92671522E-17, -0.251327425, 0.0 }, new[] { 1.56720257, 1.06371164, 0.0 }},
+            new object[] {new[] {1.7, 1.426469, 0}, new[] {1.7, 1.175142, 0}},
         };
 
         [SolidworksFact]
@@ -70,7 +70,7 @@ namespace SolidworksAddinFramework.Spec
 
                 var limitedLine = Modeler.CreateTrimmedLine(edge);
 
-                var tol = 1e-9f;
+                var tol = 1e-9;
                 var startPoint = limitedLine.StartPoint(0)[0];
                 var endPoint = limitedLine.EndPoint(0)[0];
                 v0.X.Should().BeApproximately(startPoint.X, tol);
@@ -94,13 +94,13 @@ namespace SolidworksAddinFramework.Spec
             {
                 var points = new[]
                 {
-                    new Vector3(1.306213E-17f, -0.02393888f, -0.03204574f),
-                    new Vector3(0f, 3.469447E-18f, 0.04f),
-                    new Vector3(0.4619068f, 0.03750812f, 0.01389752f),
-                    new Vector3(0.5f, 0.0386182f, -0.01042281f),
-                    new Vector3(1f, 0.03395086f, -0.0211504f),
-                    new Vector3(1f, -0.01454161f, 0.03726314f),
-                    new Vector3(0.4766606f, 0.03750812f, 0.01389752f),
+                    new Vector3(1.306213E-17, -0.02393888, -0.03204574),
+                    new Vector3(0, 3.469447E-18, 0.04),
+                    new Vector3(0.4619068, 0.03750812, 0.01389752),
+                    new Vector3(0.5, 0.0386182, -0.01042281),
+                    new Vector3(1, 0.03395086, -0.0211504),
+                    new Vector3(1, -0.01454161, 0.03726314),
+                    new Vector3(0.4766606, 0.03750812, 0.01389752),
                 }
                 .ToList();
                 var curve = Modeler.InterpolatePointsToCurve(points, 1e-2, true, false);
@@ -152,13 +152,13 @@ namespace SolidworksAddinFramework.Spec
 
             var connect = edge0.ShortestEdgeJoining(edge1);
 
-            connect.A.X.Should().BeApproximately(0, 1e-6f);
-            connect.A.Y.Should().BeApproximately(0, 1e-6f);
-            connect.A.Z.Should().BeApproximately(-1, 1e-6f);
+            connect.A.X.Should().BeApproximately(0, 1e-6);
+            connect.A.Y.Should().BeApproximately(0, 1e-6);
+            connect.A.Z.Should().BeApproximately(-1, 1e-6);
 
-            connect.B.X.Should().BeApproximately(0, 1e-6f);
-            connect.B.Y.Should().BeApproximately(0, 1e-6f);
-            connect.B.Z.Should().BeApproximately(1, 1e-6f);
+            connect.B.X.Should().BeApproximately(0, 1e-6);
+            connect.B.Y.Should().BeApproximately(0, 1e-6);
+            connect.B.Z.Should().BeApproximately(1, 1e-6);
 
         }
         

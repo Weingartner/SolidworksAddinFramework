@@ -243,7 +243,6 @@
     <Compile Include="EventHandlers\DoubleBuffer.cs" />
     <Compile Include="EventHandlers\GLDoubleBuffer.cs" />
     <Compile Include="EventHandlers\OpenGlRenderer.cs" />
-    <Compile Include="EventHandlers\OpenGL.cs" />
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="FeatureMgrViewObservables.cs" />

@@ -17,7 +17,7 @@ namespace SolidworksAddinFramework.Spec.opengl
             {
                 var v = new Vector3((double) r.NextDouble(), (double) r.NextDouble(), (double) r.NextDouble());
                 var o = v.Orthogonal();
-                v.Dot(o).Should().BeApproximately(0, 1e-9f);
+                v.Dot(o).Should().BeApproximately(0, 1e-9);
 
             }
             

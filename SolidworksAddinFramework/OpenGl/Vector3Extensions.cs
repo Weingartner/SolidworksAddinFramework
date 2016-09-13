@@ -67,7 +67,7 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="v"></param>
         /// <returns></returns>
         public static Vector3 Orthogonal(this Vector3 v) =>
-            Math.Abs(v.X) > Math.Abs(v.Z) ? new Vector3(-v.Y, v.X, 0.0f) : new Vector3(0.0f, -v.Z, v.Y); 
+            Math.Abs(v.X) > Math.Abs(v.Z) ? new Vector3(-v.Y, v.X, 0.0) : new Vector3(0.0, -v.Z, v.Y); 
 
         public static double[] ToDoubles(this Vector3 v) => new[] {v.X, v.Y, v.Z};
         public static double[] ToDoubles(this Vector4 v) => new[] {v.X, v.Y, v.Z, v.W};
