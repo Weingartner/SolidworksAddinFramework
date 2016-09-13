@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using JetBrains.Annotations;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
@@ -18,8 +19,16 @@ namespace SolidworksAddinFramework.Geometry
         public double[] KnotsU { get; }
 
         public double[] KnotsV { get; }
-        public BSplineSurface([NotNull] Vector4[,] controlPointList, int orderU, int orderV,
-            [NotNull] double[] knotsU, [NotNull] double[] knotsV)
+        public int SurfaceDimension { get; set; }
+
+        public BSplineSurface
+            ( [NotNull] Vector4[,] controlPointList
+            , int orderU
+            , int orderV
+            , [NotNull] double[] knotsU
+            , [NotNull] double[] knotsV
+            , int surfaceDimension
+            )
         {
 
             if (controlPointList == null) throw new ArgumentNullException(nameof(controlPointList));
@@ -31,12 +40,17 @@ namespace SolidworksAddinFramework.Geometry
             OrderV = orderV;
             KnotsU = knotsU;
             KnotsV = knotsV;
+            SurfaceDimension = surfaceDimension;
         }
 
         public BSplineSurface WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
         {
+                
             var mod = converter(ControlPointList);
-            return new BSplineSurface(mod, OrderU,OrderV,KnotsU,KnotsV);
+            if(SurfaceDimension==3 && mod.EnumerateColumnWise().Any(v=>v.Z!=1.0) )
+                throw new ArgumentException("This should be a non rational surface");
+
+            return new BSplineSurface(mod, OrderU,OrderV,KnotsU,KnotsV, SurfaceDimension);
         }
 
         #region equality
@@ -96,7 +110,7 @@ namespace SolidworksAddinFramework.Geometry
 
             var swControlPointList = ControlPointList
                 .EnumerateColumnWise()
-                .SelectMany(v => new double [] {v.X/v.W, v.Y/v.W, v.Z/v.W, v.W})
+                .SelectMany(v => new double [] {v.X/v.W, v.Y/v.W, v.Z/v.W, v.W}.Take(SurfaceDimension))
                 .ToArray();
 
             var uLength = ControlPointList.GetLength(0);
@@ -109,7 +123,7 @@ namespace SolidworksAddinFramework.Geometry
             var uPeriodicity = BitConverter.GetBytes(0);
             var vPeriodicity = BitConverter.GetBytes(0);
 
-            var dimControlPoints = BitConverter.GetBytes(4);
+            var dimControlPoints = BitConverter.GetBytes(SurfaceDimension);
             var unusedParameter = BitConverter.GetBytes(0);
 
             var props = new[]
@@ -184,7 +198,8 @@ namespace SolidworksAddinFramework.Geometry
                     ,orderU: surfParams.UOrder
                     ,orderV: surfParams.VOrder
                     ,knotsU: uKnotVector
-                    ,knotsV: vKnotVector);
+                    ,knotsV: vKnotVector
+                    ,surfaceDimension: surfParams.ControlPointDimension);
 
 
         }
