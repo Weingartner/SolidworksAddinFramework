@@ -117,9 +117,11 @@ namespace XUnit.Solidworks.Addin
             Subject.OnNext(Unit.Default);
         }
 
-        public static async Task PauseTestExecution()
+        public static async Task PauseTestExecution(bool pause=true)
         {
 #if DEBUG
+            if (!pause)
+                return;
             CanContinueTestExecution = true;
             using (Disposable.Create(() => CanContinueTestExecution = false))
             {

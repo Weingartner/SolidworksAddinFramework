@@ -193,6 +193,50 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [SolidworksFact]
+        public async Task GetTrimCurves2ShouldReturnNonPeriodicTrimCurve ()
+        {
+            await CreatePartDoc(async (modelDoc,yielder) =>
+            {
+
+                var disc0 = Modeler.CreateCirclularSheet
+                    ( center: Vector3.Zero
+                    , vNormal: Vector3.UnitZ
+                    , vRef: Vector3.UnitX
+                    , radius: 2
+                    );
+
+                // Display the original sheet. Visually verify it is ok.
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (disc0.DisplayUndoable(modelDoc))
+                    await PauseTestExecution(pause:false);
+
+                // The sheet should only have one face. Extract it
+                var faces = disc0.GetFaces().CastArray<IFace2>();
+                faces.Length.Should().Be(1);
+                var face = faces[0];
+
+                // Convert the solidworks face to a bspline face
+                var bsplineFace = BSplineFace.Create(face);
+
+                bsplineFace.TrimLoops.Count.Should().Be(1);
+                bsplineFace.TrimLoops[0].Count.Should().Be(1);
+
+                // The curve is a clamped closed curve. It is not "Solidworks periodic"
+                bsplineFace.TrimLoops[0][0].KnotVectorU.Take(3).ShouldBeEquivalentTo(new[] { 0,0,0});
+                bsplineFace.TrimLoops[0][0].KnotVectorU.TakeLast(3).ShouldBeEquivalentTo(new[] { 1,1,1});
+                var controlPoints00 = bsplineFace.TrimLoops[0][0].ControlPoints;
+                controlPoints00.First()
+                    .Should().Be(controlPoints00.Last());
+
+                // This is not solidworks periodic so this property should be false
+                bsplineFace.TrimLoops[0][0].IsPeriodic.Should().BeFalse();
+
+            });
+
+        }
+
+        [SolidworksFact]
         public void CanSpecifyTrimLoopsManually()
         {
             #region data
