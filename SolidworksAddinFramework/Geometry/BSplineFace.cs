@@ -41,14 +41,29 @@ namespace SolidworksAddinFramework.Geometry
             var reader = new GetTrimCurves2DataReader(packedData);
 
             // Packed Double 1
+            // An integer pair containing number of loops and total number of SP curves (trim curves).
+            // The length of any edge list generated immediately after a call to IFace2::GetTrimCurves2
+            // will be equal to the number of SP curves
             var packedDouble1 = reader.ReadDouble().DoubleToInteger();
             int numLoops = packedDouble1.Item1;
             int numSPCurves = packedDouble1.Item2;
 
             // PackeDouble 2
+            // Series of integer pairs containing the number of SP curves in each loop.
+            // The first integer in each pair represents the number of curves in the odd loops;
+            // the second represents the even. The total number of integer pairs is half the 
+            // number of loops, rounded up
             var curvesPerLoopLookup = reader.ReadIntegers(numLoops).ToList();
 
-            // PackedDouble 3
+
+            // PackedDouble 3[]  ( Array of doubles )
+            // For each SP curve, a set of two integer pairs.
+            // The first contains the order of the curve and
+            // a Boolean indicating if it is periodic.If the curve is periodic,
+            // it is clamped (that is, knots of multiplicity = order exists at each end of the curve).
+            // The second contains the dimension of the curve and the number of control points in it. 
+            // If the dimension is 2, then the curve is non - rational; if the dimension is 3,
+            // then the curve is rational.
             var spCurveInfos = reader
                 .ReadBufferedIntegers(4, numSPCurves)
                 .Select(b => new {order = b[0], isPeriodic = b[1]== 1, dimension=b[2], isRational=b[2]==3, numCtrlPoints = b[3]})
