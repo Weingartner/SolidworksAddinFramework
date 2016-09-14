@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
@@ -55,6 +56,7 @@ namespace SolidworksAddinFramework.Geometry
             // number of loops, rounded up
             var curvesPerLoopLookup = reader.ReadIntegers(numLoops).ToList();
 
+            var i = 0;
 
             // PackedDouble 3[]  ( Array of doubles )
             // For each SP curve, a set of two integer pairs.
@@ -66,6 +68,11 @@ namespace SolidworksAddinFramework.Geometry
             // then the curve is rational.
             var spCurveInfos = reader
                 .ReadBufferedIntegers(bufferSize: 4, numberOfBuffers: numSPCurves)
+                .Do(b =>
+                {
+                    LogViewer.Log($"Get TrimCurves2 'PackedDouble 3' buffer {i++}");
+                    LogViewer.Log(string.Join(" ",b));
+                })
                 .Select(b => new {order = b[0], isPeriodic = b[1]== 1, dimension=b[2], isRational=b[2]==3, numCtrlPoints = b[3]})
                 .ToList();
 
