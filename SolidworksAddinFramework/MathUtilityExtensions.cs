@@ -136,6 +136,27 @@ namespace SolidworksAddinFramework
             return (MathTransform) math.CreateTransform(data);
         }
 
+        public static string ToHexString(this double d)
+        {
+            var bytes = BitConverter.GetBytes(d);
+            return BitConverter.ToString(bytes);
+        }
+        public static string ToHexString(this int d)
+        {
+            var bytes = BitConverter.GetBytes(d);
+            return BitConverter.ToString(bytes);
+        }
+        public static string ToHexString(this double[] d)
+        {
+            var bytes = d.Select(ToHexString);
+            return string.Join(":",bytes);
+        }
+        public static string ToHexString(this int[] d)
+        {
+            var bytes = d.Select(ToHexString);
+            return string.Join(":",bytes);
+        }
+
         public static Matrix4x4 ToMatrix4X4(this IMathTransform transform)
         {
             var _ =  new Matrix4x4();
