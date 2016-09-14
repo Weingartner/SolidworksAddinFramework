@@ -140,9 +140,6 @@ namespace SolidworksAddinFramework.Geometry
                 BitConverter.ToDouble(dimControlPoints.Concat(unusedParameter).ToArray(), 0)
             };
 
-
-            LogViewer.Log("Surface Props"); 
-            LogViewer.Log(props.ToHexString()); 
             var bsplineSurface = (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
                 ( props
