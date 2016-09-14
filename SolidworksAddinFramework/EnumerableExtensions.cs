@@ -17,6 +17,8 @@ namespace SolidworksAddinFramework
     public static class EnumerableExtensions
     {
 
+        public static string Join(this IEnumerable<string> e, string delim) => string.Join(delim, e);
+
         /// <summary>
         /// This assumes that the inner enumerables always overlap with each other but
         /// we wish to eliminate the overlap. For example [ [ 1 2 3 4] [3 4 5 6] [5 6 7 8] ]
