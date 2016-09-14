@@ -12,6 +12,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Xml;
 using Accord.Math.Optimization;
+using JetBrains.Annotations;
 using LanguageExt;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
@@ -101,8 +102,10 @@ namespace SolidworksAddinFramework
             }
         }
 
-        public static void DisplayTs(this IBody2 body ,IModelDoc2 doc = null, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
+        public static void DisplayTs([NotNull] this IBody2 body ,IModelDoc2 doc = null, Color? c = null, swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
+            if (body == null)
+                throw new ArgumentNullException(nameof(body));
             doc = doc ?? (IModelDoc2)SwAddinBase.Active.SwApp.ActiveDoc;
             c = c ?? Color.Yellow;
             var colorref = ColorTranslator.ToWin32(c.Value);
