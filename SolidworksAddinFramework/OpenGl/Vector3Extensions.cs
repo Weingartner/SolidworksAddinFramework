@@ -151,9 +151,13 @@ namespace SolidworksAddinFramework.OpenGl
 
             var sign = Math.Sign(Vector3.Cross(v0.To3D(), v1.To3D()).Z);
             var acos = Math.Acos(Vector2.Dot(v0, v1) / v0Length / v1Length);
-            return double.IsNaN(acos) ? 0 : acos * sign;
+            return Double.IsNaN(acos) ? 0 : acos * sign;
         }
 
+        public static double AngleBetweenVectors(Vector3 v0, Vector3 v1)
+        {
+            return Math.Acos(v0.Dot(v1)/(v0.Length()*v1.Length()));
+        }
     }
 
     public static class Matrix4x4Extensions
