@@ -193,7 +193,7 @@ namespace SolidworksAddinFramework.Spec
         }
 
         [SolidworksFact]
-        public async Task GetTrimCurves2ShouldReturnNonPeriodicTrimCurve ()
+        public async Task GetTrimCurves2ForADiscShouldReturnASingleNonPeriodicClosedTrimCurve ()
         {
             await CreatePartDoc(async (modelDoc,yielder) =>
             {
@@ -236,6 +236,69 @@ namespace SolidworksAddinFramework.Spec
 
         }
 
+        [SolidworksFact]
+        public async Task GetTrimCurves2ForAHalfDiscShouldReturnTwoNonPeriodicOpenTrimCurve ()
+        {
+            await CreatePartDoc(async (modelDoc,yielder) =>
+            {
+
+                var disc0 = Modeler.CreateSemiCirclularSheet
+                    ( center: Vector3.Zero
+                    , vNormal: Vector3.UnitZ
+                    , vRef: Vector3.UnitX
+                    , radius: 2
+                    );
+
+                // Display the original sheet. Visually verify it is ok.
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (disc0.DisplayUndoable(modelDoc))
+                    await PauseTestExecution(pause:false);
+
+                // The sheet should only have one face. Extract it
+                var faces = disc0.GetFaces().CastArray<IFace2>();
+                faces.Length.Should().Be(1);
+                var face = faces[0];
+
+                // Convert the solidworks face to a bspline face
+                var bsplineFace = BSplineFace.Create(face);
+
+                bsplineFace.TrimLoops.Count.Should().Be(1);
+                var trimLoop = bsplineFace.TrimLoops[0];
+
+                trimLoop.Count.Should().Be(2);
+
+                {
+                    // The curve is a clamped open curve. ( A half circle ) It is not "Solidworks periodic"
+                    trimLoop[0].Order.Should().Be(3);
+                    trimLoop[0].KnotVectorU.Take(3).ShouldBeEquivalentTo(new[] { 0,0,0});
+                    trimLoop[0].KnotVectorU.TakeLast(3).ShouldBeEquivalentTo(new[] { 1,1,1});
+                    var controlPoints00 = trimLoop[0].ControlPoints;
+
+                    controlPoints00.First()
+                        .Should().NotBe(controlPoints00.Last());
+
+                    // This is not solidworks periodic so this property should be false
+                    trimLoop[0].IsClosed.Should().BeFalse();
+                    
+                }
+                {
+                    // The curve is a clamped closed curve. ( A line ) It is not "Solidworks periodic"
+                    trimLoop[1].Order.Should().Be(2);
+                    trimLoop[1].KnotVectorU.Take(2).ShouldBeEquivalentTo(new[] { 0,0});
+                    trimLoop[1].KnotVectorU.TakeLast(2).ShouldBeEquivalentTo(new[] { 1,1});
+                    var controlPoints00 = trimLoop[0].ControlPoints;
+
+                    controlPoints00.First()
+                        .Should().NotBe(controlPoints00.Last());
+
+                    // This is not solidworks periodic so this property should be false
+                    trimLoop[1].IsClosed.Should().BeFalse();
+                    
+                }
+            });
+
+        }
         [SolidworksFact]
         public void CanSpecifyTrimLoopsManually()
         {
