@@ -146,6 +146,46 @@ namespace SolidworksAddinFramework
             var uvHigh = surf.GetClosestPointOnTs(high);
             return modeler.CreateSheetFromSurface(surf, uvLow, uvHigh);
         }
+        public static IBody2 CreateSemiCirclularSheet
+            ( this IModeler modeler
+            , Vector3 center
+            , Vector3 vNormal
+            , Vector3 vRef // Horizontal  
+            , double radius)
+        {
+            // Should be orthogonal
+            Debug.Assert(vRef.Dot(vNormal)<1e-9);
+
+            var math = SwAddinBase.Active.Math;
+            var centerSw = center.ToSwMathPoint(math);
+            var vNormalSw = vNormal.ToSwMathPoint(math);
+            var vNormalOrthSw = vRef.ToSWVector(math).Normalise();
+
+            var centerDbls = centerSw.ArrayData;
+            var vNormalDbls = vNormalSw.ArrayData;
+            var vNormalOrthDbls = vNormalOrthSw.ArrayData;
+
+            var surf = (Surface) modeler.CreatePlanarSurface2(centerDbls, vNormalDbls, vNormalOrthDbls);
+
+
+            var startPoint = center + radius*vRef.Unit();
+            var endPoint = center - radius*vRef.Unit();
+
+            var startPointDbls = startPoint.ToDoubles();
+            var endPointDbls = endPoint.ToDoubles();
+
+            
+            var arco = modeler.CreateArc
+                        (centerDbls, vNormalDbls, radius, startPointDbls, endPointDbls);
+
+            var arc = (Curve) arco;
+            var arcStartPoint = startPoint;
+            var arcEndPoint = endPoint;
+
+            var trimmedArc = arc.CreateTrimmedCurve2(arcStartPoint.X,arcStartPoint.Y,arcStartPoint.Z,arcEndPoint.X,arcEndPoint.Y,arcEndPoint.Z);
+            var line = modeler.CreateTrimmedLine(arcEndPoint, arcStartPoint);
+            return (IBody2) surf.CreateTrimmedSheet(new[] {trimmedArc, line});
+        }
         public static IBody2 CreateCirclularSheet
             ( this IModeler modeler
             , Vector3 center
