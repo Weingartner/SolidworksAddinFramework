@@ -21,7 +21,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             var propsDouble = PropsDouble;
             var knots = KnotVectorU;
-            var ctrlPtCoords = ControlPoints.SelectMany(p => Vector3Extensions.ToDoubles((Vector4) p)).ToArray();
+            var ctrlPtCoords = ControlPoints.SelectMany(p => p.ToDoubles()).ToArray();
             return (ICurve) SwAddinBase.Active.Modeler.CreateBsplineCurve( propsDouble, knots, ctrlPtCoords);
         }
 
