@@ -95,7 +95,12 @@ namespace SolidworksAddinFramework.Geometry
                         .Select(ToRationalVector3)
                         .ToList();
 
-                    return new BSpline2D(ctrlPoints.ToArray(), info.knots.ToArray(), info.order, info.isPeriodic, info.dimension==3);
+                    return new BSpline2D
+                        ( controlPoints: ctrlPoints.ToArray()
+                        , knotVectorU: info.knots.ToArray()
+                        , order: info.order
+                        , isClosed: info.isPeriodic
+                        , isRational: info.dimension==3);
 
                 })
                 .ToArray();

@@ -10,7 +10,7 @@ namespace SolidworksAddinFramework.Geometry
 {
     public class BSpline3D : BSpline<Vector4>
     {
-        public BSpline3D([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational) : base(controlPoints, knotVectorU, order, isPeriodic, isRational)
+        public BSpline3D([NotNull] Vector4[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed, bool isRational) : base(controlPoints, knotVectorU, order, isClosed, isRational)
         {
             if(!IsRational)
             {

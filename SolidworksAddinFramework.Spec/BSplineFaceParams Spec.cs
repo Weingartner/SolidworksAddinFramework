@@ -230,7 +230,7 @@ namespace SolidworksAddinFramework.Spec
                     .Should().Be(controlPoints00.Last());
 
                 // This is not solidworks periodic so this property should be false
-                bsplineFace.TrimLoops[0][0].IsPeriodic.Should().BeFalse();
+                bsplineFace.TrimLoops[0][0].IsClosed.Should().BeTrue();
 
             });
 

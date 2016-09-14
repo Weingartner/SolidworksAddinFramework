@@ -24,7 +24,7 @@ namespace SolidworksAddinFramework.Geometry
         /// </summary>
         public T[] ControlPoints { get; }
 
-        public bool IsPeriodic { get; }
+        public bool IsClosed { get; }
 
         /// <summary>
         /// The dimension of the control point
@@ -37,7 +37,7 @@ namespace SolidworksAddinFramework.Geometry
 
         public double[] KnotVectorU { get; }
 
-        public BSpline([NotNull] T[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational)
+        public BSpline([NotNull] T[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed, bool isRational)
         {
 
             if (controlPoints == null) throw new ArgumentNullException(nameof(controlPoints));
@@ -45,7 +45,7 @@ namespace SolidworksAddinFramework.Geometry
 
             ControlPoints = controlPoints;
             Order = order;
-            IsPeriodic = isPeriodic;
+            IsClosed = isClosed;
             IsRational = isRational;
             KnotVectorU = knotVectorU;
         }

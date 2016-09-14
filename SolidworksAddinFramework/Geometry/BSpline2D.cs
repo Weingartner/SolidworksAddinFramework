@@ -13,7 +13,7 @@ namespace SolidworksAddinFramework.Geometry
     /// </summary>
     public class BSpline2D : BSpline<Vector3>
     {
-        public BSpline2D([NotNull] Vector3[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isPeriodic, bool isRational) : base(controlPoints, knotVectorU, order, isPeriodic, isRational)
+        public BSpline2D([NotNull] Vector3[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed, bool isRational) : base(controlPoints, knotVectorU, order, isClosed, isRational)
         {
             if(!isRational) //  Non rational should have all W ( Z ) be 1.0
                 Debug.Assert(controlPoints.All(c=>Math.Abs(c.Z - 1) < 1e-9));
