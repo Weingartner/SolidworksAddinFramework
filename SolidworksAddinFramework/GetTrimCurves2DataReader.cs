@@ -23,6 +23,14 @@ namespace SolidworksAddinFramework
                 yield return _Data[idx++];
             }
         }
+        public IEnumerable<double> ReadDoublesWithoutConsume(int n)
+        {
+            var _idx = idx;
+            for (var i = 0; i < n; i++)
+            {
+                yield return _Data[_idx++];
+            }
+        }
 
 
         /// <summary>
