@@ -65,7 +65,7 @@ namespace SolidworksAddinFramework.Geometry
             // If the dimension is 2, then the curve is non - rational; if the dimension is 3,
             // then the curve is rational.
             var spCurveInfos = reader
-                .ReadBufferedIntegers(4, numSPCurves)
+                .ReadBufferedIntegers(bufferSize: 4, numberOfBuffers: numSPCurves)
                 .Select(b => new {order = b[0], isPeriodic = b[1]== 1, dimension=b[2], isRational=b[2]==3, numCtrlPoints = b[3]})
                 .ToList();
 

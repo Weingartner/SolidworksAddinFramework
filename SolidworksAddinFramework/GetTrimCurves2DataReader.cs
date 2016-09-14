@@ -39,13 +39,13 @@ namespace SolidworksAddinFramework
         /// <summary>
         /// Read n * b integers and return them in group sizes of b
         /// </summary>
-        /// <param name="b"></param>
-        /// <param name="n"></param>
+        /// <param name="bufferSize"></param>
+        /// <param name="numberOfBuffers"></param>
         /// <returns></returns>
-        public IEnumerable<int[]> ReadBufferedIntegers(int b, int n)
+        public IEnumerable<int[]> ReadBufferedIntegers(int bufferSize, int numberOfBuffers)
         {
-            return ReadIntegers(n*b)
-                .Buffer(b, b)
+            return ReadIntegers(numberOfBuffers*bufferSize)
+                .Buffer(bufferSize, bufferSize)
                 .Select(q=>q.ToArray());
         }
 
