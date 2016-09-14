@@ -97,7 +97,13 @@ namespace SolidworksAddinFramework.Geometry
             {
                 int order = (short) Order;
                 int numCtrlPoints = (short) ControlPoints.Length;
-                int periodicity = (short) (IsPeriodic ? 1 : 0);
+
+                // Here periodicity means "Is the curve solidworks periodic". Our curves are
+                // never solidworks periodic though they may be closed. Sometimes in solidworks doc you
+                // find the work periodic but it means closed. Better differentation is made when they
+                // say "clamped periodic" vs "solidworks periodic"
+
+                int periodicity = 0;
                 var propsDouble = new[] {Dimension, order, numCtrlPoints, periodicity}.ToDouble();
                 return propsDouble;
             }
