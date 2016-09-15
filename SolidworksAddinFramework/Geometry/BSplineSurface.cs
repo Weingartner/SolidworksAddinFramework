@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using JetBrains.Annotations;
-using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
