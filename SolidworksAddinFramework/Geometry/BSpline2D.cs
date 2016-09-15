@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 
@@ -11,6 +12,7 @@ namespace SolidworksAddinFramework.Geometry
     /// <summary>
     /// Control points are (X,Y,W) the W param is mapped to the Z parameter of the Vector3
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class BSpline2D : BSpline<Vector3>
     {
         public BSpline2D([NotNull] Vector3[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed, bool isRational) : base(controlPoints, knotVectorU, order, isClosed, isRational)

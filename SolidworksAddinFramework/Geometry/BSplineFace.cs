@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.DoubleNumerics;
 using LanguageExt;
+using Newtonsoft.Json;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework.Geometry
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class BSplineFace
     {
+        [JsonProperty]
         public BSplineSurface Surface { get; }
+
+        [JsonProperty]
         public IReadOnlyList<IReadOnlyList<BSpline2D>> TrimLoops { get; }
 
         public BSplineFace

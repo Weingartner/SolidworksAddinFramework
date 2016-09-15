@@ -2,9 +2,11 @@ using System;
 using System.DoubleNumerics;
 using System.Linq;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace SolidworksAddinFramework.Geometry
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public abstract class BSpline<T> : IEquatable<BSpline<T>>
         where T : IEquatable<T>
     {
@@ -22,19 +24,25 @@ namespace SolidworksAddinFramework.Geometry
         /// on if the spline is periodic, closed and if 
         /// it's a tuesday or not. Grrrr. So be careful.
         /// </summary>
+        [JsonProperty]
         public T[] ControlPoints { get; }
 
+        [JsonProperty]
         public bool IsClosed { get; }
 
         /// <summary>
         /// The dimension of the control point
         /// </summary>
+        [JsonProperty]
         public abstract int Dimension { get; }
 
+        [JsonProperty]
         public bool IsRational { get; }
 
+        [JsonProperty]
         public int Order { get; }
 
+        [JsonProperty]
         public double[] KnotVectorU { get; }
 
         public BSpline([NotNull] T[] controlPoints, [NotNull] double[] knotVectorU, int order, bool isClosed, bool isRational)

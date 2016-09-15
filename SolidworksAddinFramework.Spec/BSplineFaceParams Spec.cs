@@ -9,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LanguageExt;
+using Newtonsoft.Json;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
@@ -1101,6 +1102,10 @@ namespace SolidworksAddinFramework.Spec
                     = faces
                     .Select(BSplineFace.Create)
                     .ToList();
+
+                var bsplineFacesJson = JsonConvert.SerializeObject(bsplineFaces, Formatting.Indented);
+
+                LogViewer.Log(bsplineFacesJson);
 
                 // Convert our representation back to an IBody2. We
                 // have used Option<T> wrappers to indicate failure

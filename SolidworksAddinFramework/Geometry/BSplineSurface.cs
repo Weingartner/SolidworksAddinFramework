@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class BSplineSurface : IEquatable<BSplineSurface>
     {
         /// <summary>
@@ -18,6 +20,8 @@ namespace SolidworksAddinFramework.Geometry
         /// [X,Y,Z,W] but that is non standard nurbs representation. Be aware
         /// of the difference when comparing raw solidworks data and this structure.
         /// </summary>
+
+        [JsonProperty]
         public Vector4[,] ControlPointList { get; }
 
         /// <summary>
@@ -26,14 +30,19 @@ namespace SolidworksAddinFramework.Geometry
         /// list will be
         /// [X,Y,Z,1]
         /// </summary>
+        [JsonProperty]
         public int SurfaceDimension { get; set; }
 
+        [JsonProperty]
         public int OrderU { get; }
 
+        [JsonProperty]
         public int OrderV { get; }
 
+        [JsonProperty]
         public double[] KnotsU { get; }
 
+        [JsonProperty]
         public double[] KnotsV { get; }
 
         /// <summary>
@@ -42,6 +51,7 @@ namespace SolidworksAddinFramework.Geometry
         /// will try to force solidworks to give us
         /// non periodic ( in the knot vector ) surfaces.
         /// </summary>
+        [JsonProperty]
         public bool UIsPeriodic { get; set; }
 
         /// <summary>
@@ -50,6 +60,7 @@ namespace SolidworksAddinFramework.Geometry
         /// will try to force solidworks to give us
         /// non periodic ( in the knot vector ) surfaces.
         /// </summary>
+        [JsonProperty]
         public bool VIsPeriodic { get; set; }
 
         public BSplineSurface
