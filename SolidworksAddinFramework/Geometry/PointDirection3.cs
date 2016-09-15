@@ -58,7 +58,7 @@ namespace SolidworksAddinFramework.Geometry
         /// <returns></returns>
         public Vector3 ProjectOnPlane(Vector3 q)
         {
-            var p = this.Point;
+            var p = Point;
             var dUnit = Direction.Unit();
             return q - (q - p).Dot(dUnit)*dUnit;
         }

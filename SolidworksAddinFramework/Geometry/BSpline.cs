@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.DoubleNumerics;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace SolidworksAddinFramework.Geometry
@@ -66,7 +66,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((BSpline<T>) obj);
         }
 

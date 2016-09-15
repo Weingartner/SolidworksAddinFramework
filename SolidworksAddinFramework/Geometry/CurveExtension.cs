@@ -311,9 +311,9 @@ namespace SolidworksAddinFramework.Geometry
 
             public MinimumRadiusResult(double t, double radius, Vector3 location)
             {
-                this.T = t;
-                this.Radius = radius;
-                this.Location = location;
+                T = t;
+                Radius = radius;
+                Location = location;
             }
         }
 
@@ -339,11 +339,7 @@ namespace SolidworksAddinFramework.Geometry
                     ,radius:((double[])radiusObject)[0]
                     ,location:((MathPoint)((object[])locationObject)[0]).ToVector3());
             }
-            else
-            {
-                return null;
-            }
-
+            return null;
         }
 
         public static double ReverseEvaluate(this ICurve curve, Vector3 p) => curve.ReverseEvaluate(p.X, p.Y, p.Z);
@@ -402,7 +398,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             return ((double[]) curve.GetTessPts(chordTol, lengthTol, startPt, midPt))
                 .Buffer(3, 3)
-                .Select(b => new Vector3((double) b[0], (double) b[1], (double) b[2]));
+                .Select(b => new Vector3(b[0], b[1], b[2]));
         }
 
         public static ICurve GetCurveTs(this IEdge edge)

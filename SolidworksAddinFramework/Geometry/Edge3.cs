@@ -151,8 +151,8 @@ namespace SolidworksAddinFramework.Geometry
                 }
             }
             // finally do the division to get sc and tc
-            var sc = (double)(Math.Abs(sN) < tol ? 0.0 : sN / sD);
-            var tc = (double)(Math.Abs(tN) < tol ? 0.0 : tN / tD);
+            var sc = Math.Abs(sN) < tol ? 0.0 : sN / sD;
+            var tc = Math.Abs(tN) < tol ? 0.0 : tN / tD;
 
             // get the difference of the two closest points
             var dP = w + (sc * u) - (tc * v);  // =  S1(sc) - e2(tc)
@@ -222,8 +222,8 @@ namespace SolidworksAddinFramework.Geometry
             }
 
             // finally do the division to get sc and tc
-            var c1 = (double)(Math.Abs(t1) < tol ? 0.0 : t1 / d1);
-            var c2 = (double)(Math.Abs(t2) < tol ? 0.0 : t2 / d2);
+            var c1 = Math.Abs(t1) < tol ? 0.0 : t1 / d1;
+            var c2 = Math.Abs(t2) < tol ? 0.0 : t2 / d2;
 
             var p1 = c1*u1 + e1.A;
             var p2 = c2*u2 + e2.Point;

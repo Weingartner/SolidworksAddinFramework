@@ -8,8 +8,8 @@ namespace SolidworksAddinFramework.Geometry
 
         public EdgeDistance(Edge3 edge, double distance)
         {
-            this.Edge = edge;
-            this.Distance = distance;
+            Edge = edge;
+            Distance = distance;
         }
     }
 }

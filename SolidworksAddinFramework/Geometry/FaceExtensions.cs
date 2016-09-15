@@ -10,8 +10,8 @@ namespace SolidworksAddinFramework.Geometry
         {
             var box = (double[]) face.GetBox();
             return new Range3Single(
-                (double) box[0], (double) box[1], (double) box[2], 
-                (double) box[3], (double) box[4], (double) box[5]);
+                box[0], box[1], box[2], 
+                box[3], box[4], box[5]);
         }
 
         public static bool GetDistance(this IFace2 entity0, IFace2 entity1, out double[] posacast, out double[] posbcast)

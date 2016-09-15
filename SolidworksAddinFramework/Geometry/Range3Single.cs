@@ -310,7 +310,7 @@ namespace SolidworksAddinFramework.Geometry
         public Tuple<Vector3, double> BoundingSphere()
         {
             var d = Math.Sqrt(Dx*Dx + Dy*Dy + Dz*Dz);
-            return Prelude.Tuple(Center, (double) d/2);
+            return Prelude.Tuple(Center, d/2);
         }
     }
 }

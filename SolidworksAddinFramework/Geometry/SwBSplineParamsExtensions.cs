@@ -63,7 +63,7 @@ namespace SolidworksAddinFramework.Geometry
                         w = p[3];
                     }
 
-                    return new Vector4((double) (x*w), (double) (y*w), (double) (z*w), (double) w);
+                    return new Vector4(x*w, y*w, z*w, w);
                 })
                 .ToArray();
 
