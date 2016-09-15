@@ -464,6 +464,14 @@ namespace SolidworksAddinFramework
         {
             return q.SelectMany(o => o.Match(EnumerableEx.Return, Enumerable.Empty<T>));
         }
+        public static IEnumerable<T> AssertAllSome<T,Ex>(this IEnumerable<Option<T>> q, Func<Ex> exFn )
+            where Ex : Exception
+        {
+            return q.SelectMany(o => o.Match(EnumerableEx.Return, () => { throw exFn(); }));
+        }
+
+        public static IEnumerable<T> AssertAllSome<T>(this IEnumerable<Option<T>> q)
+            => q.AssertAllSome(() => new OptionIsNoneException("Should not be none"));
 
         public static IObservableExceptional<T> WhereIsSome<T>(this IObservableExceptional<Option<T>> q)
         {
