@@ -133,7 +133,7 @@ namespace SolidworksAddinFramework.Geometry
             // surfaceCtrlPoinCoords
             var surfaceCtrlPoints = reader.Read(surfaceDimension*uvNumCtrlPoints.u*uvNumCtrlPoints.v)
                 .Buffer(surfaceDimension, surfaceDimension)
-                .Select(ToRationalVector4)
+                .Select(ToRationalVector4WithWeighRescaling)
                 .ToList();
 
             // packed doubles 8 
@@ -162,10 +162,18 @@ namespace SolidworksAddinFramework.Geometry
             return new Vector3
                 (data[0], data[1], data.Count == 3 ? data[2] : 1);
         }
-        private static Vector4 ToRationalVector4(IList<double> data)
+
+        /// <summary>
+        /// This transforms solidworks (X,Y,Z,W) to (X*W,Y*W,Z*W,W) format that is nurbs book standard
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static Vector4 ToRationalVector4WithWeighRescaling(IList<double> data)
         {
+            var w = data.Count == 4 ? data[3] : 1;
+
             return new Vector4
-                ((double) data[0], (double) data[1], (double)data[2], (double) (data.Count == 4 ? data[3] : 1));
+                (data[0] * w, data[1] * w, data[2] * w, w);
         }
 
 

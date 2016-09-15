@@ -10,7 +10,24 @@ namespace SolidworksAddinFramework.Geometry
 {
     public class BSplineSurface : IEquatable<BSplineSurface>
     {
+        /// <summary>
+        /// This is the UV control point list. Each control point is stored as
+        /// [X/W, Y/W, Z/W, W]. If SurfaceDimension is 3 then W will be forced
+        /// to 1.0.
+        /// 
+        /// Note that internally Solidworks stores the control point list as
+        /// [X,Y,Z,W] but that is non standard nurbs representation. Be aware
+        /// of the difference when comparing raw solidworks data and this structure.
+        /// </summary>
         public Vector4[,] ControlPointList { get; }
+
+        /// <summary>
+        /// If 4 then the control point list will be 
+        /// [X/W, Y/W, Z/W, W]. If 3 then the control point
+        /// list will be
+        /// [X,Y,Z,1]
+        /// </summary>
+        public int SurfaceDimension { get; set; }
 
         public int OrderU { get; }
 
@@ -19,7 +36,6 @@ namespace SolidworksAddinFramework.Geometry
         public double[] KnotsU { get; }
 
         public double[] KnotsV { get; }
-        public int SurfaceDimension { get; set; }
         public bool UIsPeriodic { get; set; }
         public bool VIsPeriodic { get; set; }
 
