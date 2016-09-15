@@ -164,11 +164,14 @@ namespace SolidworksAddinFramework.Geometry
                     );
 
             Debug.Assert(bsplineSurface != null);
+
+#if DEBUG
             var p = bsplineSurface.Parameterization2();
             Debug.Assert(Math.Abs(p.UMax - KnotsU.Last()) < 1e-9);
             Debug.Assert(Math.Abs(p.UMin - KnotsU.First()) < 1e-9);
             Debug.Assert(Math.Abs(p.VMax - KnotsV.Last()) < 1e-9);
             Debug.Assert(Math.Abs(p.VMin - KnotsV.First()) < 1e-9);
+#endif
 
             return bsplineSurface;
         }
