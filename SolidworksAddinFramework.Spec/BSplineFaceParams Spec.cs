@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.DoubleNumerics;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LanguageExt;
@@ -1105,7 +1106,10 @@ namespace SolidworksAddinFramework.Spec
 
                 var bsplineFacesJson = JsonConvert.SerializeObject(bsplineFaces, Formatting.Indented);
 
-                LogViewer.Log(bsplineFacesJson);
+                // you can now paste this into your favorite editor
+                copy_to_clipboard(bsplineFacesJson);
+
+                LogViewer.Log("JSON of bsplineFaces is now in clipboard");
 
                 // Convert our representation back to an IBody2. We
                 // have used Option<T> wrappers to indicate failure
@@ -1130,6 +1134,16 @@ namespace SolidworksAddinFramework.Spec
                 // Assert that the test has passed.
                 numberOfBadFaces.Should().Be(0);
             }
+        }
+
+
+        protected void copy_to_clipboard(string toBeCopiedToClipboard)
+        {
+            var stringToBeCopiedToClipboard = toBeCopiedToClipboard;
+            Thread clipboardThread = new Thread(() => System.Windows.Forms.Clipboard.SetText(stringToBeCopiedToClipboard));
+            clipboardThread.SetApartmentState(ApartmentState.STA);
+            clipboardThread.IsBackground = false;
+            clipboardThread.Start();
         }
 
         /// <summary>
