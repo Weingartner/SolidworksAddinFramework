@@ -93,6 +93,8 @@
       <HintPath>$(SolutionDir)packages\Polly.4.2.1\lib\net45\Polly.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
@@ -154,6 +156,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -206,6 +209,10 @@
     <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">
       <Project>{A67399BE-AAF7-433F-8F72-9B0424C5BE67}</Project>
       <Name>DemoMacroFeature</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
+      <Project>{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}</Project>
+      <Name>SolidworksAddinFramework.Wpf</Name>
     </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>

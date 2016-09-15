@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
+using LanguageExt;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
+using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -160,12 +161,19 @@ namespace SolidworksAddinFramework.Geometry
         public Option<IBody2> ToSheetBody()
         {
             var surface = Surface.ToSurface();
-            var loops =
-                TrimLoops.SelectMany(loop => loop.Select(c => c.ToPCurve(surface)).EndWith(null)).SkipLast(1).ToArray();
-            var trimmedSheet4 = (IBody2) surface.CreateTrimmedSheet4(loops, true);
-            Debug.Assert(trimmedSheet4!=null);
-            return trimmedSheet4;
+            var loops = TrimLoops
+                .SelectMany(loop => loop.Select(c => c.ToPCurve(surface)).EndWith(null))
+                .SkipLast(1)
+                .ToArray();
+
+            var trimmedSheet4 = (IBody2) surface.CreateTrimmedSheet4
+                ( Curves: loops
+                , PreserveAnalyticCurves: true // We have tried 'false'. Doesn't make different to failures
+                ); 
+
+            return Optional(trimmedSheet4); // returns None if trimmedSheet4 is null
         }
+
         private static Vector3 ToRationalVector3(IList<double> data)
         {
             return new Vector3

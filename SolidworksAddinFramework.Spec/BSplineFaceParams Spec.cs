@@ -8,8 +8,10 @@ using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using FluentAssertions;
+using LanguageExt;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Xunit;
@@ -114,6 +116,7 @@ namespace SolidworksAddinFramework.Spec
 
                         return faceParams.ToSheetBody();
                     })
+                    .AssertAllSome()
                     .ToArray();
 
                 using(box.DisplayUndoable(modelDoc)) {
@@ -178,7 +181,7 @@ namespace SolidworksAddinFramework.Spec
                 var bsplineFace = BSplineFace.Create(face);
 
                 // Convert the bspline face back to a sheet body
-                var disc1 = bsplineFace.ToSheetBody();
+                var disc1 = bsplineFace.ToSheetBody().__Value__();
 
                 // Display the recovered sheet. Visually verify it is ok
                 // Press "Continue Test Execution" button within solidworks
@@ -931,7 +934,7 @@ namespace SolidworksAddinFramework.Spec
                             .TransformSurfaceControlPoints
                               (ctrlPts => ctrlPts.Select(v => new Vector4(v.X+2, v.Y, v.Z, v.W)));
 
-                        return faceParams.ToSheetBody();
+                        return faceParams.ToSheetBody().__Value__();
                     })
                     .ToArray();
 
@@ -992,7 +995,10 @@ namespace SolidworksAddinFramework.Spec
         private static IBody2[] RoundTrip(IBody2 cutBody)
         {
             var faces = cutBody.GetFaces().CastArray<IFace2>();
-            var sheets = faces.Select(face => BSplineFace.Create(face).ToSheetBody()).ToArray();
+            var sheets = faces
+                .Select(face => BSplineFace.Create(face).ToSheetBody())
+                .AssertAllSome()
+                .ToArray();
 
             //foreach (var sheet in sheets)
             //{
@@ -1053,6 +1059,72 @@ namespace SolidworksAddinFramework.Spec
 
             });
 
+        }
+
+        /// <summary>
+        /// Demonstrate extracting a bspline face from the first surface
+        /// found in active solidworks model, converting it to our representation
+        /// of a trimmed bspline surface and then converting it
+        /// back to a sheet body.
+        ///
+        /// Run this test with a part document active in solidworks that has a single
+        /// surface body.
+        /// </summary>
+        /// <returns></returns>
+        [SolidworksFact]
+        public async Task CanRebuildSelected()
+        {
+
+            var modelDoc = (IModelDoc2)SwApp.ActiveDoc;
+
+            var surface = modelDoc
+                .GetBodiesTs(swBodyType_e.swSheetBody)[0];
+
+            // Copy the original surface
+            var surfaceCopy = surface.CopyTs();
+
+            // Temporarily hide the original surface so the model viewport is clear
+            using (surface.HideBodyUndoable())
+            {
+                // Display the copy so the tester can visually verify it is ok.
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (surfaceCopy.DisplayUndoable(modelDoc, Color.Green))
+                    await PauseTestExecution();
+
+                // The sheet should only have one face. Extract it
+                IFace2[] faces
+                    = surfaceCopy.GetFaces().CastArray<IFace2>();
+
+                // Convert the solidworks face to our representation
+                List<BSplineFace> bsplineFaces
+                    = faces
+                    .Select(BSplineFace.Create)
+                    .ToList();
+
+                // Convert our representation back to an IBody2. We
+                // have used Option<T> wrappers to indicate failure
+                // or success for each conversion.
+                List<Option<IBody2>> faceBodies
+                    = bsplineFaces
+                    .Select(bsplineFace => bsplineFace.ToSheetBody())
+                    .ToList();
+
+                // Count the number of faces that were not able to
+                // be converted from bspline surface to IBody2
+                int numberOfBadFaces = faceBodies.Count(b => b.IsNone);
+                LogViewer.Log($"Number of bad faces is {numberOfBadFaces}");
+
+                // Display the recovered sheet. Visually verify it is ok
+                // Press "Continue Test Execution" button within solidworks
+                // to continue the test after visual inspection of the sheet
+                using (faceBodies.WhereIsSome().DisplayUndoable(modelDoc, Color.Blue))
+                    await PauseTestExecution();
+
+
+                // Assert that the test has passed.
+                numberOfBadFaces.Should().Be(0);
+            }
         }
 
         /// <summary>
