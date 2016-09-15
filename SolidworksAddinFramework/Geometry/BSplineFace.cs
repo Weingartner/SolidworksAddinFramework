@@ -148,7 +148,16 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
-        public IBody2 ToSheetBody()
+
+        /// <summary>
+        /// Generates a solidworks sheet body representation of the bspline face.
+        /// </summary>
+        /// <returns>
+        /// an optionof IBody2 which just makes it explicit that the
+        /// caller needs to handle the case when the sheet body returned
+        /// is null. 
+        /// </returns>
+        public Option<IBody2> ToSheetBody()
         {
             var surface = Surface.ToSurface();
             var loops =

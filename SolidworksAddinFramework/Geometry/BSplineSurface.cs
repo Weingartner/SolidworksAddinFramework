@@ -36,7 +36,21 @@ namespace SolidworksAddinFramework.Geometry
         public double[] KnotsU { get; }
 
         public double[] KnotsV { get; }
+
+        /// <summary>
+        /// Stores if the spline is periodic. We don't
+        /// really want this to be true and probably
+        /// will try to force solidworks to give us
+        /// non periodic ( in the knot vector ) surfaces.
+        /// </summary>
         public bool UIsPeriodic { get; set; }
+
+        /// <summary>
+        /// Stores if the spline is periodic. We don't
+        /// really want this to be true and probably
+        /// will try to force solidworks to give us
+        /// non periodic ( in the knot vector ) surfaces.
+        /// </summary>
         public bool VIsPeriodic { get; set; }
 
         public BSplineSurface
@@ -65,6 +79,11 @@ namespace SolidworksAddinFramework.Geometry
             VIsPeriodic = vIsPeriodic;
         }
 
+        /// <summary>
+        /// Return a new surface with the control points modified.
+        /// </summary>
+        /// <param name="converter"></param>
+        /// <returns></returns>
         public BSplineSurface WithCtrlPts(Func<Vector4[,], Vector4[,]> converter)
         {
                 
@@ -121,7 +140,7 @@ namespace SolidworksAddinFramework.Geometry
         #endregion
 
         /// <summary>
-        /// Create a surface
+        /// Returns an untrimmed solidworks surface.
         /// </summary>
         /// <param name="swBSplineSurfaceParams"></param>
         /// <returns></returns>
