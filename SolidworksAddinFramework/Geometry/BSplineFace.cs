@@ -160,7 +160,7 @@ namespace SolidworksAddinFramework.Geometry
         private static Vector3 ToRationalVector3(IList<double> data)
         {
             return new Vector3
-                ((double) data[0], (double) data[1], (double) (data.Count == 3 ? data[2] : 1));
+                (data[0], data[1], data.Count == 3 ? data[2] : 1);
         }
         private static Vector4 ToRationalVector4(IList<double> data)
         {

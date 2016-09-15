@@ -76,7 +76,7 @@ namespace SolidworksAddinFramework.Geometry
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((BSplineSurface) obj);
         }
 
@@ -116,7 +116,7 @@ namespace SolidworksAddinFramework.Geometry
 
             var swControlPointList = ControlPointList
                 .EnumerateColumnWise()
-                .SelectMany(v => new double [] {v.X/v.W, v.Y/v.W, v.Z/v.W, v.W}.Take(SurfaceDimension))
+                .SelectMany(v => new[] {v.X/v.W, v.Y/v.W, v.Z/v.W, v.W}.Take(SurfaceDimension))
                 .ToArray();
 
             var uLength = ControlPointList.GetLength(0);
@@ -125,7 +125,6 @@ namespace SolidworksAddinFramework.Geometry
             var numUCtrPts = BitConverter.GetBytes(uLength);
             var numVCtrPts = BitConverter.GetBytes(vLength);
 
-            //TODO: find out what periodicity means in this context 
             var uPeriodicity = BitConverter.GetBytes(UIsPeriodic ? 1 : 0);
             var vPeriodicity = BitConverter.GetBytes(VIsPeriodic ? 1 : 0);
 
@@ -142,10 +141,11 @@ namespace SolidworksAddinFramework.Geometry
 
             var bsplineSurface = (Surface) SwAddinBase.Active.Modeler
                 .CreateBsplineSurface
-                ( props
+                    ( props
                     , KnotsU
                     , KnotsV
-                    , swControlPointList);
+                    , swControlPointList
+                    );
 
             Debug.Assert(bsplineSurface != null);
             var p = bsplineSurface.Parameterization2();
@@ -190,7 +190,7 @@ namespace SolidworksAddinFramework.Geometry
                             if (surfParams.ControlPointDimension == 4)
                                 w = array[3];
 
-                            var ctrlPoint = new Vector4((double) (x*w),(double) (y*w),(double) (z*w),(double) w);
+                            var ctrlPoint = new Vector4(x*w,y*w,z*w,w);
 
 
                             controlPointArray[v, u] = ctrlPoint;
