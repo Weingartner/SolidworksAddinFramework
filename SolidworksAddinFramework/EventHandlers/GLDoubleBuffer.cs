@@ -11,7 +11,7 @@ namespace SolidworksAddinFramework
 {
     public class GLDoubleBuffer : DoubleBuffer<ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>>
     {
-        private ModelView _ModelView;
+        private readonly ModelView _ModelView;
 
         public GLDoubleBuffer(ModelView modelView) : base(ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty)
         {
