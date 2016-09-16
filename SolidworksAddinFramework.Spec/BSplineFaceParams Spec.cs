@@ -1080,7 +1080,7 @@ namespace SolidworksAddinFramework.Spec
             var modelDoc = (IModelDoc2)SwApp.ActiveDoc;
 
             var surface = modelDoc
-                .GetBodiesTs(swBodyType_e.swSheetBody)[0];
+                .GetBodiesTs(swBodyType_e.swSolidBody)[0];
 
             // Copy the original surface
             var surfaceCopy = surface.CopyTs();
