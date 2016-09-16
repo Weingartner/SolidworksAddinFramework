@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using LanguageExt;
@@ -118,6 +119,9 @@ namespace SolidworksAddinFramework.Geometry
                 .Select(o => trimCurves.ToArraySegment(o.start, o.step).ToArray())
                 .ToArray();
 
+
+            fixLoops(bLoops);
+
             // packed double 4
             var surfaceDimension = reader.ReadDouble().DoubleToInteger().Item1;
 
@@ -154,6 +158,25 @@ namespace SolidworksAddinFramework.Geometry
 
         }
 
+        /// <summary>
+        /// Make sure that the last point of each sub curve is exactly the same as the 
+        /// first point of the next sub curve.
+        /// </summary>
+        /// <param name="trimLoops"></param>
+        public static void fixLoops(IReadOnlyList<IReadOnlyList<BSpline2D>> trimLoops)
+        {
+            foreach (var loop in trimLoops)
+            {
+                var splines = loop.EndWith(loop.First());
+                foreach (var pair in splines.Buffer(2,1).Where(b=>b.Count==2))
+                {
+                    // I assume that all subcurves are of the same dimension.
+                    // but good to check.
+                    Debug.Assert(pair[1].Dimension == pair[0].Dimension);
+                    pair[1].ControlPoints[0] = pair[0].ControlPoints.Last();
+                }
+            }
+        }
 
         /// <summary>
         /// Generates a solidworks sheet body representation of the bspline face.
@@ -178,6 +201,7 @@ namespace SolidworksAddinFramework.Geometry
 
             return Optional(trimmedSheet4); // returns None if trimmedSheet4 is null
         }
+
 
         private static Vector3 ToRationalVector3(IList<double> data)
         {
