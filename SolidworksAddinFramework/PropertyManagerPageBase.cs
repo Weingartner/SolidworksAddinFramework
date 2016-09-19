@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -350,12 +351,18 @@ namespace SolidworksAddinFramework
         {
         }
 
+        private readonly Subject<int> _GainedFocusSubject = new Subject<int>();
+        protected IObservable<int> GainedFocusObservable(int id) => _GainedFocusSubject.Where(i => i == id);
         public virtual void OnGainedFocus(int id)
         {
+            _GainedFocusSubject.OnNext(id);
         }
 
+        private readonly Subject<int> _LostFocusSubject = new Subject<int>();
+        private IObservable<int> LostFocusObservable(int id) => _LostFocusSubject.Where(i => i == id).AsObservable();
         public virtual void OnLostFocus(int id)
         {
+            _LostFocusSubject.OnNext(id);
         }
 
         public virtual int OnWindowFromHandleControlCreated(int id, bool status)
@@ -514,17 +521,38 @@ namespace SolidworksAddinFramework
         /// <param name="source"></param>
         /// <param name="selector"></param>
         /// <param name="config"></param>
+        /// <param name="gainedFocusObserver"></param>
+        /// <param name="lostFocusObserver"></param>
         /// <returns></returns>
         protected IDisposable CreateNumberBox<T>(IPropertyManagerPageGroup @group,
             string tip,
             string caption,
             T source,
             Expression<Func<T,double>> selector,
-            Func<IPropertyManagerPageNumberbox, IDisposable> config = null)
+            Func<IPropertyManagerPageNumberbox, IDisposable> config = null,
+            IObserver<Unit> gainedFocusObserver = null,
+            IObserver<Unit> lostFocusObserver = null)
         {
             var id = NextId();
             var box = @group.CreateNumberBox(id, caption, tip);
-            return InitControl(@group, box, config, c => c.Value, NumberBoxChangedObservable(id), source, selector);
+            var d = new CompositeDisposable();
+            if (gainedFocusObserver != null)
+            {
+                GainedFocusObservable(id)
+                    .Ignore()
+                    .Subscribe(gainedFocusObserver)
+                    .DisposeWith(d);
+            }
+            if (lostFocusObserver != null)
+            {
+                LostFocusObservable(id)
+                    .Ignore()
+                    .Subscribe(lostFocusObserver)
+                    .DisposeWith(d);
+            }
+            InitControl(@group, box, config, c => c.Value, NumberBoxChangedObservable(id), source, selector)
+                .DisposeWith(d);
+            return d;
         }
 
         protected IDisposable CreateCheckBox<T>(IPropertyManagerPageGroup @group,
