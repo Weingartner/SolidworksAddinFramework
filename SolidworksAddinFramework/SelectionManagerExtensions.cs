@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -34,12 +35,25 @@ namespace SolidworksAddinFramework
         public static IEnumerable<ObjectSelection> GetObjectSelections(this ISelectionMgr selMgr)
         {
             var count = selMgr.GetSelectedObjectCount2(AnyMark);
+            selMgr.EnableContourSelection = true;
             return Enumerable.Range(StartIndex, count)
                 .Select(index =>
                 {
-                    var type = (swSelectType_e)selMgr.GetSelectedObjectType3(index, AnyMark);
+                    var type = (swSelectType_e) selMgr.GetSelectedObjectType3(index, AnyMark);
                     var mark = selMgr.GetSelectedObjectMark(index);
                     var obj = selMgr.GetSelectedObject6(index, AnyMark);
+                    //var typeList = ComWangling.GetComTypeFor<Surface>(obj).ToList();
+
+                    //LogViewer.Log($"Type of selection is {string.Join(", ", typeList)}");
+
+                    //if (type==swSelectType_e.swSelREFEDGES || type == swSelectType_e.swSelEDGES)
+                    //{
+                    //    var edge = obj.DirectCast<IEdge>();
+                    //}else if (type == swSelectType_e.swSelHELIX)
+                    //{
+                    //    var foo = obj.DirectCast<IFeature>();
+                    //}
+
                     return new ObjectSelection(obj, type, mark, index);
                 });
         }
