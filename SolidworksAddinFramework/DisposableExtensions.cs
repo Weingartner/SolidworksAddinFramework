@@ -83,5 +83,10 @@ namespace SolidworksAddinFramework
 
         }
 
+        public static void UpdateDisposable(this SerialDisposable d, Func<IDisposable> fn)
+        {
+            d.Disposable = Disposable.Empty;
+            d.Disposable = fn();
+        }
     }
 }
