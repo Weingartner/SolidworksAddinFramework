@@ -483,6 +483,12 @@ namespace SolidworksAddinFramework
             return obs.Select(_ => Unit.Default);
         }
 
+        [Obsolete("Flatten the observable before you ignore the values")]
+        public static IObservable<Unit> Ignore<T>(this IObservable<IObservable<T>> obs)
+        {
+            throw new Exception("Flatten the observable before you ignore the values");
+        }
+
         public static IObservable<T> Connect<T>(this IConnectableObservable<T> obs, CompositeDisposable d)
         {
             obs.Connect().DisposeWith(d);
