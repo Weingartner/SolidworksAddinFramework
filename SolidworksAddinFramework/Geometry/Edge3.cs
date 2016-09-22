@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.DoubleNumerics;
+using LanguageExt;
+using SolidworksAddinFramework.OpenGl;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -39,6 +41,20 @@ namespace SolidworksAddinFramework.Geometry
             var d = Delta;
             var t = Vector3.Dot(point - A, d)/d.LengthSquared();
             return Delta*t + A;
+        }
+
+        public Option<Vector3> IntersectPlane(PointDirection3 plane)
+        {
+            var t = (plane.Point - A).Dot(plane.Direction)
+                    /(B - A).Dot(plane.Direction);
+
+            if(t<=0)
+                return Option<Vector3>.None;
+
+            if(t>=1)
+                return Option<Vector3>.None;
+
+            return A + t*(B - A);
         }
 
         /// <summary>
