@@ -9,6 +9,11 @@ namespace SolidworksAddinFramework.Geometry
         public readonly Vector3 B;
         public readonly Vector3 C;
 
+        public override string ToString()
+        {
+            return $"[{A}, {B}, {C}]";
+        }
+
         public Triangle(Vector3 a, Vector3 b, Vector3 c)
         {
             A = a;
@@ -31,16 +36,5 @@ namespace SolidworksAddinFramework.Geometry
             return Vector3.Cross(v0,v1);
         }
 
-        public IEnumerable<Triangle> Sweep(Triangle other)
-        {
-            var x0 = this;
-            var x1 = other;
-            yield return new Triangle(x0.A, x1.C, x0.C);
-            yield return new Triangle(x0.A, x1.A, x0.C);
-            yield return new Triangle(x0.A, x1.A, x0.B);
-            yield return new Triangle(x0.B, x1.B, x1.A);
-            yield return new Triangle(x0.B, x1.B, x0.C);
-            yield return new Triangle(x0.C, x1.C, x1.B);
-        }
     }
 }

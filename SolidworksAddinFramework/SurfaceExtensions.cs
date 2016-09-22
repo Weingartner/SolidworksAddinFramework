@@ -5,6 +5,7 @@ using System.DoubleNumerics;
 using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet;
+using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 

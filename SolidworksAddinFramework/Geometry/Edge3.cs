@@ -57,6 +57,8 @@ namespace SolidworksAddinFramework.Geometry
             return A + t*(B - A);
         }
 
+        public double AngleBetween(Edge3 other) => this.Delta.AngleBetweenVectors(other.Delta);
+
         /// <summary>
         /// Find the closest point on the curve
         /// </summary>

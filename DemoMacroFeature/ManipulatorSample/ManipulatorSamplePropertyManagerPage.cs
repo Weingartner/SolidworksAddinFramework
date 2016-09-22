@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using LanguageExt;
 using ReactiveUI;
 using SolidworksAddinFramework;
+using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;

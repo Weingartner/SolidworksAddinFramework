@@ -1,6 +1,7 @@
 ﻿using System;
 using System.DoubleNumerics;
 using FluentAssertions;
+using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using Xunit;
 

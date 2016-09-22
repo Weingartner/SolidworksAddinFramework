@@ -218,7 +218,9 @@
     <Compile Include="Geometry\CurveExtension.cs" />
     <Compile Include="Geometry\EdgeDistance.cs" />
     <Compile Include="Geometry\FaceExtensions.cs" />
+    <Compile Include="Geometry\Matrix4x4Extensions.cs" />
     <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
+    <Compile Include="Geometry\Vector3Extensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
@@ -292,7 +294,6 @@
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\ModernOpenGl.cs" />
     <Compile Include="OpenGl\OpenWire.cs" />
-    <Compile Include="OpenGl\Vector3Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />

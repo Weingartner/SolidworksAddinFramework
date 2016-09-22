@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.DoubleNumerics;
 using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 
-namespace SolidworksAddinFramework.OpenGl
+namespace SolidworksAddinFramework.Geometry
 {
     public static class Vector3Extensions
     {
@@ -154,24 +153,9 @@ namespace SolidworksAddinFramework.OpenGl
             return Double.IsNaN(acos) ? 0 : acos * sign;
         }
 
-        public static double AngleBetweenVectors(Vector3 v0, Vector3 v1)
+        public static double AngleBetweenVectors(this Vector3 v0, Vector3 v1)
         {
             return Math.Acos(v0.Dot(v1)/(v0.Length()*v1.Length()));
-        }
-    }
-
-    public static class Matrix4x4Extensions
-    {
-        public static Matrix4x4 CreateFromAxisAngleOrigin(PointDirection3 p, double angle)
-        {
-            return
-                Matrix4x4.CreateTranslation(-p.Point)
-                *Matrix4x4.CreateFromAxisAngle(p.Direction.Unit(), angle)
-                *Matrix4x4.CreateTranslation(p.Point);
-        }
-        public static Matrix4x4 CreateFromEdgeAngleOrigin(Edge3 p, double angle)
-        {
-            return CreateFromAxisAngleOrigin(new PointDirection3(p.A,p.Delta),angle);
         }
     }
 }

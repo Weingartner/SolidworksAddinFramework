@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
