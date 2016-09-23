@@ -172,40 +172,44 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="transform"></param>
         public override void ApplyTransform(Matrix4x4 transform)
         {
-            {
-                var list = new TriangleWithNormals[_OriginalTriangleVerticies.Count];
-
-                list.Length
-                    .ParallelChunked((lower, upper) =>
-                    {
-                        for (int i1 = lower; i1 < upper; i1++)
-                        {
-                            list[i1] = _OriginalTriangleVerticies[i1].ApplyTransform(transform);
-                        }
-                    });
-
-                TrianglesWithNormals = list;
-                
-            }
-            {
-                var list = new Edge3[_OriginalEdgeVertices.Count]; 
-
-                list.Length
-                    .ParallelChunked((lower, upper) =>
-                    {
-                        for (int i = lower; i < upper; i++)
-                        {
-                            list[i] = _OriginalEdgeVertices[i].ApplyTransform(transform);
-
-                        }
-                    
-                    });
-
-                Edges = list;
-                
-            }
+            TrianglesWithNormals = TransformTriangles(transform);
+            Edges = TransformEdges(transform);
             UpdateBoundingSphere();
         }
 
+        public Mesh CreateTransformed(Matrix4x4 transform)
+        {
+            return new Mesh(Color, _IsSolid, TransformTriangles(transform), TransformEdges(transform));
+        }
+
+        private Edge3[] TransformEdges(Matrix4x4 transform)
+        {
+            var list = new Edge3[_OriginalEdgeVertices.Count];
+
+            list.Length
+                .ParallelChunked((lower, upper) =>
+                {
+                    for (int i = lower; i < upper; i++)
+                    {
+                        list[i] = _OriginalEdgeVertices[i].ApplyTransform(transform);
+                    }
+                });
+            return list;
+        }
+
+        private TriangleWithNormals[] TransformTriangles(Matrix4x4 transform)
+        {
+            var list = new TriangleWithNormals[_OriginalTriangleVerticies.Count];
+
+            list.Length
+                .ParallelChunked((lower, upper) =>
+                {
+                    for (int i1 = lower; i1 < upper; i1++)
+                    {
+                        list[i1] = _OriginalTriangleVerticies[i1].ApplyTransform(transform);
+                    }
+                });
+            return list;
+        }
     }
 }
