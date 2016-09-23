@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.DoubleNumerics;
 using System.Runtime.CompilerServices;
+using LanguageExt;
 using SolidworksAddinFramework.OpenGl;
 
 namespace SolidworksAddinFramework.Geometry
@@ -62,6 +63,14 @@ namespace SolidworksAddinFramework.Geometry
             var dUnit = Direction.Unit();
             return q - (q - p).Dot(dUnit)*dUnit;
         }
+
+        /// <summary>
+        /// returns true if the point is above the plane. False if
+        /// the point is below or on the plane
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public bool IsAbovePlane(Vector3 q) => Direction.Dot(q - Point) > 0;
 
         public Vector3 ProjectOnEdge(Vector3 point)
         {
