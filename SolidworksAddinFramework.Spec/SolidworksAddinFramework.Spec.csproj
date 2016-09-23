@@ -204,6 +204,7 @@
     <Compile Include="Geometry\Edge3.IntersectPlaneSpec.cs" />
     <Compile Include="EnumerableExtensionsSpec.cs" />
     <Compile Include="Geometry\PlanePolygonSpec.cs" />
+    <Compile Include="Geometry\Triange.IntersectPlaneSpec.cs" />
     <Compile Include="GetTrimCurves2DataReaderSpec.cs" />
     <Compile Include="ListExtensionsSpec.cs" />
     <Compile Include="ModelerExtensionSpec.cs" />
@@ -222,6 +223,10 @@
     <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">
       <Project>{A67399BE-AAF7-433F-8F72-9B0424C5BE67}</Project>
       <Name>DemoMacroFeature</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SolidworksAddinFramework.FSCheck\SolidworksAddinFramework.FSCheck.csproj">
+      <Project>{d3741261-21cc-488e-a4dd-08eb40bce1fb}</Project>
+      <Name>SolidworksAddinFramework.FSCheck</Name>
     </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
       <Project>{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}</Project>
