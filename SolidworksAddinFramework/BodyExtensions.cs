@@ -433,6 +433,11 @@ namespace SolidworksAddinFramework
         {
             return OpenGlRenderer.DisplayUndoable(renderable, doc, layer);
         }
+        public static IDisposable DisplayUndoable
+            (this IEnumerable<IRenderable> renderable, IModelDoc2 doc, int layer = 0)
+        {
+            return OpenGlRenderer.DeferRedraw(doc,()=>renderable.Select(r=>r.DisplayUndoable(doc, layer)).ToCompositeDisposable());
+        }
 
         /// <summary>
         /// Uses Display3 to render the object. This is slow for animation. Better to create a Mesh and then render it. This
