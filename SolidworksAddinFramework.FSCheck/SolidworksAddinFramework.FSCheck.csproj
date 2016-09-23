@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FsCheck, Version=2.6.0.0, Culture=neutral, PublicKeyToken=bd43d8adb249532d, processorArchitecture=MSIL">
+    <Reference Include="FsCheck, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\FsCheck.2.6.0\lib\net45\FsCheck.dll</HintPath>
       <Private>True</Private>
     </Reference>
