@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.OpenGl;
+using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 
 
@@ -143,7 +144,13 @@ namespace SolidworksAddinFramework
                 });
                 Redraw(doc);
             });
-            return new ScheduledDisposable(DispatcherScheduler.Current, d);
+            var t = Thread.CurrentThread;
+            return Disposable.Create
+                (() =>
+                 {
+                     Debug.Assert(Thread.CurrentThread == t);
+                     d.Dispose();
+                 });
         }
 
         private static void Redraw(IModelDoc2 doc)
@@ -195,7 +202,15 @@ namespace SolidworksAddinFramework
 
         private IDisposable DeferRedraw(Func<GLDoubleBuffer, IDisposable> action)
         {
-            return new ScheduledDisposable(_Scheduler, action(_GlDoubleBuffer));
+            var d = action(_GlDoubleBuffer);
+            var t = Thread.CurrentThread;
+            return Disposable.Create
+                (() =>
+                 {
+                     Debug.Assert(Thread.CurrentThread == t);
+                     d.Dispose();
+
+                 });
         }
 
         private static IDisposable DeferRedraw([NotNull] IModelDoc2 doc, [NotNull] Func<GLDoubleBuffer, IDisposable> action)

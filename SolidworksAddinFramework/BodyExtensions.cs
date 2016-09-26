@@ -436,7 +436,10 @@ namespace SolidworksAddinFramework
         public static IDisposable DisplayUndoable
             (this IEnumerable<IRenderable> renderable, IModelDoc2 doc, int layer = 0)
         {
-            return OpenGlRenderer.DeferRedraw(doc,()=>renderable.Select(r=>r.DisplayUndoable(doc, layer)).ToCompositeDisposable());
+            return OpenGlRenderer.DeferRedraw
+                ( doc
+                , ()=>renderable.Select(r=>r.DisplayUndoable(doc, layer)).ToCompositeDisposable()
+                );
         }
 
         /// <summary>
