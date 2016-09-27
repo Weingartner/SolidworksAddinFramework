@@ -304,7 +304,7 @@ namespace SolidworksAddinFramework
             var math = SwAddinBase.Active.Math;
             var view = doc.ActiveView.DirectCast<IModelView>();
             var t = view.Transform.DirectCast<MathTransform>();
-            var mathPoint = point.ToSwMathPoint(math);
+            var mathPoint = point.ToSwMathPoint();
             mathPoint = mathPoint.MultiplyTransformTs(t);
             var v3 = mathPoint.ToVector3();
             return new Vector2(v3.X, v3.Y);

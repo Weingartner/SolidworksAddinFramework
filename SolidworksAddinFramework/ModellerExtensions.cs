@@ -157,8 +157,8 @@ namespace SolidworksAddinFramework
             Debug.Assert(vRef.Dot(vNormal)<1e-9);
 
             var math = SwAddinBase.Active.Math;
-            var centerSw = center.ToSwMathPoint(math);
-            var vNormalSw = vNormal.ToSwMathPoint(math);
+            var centerSw = center.ToSwMathPoint();
+            var vNormalSw = vNormal.ToSwMathPoint();
             var vNormalOrthSw = vRef.ToSWVector(math).Normalise();
 
             var centerDbls = centerSw.ArrayData;
@@ -197,8 +197,8 @@ namespace SolidworksAddinFramework
             Debug.Assert(vRef.Dot(vNormal)<1e-9);
 
             var math = SwAddinBase.Active.Math;
-            var centerSw = center.ToSwMathPoint(math);
-            var vNormalSw = vNormal.ToSwMathPoint(math);
+            var centerSw = center.ToSwMathPoint();
+            var vNormalSw = vNormal.ToSwMathPoint();
             var vNormalOrthSw = vRef.ToSWVector(math).Normalise();
 
             var centerDbls = centerSw.ArrayData;

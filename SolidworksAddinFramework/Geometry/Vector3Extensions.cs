@@ -118,7 +118,7 @@ namespace SolidworksAddinFramework.Geometry
         public static Vector3 YComponent(this Vector3 v)=> new Vector3(0,v.Y,0);
         public static Vector3 ZComponent(this Vector3 v)=> new Vector3(0,0,v.Z);
 
-        public static MathPoint ToSwMathPoint(this Vector3 v, IMathUtility m) => m.Point(new[] {v.X, v.Y, v.Z});
+        public static MathPoint ToSwMathPoint(this Vector3 v) => SwAddinBase.Active.Math.Point(new[] {v.X, v.Y, v.Z});
         public static MathVector ToSWVector(this Vector3 v, IMathUtility m) => m.Vector(new[] {v.X, v.Y, v.Z});
 
         /// <summary>
