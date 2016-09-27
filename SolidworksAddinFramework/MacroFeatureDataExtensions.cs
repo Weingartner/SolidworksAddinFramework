@@ -48,7 +48,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="macroFeatureData"></param>
         /// <param name="body"></param>
-        public static int AddIdsToBody(this IMacroFeatureData macroFeatureData, IBody2 body, int i = 0)
+        public static int AddIdsToBody(this IMacroFeatureData macroFeatureData, IBody2 body, int i = 1)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
             {
