@@ -40,9 +40,15 @@ namespace SolidworksAddinFramework.OpenGl
             //}
 
             //GL.Clear(ClearBufferMask.ColorBufferBit);
-            using (ModernOpenGl.SetColor(_Color, ShadingModel.Flat, solidBody: false))
+            DrawPoint(_Color, _Size - 3);
+            DrawPoint(Color.Black, _Size);
+        }
+
+        private void DrawPoint(Color color, int size)
+        {
+            using (ModernOpenGl.SetColor(color, ShadingModel.Flat, solidBody: false))
             {
-                GL.PointSize(_Size);
+                GL.PointSize(size);
                 GL.Enable(EnableCap.AlphaTest);
                 GL.AlphaFunc(AlphaFunction.Notequal, 0);
                 GL.Enable(EnableCap.Blend);
