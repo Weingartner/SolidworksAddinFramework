@@ -70,6 +70,9 @@ namespace DemoMacroFeatures
             var cmdIndex1 = cmdGroup.AddCommandItem2(nameof(CreateManipulatorSample), -1, "Manipulator", "Manipulator", 0,
                 nameof(CreateManipulatorSample), "", mainItemId1, menuToolbarOption);
 
+            var cmdIndex2 = cmdGroup.AddCommandItem2(nameof(CreateMultiWireBodies), -1, "Multi Wire Bodies", "Multi Wire BOdies", 0,
+                nameof(CreateMultiWireBodies), "", mainItemId1, menuToolbarOption);
+
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
@@ -94,7 +97,7 @@ namespace DemoMacroFeatures
 
                     var cmdBox = cmdTab.AddCommandTabBox();
 
-                    var cmdIDs = new[] {cmdIndex0, cmdIndex1}
+                    var cmdIDs = new[] {cmdIndex0, cmdIndex1, cmdIndex2}
                         .Select(id => cmdGroup.CommandID[id])
                         .ToArray();
 
@@ -123,6 +126,10 @@ namespace DemoMacroFeatures
         public void CreateManipulatorSample()
         {
             ManipulatorSamplePropertyManagerPage.Create(SwApp).Show();
+        }
+        public void CreateMultiWireBodies()
+        {
+            MultiWireBodies.MultiWireBodies.AddMacroFeature(SwApp);
         }
 
         // ReSharper restore MemberCanBePrivate.Global

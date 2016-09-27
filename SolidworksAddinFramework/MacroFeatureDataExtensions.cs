@@ -48,7 +48,7 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="macroFeatureData"></param>
         /// <param name="body"></param>
-        public static void AddIdsToBody(this IMacroFeatureData macroFeatureData, IBody2 body)
+        public static int AddIdsToBody(this IMacroFeatureData macroFeatureData, IBody2 body, int i = 0)
         {
             if (body == null) throw new ArgumentNullException(nameof(body));
             {
@@ -57,19 +57,25 @@ namespace SolidworksAddinFramework
                 macroFeatureData.GetEntitiesNeedUserId((object)body, out FacesNeedId, out EdgesNeedId);
                 var edgesNeedId = (object[]) EdgesNeedId;
                 var facesNeedId = (object[]) FacesNeedId;
-                int i = 0;
                 var empty = new object[] {}; 
                 foreach (var edge in edgesNeedId ?? empty)
                 {
-                    macroFeatureData.SetEdgeUserId((Edge) edge, i, 0);
+                    if (!macroFeatureData.SetEdgeUserId((Edge) edge, i, 0))
+                    {
+                        throw new Exception("SetUserIdFailed");
+                    }
                     i++;
                 }
                 foreach (var face in facesNeedId ?? empty)
                 {
-                    macroFeatureData.SetFaceUserId((Face2) face, i, 0);
+                    if (!macroFeatureData.SetFaceUserId((Face2) face, i, 0))
+                    {
+                        throw new Exception("SetUserIdFailed");
+                    }
                     i++;
                 }
             }
+            return i;
         }
 
         private const string FeatureDataKey = "Main";

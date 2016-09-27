@@ -124,6 +124,10 @@
       <HintPath>$(SolutionDir)packages\reactiveui-core.6.5.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ReactiveUI.Fody.Helpers, Version=1.1.51.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ReactiveUI.Fody.1.1.51\lib\net45\ReactiveUI.Fody.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
       <HintPath>$(SolidWorksLocation)api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -198,6 +202,9 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MultiWireBodies\MultiWireBodies.cs" />
+    <Compile Include="MultiWireBodies\MulitWireBodiesData.cs" />
+    <Compile Include="MultiWireBodies\MultiWireBodiesPmp.cs" />
     <Compile Include="DummyMacroFeature.cs" />
     <Compile Include="DummyMacroFeatureData.cs" />
     <Compile Include="ManipulatorSample\ManipulatorSampleModel.cs" />
@@ -230,8 +237,18 @@
       <Name>SolidworksAddinFramework</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>powershell $(ProjectDir)..\regaddin.ps1 "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('$(SolutionDir)packages\Fody.1.28.3\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)packages\Fody.1.28.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\Fody.1.28.3\build\Fody.targets'))" />
+  </Target>
 </Project>
