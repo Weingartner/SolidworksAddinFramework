@@ -100,5 +100,11 @@ namespace SolidworksAddinFramework.OpenGl
                 }
             });
         }
+
+        public static IDisposable Enable(EnableCap enableCap)
+        {
+            GL.Enable(enableCap);
+            return Disposable.Create(() => GL.Disable(enableCap));
+        }
     }
 }
