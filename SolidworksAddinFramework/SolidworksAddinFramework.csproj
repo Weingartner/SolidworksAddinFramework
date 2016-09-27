@@ -229,6 +229,7 @@
     <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
+    <Compile Include="OpenGl\MeshExtensions.cs" />
     <Compile Include="Packing.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
