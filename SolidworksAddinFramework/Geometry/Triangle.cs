@@ -51,8 +51,7 @@ namespace SolidworksAddinFramework.Geometry
                     select new Edge3(a, b));
         }
 
-        public Option<Edge3>
-            IntersectPlane(PointDirection3 plane)
+        public Option<Edge3> IntersectPlane(PointDirection3 plane)
         {
             var d = plane.IsAbovePlane(A);
             if (d == plane.IsAbovePlane(B) && d == plane.IsAbovePlane(C))
@@ -72,6 +71,15 @@ namespace SolidworksAddinFramework.Geometry
         private static Edge3 Edge3(Vector3 a, Vector3 b)
         {
             return new Edge3(a, b);
+        }
+
+        public Vector3 DropVectorC()
+        {
+            var vBC = C - B;
+            var vBA = A - B;
+            var vDropC = vBC.ProjectOn(vBA);
+            var k = vBC-vDropC;
+            return k;
         }
     }
 }
