@@ -99,7 +99,12 @@ namespace SolidworksAddinFramework.Geometry
 
         public static Vector3 ProjectOn(this Vector3 point, Vector3 axis)
         {
-            return axis.Unit()*Vector3.Dot(point, axis);
+            return ProjectOnUnit(point, axis.Unit());
+        }
+
+        public static Vector3 ProjectOnUnit(this Vector3 point, Vector3 axis)
+        {
+            return axis*Vector3.Dot(point, axis);
         }
 
         public static Vector3 WithZ(this Vector3 v,double value)=>new Vector3(v.X,v.Y,value);
