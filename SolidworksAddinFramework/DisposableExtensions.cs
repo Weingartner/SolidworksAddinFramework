@@ -88,5 +88,49 @@ namespace SolidworksAddinFramework
             d.Disposable = Disposable.Empty;
             d.Disposable = fn();
         }
+
+        public static SerialDisposable DisposedWith(this Action<IDisposable> registered)
+        {
+            var s = new SerialDisposable();
+            registered(s);
+            return s;
+        }
+
+        public static void UpdateDisposableIf(this SerialDisposable d, Boolean f, Func<IDisposable> fn)
+        {
+            if (f)
+            {
+                UpdateDisposable(d,fn);
+            }
+        }
+
     }
+
+    /// <summary>
+    /// A disposable that creates other disposables. The created
+    /// disposables are disposed when the factory itself is disposed.
+    /// </summary>
+    public class DisposableFactory : IDisposable
+    {
+        private CompositeDisposable _Disposable = new CompositeDisposable();
+        public void Dispose()
+        {
+            _Disposable.Dispose();
+        }
+
+        public void Add(IDisposable d) => _Disposable.Add(d);
+
+        public SerialDisposable CreateSerial()
+        {
+            var s = new SerialDisposable();
+            _Disposable.Add(s);
+            return s;
+        }
+    }
+
+    public static class DisposableFactoryExtensions
+    {
+        public static void DisposeWith(this IDisposable d, DisposableFactory f) => f.Add(d);
+    }
+
 }
