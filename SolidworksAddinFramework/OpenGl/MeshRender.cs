@@ -15,13 +15,13 @@ namespace SolidworksAddinFramework.OpenGl
 {
     public static class MeshRender
     {
-        public static void Render(Mesh mesh, Color color, bool isSolid)
+        public static void Render(MeshData mesh, Color color, bool isSolid)
         {
             using (ModernOpenGl.SetColor(color, ShadingModel.Smooth, solidBody:isSolid))
             using (ModernOpenGl.SetLineWidth(2.0))
             using (ModernOpenGl.Begin(PrimitiveType.Triangles))
             {
-                var tris = mesh.TrianglesWithNormals;
+                var tris = mesh.Triangles;
                 foreach (var tri in tris)
                 {
                     tri.GLVertexAndNormal();

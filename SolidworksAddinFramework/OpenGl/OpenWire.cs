@@ -10,39 +10,38 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public abstract class Wire : RenderableBase
+    public abstract class Wire : RenderableBase<IReadOnlyList<Vector3>>
     {
-        private IReadOnlyList<Vector3> _Points;
         private readonly PrimitiveType _Mode;
         public double Thickness { get; set; }
 
         public Color Color { get; set; }
 
-        protected Wire(IEnumerable<Vector3> points, double thickness, PrimitiveType mode, Color color)
+        protected Wire(IEnumerable<Vector3> points, double thickness, PrimitiveType mode, Color color):base(points.ToList())
         {
-            _Points = points.ToList();
             Thickness = thickness;
             _Mode = mode;
             Color = color;
-            UpdateBoundingSphere(_Points);
         }
 
-        public override void Render(DateTime time)
+        protected override IReadOnlyList<Vector3> DoTransform(IReadOnlyList<Vector3> data, Matrix4x4 transform)
+        {
+            return data.Select(v => Vector3.Transform(v,transform)).ToList();
+        }
+
+        protected override void DoRender(IReadOnlyList<Vector3> data, DateTime time)
         {
             using (ModernOpenGl.SetLineWidth(Thickness))
             using (ModernOpenGl.SetColor(Color, ShadingModel.Smooth, solidBody:false))
             using (ModernOpenGl.Begin(_Mode))
             {
-                _Points.ForEach(p=>p.GLVertex3());
+                data.ForEach(p=>p.GLVertex3());
             }
         }
 
-        public override void ApplyTransform(Matrix4x4 transform)
+        protected override Tuple<Vector3, double> UpdateBoundingSphere(IReadOnlyList<Vector3> data, DateTime time)
         {
-            _Points = _Points
-                .Select(p => Vector3.Transform(p,transform))
-                .ToList();
-            UpdateBoundingSphere(_Points);
+            throw new NotImplementedException();
         }
     }
 
@@ -59,6 +58,7 @@ namespace SolidworksAddinFramework.OpenGl
 
         public OpenWire(IEnumerable<double[]> points, double thickness, Color color) : this(points.Select(p=>p.ToVector3D()), thickness, color)
         { }
+
     }
 
     public class ClosedWire : Wire

@@ -27,6 +27,10 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         public abstract void OnStart(DateTime startTime);
 
         public abstract void Render(DateTime time);
+        public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
+        {
+            throw new NotImplementedException();
+        }
 
         public Tuple<Vector3, double> BoundingSphere
         {
@@ -36,10 +40,6 @@ namespace SolidworksAddinFramework.OpenGl.Animation
             }
         }
 
-        public void ApplyTransform(Matrix4x4 transform)
-        {
-            throw new NotImplementedException();
-        }
 
         private static IDisposable Redraw(IModelDoc2 doc, double framerate = 30)
         {

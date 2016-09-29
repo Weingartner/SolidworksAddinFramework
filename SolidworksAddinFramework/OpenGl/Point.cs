@@ -7,44 +7,44 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Point : RenderableBase
+    public class Point : RenderableBase<Vector3>
     {
         private readonly Color _Color;
         private readonly int _Size;
 
-        public Point(Vector3 location, Color color, int size, bool inFront=false)
+        public Point(Vector3 location, Color color, int size, bool inFront=false):base(location)
         {
-            Location = location;
             _Color = color;
             _Size = size;
-            UpdateBoundingSphere();
+            UpdateBoundingSphere(location);
         }
 
-        private void UpdateBoundingSphere()
+        private void UpdateBoundingSphere(Vector3 location)
         {
             UpdateBoundingSphere
                 (new[]
                 {
-                    Location
+                    location
                 });
         }
 
-        private Vector3 Location { get; set; }
-
-        public override void Render(DateTime time)
+        protected override Vector3 DoTransform(Vector3 data, Matrix4x4 transform)
         {
-            //using(ModernOpenGl.SetColor(_Color, ShadingModel.Smooth))
-            //using (ModernOpenGl.Begin(PrimitiveType.Points))
-            //{
-            //    Location.GLVertex3();
-            //}
-
-            //GL.Clear(ClearBufferMask.ColorBufferBit);
-            DrawPoint(_Color, _Size - 3);
-            DrawPoint(Color.Black, _Size);
+            return Vector3.Transform(data,transform);
         }
 
-        private void DrawPoint(Color color, int size)
+        protected override void DoRender(Vector3 data, DateTime time)
+        {
+            DrawPoint(_Color, _Size - 3, data);
+            DrawPoint(Color.Black, _Size, data);
+        }
+
+        protected override Tuple<Vector3, double> UpdateBoundingSphere(Vector3 data, DateTime time)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DrawPoint(Color color, int size, Vector3 location)
         {
             using (ModernOpenGl.SetColor(color, ShadingModel.Flat, solidBody: false))
             {
@@ -56,7 +56,7 @@ namespace SolidworksAddinFramework.OpenGl
                 GL.Enable(EnableCap.PointSmooth);
                 GL.Hint(HintTarget.PointSmoothHint, HintMode.Nicest);
                 GL.Begin(PrimitiveType.Points);
-                Location.GLVertex3();
+                location.GLVertex3();
                 GL.End();
 
                 GL.Disable(EnableCap.PointSmooth);
@@ -65,11 +65,6 @@ namespace SolidworksAddinFramework.OpenGl
             }
         }
 
-        public override void ApplyTransform(Matrix4x4 transform)
-        {
-            Location = Vector3.Transform(Location,transform);
-            UpdateBoundingSphere();
-        }
 
     }
 

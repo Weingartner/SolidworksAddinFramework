@@ -15,7 +15,24 @@ using SolidWorks.Interop.swconst;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Mesh : RenderableBase
+    public class MeshData
+    {
+        public MeshData(IReadOnlyList<TriangleWithNormals> triangles, IReadOnlyList<Edge3> edges)
+        {
+            Triangles = triangles;
+            Edges = edges;
+        }
+
+        public MeshData()
+        {
+        }
+
+        public IReadOnlyList<TriangleWithNormals> Triangles { get; }
+
+        public IReadOnlyList<Edge3> Edges { get; }
+    }
+
+    public class Mesh : RenderableBase<MeshData>
     {
         public static Mesh CreateMesh(IBody2 body, Color color, bool isSolid)
         {
@@ -37,8 +54,6 @@ namespace SolidworksAddinFramework.OpenGl
             return new Mesh(color, isSolid, tris, edges);
         }
 
-        private readonly IReadOnlyList<TriangleWithNormals> _OriginalTriangleVerticies;
-        private readonly IReadOnlyList<Edge3> _OriginalEdgeVertices;
         public Color Color { get; set; }
         private bool _IsSolid;
 
@@ -47,26 +62,19 @@ namespace SolidworksAddinFramework.OpenGl
         public static Mesh Empty = new Mesh(Color.Black, false, Enumerable.Empty<TriangleWithNormals>());
 
         public Mesh(Color color, bool isSolid,
-            [NotNull] IEnumerable<TriangleWithNormals> tris, IReadOnlyList<Edge3> edges = null)
+            [NotNull] IEnumerable<TriangleWithNormals> tris, IReadOnlyList<Edge3> edges = null):base(new MeshData(tris.ToList(), edges ?? new List<Edge3>()))
         {
             if (tris == null)
                 throw new ArgumentNullException(nameof(tris));
-
             Color = color;
-            _OriginalTriangleVerticies = tris.ToList();
-            _OriginalEdgeVertices = edges ?? new List<Edge3>();
             _IsSolid = isSolid;
-
-            TrianglesWithNormals = _OriginalTriangleVerticies;
-            Edges = _OriginalEdgeVertices;
-
-            UpdateBoundingSphere();
         }
 
 
         public Mesh(Color color, bool isSolid, IReadOnlyList<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
             : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
         {
+            new MeshData();
         }
 
         private void UpdateBoundingSphere()
@@ -90,9 +98,10 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
 
-        public IReadOnlyList<Edge3> Edges { get; private set; }
+        public IReadOnlyList<Edge3> Edges => _TransformedData.Edges;
 
-        public IReadOnlyList<TriangleWithNormals> TrianglesWithNormals { get; set; }
+        public IReadOnlyList<TriangleWithNormals> TrianglesWithNormals => _TransformedData.Triangles
+            ;
 
         public IReadOnlyList<Triangle> Triangles => 
             TrianglesWithNormals
@@ -100,9 +109,16 @@ namespace SolidworksAddinFramework.OpenGl
                 .ToList();
 
 
-        public override void Render(DateTime time)
+        protected override MeshData DoTransform(MeshData data, Matrix4x4 transform) => new MeshData(TransformTriangles(data,transform), TransformEdges(data, transform));
+
+        protected override void DoRender(MeshData data, DateTime time)
         {
-            MeshRender.Render(this, Color, _IsSolid);
+            MeshRender.Render(data, Color, _IsSolid);
+        }
+
+        protected override Tuple<Vector3, double> UpdateBoundingSphere(MeshData data, DateTime time)
+        {
+            throw new NotImplementedException();
         }
 
         public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
@@ -156,48 +172,37 @@ namespace SolidworksAddinFramework.OpenGl
 
         }
 
-        /// <summary>
-        /// Apply the transform to the ORIGINAL mesh that was created. Multiple
-        /// calls are NOT cumulative.
-        /// </summary>
-        /// <param name="transform"></param>
-        public override void ApplyTransform(Matrix4x4 transform)
-        {
-            TrianglesWithNormals = TransformTriangles(transform);
-            Edges = TransformEdges(transform);
-            UpdateBoundingSphere();
-        }
 
         public Mesh CreateTransformed(Matrix4x4 transform)
         {
-            return new Mesh(Color, _IsSolid, TransformTriangles(transform), TransformEdges(transform));
+            return new Mesh(Color, _IsSolid, TransformTriangles(_Data, transform), TransformEdges(_Data, transform));
         }
 
-        private Edge3[] TransformEdges(Matrix4x4 transform)
+        private static Edge3[] TransformEdges(MeshData data, Matrix4x4 transform)
         {
-            var list = new Edge3[_OriginalEdgeVertices.Count];
+            var list = new Edge3[data.Edges.Count];
 
             list.Length
                 .ParallelChunked((lower, upper) =>
                 {
                     for (int i = lower; i < upper; i++)
                     {
-                        list[i] = _OriginalEdgeVertices[i].ApplyTransform(transform);
+                        list[i] = data.Edges[i].ApplyTransform(transform);
                     }
                 });
             return list;
         }
 
-        private TriangleWithNormals[] TransformTriangles(Matrix4x4 transform)
+        private static TriangleWithNormals[] TransformTriangles(MeshData data, Matrix4x4 transform)
         {
-            var list = new TriangleWithNormals[_OriginalTriangleVerticies.Count];
+            var list = new TriangleWithNormals[data.Triangles.Count];
 
             list.Length
                 .ParallelChunked((lower, upper) =>
                 {
                     for (int i1 = lower; i1 < upper; i1++)
                     {
-                        list[i1] = _OriginalTriangleVerticies[i1].ApplyTransform(transform);
+                        list[i1] = data.Triangles[i1].ApplyTransform(transform);
                     }
                 });
             return list;

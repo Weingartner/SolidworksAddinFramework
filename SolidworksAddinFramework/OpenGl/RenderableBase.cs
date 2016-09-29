@@ -4,9 +4,22 @@ using System.DoubleNumerics;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public abstract class RenderableBase : IRenderable
+    public abstract class RenderableBase<T> : IRenderable
     {
+        protected readonly T _Data;
+        protected T _TransformedData;
+
+        private Matrix4x4 _Transform = Matrix4x4.Identity;
+        private Matrix4x4 _BaseTransform = Matrix4x4.Identity;
+
         protected Lazy<Tuple<Vector3, double>> _BoundingSphere;
+
+        protected RenderableBase(T data)
+        {
+            _Data = data;
+            _TransformedData = data;
+        }
+
 
         protected void UpdateBoundingSphere(IReadOnlyList<Vector3> points)
         {
@@ -22,9 +35,37 @@ namespace SolidworksAddinFramework.OpenGl
             return Renderable.BoundingSphere(points);
         }
 
-        public abstract void Render(DateTime time);
-        public abstract void ApplyTransform(Matrix4x4 transform);
+        public void Render(DateTime time)
+        {
+            DoRender(_TransformedData, time);
+            _BoundingSphere = new Lazy<Tuple<Vector3, double>>(()=> UpdateBoundingSphere(_TransformedData, time));
+        }
 
-        public virtual Tuple<Vector3, double> BoundingSphere => _BoundingSphere.Value;
+
+        public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
+        {
+
+            if (accumulate == false)
+            {
+                _Transform = transform;
+            }
+            else
+            {
+                _BaseTransform = transform*_BaseTransform;
+                _Transform = Matrix4x4.Identity;
+            }
+
+            transform = _Transform*_BaseTransform;
+
+            _TransformedData = DoTransform(_Data, transform);
+
+        }
+
+        protected abstract T DoTransform(T data, Matrix4x4 transform); 
+        protected abstract void DoRender(T data, DateTime time);
+        protected abstract Tuple<Vector3, double> UpdateBoundingSphere(T data, DateTime time);
+
+
+        public Tuple<Vector3, double> BoundingSphere => _BoundingSphere.Value;
     }
 }
