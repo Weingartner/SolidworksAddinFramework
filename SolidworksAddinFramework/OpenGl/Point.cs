@@ -16,17 +16,8 @@ namespace SolidworksAddinFramework.OpenGl
         {
             _Color = color;
             _Size = size;
-            UpdateBoundingSphere(location);
         }
 
-        private void UpdateBoundingSphere(Vector3 location)
-        {
-            UpdateBoundingSphere
-                (new[]
-                {
-                    location
-                });
-        }
 
         protected override Vector3 DoTransform(Vector3 data, Matrix4x4 transform)
         {

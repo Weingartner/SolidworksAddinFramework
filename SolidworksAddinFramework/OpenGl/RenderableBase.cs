@@ -12,22 +12,13 @@ namespace SolidworksAddinFramework.OpenGl
         private Matrix4x4 _Transform = Matrix4x4.Identity;
         private Matrix4x4 _BaseTransform = Matrix4x4.Identity;
 
-        protected Lazy<Tuple<Vector3, double>> _BoundingSphere;
+        private Lazy<Tuple<Vector3, double>> _BoundingSphere;
 
         protected RenderableBase(T data)
         {
             _Data = data;
             _TransformedData = data;
-        }
-
-
-        protected void UpdateBoundingSphere(IReadOnlyList<Vector3> points)
-        {
-            _BoundingSphere = new Lazy<Tuple<Vector3, double>>(()=> CalcBoundingSphere(points));
-        }
-        protected void UpdateBoundingSphere(Func<Tuple<Vector3, double>> sphere)
-        {
-            _BoundingSphere = new Lazy<Tuple<Vector3, double>>(sphere);
+            _BoundingSphere = new Lazy<Tuple<Vector3, double>>(()=> UpdateBoundingSphere(_TransformedData, DateTime.Now));
         }
 
         private Tuple<Vector3, double> CalcBoundingSphere(IReadOnlyList<Vector3> points)

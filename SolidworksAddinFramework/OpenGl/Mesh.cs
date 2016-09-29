@@ -74,27 +74,6 @@ namespace SolidworksAddinFramework.OpenGl
         public Mesh(Color color, bool isSolid, IReadOnlyList<Triangle> enumerable, IReadOnlyList<Edge3> edges = null) 
             : this(color, isSolid, enumerable.Select(p=>(TriangleWithNormals)p), edges)
         {
-            new MeshData();
-        }
-
-        private void UpdateBoundingSphere()
-        {
-            UpdateBoundingSphere(CreateBoundingSphere);
-        }
-
-        private Tuple<Vector3, double> CreateBoundingSphere()
-        {
-            var rangeBuilder = new Range3Single.Range3SingleBuilder();
-            var count = TrianglesWithNormals.Count;
-            for (var i = 0; i < count; i++)
-            {
-                var tri = TrianglesWithNormals[i];
-                rangeBuilder.Update(tri.A.Point);
-                rangeBuilder.Update(tri.B.Point);
-                rangeBuilder.Update(tri.C.Point);
-            }
-            var boundingSphere = rangeBuilder.Range.BoundingSphere();
-            return boundingSphere;
         }
 
 
@@ -118,7 +97,17 @@ namespace SolidworksAddinFramework.OpenGl
 
         protected override Tuple<Vector3, double> UpdateBoundingSphere(MeshData data, DateTime time)
         {
-            throw new NotImplementedException();
+            var rangeBuilder = new Range3Single.Range3SingleBuilder();
+            var count = data.Triangles.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var tri = data.Triangles[i];
+                rangeBuilder.Update(tri.A.Point);
+                rangeBuilder.Update(tri.B.Point);
+                rangeBuilder.Update(tri.C.Point);
+            }
+            var boundingSphere = rangeBuilder.Range.BoundingSphere();
+            return boundingSphere;
         }
 
         public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
