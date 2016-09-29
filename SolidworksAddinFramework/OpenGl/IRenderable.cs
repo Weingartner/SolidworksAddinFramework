@@ -17,6 +17,44 @@ namespace SolidworksAddinFramework.OpenGl
         Tuple<Vector3, double> BoundingSphere { get; }
     }
 
+    public class CompositeRenderable : IRenderable
+    {
+        private readonly IReadOnlyList<IRenderable> _SubRenderables;
+
+        public CompositeRenderable(IReadOnlyList<IRenderable> subRenderables)
+        {
+            _SubRenderables = subRenderables;
+        }
+
+        public CompositeRenderable(params IRenderable[] subRenderables) : this(subRenderables.ToList())
+        {
+        }
+
+        public void Render(DateTime time)
+        {
+            foreach (var subRenderable in _SubRenderables)
+            {
+                subRenderable.Render(time);
+            }
+        }
+
+        public void ApplyTransform(Matrix4x4 transform)
+        {
+            foreach (var subRenderable in _SubRenderables)
+            {
+                   subRenderable.ApplyTransform(transform);
+            }
+        }
+
+        public Tuple<Vector3, double> BoundingSphere
+        {
+            get
+            {
+              throw  new NotSupportedException("");
+            }
+        } 
+    }
+
     public class EdgeList : IRenderable
     {
         private readonly Color _Color;
