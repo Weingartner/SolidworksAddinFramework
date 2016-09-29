@@ -51,11 +51,11 @@ namespace SolidworksAddinFramework.OpenGl
             }
             else
             {
-                _BaseTransform = transform*_BaseTransform;
+                _BaseTransform = _BaseTransform*transform;
                 _Transform = Matrix4x4.Identity;
             }
 
-            transform = _Transform*_BaseTransform;
+            transform = this._BaseTransform*_Transform;
 
             _TransformedData = DoTransform(_Data, transform);
 
