@@ -163,9 +163,30 @@ namespace SolidworksAddinFramework
                 .IfSome(renderer =>
                 {
                     var activeView = (IModelView) doc.ActiveView;
-                    if (renderer._GlDoubleBuffer.FrontIsActive)
+                    if (renderer._GlDoubleBuffer.FrontIsActive && renderer._GlDoubleBuffer.RedrawEnabled)
                         activeView.GraphicsRedraw(null);
                 });
+        }
+
+        public static IDisposable DisableRedraw(IModelDoc2 doc)
+        {
+            if (doc == null)
+                throw new ArgumentNullException(nameof(doc));
+
+            return ((IReadOnlyDictionary<IModelDoc2, OpenGlRenderer>)Lookup)
+                .TryGetValue(doc)
+                .Match(renderer =>
+                {
+                    var activeView = (IModelView) doc.ActiveView;
+                    renderer._GlDoubleBuffer.RedrawEnabled = false;
+                    return Disposable.Create(() =>
+                    {
+                        renderer._GlDoubleBuffer.RedrawEnabled = true;
+
+                    });
+                },
+                    () => { throw new Exception("Unable to get renderer"); });
+            
         }
 
         private void DoSetup()

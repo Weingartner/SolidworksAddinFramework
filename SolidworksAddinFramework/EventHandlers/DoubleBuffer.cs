@@ -34,6 +34,7 @@ namespace SolidworksAddinFramework.EventHandlers
         }
 
         public bool FrontIsActive => _Level == 0;
+        public bool RedrawEnabled { get; set; } = true;
 
 
         private int _Level = 0;
