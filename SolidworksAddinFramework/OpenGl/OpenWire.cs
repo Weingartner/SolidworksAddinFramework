@@ -10,7 +10,7 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public abstract class Wire : RenderableBase<IReadOnlyList<Vector3>>
+    public abstract class Wire : RendererBase<IReadOnlyList<Vector3>>
     {
         private readonly PrimitiveType _Mode;
         public double Thickness { get; set; }

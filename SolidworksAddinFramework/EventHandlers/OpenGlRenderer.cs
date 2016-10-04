@@ -65,17 +65,17 @@ namespace SolidworksAddinFramework
             return new CompositeDisposable(d0, d1);
         }
 
-        public static IDisposable DisplayUndoable(IRenderable renderable, IModelDoc2 doc, int layer = 0)
+        public static IDisposable DisplayUndoable(IRenderer renderer, IModelDoc2 doc, int layer = 0)
         {
-            if (renderable == null)
-                throw new ArgumentNullException(nameof(renderable));
+            if (renderer == null)
+                throw new ArgumentNullException(nameof(renderer));
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
             OpenGlRenderer openGlRenderer;
             if (Lookup.TryGetValue(doc, out openGlRenderer))
             {
-                return openGlRenderer.DisplayUndoableImpl(renderable, doc, layer);
+                return openGlRenderer.DisplayUndoableImpl(renderer, doc, layer);
             }
             throw new Exception("Can't render OpenGL content, because the model view wasn't setup properly.");
         }
@@ -118,24 +118,27 @@ namespace SolidworksAddinFramework
         private readonly GLDoubleBuffer _GlDoubleBuffer;
         private readonly IScheduler _Scheduler;
 
-        private IDisposable DisplayUndoableImpl(IRenderable renderable, IModelDoc2 doc, int layer)
+        private IDisposable DisplayUndoableImpl(IRenderer renderer, IModelDoc2 doc, int layer)
         {
-            if (renderable == null)
-                throw new ArgumentNullException(nameof(renderable));
+            if (renderer == null)
+                throw new ArgumentNullException(nameof(renderer));
             if (doc == null)
                 throw new ArgumentNullException(nameof(doc));
 
-            _GlDoubleBuffer.Update(b => b.SetItem(renderable, Tuple.Create(layer, renderable)));
+            _GlDoubleBuffer.Update(b => b.SetItem(renderer, Tuple.Create(layer, renderer)));
 
             Redraw(doc);
 
+            var s = renderer.NeedsRedraw.Subscribe(v => Redraw(doc));
+
             var d = Disposable.Create(() =>
             {
+                s.Dispose();
                 _GlDoubleBuffer.Update(btr =>
                 {
-                    if (btr.ContainsKey(renderable))
+                    if (btr.ContainsKey(renderer))
                     {
-                        return btr.Remove(renderable);
+                        return btr.Remove(renderer);
                     }
                     else
                     {

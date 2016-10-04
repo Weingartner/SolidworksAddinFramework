@@ -9,14 +9,14 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         
         public static Animator CreateAnimator
             (this ImmutableList<IAnimationSection> animationSections,
-            ImmutableList<IRenderable> children)
+            ImmutableList<IRenderer> children)
         {
             return new Animator(animationSections, children);
 
         }
         public static Animator CreateAnimator
             (this ImmutableList<IAnimationSection> animationSections,
-            IRenderable child)
+            IRenderer child)
         {
             return animationSections.CreateAnimator(ImmutableList.Create(child));
 

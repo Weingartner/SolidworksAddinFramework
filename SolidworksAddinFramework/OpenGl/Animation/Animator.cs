@@ -11,9 +11,9 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         private IReadOnlyList<SectionTime> _SectionTimes;
 
         public override ImmutableList<IAnimationSection> Sections { get; }
-        private readonly ImmutableList<IRenderable> _Children;
+        private readonly ImmutableList<IRenderer> _Children;
 
-        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderable> children)
+        public Animator(ImmutableList<IAnimationSection> sections, ImmutableList<IRenderer> children)
         {
             Sections = sections;
             _Children = children;

@@ -508,5 +508,19 @@ namespace SolidworksAddinFramework
                 return resultSelector(p, disposable);
             });
         }
+
+        /// <summary>
+        /// Combines the latest values from each observable but tags each new value of
+        /// the input sequences with a unqiue GUID
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observables"></param>
+        /// <returns></returns>
+        public static IObservable<IList<Tuple<Guid, T>>> CombineLatestAndTag<T>(this IObservable<T>[] observables)
+        {
+            return observables
+                .Select(o => o.Select<T, Tuple<Guid, T>>(action => Prelude.Tuple<Guid, T>(Guid.NewGuid(), action)))
+                .CombineLatest();
+        }
     }
 }

@@ -7,7 +7,7 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class Point : RenderableBase<Vector3>
+    public class Point : RendererBase<Vector3>
     {
         private readonly Color _Color;
         private readonly int _Size;

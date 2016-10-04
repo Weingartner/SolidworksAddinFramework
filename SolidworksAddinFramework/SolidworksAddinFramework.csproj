@@ -229,8 +229,11 @@
     <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
-    <Compile Include="OpenGl\EdgeListRenderable.cs" />
+    <Compile Include="OpenGl\CompositeRenderer.cs" />
+    <Compile Include="OpenGl\EdgeListRenderer.cs" />
+    <Compile Include="OpenGl\EmptyRenderer.cs" />
     <Compile Include="OpenGl\MeshExtensions.cs" />
+    <Compile Include="OpenGl\SerialRenderer.cs" />
     <Compile Include="Packing.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
@@ -279,7 +282,7 @@
     <Compile Include="ObservableExceptionalExtensions.cs" />
     <Compile Include="OpenGl\ParallelExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
-    <Compile Include="OpenGl\RenderableBase.cs" />
+    <Compile Include="OpenGl\RendererBase.cs" />
     <Compile Include="OptionExtensions.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
@@ -291,7 +294,7 @@
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="OpenGl\Animation\AnimationExtensions.cs" />
     <Compile Include="OpenGl\FaceTriStrips.cs" />
-    <Compile Include="OpenGl\IRenderable.cs" />
+    <Compile Include="OpenGl\IRenderer.cs" />
     <Compile Include="OpenGl\Mesh.cs" />
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\ModernOpenGl.cs" />

@@ -4,12 +4,13 @@ using System.Collections.Immutable;
 using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using LanguageExt;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Exceptional.Reactive;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
-    public abstract class AnimatorBase : IRenderable
+    public abstract class AnimatorBase : IRenderer
     {
         public abstract TimeSpan Duration { get; }
         public abstract ImmutableList<IAnimationSection> Sections { get; }
@@ -25,6 +26,8 @@ namespace SolidworksAddinFramework.OpenGl.Animation
         }
 
         public abstract void OnStart(DateTime startTime);
+
+        public IObservable<Unit> NeedsRedraw => Observable.Never(Unit.Default);
 
         public abstract void Render(DateTime time);
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)

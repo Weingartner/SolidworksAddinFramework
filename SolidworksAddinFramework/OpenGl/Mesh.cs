@@ -32,7 +32,7 @@ namespace SolidworksAddinFramework.OpenGl
         public IReadOnlyList<Edge3> Edges { get; }
     }
 
-    public class Mesh : RenderableBase<MeshData>
+    public class Mesh : RendererBase<MeshData>
     {
         public static Mesh CreateMesh(IBody2 body, Color color, bool isSolid)
         {

@@ -9,11 +9,11 @@ using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework
 {
-    public class GLDoubleBuffer : DoubleBuffer<ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>>
+    public class GLDoubleBuffer : DoubleBuffer<ImmutableDictionary<IRenderer, Tuple<int, IRenderer>>>
     {
         private readonly ModelView _ModelView;
 
-        public GLDoubleBuffer(ModelView modelView) : base(ImmutableDictionary<IRenderable, Tuple<int, IRenderable>>.Empty)
+        public GLDoubleBuffer(ModelView modelView) : base(ImmutableDictionary<IRenderer, Tuple<int, IRenderer>>.Empty)
         {
             _ModelView = modelView;
         }

@@ -8,11 +8,11 @@ using SolidworksAddinFramework.Geometry;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public class EdgeListRenderable : RenderableBase<IReadOnlyList<Edge3>>
+    public class EdgeListRenderer : RendererBase<IReadOnlyList<Edge3>>
     {
         private readonly Color _Color;
 
-        public EdgeListRenderable(IEnumerable<Edge3> edges, Color color):base(edges.ToList())
+        public EdgeListRenderer(IEnumerable<Edge3> edges, Color color):base(edges.ToList())
         {
             _Color = color;
         }

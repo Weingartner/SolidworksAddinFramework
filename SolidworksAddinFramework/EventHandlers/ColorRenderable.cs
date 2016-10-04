@@ -5,13 +5,13 @@ namespace SolidworksAddinFramework
 {
     public class ColorRenderable
     {
-        public ColorRenderable(IRenderable renderable, Color color)
+        public ColorRenderable(IRenderer renderer, Color color)
         {
-            Renderable = renderable;
+            Renderer = renderer;
             Color = color;
         }
 
-        public IRenderable Renderable { get; }
+        public IRenderer Renderer { get; }
         public Color Color { get; }
 
     }
