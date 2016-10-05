@@ -29,15 +29,20 @@ namespace SolidworksAddinFramework.OpenGl
             return data.Select(v => Vector3.Transform(v,transform)).ToList();
         }
 
-        protected override void DoRender(IReadOnlyList<Vector3> data, DateTime time)
+        protected override void DoRender(IReadOnlyList<Vector3> data, DateTime time, double opacity, bool visibile)
         {
+            if (!Visibility)
+                return;
             using (ModernOpenGl.SetLineWidth(Thickness))
-            using (ModernOpenGl.SetColor(Color, ShadingModel.Smooth, solidBody:false))
-            using (ModernOpenGl.Begin(_Mode))
             {
-                data.ForEach(p=>p.GLVertex3());
+                using (ModernOpenGl.SetColor(FromArgb(opacity, Color), ShadingModel.Smooth, solidBody:false))
+                using (ModernOpenGl.Begin(_Mode))
+                {
+                    data.ForEach(p=>p.GLVertex3());
+                }
             }
         }
+
 
         protected override Tuple<Vector3, double> UpdateBoundingSphere(IReadOnlyList<Vector3> data, DateTime time)
         {

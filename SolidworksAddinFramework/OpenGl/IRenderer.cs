@@ -19,8 +19,9 @@ namespace SolidworksAddinFramework.OpenGl
         /// transform could be a reference frame transform
         /// </summary>
         /// <param name="time"></param>
+        /// <param name="parentOpacity"></param>
         /// <param name="renderTransform"></param>
-        void Render(DateTime time,Matrix4x4? renderTransform = null);
+        void Render(DateTime time,double parentOpacity=1.0,Matrix4x4? renderTransform = null);
 
         /// <summary>
         /// Temporarily transforms the object. Subsequent calls to this method are not cumulative unless
@@ -30,6 +31,10 @@ namespace SolidworksAddinFramework.OpenGl
         /// <param name="accumulate"></param>
         void ApplyTransform(Matrix4x4 transform, bool accumulate=false);
         Tuple<Vector3, double> BoundingSphere { get; }
+
+        double Opacity { get; set; }
+
+        bool Visibility { get; set; }
     }
 
     public interface IRenderable

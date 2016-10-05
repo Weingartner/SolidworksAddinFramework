@@ -32,9 +32,12 @@ namespace SolidworksAddinFramework.OpenGl
             return list;
         }
 
-        protected override void DoRender(IReadOnlyList<Edge3> data, DateTime time)
+        protected override void DoRender(IReadOnlyList<Edge3> data, DateTime time, double opacity, bool visbility)
         {
-            using (ModernOpenGl.SetColor(_Color, ShadingModel.Smooth, solidBody: false))
+            if (!visbility)
+                return;
+
+            using (ModernOpenGl.SetColor(FromArgb(opacity, _Color), ShadingModel.Smooth, solidBody: false))
             using (ModernOpenGl.SetLineWidth(2.0))
             using (ModernOpenGl.Begin(PrimitiveType.Lines))
                 foreach (var v in data)

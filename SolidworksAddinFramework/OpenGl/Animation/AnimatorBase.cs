@@ -29,7 +29,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public IObservable<Unit> NeedsRedraw => Observable.Never(Unit.Default);
 
-        public abstract void Render(DateTime time, Matrix4x4? renderTransform = null);
+        public abstract void Render(DateTime time, double parentOpacity = 1.0, Matrix4x4? renderTransform = null);
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
         {
             throw new NotImplementedException();
@@ -42,6 +42,9 @@ namespace SolidworksAddinFramework.OpenGl.Animation
                 throw new NotImplementedException();
             }
         }
+
+        public double Opacity { get; set; } = 1.0;
+        public bool Visibility { get; set; } = true;
 
 
         private static IDisposable Redraw(IModelDoc2 doc, double framerate = 30)

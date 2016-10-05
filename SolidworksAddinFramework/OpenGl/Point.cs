@@ -24,9 +24,11 @@ namespace SolidworksAddinFramework.OpenGl
             return Vector3.Transform(data,transform);
         }
 
-        protected override void DoRender(Vector3 data, DateTime time)
+        protected override void DoRender(Vector3 data, DateTime time, double opacity, bool visibile)
         {
-            DrawPoint(_Color, _Size - 3, data);
+            if (!visibile)
+                return;
+            DrawPoint(FromArgb(opacity,_Color), _Size - 3, data);
             DrawPoint(Color.Black, _Size, data);
         }
 

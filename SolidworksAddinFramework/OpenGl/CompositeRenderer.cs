@@ -22,11 +22,14 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IObservable<Unit> NeedsRedraw => _SubRenderables.Select(v => v.NeedsRedraw).Merge();
 
-        public void Render(DateTime time, Matrix4x4? renderTransform)
+        public void Render(DateTime time, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
         {
+            if (!Visibility)
+                return;
+
             foreach (var subRenderable in _SubRenderables)
             {
-                subRenderable.Render(time, renderTransform);
+                subRenderable.Render(time, Opacity*parentOpacity, renderTransform);
             }
         }
 
@@ -45,7 +48,10 @@ namespace SolidworksAddinFramework.OpenGl
             {
                 throw new NotSupportedException("");
             }
-        } 
+        }
+
+        public double Opacity { get; set; } = 1.0;
+        public bool Visibility { get; set; } = true;
     }
 
     public static class CompositeRendererExtensions

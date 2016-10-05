@@ -90,9 +90,12 @@ namespace SolidworksAddinFramework.OpenGl
 
         protected override MeshData DoTransform(MeshData data, Matrix4x4 transform) => new MeshData(TransformTriangles(data,transform), TransformEdges(data, transform));
 
-        protected override void DoRender(MeshData data, DateTime time)
+        protected override void DoRender(MeshData data, DateTime time, double opacity, bool visibility)
         {
-            MeshRender.Render(data, Color, _IsSolid);
+            if (!visibility)
+                return;
+            var color = FromArgb(opacity,Color);
+            MeshRender.Render(data, color, _IsSolid);
         }
 
         protected override Tuple<Vector3, double> UpdateBoundingSphere(MeshData data, DateTime time)

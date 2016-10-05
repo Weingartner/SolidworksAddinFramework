@@ -32,11 +32,11 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IObservable<Unit> NeedsRedraw => _NeedsRedraw;
 
-        public void Render(DateTime time, Matrix4x4? renderTransform = null)
+        public void Render(DateTime time, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
         {
             var transform = _Transformable.Transform*(renderTransform ?? Matrix4x4.Identity);
 
-            Renderer.Render(time, transform);
+            Renderer.Render(time, parentOpacity*Opacity, transform);
         }
 
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
@@ -46,5 +46,7 @@ namespace SolidworksAddinFramework.OpenGl
 
 
         public Tuple<Vector3, double> BoundingSphere => Renderer.BoundingSphere;
+        public double Opacity { get; set; } = 1.0;
+        public bool Visibility { get; set; } = true;
     }
 }
