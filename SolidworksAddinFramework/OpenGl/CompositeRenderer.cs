@@ -22,11 +22,11 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IObservable<Unit> NeedsRedraw => _SubRenderables.Select(v => v.NeedsRedraw).Merge();
 
-        public void Render(DateTime time)
+        public void Render(DateTime time, Matrix4x4? renderTransform)
         {
             foreach (var subRenderable in _SubRenderables)
             {
-                subRenderable.Render(time);
+                subRenderable.Render(time, renderTransform);
             }
         }
 

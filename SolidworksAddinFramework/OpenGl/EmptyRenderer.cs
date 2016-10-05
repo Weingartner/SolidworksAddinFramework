@@ -9,7 +9,7 @@ namespace SolidworksAddinFramework.OpenGl
     {
         public IObservable<Unit> NeedsRedraw => Observable.Never(Unit.Default);
 
-        public void Render(DateTime time)
+        public void Render(DateTime time, Matrix4x4? renderTransform = null)
         {
         }
 

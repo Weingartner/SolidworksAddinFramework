@@ -23,7 +23,6 @@ namespace SolidworksAddinFramework.OpenGl
             get { return _Renderer; }
             set
             {
-                Update(value);
                 this.RaiseAndSetIfChanged(ref _Renderer, value);
                 // ReSharper disable once ExplicitCallerInfoArgument
                 this.RaisePropertyChanged(nameof(BoundingSphere));
@@ -33,21 +32,18 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IObservable<Unit> NeedsRedraw => _NeedsRedraw;
 
-        public void Render(DateTime time)
+        public void Render(DateTime time, Matrix4x4? renderTransform = null)
         {
-            Renderer.Render(time);
+            var transform = _Transformable.Transform*(renderTransform ?? Matrix4x4.Identity);
+
+            Renderer.Render(time, transform);
         }
 
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
         {
             _Transformable.ApplyTransform(transform, accumulate);
-            Update(Renderer);
         }
 
-        private void Update(IRenderer renderer)
-        {
-            renderer.ApplyTransform(_Transformable.Transform, false);
-        }
 
         public Tuple<Vector3, double> BoundingSphere => Renderer.BoundingSphere;
     }

@@ -54,19 +54,17 @@ namespace SolidworksAddinFramework.OpenGl
 
         public void FireRedraw() => _NeedsRedraw.OnNext(Unit.Default);
 
-        public void Render(DateTime time)
+        public void Render(DateTime time, Matrix4x4? renderTransform = null)
         {
+            var transform = _Transform.Transform*(renderTransform ?? Matrix4x4.Identity);
+            _TransformedData = DoTransform(_Data, transform);
             DoRender(_TransformedData, time);
             _BoundingSphere = new Lazy<Tuple<Vector3, double>>(()=> UpdateBoundingSphere(_TransformedData, time));
         }
 
-
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
         {
             _Transform.ApplyTransform(transform, accumulate);
-
-            _TransformedData = DoTransform(_Data, _Transform.Transform);
-
         }
 
         protected abstract T DoTransform(T data, Matrix4x4 transform); 

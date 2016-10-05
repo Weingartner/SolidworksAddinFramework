@@ -13,10 +13,18 @@ namespace SolidworksAddinFramework.OpenGl
     public interface IRenderer
     {
         IObservable<Unit> NeedsRedraw { get; }
-        void Render(DateTime time);
 
         /// <summary>
-        /// Temporarily transforms the object. Subsequent calls to this method are not cumulative.
+        /// Draw the object with an additional transform. This additional
+        /// transform could be a reference frame transform
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="renderTransform"></param>
+        void Render(DateTime time,Matrix4x4? renderTransform = null);
+
+        /// <summary>
+        /// Temporarily transforms the object. Subsequent calls to this method are not cumulative unless
+        /// the 'accumulate' parameter is set to true.
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="accumulate"></param>
@@ -37,10 +45,16 @@ namespace SolidworksAddinFramework.OpenGl
         private IRenderer _A;
         private IRenderer _B;
 
+        public enum Choose
+        {
+            A,
+            B
+        };
+
         private SerialRenderer _Target = new SerialRenderer();
 
         [Reactive]
-        public bool Switch { get; set; } = true;
+        public Choose Switch { get; set; } = Choose.A;
 
         public EitherRenderable(IRenderer a, IRenderer b)
         {
@@ -48,7 +62,7 @@ namespace SolidworksAddinFramework.OpenGl
             _B = b;
             this.WhenAnyValue(p => p.Switch)
                 .Subscribe
-                (v => _Target.Renderer = v ? _A : _B);
+                (v => _Target.Renderer = v == Choose.A ? _A : _B);
         }
 
         public IRenderer GetRenderer()
@@ -57,12 +71,35 @@ namespace SolidworksAddinFramework.OpenGl
         }
     }
 
+    public class HideableRenderable :ReactiveObject, IRenderable
+    {
+        private EitherRenderable _Inner;
+
+        public HideableRenderable(IRenderer inner)
+        {
+            _Inner = new EitherRenderable(a: new EmptyRenderer(), b: inner);
+            this.WhenAnyValue(p => p.Visibile)
+                .Subscribe
+                (visible => _Inner.Switch = ToAorB(visible));
+        }
+
+        private static EitherRenderable.Choose ToAorB(bool visible) => visible ? EitherRenderable.Choose.B : EitherRenderable.Choose.A;
+
+        [Reactive] public bool Visibile {get; set;}
+
+        public IRenderer GetRenderer()
+        {
+            return _Inner.GetRenderer();
+        }
+    }
+
     public static class RendererExtensions
     {
-        public static EitherRenderable Hideable(this IRenderer @this)
+        public static HideableRenderable Hideable(this IRenderer @this)
         {
-            return new EitherRenderable(@this, new EmptyRenderer());
+            return new HideableRenderable(@this);
         }
+
         public static Tuple<Vector3,double> BoundingSphere(IReadOnlyList<Vector3> points)
         {
             var range = Range3Single.FromVertices(points);

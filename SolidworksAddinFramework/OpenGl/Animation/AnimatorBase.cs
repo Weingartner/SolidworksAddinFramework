@@ -29,7 +29,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public IObservable<Unit> NeedsRedraw => Observable.Never(Unit.Default);
 
-        public abstract void Render(DateTime time);
+        public abstract void Render(DateTime time, Matrix4x4? renderTransform = null);
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)
         {
             throw new NotImplementedException();
