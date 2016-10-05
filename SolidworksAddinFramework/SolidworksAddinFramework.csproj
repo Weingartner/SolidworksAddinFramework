@@ -234,6 +234,7 @@
     <Compile Include="OpenGl\EmptyRenderer.cs" />
     <Compile Include="OpenGl\MeshExtensions.cs" />
     <Compile Include="OpenGl\SerialRenderer.cs" />
+    <Compile Include="OpenGl\Transformable.cs" />
     <Compile Include="Packing.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />

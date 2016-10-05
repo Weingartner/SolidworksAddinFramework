@@ -47,4 +47,9 @@ namespace SolidworksAddinFramework.OpenGl
             }
         } 
     }
+
+    public static class CompositeRendererExtensions
+    {
+        public static CompositeRenderer ToCompositeRenderer(this IEnumerable<IRenderer> @this )=>new CompositeRenderer(@this.ToList());
+    }
 }
