@@ -343,6 +343,10 @@ namespace SolidworksAddinFramework
             source
             .ObserveOn(SolidworksSchedular.Default);
 
+        public static IObservable<T> ObserveOnSolidworksThread<T>(this IObservable<T> source) =>
+            source
+            .ObserveOn(SolidworksSchedular.Default);
+
         /// <summary>
         /// A helper for attaching observables to solidworks events with delegates that have <![CDATA[Func<T>]]> type signitures.
         /// </summary>
