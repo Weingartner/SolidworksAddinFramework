@@ -42,20 +42,35 @@ namespace DemoMacroFeatures.MultiWireBodies
         {
             SwFeatureData.EnableMultiBodyConsume = true;
 
-            var line0 = modeler.CreateTrimmedLine(new Vector3(0, 0, 0), new Vector3(1, 0, 0));
-            var line1 = modeler.CreateTrimmedLine(new Vector3(0, 1, 0), new Vector3(1, 1, 0));
+            if (Database.Style == MulitWireBodiesData.StyleEnum.Wire)
+            {
+                var line0 = modeler.CreateTrimmedLine(new Vector3(0, 0, 0), new Vector3(1, 0, 0));
+                var line1 = modeler.CreateTrimmedLine(new Vector3(0, 1, 0), new Vector3(1, 1, 0));
 
-            var wire0 = line0.CreateWireBody();
-            var wire1 = line1.CreateWireBody();
+                var wire0 = line0.CreateWireBody();
+                var wire1 = line1.CreateWireBody();
 
-            SwFeatureData.AddIdsToBody(wire0);
-            SwFeatureData.AddIdsToBody(wire1);
+                SwFeatureData.AddIdsToBody(wire0);
+                SwFeatureData.AddIdsToBody(wire1);
 
-            return new[] {wire0, wire1};
+                return new[] { wire0, wire1 };
+
+            }
+            else
+            {
+                var solid0 = modeler.CreateBox(new Vector3(0, 0, 0), Vector3.UnitX, 1, 1, 1);
+                var solid1 = modeler.CreateBox(new Vector3(2, 0, 0), Vector3.UnitX, 1, 1, 1);
+
+                SwFeatureData.AddIdsToBody(solid0);
+                SwFeatureData.AddIdsToBody(solid0);
+
+                return new[] { solid0, solid1 };
+            }
+
         }
 
-
-        public static void AddMacroFeature(ISldWorks app)
+        public static
+            void AddMacroFeature(ISldWorks app)
         {
             var moddoc = (IModelDoc2) app.ActiveDoc;
             var macroFeature = new MultiWireBodies();

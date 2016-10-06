@@ -33,7 +33,20 @@ namespace WeinCadSW.MacroFeatures.CurveBender
         protected override IEnumerable<IDisposable> AddControlsImpl()
         {
 
-            yield break;
+            var group = Page.CreateGroup(1, "Controls", new [] { swAddGroupBoxOptions_e.swGroupBoxOptions_Expanded ,
+                swAddGroupBoxOptions_e.swGroupBoxOptions_Visible});
+
+            yield return CreateLabel(group, "Select test style", "Select test style");
+
+            yield return CreateOptionGroup
+                (group,
+                 MacroFeature.Database,
+                 p => p.Style,
+                 config =>
+                 {
+                     config.CreateOption("Solid", MulitWireBodiesData.StyleEnum.Solid);
+                     config.CreateOption("Wire", MulitWireBodiesData.StyleEnum.Wire);
+                 });
 
         }
 
