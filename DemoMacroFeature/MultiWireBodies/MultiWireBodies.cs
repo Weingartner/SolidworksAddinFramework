@@ -38,14 +38,18 @@ namespace DemoMacroFeatures.MultiWireBodies
             Console.WriteLine("Constructed");
         }
 
+        private Random _R = new Random();
+
         protected override object Regenerate(IModeler modeler)
         {
             SwFeatureData.EnableMultiBodyConsume = true;
 
             if (Database.Style == MulitWireBodiesData.StyleEnum.Wire)
             {
-                var line0 = modeler.CreateTrimmedLine(new Vector3(0, 0, 0), new Vector3(1, 0, 0));
-                var line1 = modeler.CreateTrimmedLine(new Vector3(0, 1, 0), new Vector3(1, 1, 0));
+                var w = _R.NextDouble();
+
+                var line0 = modeler.CreateTrimmedLine(new Vector3(0, -w, 0), new Vector3(1, -w, 0));
+                var line1 = modeler.CreateTrimmedLine(new Vector3(0, w, 0), new Vector3(1, w, 0));
 
                 var wire0 = line0.CreateWireBody();
                 var wire1 = line1.CreateWireBody();
