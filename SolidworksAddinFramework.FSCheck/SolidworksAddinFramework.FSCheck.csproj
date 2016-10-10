@@ -45,7 +45,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DoubleNumerics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\System.DoubleNumerics.3.1.0\lib\dotnet\System.DoubleNumerics.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\System.DoubleNumerics.3.1.2\lib\dotnet\System.DoubleNumerics.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
