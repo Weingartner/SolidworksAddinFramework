@@ -1,4 +1,5 @@
 using System.DoubleNumerics;
+using System.Text;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -15,5 +16,17 @@ namespace SolidworksAddinFramework.Geometry
         {
             return CreateFromAxisAngleOrigin(new PointDirection3(p.A,p.Delta),angle);
         }
+
+        public static Matrix4x4 ExtractRotationPart(this Matrix4x4 m)
+        {
+            Vector3 dScale;
+            Quaternion dRotation;
+            Vector3 dTranslation;
+            Matrix4x4.Decompose(m, out dScale, out dRotation, out dTranslation);
+            return Matrix4x4.CreateFromQuaternion(dRotation);
+            
+        }
+
+
     }
 }
