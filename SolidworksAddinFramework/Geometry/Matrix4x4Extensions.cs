@@ -1,5 +1,8 @@
+using System;
+using System.Diagnostics;
 using System.DoubleNumerics;
 using System.Text;
+using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -17,6 +20,25 @@ namespace SolidworksAddinFramework.Geometry
             return CreateFromAxisAngleOrigin(new PointDirection3(p.A,p.Delta),angle);
         }
 
+        /// <summary>
+        /// A fluent matrix inversion. Will fail with an
+        /// exception if the matrix is not invertable. Use
+        /// only when you are sure you have an invertable 
+        /// matrix;
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static Matrix4x4 InvertUnsafe(this Matrix4x4 m)
+        {
+            Matrix4x4 inv;
+            if (!Matrix4x4.Invert(m, out inv))
+            {
+                throw new Exception("Matrix inversion failed");
+            }
+            return inv;
+
+        }
+
         public static Matrix4x4 ExtractRotationPart(this Matrix4x4 m)
         {
             Vector3 dScale;
@@ -27,6 +49,7 @@ namespace SolidworksAddinFramework.Geometry
             
         }
 
-
+        public static MathTransform ToSwTransform(this Matrix4x4 m, IMathUtility math = null) => 
+            (math ?? SwAddinBase.Active.Math).ToSwMatrix(m);
     }
 }
