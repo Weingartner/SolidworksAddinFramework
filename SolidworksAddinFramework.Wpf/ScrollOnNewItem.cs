@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
+using ReactiveUI;
 
 namespace SolidworksAddinFramework.Wpf
 {
@@ -28,20 +31,31 @@ namespace SolidworksAddinFramework.Wpf
             AssociatedObject.Unloaded -= OnUnLoaded;
         }
 
+        private IDisposable d;
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var incc = AssociatedObject.ItemsSource as INotifyCollectionChanged;
-            if (incc == null) return;
+            var d0 = new SerialDisposable();
+            var d1 = AssociatedObject
+                .WhenAnyValue(p => p.ItemsSource)
+                .Select
+                (o =>
+                 {
+                     var incc = o as INotifyCollectionChanged;
+                     if (incc == null)
+                         return Disposable.Empty;
+                     incc.CollectionChanged += OnCollectionChanged;
+                     return Disposable.Create(() => incc.CollectionChanged -= OnCollectionChanged);
+                 }).Subscribe(d=>d0.Disposable=d);
 
-            incc.CollectionChanged += OnCollectionChanged;
+            d = new CompositeDisposable(d0,d1);
+
+
+
         }
 
         private void OnUnLoaded(object sender, RoutedEventArgs e)
         {
-            var incc = AssociatedObject.ItemsSource as INotifyCollectionChanged;
-            if (incc == null) return;
-
-            incc.CollectionChanged -= OnCollectionChanged;
+            d.Dispose();
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
