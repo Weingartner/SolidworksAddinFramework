@@ -387,11 +387,10 @@ namespace SolidworksAddinFramework
         public static ISurface CreatePlanarSurface(this IModeler activeModeler, PointDirection3 plane)
         {
             var planeDirection = plane.Direction;
-            var math = SwAddinBase.Active.Math;
-            var vRef = planeDirection.Orthogonal().ToSWVector(math);
-            var mathVector = planeDirection.ToSWVector(math);
-            var vRootPoint = plane.Point.ToSWVector(math);
-            return (ISurface) activeModeler.CreatePlanarSurface2(vRootPoint, mathVector, vRef);
+            var vRef = planeDirection.Orthogonal();
+            var mathVector = planeDirection;
+            var vRootPoint = plane.Point;
+            return (ISurface) activeModeler.CreatePlanarSurface2(vRootPoint.ToDoubles(), mathVector.ToDoubles(), vRef.ToDoubles());
         }
     }
 }
