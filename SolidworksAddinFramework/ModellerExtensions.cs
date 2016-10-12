@@ -377,5 +377,21 @@ namespace SolidworksAddinFramework
 
             return (Curve) modeler.CreateBsplineCurve(props, knotVectorU, controlPointsList);
         }
+
+        /// <summary>
+        /// Create a surface from a plane definition
+        /// </summary>
+        /// <param name="activeModeler"></param>
+        /// <param name="plane"></param>
+        /// <returns></returns>
+        public static ISurface CreatePlanarSurface(this IModeler activeModeler, PointDirection3 plane)
+        {
+            var planeDirection = plane.Direction;
+            var math = SwAddinBase.Active.Math;
+            var vRef = planeDirection.Orthogonal().ToSWVector(math);
+            var mathVector = planeDirection.ToSWVector(math);
+            var vRootPoint = plane.Point.ToSWVector(math);
+            return (ISurface) activeModeler.CreatePlanarSurface2(vRootPoint, mathVector, vRef);
+        }
     }
 }
