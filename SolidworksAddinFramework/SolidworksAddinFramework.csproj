@@ -114,9 +114,8 @@
     <Reference Include="ReactiveUI, Version=7.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\reactiveui-core.7.2.0\lib\Net45\ReactiveUI.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI.Events, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\reactiveui-events.6.5.0\lib\net45\ReactiveUI.Events.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ReactiveUI.Events, Version=7.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\reactiveui-events.7.2.0\lib\Net45\ReactiveUI.Events.dll</HintPath>
     </Reference>
     <Reference Include="ReactiveUI.Fody.Helpers, Version=2.0.66.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ReactiveUI.Fody.2.0.66\lib\net45\ReactiveUI.Fody.Helpers.dll</HintPath>
