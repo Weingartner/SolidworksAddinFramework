@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DoubleNumerics;
 using System.Linq;
+using System.Numerics;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
@@ -10,6 +11,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using WeinCadSW.MacroFeatures.CurveBender;
+using Vector3 = System.DoubleNumerics.Vector3;
 
 namespace DemoMacroFeatures.MultiWireBodies
 {

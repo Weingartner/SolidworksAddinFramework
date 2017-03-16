@@ -1,9 +1,11 @@
 using System.DoubleNumerics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
+using Vector3 = System.DoubleNumerics.Vector3;
 
 namespace DemoMacroFeatures.SampleMacroFeature
 {
