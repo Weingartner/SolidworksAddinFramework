@@ -69,22 +69,9 @@ namespace SolidworksAddinFramework.Wpf
 
         public static Task<LogViewer> CreateLogViewer()
         {
-            var tcs = new TaskCompletionSource<LogViewer>();
-            var thread = new Thread(() =>
-            {
-                // Set up the SynchronizationContext so that any awaits
-                // resume on the STA thread as they would in a GUI app.
-                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext());
-                var viewer = new LogViewer();
-                viewer.Show();
-                tcs.SetResult(viewer);
-                Dispatcher.Run();
-            });
-            thread.Name = "LoggerThread";
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            return tcs.Task;
+            var viewer = new LogViewer();
+            viewer.Show();
+            return Task.FromResult(viewer);
         }
 
         private static int CurrentIndex = 0;
