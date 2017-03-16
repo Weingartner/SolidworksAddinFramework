@@ -39,7 +39,7 @@ namespace SolidworksAddinFramework
                         return Disposable.Empty;
 
                     var modelView = (ModelView) modelDoc.GetFirstModelView();
-                    Lookup.GetOrAdd(modelDoc, mv => new OpenGlRenderer(modelView));
+                    Lookup.GetOrAdd(modelDoc, mv => new OpenGlRenderer(modelView ));
 
                     return Disposable.Create(() =>
                     {
@@ -110,13 +110,15 @@ namespace SolidworksAddinFramework
                     if(layer.Index!=0)
                         GL.Clear(ClearBufferMask.DepthBufferBit);
                     foreach (var r in layer.Renderables)
-                        r.Render(time);
+                        r.Render(time, _DrawContext);
                 }
             });
+            _DrawContext = new OpenGLDrawContext();
         }
 
         private readonly GLDoubleBuffer _GlDoubleBuffer;
         private readonly IScheduler _Scheduler;
+        private readonly IDrawContext _DrawContext;
 
         private IDisposable DisplayUndoableImpl(IRenderer renderer, IModelDoc2 doc, int layer)
         {

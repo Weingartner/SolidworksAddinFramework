@@ -32,20 +32,14 @@ namespace SolidworksAddinFramework.OpenGl
             return list;
         }
 
-        protected override void DoRender(IReadOnlyList<Edge3> data, DateTime time, double opacity, bool visbility)
+        protected override void DoRender(IReadOnlyList<Edge3> data, DateTime time, double opacity, bool visbility, IDrawContext drawContext)
         {
             if (!visbility)
                 return;
 
-            using (ModernOpenGl.SetColor(FromArgb(opacity, _Color), ShadingModel.Smooth, solidBody: false))
-            using (ModernOpenGl.SetLineWidth(2.0))
-            using (ModernOpenGl.Begin(PrimitiveType.Lines))
-                foreach (var v in data)
-                {
-                    v.A.GLVertex3();
-                    v.B.GLVertex3();
-                }
+            drawContext.DrawEdges(data, opacity, _Color);
         }
+
 
         protected override Tuple<Vector3, double> UpdateBoundingSphere(IReadOnlyList<Edge3> data, DateTime time)
         {

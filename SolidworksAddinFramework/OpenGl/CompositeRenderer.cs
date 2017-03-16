@@ -22,14 +22,14 @@ namespace SolidworksAddinFramework.OpenGl
 
         public IObservable<Unit> NeedsRedraw => _SubRenderables.Select(v => v.NeedsRedraw).Merge();
 
-        public void Render(DateTime time, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
+        public void Render(DateTime time, IDrawContext drawContext, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
         {
             if (!Visibility)
                 return;
 
             foreach (var subRenderable in _SubRenderables)
             {
-                subRenderable.Render(time, Opacity*parentOpacity, renderTransform);
+                subRenderable.Render(time, drawContext, Opacity*parentOpacity, renderTransform);
             }
         }
 

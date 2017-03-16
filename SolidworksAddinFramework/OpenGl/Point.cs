@@ -24,12 +24,12 @@ namespace SolidworksAddinFramework.OpenGl
             return Vector3.Transform(data,transform);
         }
 
-        protected override void DoRender(Vector3 data, DateTime time, double opacity, bool visibile)
+        protected override void DoRender(Vector3 data, DateTime time, double opacity, bool visibile, IDrawContext drawContext)
         {
             if (!visibile)
                 return;
-            DrawPoint(FromArgb(opacity,_Color), _Size - 3, data);
-            DrawPoint(Color.Black, _Size, data);
+            drawContext.DrawPoint(FromArgb(opacity,_Color), _Size - 3, data);
+            drawContext.DrawPoint(Color.Black, _Size, data);
         }
 
         protected override Tuple<Vector3, double> UpdateBoundingSphere(Vector3 data, DateTime time)
@@ -37,26 +37,6 @@ namespace SolidworksAddinFramework.OpenGl
             throw new NotImplementedException();
         }
 
-        private void DrawPoint(Color color, int size, Vector3 location)
-        {
-            using (ModernOpenGl.SetColor(color, ShadingModel.Flat, solidBody: false))
-            {
-                GL.PointSize(size);
-                GL.Enable(EnableCap.AlphaTest);
-                GL.AlphaFunc(AlphaFunction.Notequal, 0);
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                GL.Enable(EnableCap.PointSmooth);
-                GL.Hint(HintTarget.PointSmoothHint, HintMode.Nicest);
-                GL.Begin(PrimitiveType.Points);
-                location.GLVertex3();
-                GL.End();
-
-                GL.Disable(EnableCap.PointSmooth);
-                GL.BlendFunc(BlendingFactorSrc.Zero, BlendingFactorDest.Zero);
-                GL.Disable(EnableCap.Blend);
-            }
-        }
 
 
     }

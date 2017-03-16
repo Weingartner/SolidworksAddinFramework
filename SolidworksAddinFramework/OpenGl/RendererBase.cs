@@ -29,15 +29,17 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
         private readonly Subject<Unit> _NeedsRedraw = new Subject<Unit>();
+        private readonly IDrawContext _IDrawContext;
+
         public IObservable<Unit> NeedsRedraw => _NeedsRedraw;
 
         public void FireRedraw() => _NeedsRedraw.OnNext(Unit.Default);
 
-        public void Render(DateTime time, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
+        public void Render(DateTime time, IDrawContext drawContext, double parentOpacity = 1.0, Matrix4x4? renderTransform = null)
         {
             var transform = _Transform.Transform*(renderTransform ?? Matrix4x4.Identity);
             _TransformedData = DoTransform(_Data, transform);
-            DoRender(_TransformedData, time, Opacity, Visibility );
+            DoRender(_TransformedData, time, Opacity, Visibility, drawContext );
             _BoundingSphere = new Lazy<Tuple<Vector3, double>>(()=> UpdateBoundingSphere(_TransformedData, time));
         }
 
@@ -47,7 +49,7 @@ namespace SolidworksAddinFramework.OpenGl
         }
 
         protected abstract T DoTransform(T data, Matrix4x4 transform); 
-        protected abstract void DoRender(T data, DateTime time, double opacity, bool visibile);
+        protected abstract void DoRender(T data, DateTime time, double opacity, bool visibile, IDrawContext drawContext);
         protected abstract Tuple<Vector3, double> UpdateBoundingSphere(T data, DateTime time);
 
 

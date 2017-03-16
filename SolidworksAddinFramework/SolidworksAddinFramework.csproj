@@ -237,6 +237,7 @@
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
     <Compile Include="OpenGl\CompositeRenderer.cs" />
+    <Compile Include="OpenGl\OpenGLDrawContext.cs" />
     <Compile Include="OpenGl\EdgeListRenderer.cs" />
     <Compile Include="OpenGl\EmptyRenderer.cs" />
     <Compile Include="OpenGl\MeshExtensions.cs" />

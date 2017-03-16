@@ -19,9 +19,10 @@ namespace SolidworksAddinFramework.OpenGl
         /// transform could be a reference frame transform
         /// </summary>
         /// <param name="time"></param>
+        /// <param name="drawContext"></param>
         /// <param name="parentOpacity"></param>
         /// <param name="renderTransform"></param>
-        void Render(DateTime time,double parentOpacity=1.0,Matrix4x4? renderTransform = null);
+        void Render(DateTime time, IDrawContext drawContext, double parentOpacity = 1.0, Matrix4x4? renderTransform = null);
 
         /// <summary>
         /// Temporarily transforms the object. Subsequent calls to this method are not cumulative unless
