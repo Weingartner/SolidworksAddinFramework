@@ -5,22 +5,14 @@ using System.DoubleNumerics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.DoubleNumerics;
 using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Text;
-using System.Xml;
-using Accord.Math.Optimization;
 using JetBrains.Annotations;
 using LanguageExt;
-using MathNet.Numerics.LinearAlgebra.Double;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using Weingartner.Numerics;
 
 namespace SolidworksAddinFramework
 {
@@ -135,8 +127,8 @@ namespace SolidworksAddinFramework
         {
             var box = (double[]) body.GetBodyBox();
             return new Range3Single(
-                new Vector3((double) box[0], (double) box[1], (double) box[2]), 
-                new Vector3((double) box[3], (double) box[4], (double) box[5]));
+                new Vector3(box[0], box[1], box[2]), 
+                new Vector3(box[3], box[4], box[5]));
         }
 
         public static bool GetDistance(this IBody2 body0, IBody2 body1, out double[] p0, out double []p1)
@@ -234,7 +226,7 @@ namespace SolidworksAddinFramework
         /// <returns></returns>
         public static IEnumerable<IBody2> CutBySheets(this IBody2 target, IEnumerable<IBody2> tools)
             {
-                var targets = new List<IBody2>() { target.CopyTs() };
+                var targets = new List<IBody2> { target.CopyTs() };
                 foreach (var tool in tools)
                 {
                     targets = targets.SelectMany
@@ -270,7 +262,7 @@ namespace SolidworksAddinFramework
         private static string GetTempFilePathWithExtension(string extension)
         {
             var path = Path.GetTempPath();
-            var fileName = Guid.NewGuid().ToString() + extension;
+            var fileName = Guid.NewGuid() + extension;
             return Path.Combine(path, fileName);
         }
 
@@ -373,7 +365,7 @@ namespace SolidworksAddinFramework
                 // Call ISldWorks::ActivateDoc3 to make the document to convert the active document.
                 // Call ISldWorks::ActiveDoc to get the active document.
 
-                var status = ((IModelDoc2) doc) // Note that this does not return the correct doc if the doc is hidden
+                var status = doc // Note that this does not return the correct doc if the doc is hidden
                     .Extension
                     .SaveAs
                         ( igesFile
@@ -402,7 +394,7 @@ namespace SolidworksAddinFramework
     public static class DisplayTransaction
     {
         public static IDisposable DisplayUndoable(this IEnumerable<IBody2> bodies, IModelDoc2 doc,
-            System.Drawing.Color? c = null,
+            Color? c = null,
             swTempBodySelectOptions_e opt = swTempBodySelectOptions_e.swTempBodySelectOptionNone)
         {
                 var view = (IModelView)doc.ActiveView;
