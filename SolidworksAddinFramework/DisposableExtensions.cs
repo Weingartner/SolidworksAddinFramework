@@ -28,13 +28,6 @@ namespace SolidworksAddinFramework
         }
 
 
-        public static T DisposeWith<T>(this T disposable, CompositeDisposable container)
-            where T : IDisposable
-        {
-            if(disposable!=null)
-                container.Add(disposable);
-            return disposable;
-        }
         public static T DisposeWith<T>(this T disposable, Action<IDisposable> act)
             where T : IDisposable
         {

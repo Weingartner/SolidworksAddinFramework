@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -19,41 +18,36 @@ namespace SolidworksAddinFramework.EditorView
         public object Editable { get; }
         public Func<IEditor> CreateEditor { get; }
         public IObservable<bool> CanExecute { get; }
-        public IScheduler EditorScheduler { get; }
 
         public ReactiveEditCommand(
             Func<IEditor> createEditor,
             IObservable<bool> canExecute,
-            IScheduler editorScheduler,
             object editable)
         {
             Editable = editable;
             CreateEditor = createEditor;
             CanExecute = canExecute.ObserveOnDispatcher();
-            EditorScheduler = editorScheduler;
         }
 
-        public static ReactiveEditCommand Create(Func<IEditor> createEditor, IScheduler schedular, object editable)
+        public static ReactiveEditCommand Create(Func<IEditor> createEditor, object editable)
         {
             return new ReactiveEditCommand(
                 createEditor,
-                Observable.Return(true)
-                ,schedular
-                ,editable);
+                Observable.Return(true),editable);
         }
     }
 
     public static class ReactiveEditCommandExtensions
     {
-        public static IReactiveCommand RegisterWith(this ReactiveEditCommand command, ISerialCommandController serialCommandController, IScheduler schedular)
+        public static ReactiveCommand RegisterWith(this ReactiveEditCommand command, ISerialCommandController serialCommandController)
         {
-            return serialCommandController.Register(command, schedular);
+            return serialCommandController.Register(command);
         }
     }
 
     public interface ISerialCommandController : INotifyPropertyChanged
     {
-        IReactiveCommand Register(ReactiveEditCommand command, IScheduler wpfScheduler);
+        ReactiveCommand Register(ReactiveEditCommand command);
         Option<object> Editing { get; }
     }
 }

@@ -30,6 +30,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="devDept.Eyeshot.Control.Wpf.v10, Version=10.0.836.0, Culture=neutral, PublicKeyToken=5385d83d2fb4d7d9, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\devDept.Eyeshot.10.0.836\lib\net40\devDept.Eyeshot.Control.Wpf.v10.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="devDept.Geometry.v10, Version=10.0.836.0, Culture=neutral, PublicKeyToken=9440825e8b4733bc, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\devDept.Eyeshot.10.0.836\lib\net40\devDept.Geometry.v10.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="devDept.Graphics.Shaders.v10, Version=10.0.836.0, Culture=neutral, PublicKeyToken=54ce5f5f803e4b42, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\devDept.Eyeshot.10.0.836\lib\net40\devDept.Graphics.Shaders.v10.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="devDept.Graphics.Wpf.v10, Version=10.0.836.0, Culture=neutral, PublicKeyToken=f3cd437f0d8061b5, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\devDept.Eyeshot.10.0.836\lib\net40\devDept.Graphics.Wpf.v10.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FsCheck, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\FsCheck.2.6.0\lib\net45\FsCheck.dll</HintPath>
       <Private>True</Private>
@@ -39,13 +55,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="LanguageExt.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LanguageExt.Core.1.9.7\lib\net46\LanguageExt.Core.dll</HintPath>
+      <HintPath>..\..\packages\LanguageExt.Core.1.7.38\lib\net46\LanguageExt.Core.dll</HintPath>
     </Reference>
     <Reference Include="ReactiveUI, Version=7.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\reactiveui-core.7.2.0\lib\Net45\ReactiveUI.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI.Fody.Helpers, Version=2.0.66.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ReactiveUI.Fody.2.0.66\lib\net45\ReactiveUI.Fody.Helpers.dll</HintPath>
+    <Reference Include="ReactiveUI.Fody.Helpers, Version=2.0.65.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ReactiveUI.Fody.2.0.65\lib\net45\ReactiveUI.Fody.Helpers.dll</HintPath>
     </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
@@ -55,18 +71,6 @@
     <Reference Include="System.DoubleNumerics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\System.DoubleNumerics.3.1.2\lib\dotnet\System.DoubleNumerics.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Core, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Reactive.Core.3.1.1\lib\net46\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Reactive.Linq.3.1.1\lib\net46\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Reactive.PlatformServices.3.1.1\lib\net46\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>

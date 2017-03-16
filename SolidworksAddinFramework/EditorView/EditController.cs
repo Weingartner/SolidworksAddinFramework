@@ -1,11 +1,11 @@
 using System;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using LanguageExt;
 using static LanguageExt.Prelude;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework.EditorView
 {
@@ -16,16 +16,14 @@ namespace SolidworksAddinFramework.EditorView
     {
         [Reactive] public Option<object> Editing { get; private set; } = None;
 
-        public IReactiveCommand Register(ReactiveEditCommand commandSpec, IScheduler scheduler)
+        public ReactiveCommand Register(ReactiveEditCommand commandSpec)
         {
             var canExecute = this.WhenAnyValue(p => p.Editing)
-                .CombineLatest(commandSpec.CanExecute, (a, b) => a.IsNone && b)
-                .ObserveOn(scheduler);
+                                 .CombineLatest(commandSpec.CanExecute, (a, b) => a.IsNone && b);
 
-            var command = ReactiveCommand.Create(canExecute);
-            command
-                .ObserveOn(commandSpec.EditorScheduler)
-                .Subscribe(async _ =>
+            var foo = Unit.Default;
+            var command = ReactiveCommand.Create(canExecute:canExecute, execute:
+                async () =>
                 {
                     try
                     {
