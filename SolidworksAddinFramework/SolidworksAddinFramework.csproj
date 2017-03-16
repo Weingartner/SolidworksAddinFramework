@@ -323,6 +323,7 @@
     <Compile Include="SelectionException.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SldWorksExtensions.cs" />
+    <Compile Include="SolidworksSelectionDataExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />

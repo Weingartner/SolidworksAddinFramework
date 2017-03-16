@@ -5,12 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
-using LanguageExt;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static LanguageExt.Prelude;
-using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swconst;
 using Weingartner.Json.Migration;
 
 namespace SolidworksAddinFramework
@@ -57,14 +53,6 @@ namespace SolidworksAddinFramework
         {
             ObjectIds = new ReadOnlyCollection<ObjectId>(objectIds.ToList());
             Mark = mark;
-        }
-
-        public static SelectionData Create(IEnumerable<object> objects, int mark, IModelDoc2 doc)
-        {
-            var objectIds = objects
-                .Select(doc.GetPersistReference)
-                .Select(id => new ObjectId(id));
-            return new SelectionData(objectIds, mark);
         }
 
         [DataContract]
@@ -122,37 +110,8 @@ namespace SolidworksAddinFramework
 
     public static class SelectionDataExtensions
     {
-        public static IEnumerable<object> GetObjects(this SelectionData selectionData, IModelDoc2 doc)
-        {
-            return selectionData.ObjectIds
-                .Select(objectId => doc.GetObjectFromPersistReference(objectId.Data));
-        }
 
-        /// <summary>
-        /// Gets an evaluator for the selected object. We return Func because if you return the solidworks
-        /// object itself and store it you get burned by solidworks rebuilds when the object is invalidated.
-        /// Only evaluate the function when you actually need the solidworks object. If the return value
-        /// is None then it means that there is nothing selected.
-        /// </summary>
-        /// <param name="selectionData"></param>
-        /// <param name="doc"></param>
-        /// <returns></returns>
-        public static Option<Func<object>> GetSingleObject(this SelectionData selectionData, IModelDoc2 doc) => 
-            selectionData.IsEmpty
-            ? None
-            : Some(fun(()=> selectionData.GetObjects(doc).First()));
 
-        public static IEnumerable<T> GetObjects<T>(this SelectionData selectionData, IModelDoc2 doc)
-        {
-            return from o in selectionData.GetObjects(doc)
-                select o.DirectCast<T>();
-        }
-
-        public static Option<Func<T>> GetSingleObject<T>(this SelectionData selectionData, IModelDoc2 doc)
-        {
-            return from o in GetSingleObject(selectionData, doc)
-                select fun(()=> o().DirectCast<T>());
-        }
 
         public static IEnumerable<SelectionData> GetSelectionsFromModel(object model)
         {

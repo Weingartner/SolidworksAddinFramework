@@ -193,7 +193,7 @@ namespace SolidworksAddinFramework
 
         #region checkbox
 
-        private readonly Subject<Tuple<int,bool>> _CheckBoxChanged = new Subject<Tuple<int,bool>>();
+        private readonly Subject<Tuple<int, bool>> _CheckBoxChanged = new Subject<Tuple<int, bool>>();
         public virtual void OnCheckboxCheck(int id, bool @checked)
         {
             _CheckBoxChanged.OnNext(Tuple.Create(id,@checked));
@@ -223,7 +223,7 @@ namespace SolidworksAddinFramework
             _TextBoxChanged.OnNext(Tuple.Create(id,text));
         }
 
-        private readonly Subject<Tuple<int,string>> _TextBoxChanged = new Subject<Tuple<int,string>>();
+        private readonly Subject<Tuple<int, string>> _TextBoxChanged = new Subject<Tuple<int, string>>();
 
         public IObservable<string> TextBoxChangedObservable(int id) => _TextBoxChanged
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
@@ -231,7 +231,7 @@ namespace SolidworksAddinFramework
 
         #region numberbox
 
-        private readonly Subject<Tuple<int,double>> _NumberBoxChanged = new Subject<Tuple<int,double>>();
+        private readonly Subject<Tuple<int, double>> _NumberBoxChanged = new Subject<Tuple<int, double>>();
 
         public IObservable<double> NumberBoxChangedObservable(int id) => _NumberBoxChanged
             .Where(t=>t.Item1==id).Select(t=>t.Item2);
@@ -247,7 +247,7 @@ namespace SolidworksAddinFramework
         {
         }
 
-        private readonly Subject<Tuple<int,int>> _ComboBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        private readonly Subject<Tuple<int, int>> _ComboBoxSelectionSubject = new Subject<Tuple<int, int>>();
         public virtual void OnComboboxSelectionChanged(int id, int item)
         {
             _ComboBoxSelectionSubject.OnNext(Tuple.Create(id,item));
@@ -259,7 +259,7 @@ namespace SolidworksAddinFramework
 
         #region listbox
 
-        private readonly Subject<Tuple<int,int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
+        private readonly Subject<Tuple<int, int>> _ListBoxSelectionSubject = new Subject<Tuple<int, int>>();
         private int _NextId = 0;
 
         public virtual void OnListboxSelectionChanged(int id, int item)
@@ -502,7 +502,7 @@ namespace SolidworksAddinFramework
 
 
 
-        public static Func<T,IDisposable> Disposify<T>(Action<T> a)
+        public static Func<T, IDisposable> Disposify<T>(Action<T> a)
         {
             return t =>
             {
@@ -528,7 +528,7 @@ namespace SolidworksAddinFramework
             string tip,
             string caption,
             T source,
-            Expression<Func<T,double>> selector,
+            Expression<Func<T, double>> selector,
             Func<IPropertyManagerPageNumberbox, IDisposable> config = null,
             IObserver<Unit> gainedFocusObserver = null,
             IObserver<Unit> lostFocusObserver = null)
@@ -559,7 +559,7 @@ namespace SolidworksAddinFramework
             string tip,
             string caption,
             T source,
-            Expression<Func<T,bool>> selector,
+            Expression<Func<T, bool>> selector,
             Func<IPropertyManagerPageCheckbox, IDisposable> config = null,
             bool enable = true)
         {
@@ -617,7 +617,7 @@ namespace SolidworksAddinFramework
         private IDisposable CreateLabel(IPropertyManagerPageGroup @group, string tip, IObservable<string> captionObs, Func<IPropertyManagerPageLabel, IDisposable> config)
         {
             var id = NextId();
-            var box = @group.CreateLabel(id, string.Empty, tip);
+            var box = @group.CreateLabel(id, String.Empty, tip);
             var d1 = config?.Invoke(box) ?? Disposable.Empty;
             var d0 = captionObs.Subscribe(caption => box.Caption = caption);
             return ControlHolder.Create(@group, box, d0, d1);
@@ -634,9 +634,9 @@ namespace SolidworksAddinFramework
         /// <param name="builder">A callback which is passed the options group object. You can add options here. </param>
         /// <returns></returns>
         protected IDisposable CreateOptionGroup<T,TOption>
-            (IPropertyManagerPageGroup pageGroup,T source, Expression<Func<T,TOption>> selector, Action<OptionGroup<T,TOption>> builder)
+            (IPropertyManagerPageGroup pageGroup,T source, Expression<Func<T, TOption>> selector, Action<OptionGroup<T, TOption>> builder)
         {
-            var optionGroup = new OptionGroup<T,TOption>(this, pageGroup, source, selector);
+            var optionGroup = new OptionGroup<T, TOption>(this, pageGroup, source, selector);
             builder(optionGroup);
             return optionGroup;
         }
@@ -765,11 +765,11 @@ namespace SolidworksAddinFramework
 
             var selectedItems = selectionManager.GetSelectedObjects((type, mark) => selectType.Any(st => type == st) && box.Mark == mark);
             var expressionChain = ReactiveUI.Reflection.Rewrite(propertyExpr.Body).GetExpressionChain().ToList();
-            var newSelection = SelectionData.Create(selectedItems, box.Mark, ModelDoc);
-            ReactiveUI.Reflection.TrySetValueToPropertyChain(model, expressionChain, newSelection);
+            var newSelection = Create(selectedItems, box.Mark, ModelDoc);
+            ReactiveUI.Reflection.TrySetValueToPropertyChain<SelectionData>(model, expressionChain, newSelection);
         }
 
-        protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick, Func<IPropertyManagerPageButton,IDisposable> config = null)
+        protected IDisposable CreateButton(IPropertyManagerPageGroup @group, string tip, string caption, Action onClick, Func<IPropertyManagerPageButton, IDisposable> config = null)
         {
             var id = NextId();
             var box = PropertyManagerGroupExtensions.CreateButton(@group, id, caption, tip);
@@ -866,7 +866,7 @@ namespace SolidworksAddinFramework
                 label =>
                 {
                     var ctrl = (IPropertyManagerPageControl) label;
-                    ctrl.TextColor = ColorTranslator.ToWin32(System.Drawing.Color.Red);
+                    ctrl.TextColor = ColorTranslator.ToWin32(Color.Red);
                     return errorObservable.Subscribe
                         (errorOpt =>
                         {
@@ -931,6 +931,14 @@ namespace SolidworksAddinFramework
 
         protected virtual void OnCancel()
         {
+        }
+
+        public static SelectionData Create(IEnumerable<object> objects, int mark, IModelDoc2 doc)
+        {
+            var objectIds = objects
+                .Select(doc.GetPersistReference)
+                .Select(id => new SelectionData.ObjectId(id));
+            return new SelectionData(objectIds, mark);
         }
     }
 
