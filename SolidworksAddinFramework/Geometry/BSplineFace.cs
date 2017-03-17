@@ -5,9 +5,10 @@ using System.Linq;
 using System.DoubleNumerics;
 using LanguageExt;
 using Newtonsoft.Json;
-using SolidworksAddinFramework.Wpf;
+
 using SolidWorks.Interop.sldworks;
 using static LanguageExt.Prelude;
+using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
 
 namespace SolidworksAddinFramework.Geometry
 {

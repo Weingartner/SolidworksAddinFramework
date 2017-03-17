@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SolidworksAddinFramework.Reflection;
+using Weingartner.WeinCad.Interfaces.Reflection;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec.Reflection

@@ -10,6 +10,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.Numerics;
 using Weingartner.ReactiveCompositeCollections;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

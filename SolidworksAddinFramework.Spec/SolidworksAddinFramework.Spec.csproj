@@ -241,10 +241,6 @@
       <Project>{d3741261-21cc-488e-a4dd-08eb40bce1fb}</Project>
       <Name>SolidworksAddinFramework.FSCheck</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
-      <Project>{F2CC02B7-8C1A-4B28-8B53-0AED3F51FA98}</Project>
-      <Name>SolidworksAddinFramework.Wpf</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>

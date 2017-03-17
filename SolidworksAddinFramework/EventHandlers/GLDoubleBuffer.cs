@@ -3,10 +3,11 @@ using System.Collections.Immutable;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework.EventHandlers;
-using SolidworksAddinFramework.Wpf;
+
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
 using Weingartner.WeinCad.Interfaces.Drawing;
+using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
 
 namespace SolidworksAddinFramework
 {

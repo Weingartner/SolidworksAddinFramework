@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
-using SolidworksAddinFramework.Wpf;
+
 using SolidWorks.Interop.sldworks;
+using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
 
 namespace SolidworksAddinFramework.Geometry
 {

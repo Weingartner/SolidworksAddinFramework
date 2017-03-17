@@ -14,11 +14,12 @@ using DiffLib;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SolidworksAddinFramework.EditorView;
-using SolidworksAddinFramework.Reflection;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using Weingartner.ReactiveCompositeCollections;
+using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Reflection;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework

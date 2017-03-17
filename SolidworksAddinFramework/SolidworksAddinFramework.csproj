@@ -228,6 +228,7 @@
     <Compile Include="Geometry\Matrix4x4Extensions.cs" />
     <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
+    <Compile Include="ObservableExtensionsSW.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
     <Compile Include="OpenGl\Animation\AnimatorBase.cs" />
@@ -244,7 +245,6 @@
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
-    <Compile Include="BoolExtensions.cs" />
     <Compile Include="CommitableUndoablePropertyManagerPage.cs" />
     <Compile Include="ComponentExtensions.cs" />
     <Compile Include="ComWangling.cs" />
@@ -280,7 +280,6 @@
     <Compile Include="ModellerExtensions.cs" />
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ModelViewManagerExtensions.cs" />
-    <Compile Include="ObservableExceptionalExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
@@ -289,7 +288,6 @@
     <Compile Include="RefAxisExtensions.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="ObservableExtensions.cs" />
     <Compile Include="OpenGl\Animation\AnimationExtensions.cs" />
     <Compile Include="OpenGl\FaceTriStrips.cs" />
     <Compile Include="OpenGl\MeshRender.cs" />
@@ -300,7 +298,6 @@
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
     <Compile Include="RevertiblePropertyManagerPage.cs" />
-    <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
     <Compile Include="SelectionData.cs" />
     <Compile Include="SelectionException.cs" />
@@ -340,10 +337,9 @@
       <Project>{5fe360a2-506b-41aa-bdf4-7fea9d247fb2}</Project>
       <Name>Weingartner.WeinCad.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
-      <Project>{f2cc02b7-8c1a-4b28-8b53-0aed3f51fa98}</Project>
-      <Name>SolidworksAddinFramework.Wpf</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Reflection\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />
