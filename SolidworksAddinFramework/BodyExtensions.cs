@@ -201,10 +201,10 @@ namespace SolidworksAddinFramework
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        public static Range3Single GetBodyBoxTs(this IBody2 body)
+        public static Range3Double GetBodyBoxTs(this IBody2 body)
         {
             var box = (double[]) body.GetBodyBox();
-            return new Range3Single(
+            return new Range3Double(
                 new Vector3(box[0], box[1], box[2]), 
                 new Vector3(box[3], box[4], box[5]));
         }

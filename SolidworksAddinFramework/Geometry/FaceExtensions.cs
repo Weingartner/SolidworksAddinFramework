@@ -7,10 +7,10 @@ namespace SolidworksAddinFramework.Geometry
 {
     public static class FaceExtensions
     {
-        public static Range3Single GetBoxTs(this IFace2 face)
+        public static Range3Double GetBoxTs(this IFace2 face)
         {
             var box = (double[]) face.GetBox();
-            return new Range3Single(
+            return new Range3Double(
                 box[0], box[1], box[2], 
                 box[3], box[4], box[5]);
         }
