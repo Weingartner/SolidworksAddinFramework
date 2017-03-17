@@ -5,13 +5,11 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using XUnitRemote.Local;
 
 namespace XUnit.Solidworks.Addin
 {

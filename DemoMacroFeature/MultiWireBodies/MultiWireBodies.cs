@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.DoubleNumerics;
-using System.Linq;
-using System.Numerics;
-using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
-using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;

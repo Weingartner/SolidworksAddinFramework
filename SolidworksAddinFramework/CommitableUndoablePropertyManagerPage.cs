@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using ReactiveUI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;

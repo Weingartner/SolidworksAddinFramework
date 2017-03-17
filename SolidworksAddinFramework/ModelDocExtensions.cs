@@ -11,7 +11,6 @@ using LanguageExt;
 using LanguageExt.Parsec;
 using static LanguageExt.Prelude;
 using SolidworksAddinFramework.Events;
-using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;

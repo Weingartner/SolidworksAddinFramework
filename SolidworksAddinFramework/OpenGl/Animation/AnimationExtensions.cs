@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.DoubleNumerics;
 using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl.Animation

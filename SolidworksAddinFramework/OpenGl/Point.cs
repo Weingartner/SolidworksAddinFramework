@@ -1,8 +1,6 @@
 using System;
 using System.Drawing;
 using System.DoubleNumerics;
-using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
 

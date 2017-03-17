@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Reactive.Subjects;
-using LanguageExt;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 

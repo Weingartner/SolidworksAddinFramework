@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.DoubleNumerics;
-using System.Security.Cryptography;
-using System.Text;
 using FluentAssertions;
-using SolidworksAddinFramework.OpenGl;
-using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 using Xunit;
-using Xunit.Extensions;
 using XUnit.Solidworks.Addin;
 
 namespace SolidworksAddinFramework.Spec

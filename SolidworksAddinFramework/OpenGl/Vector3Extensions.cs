@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DoubleNumerics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.DoubleNumerics;
 using OpenTK.Graphics.OpenGL;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;

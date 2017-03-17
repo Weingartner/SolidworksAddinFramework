@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
-using System.Text;
 using MathNet.Numerics.LinearAlgebra.Double;
-using SolidworksAddinFramework.Geometry;
-using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
-using Weingartner.Numerics;
 using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework

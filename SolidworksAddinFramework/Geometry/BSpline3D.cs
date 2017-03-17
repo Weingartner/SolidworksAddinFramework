@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.DoubleNumerics;
 using JetBrains.Annotations;
-using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
 

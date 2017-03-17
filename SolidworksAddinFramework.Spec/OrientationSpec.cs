@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.DoubleNumerics;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Text;
 using System.Threading.Tasks;
 using SolidworksAddinFramework.Events;
 using SolidWorks.Interop.sldworks;
-using Xunit;
 using XUnit.Solidworks.Addin;
 
 namespace SolidworksAddinFramework.Spec

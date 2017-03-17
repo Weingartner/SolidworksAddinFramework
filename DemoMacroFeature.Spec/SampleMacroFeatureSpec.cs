@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using SolidworksAddinFramework;
+﻿using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Xunit;

@@ -1,12 +1,8 @@
 using System;
 using System.ComponentModel;
-using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows.Input;
 using LanguageExt;
 using ReactiveUI;
-using SolidworksAddinFramework.Wpf;
 
 namespace SolidworksAddinFramework.EditorView
 {

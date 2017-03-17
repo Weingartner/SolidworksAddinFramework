@@ -1,5 +1,3 @@
-using System.DoubleNumerics;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;

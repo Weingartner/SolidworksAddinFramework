@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ReactiveUI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;

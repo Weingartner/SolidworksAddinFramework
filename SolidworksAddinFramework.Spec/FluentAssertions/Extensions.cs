@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DoubleNumerics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.DoubleNumerics;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using FluentAssertions.Numeric;
 using FluentAssertions.Primitives;
-using LanguageExt;
 
 namespace SolidworksAddinFramework.Spec.FluentAssertions
 {

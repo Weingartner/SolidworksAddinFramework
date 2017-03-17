@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LanguageExt;
-using LanguageExt.Parsec;
+﻿using LanguageExt.Parsec;
 using Char = LanguageExt.Parsec.Char;
-using static LanguageExt.Prelude;
 using static LanguageExt.Parsec.Prim;
 using static LanguageExt.Parsec.Char;
-using static LanguageExt.Parsec.Expr;
-using static LanguageExt.Parsec.Token;
 
 namespace SolidworksAddinFramework
 {

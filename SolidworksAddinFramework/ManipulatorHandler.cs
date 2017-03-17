@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Subjects;
 using System.Runtime.InteropServices;
 using SolidWorks.Interop.sldworks;

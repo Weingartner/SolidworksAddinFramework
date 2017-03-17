@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using FluentAssertions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using XUnit;
 using XUnit.Solidworks.Addin;
-using SolidworksAddinFramework.Events;
-using System.Diagnostics;
-using SolidworksAddinFramework;
 
 namespace SolidworksAddinFramework.Spec
 {

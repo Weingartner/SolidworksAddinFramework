@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using ReactiveUI;
 using SolidWorks.Interop.swconst;

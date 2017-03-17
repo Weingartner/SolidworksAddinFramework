@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -12,15 +11,11 @@ using FluentAssertions;
 using LanguageExt;
 using Newtonsoft.Json;
 using SolidworksAddinFramework.Geometry;
-using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.WeinCad.Interfaces;
-using Xunit;
 using XUnit.Solidworks.Addin;
-using SwBSplineParamsExtensions = SolidworksAddinFramework.Geometry.SwBSplineParamsExtensions;
-
 
 
 namespace SolidworksAddinFramework.Spec

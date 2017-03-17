@@ -1,15 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Runtime.InteropServices;
-using System.Security;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
-using SolidWorks.Interop.swconst;
 using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl

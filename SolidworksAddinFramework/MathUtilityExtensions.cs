@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.DoubleNumerics;
-using System.Text;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 

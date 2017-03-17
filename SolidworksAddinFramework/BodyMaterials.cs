@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using SolidWorks.Interop.sldworks;
 
 namespace SolidworksAddinFramework

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -7,7 +6,6 @@ using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using LanguageExt.UnitsOfMeasure;
 using Newtonsoft.Json;
-using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.Numerics;

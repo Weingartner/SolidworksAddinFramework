@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;

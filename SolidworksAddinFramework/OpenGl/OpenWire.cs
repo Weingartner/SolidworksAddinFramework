@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.DoubleNumerics;
-using MathNet.Numerics.LinearAlgebra.Double;
-using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;

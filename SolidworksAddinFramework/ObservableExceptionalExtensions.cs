@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
-using System.Threading;
 using LanguageExt;
-using ReactiveUI;
 using SolidworksAddinFramework.Wpf;
 using Weingartner.Exceptional;
-using Weingartner.Exceptional.Async;
 using Weingartner.Exceptional.Reactive;
 
 namespace SolidworksAddinFramework

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Threading;
 using ReactiveUI;
 using Weingartner.ReactiveCompositeCollections;
 using Weingartner.Wpf.Common;

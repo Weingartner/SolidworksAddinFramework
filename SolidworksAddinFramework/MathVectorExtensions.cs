@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.DoubleNumerics;
-using MathNet.Numerics.LinearAlgebra;
 using SolidWorks.Interop.sldworks;
 using DLA = MathNet.Numerics.LinearAlgebra.Double;
 

@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Windows.Input;
 
 namespace SolidworksAddinFramework.EditorView

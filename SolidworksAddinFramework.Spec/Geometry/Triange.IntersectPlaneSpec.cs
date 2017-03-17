@@ -1,10 +1,8 @@
 using System;
 using System.DoubleNumerics;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using FluentAssertions;
 using FsCheck;
-using SolidworksAddinFramework.Geometry;
 using WeinCadSW.Spec.FsCheck;
 using static LanguageExt.Prelude;
 using FsCheck.Xunit;

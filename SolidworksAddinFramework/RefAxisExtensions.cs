@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.DoubleNumerics;
-using System.Text;
-using System.Threading.Tasks;
-using SolidworksAddinFramework.Geometry;
+﻿using System.DoubleNumerics;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
 

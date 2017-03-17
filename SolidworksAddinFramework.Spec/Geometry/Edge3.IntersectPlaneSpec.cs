@@ -1,11 +1,8 @@
 using System;
-using System.CodeDom;
 using System.DoubleNumerics;
 using FluentAssertions;
 using FsCheck;
-using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.Spec.FluentAssertions;
-using Xunit;
 using FsCheck.Xunit;
 using Weingartner.WeinCad.Interfaces;
 

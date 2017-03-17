@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.DoubleNumerics;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
-using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
 using Weingartner.WeinCad.Interfaces;
