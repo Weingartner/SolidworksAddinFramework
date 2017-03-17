@@ -3,18 +3,10 @@ using System.DoubleNumerics;
 using System.Drawing;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
-using SolidworksAddinFramework.Geometry;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl
 {
-    public interface IDrawContext
-    {
-        void DrawLine(Color fromArgb, double thickness, IReadOnlyList<Vector3> data, double opacity, bool closed);
-        void DrawEdges(IReadOnlyList<Edge3> data, double opacity, Color color);
-        void DrawMesh(MeshData data, double opacity, Color colorr, bool isSolid);
-        void DrawPoint(Color color, int size, Vector3 location);
-    }
-
     public class OpenGLDrawContext : IDrawContext
     {
         private Color FromArgb(double opacity, Color baseColor)

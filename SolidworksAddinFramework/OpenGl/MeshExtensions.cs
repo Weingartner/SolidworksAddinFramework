@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl
 {

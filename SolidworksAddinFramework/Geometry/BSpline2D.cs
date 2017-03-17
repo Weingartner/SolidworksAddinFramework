@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Geometry
 {

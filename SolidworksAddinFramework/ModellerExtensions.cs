@@ -7,6 +7,7 @@ using System.DoubleNumerics;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

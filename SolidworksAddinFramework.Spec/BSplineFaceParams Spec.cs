@@ -16,6 +16,7 @@ using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 using XUnit.Solidworks.Addin;
 using SwBSplineParamsExtensions = SolidworksAddinFramework.Geometry.SwBSplineParamsExtensions;

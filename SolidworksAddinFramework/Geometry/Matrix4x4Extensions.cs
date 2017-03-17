@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.DoubleNumerics;
 using System.Text;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Geometry
 {

@@ -13,6 +13,7 @@ using SolidworksAddinFramework.Events;
 using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 
 namespace SolidworksAddinFramework

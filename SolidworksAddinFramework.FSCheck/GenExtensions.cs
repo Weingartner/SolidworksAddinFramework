@@ -4,6 +4,7 @@ using System.DoubleNumerics;
 using FsCheck;
 using LanguageExt;
 using SolidworksAddinFramework.Geometry;
+using Weingartner.WeinCad.Interfaces;
 
 namespace WeinCadSW.Spec.FsCheck
 {

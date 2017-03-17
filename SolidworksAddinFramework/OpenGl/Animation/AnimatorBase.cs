@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.DoubleNumerics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using LanguageExt;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Exceptional.Reactive;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {
@@ -27,7 +26,7 @@ namespace SolidworksAddinFramework.OpenGl.Animation
 
         public abstract void OnStart(DateTime startTime);
 
-        public IObservable<Unit> NeedsRedraw => Observable.Never(Unit.Default);
+        public IObservable<System.Reactive.Unit> NeedsRedraw => Observable.Never(System.Reactive.Unit.Default);
 
         public abstract void Render(DateTime time, IDrawContext drawContext, double parentOpacity = 1.0, Matrix4x4? renderTransform = null);
         public void ApplyTransform(Matrix4x4 transform, bool accumulate = false)

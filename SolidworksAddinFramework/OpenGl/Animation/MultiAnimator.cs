@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.DoubleNumerics;
 using System.Linq;
 using JetBrains.Annotations;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {

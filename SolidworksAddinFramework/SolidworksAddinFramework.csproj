@@ -227,7 +227,6 @@
     <Compile Include="Geometry\FaceExtensions.cs" />
     <Compile Include="Geometry\Matrix4x4Extensions.cs" />
     <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
-    <Compile Include="Geometry\Vector3Extensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
     <Compile Include="OpenGl\Animation\AnimationData.cs" />
     <Compile Include="OpenGl\Animation\Animator.cs" />
@@ -237,12 +236,10 @@
     <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
     <Compile Include="OpenGl\CompositeRenderer.cs" />
-    <Compile Include="OpenGl\OpenGLDrawContext.cs" />
     <Compile Include="OpenGl\EdgeListRenderer.cs" />
-    <Compile Include="OpenGl\EmptyRenderer.cs" />
     <Compile Include="OpenGl\MeshExtensions.cs" />
-    <Compile Include="OpenGl\SerialRenderer.cs" />
-    <Compile Include="OpenGl\Transformable.cs" />
+    <Compile Include="OpenGl\OpenGLDrawContext.cs" />
+    <Compile Include="OpenGl\Vector3Extensions.cs" />
     <Compile Include="Packing.cs" />
     <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
@@ -262,12 +259,7 @@
     <Compile Include="FeatureExtensions.cs" />
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="FeatureMgrViewObservables.cs" />
-    <Compile Include="Geometry\Edge3.cs" />
     <Compile Include="Geometry\PlanePolygon.cs" />
-    <Compile Include="Geometry\Range3Single.cs" />
-    <Compile Include="Geometry\PointDirection3.cs" />
-    <Compile Include="Geometry\Triangle.cs" />
-    <Compile Include="Geometry\TriangleWithNormals.cs" />
     <Compile Include="IInterpolatable.cs" />
     <Compile Include="Json.cs" />
     <Compile Include="ListExtensions.cs" />
@@ -289,10 +281,7 @@
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ModelViewManagerExtensions.cs" />
     <Compile Include="ObservableExceptionalExtensions.cs" />
-    <Compile Include="OpenGl\ParallelExtensions.cs" />
     <Compile Include="OpenGl\Point.cs" />
-    <Compile Include="OpenGl\RendererBase.cs" />
-    <Compile Include="OptionExtensions.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
     <Compile Include="ReactiveTransaction.cs" />
@@ -303,8 +292,6 @@
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="OpenGl\Animation\AnimationExtensions.cs" />
     <Compile Include="OpenGl\FaceTriStrips.cs" />
-    <Compile Include="OpenGl\IRenderer.cs" />
-    <Compile Include="OpenGl\Mesh.cs" />
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\ModernOpenGl.cs" />
     <Compile Include="OpenGl\OpenWire.cs" />
@@ -312,11 +299,6 @@
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
     <Compile Include="PropertyManagerPageBase.cs" />
-    <Compile Include="Range1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Range.tt</DependentUpon>
-    </Compile>
     <Compile Include="RevertiblePropertyManagerPage.cs" />
     <Compile Include="Reflection\ExpressionExtensions.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
@@ -345,10 +327,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ModelDocEvents.cs</LastGenOutput>
     </Content>
-    <Content Include="Range.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Range1.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -358,6 +336,10 @@
     <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Roslyn.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Weingartner.WeinCad.Interfaces\Weingartner.WeinCad.Interfaces.csproj">
+      <Project>{5fe360a2-506b-41aa-bdf4-7fea9d247fb2}</Project>
+      <Name>Weingartner.WeinCad.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework.Wpf\SolidworksAddinFramework.Wpf.csproj">
       <Project>{f2cc02b7-8c1a-4b28-8b53-0aed3f51fa98}</Project>
       <Name>SolidworksAddinFramework.Wpf</Name>

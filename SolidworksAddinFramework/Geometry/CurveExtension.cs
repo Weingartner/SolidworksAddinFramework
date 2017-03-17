@@ -8,6 +8,7 @@ using AForge;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Geometry
 {

@@ -8,6 +8,7 @@ using MathNet;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

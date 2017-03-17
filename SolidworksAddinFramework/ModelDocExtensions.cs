@@ -15,6 +15,7 @@ using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
 using static LanguageExt.Parsec.Prim;
 using static LanguageExt.Parsec.Char;
 
@@ -296,7 +297,7 @@ namespace SolidworksAddinFramework
             eye = eye.MultiplyTransformTs(t);
             look = look.MultiplyTransformTs(t);
 
-            return new PointDirection3(Vector3Extensions.ToVector3(eye), look.ToVector3().Unit());
+            return new PointDirection3(eye.ToVector3(), look.ToVector3().Unit());
         }
 
         public static Vector2 ViewToScreen(this IModelDoc2 doc, Vector3 point)

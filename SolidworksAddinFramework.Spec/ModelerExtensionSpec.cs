@@ -13,6 +13,7 @@ using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Numerics;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 using XUnit.Solidworks.Addin;
 

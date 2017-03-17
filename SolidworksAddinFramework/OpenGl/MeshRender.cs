@@ -10,6 +10,7 @@ using OpenTK.Graphics.OpenGL;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl
 {

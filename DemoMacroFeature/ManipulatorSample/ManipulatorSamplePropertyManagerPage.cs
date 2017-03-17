@@ -10,6 +10,7 @@ using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.Exceptional.Reactive;
+using Weingartner.WeinCad.Interfaces;
 
 namespace DemoMacroFeatures.ManipulatorSample
 {

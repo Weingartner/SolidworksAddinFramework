@@ -6,6 +6,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Runtime.CompilerServices;
+using devDept.Eyeshot.Entities;
 using JetBrains.Annotations;
 using LanguageExt;
 using SolidworksAddinFramework.Geometry;
@@ -13,12 +15,88 @@ using SolidworksAddinFramework.OpenGl;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
+using LanguageExt.Trans.Linq;
+using Curve = SolidWorks.Interop.sldworks.Curve;
+using ICurve = SolidWorks.Interop.sldworks.ICurve;
+using Mesh = Weingartner.WeinCad.Interfaces.Mesh;
 
 namespace SolidworksAddinFramework
 {
     public static class BodyExtensions
     {
+        private static ConditionalWeakTable<IBody2, List<TriangleWithNormals>> MeshCache = new ConditionalWeakTable<IBody2, List<TriangleWithNormals>>();
         private static string ExportGeometryFileExtension = ".igs";
+
+        public static Mesh CreateMesh(this IBody2 body, Color color, bool isSolid)
+        {
+            if (body == null) throw new ArgumentNullException(nameof(body));
+
+
+            var tris = MeshCache.GetValue(body, bdy =>
+            {
+                var faceList = bdy.GetFaces().CastArray<IFace2>();
+                var tess = GetTess(bdy, faceList);
+                return Tesselate(faceList, tess)
+                .Buffer(3,3)
+                .Select(b=>new TriangleWithNormals(b[0],b[1],b[2])).ToList();
+                
+            });
+
+            var edges = new List<Edge3>();
+
+            return new Mesh(color, isSolid, tris, edges);
+        }
+
+        public static List<PointDirection3> Tesselate(IFace2[] faceList, ITessellation tess)
+        {
+            var r = new List<PointDirection3>();
+            // performance improvement
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (int index = 0; index < faceList.Length; index++)
+            {
+                var face = faceList[index];
+                foreach (var facet in tess.GetFaceFacets(face).CastArray<int>())
+                {
+                    var finIds = tess.GetFacetFins(facet).CastArray<int>();
+                    var vertexIds = Enumerable.ToList<int>(Enumerable.SelectMany<int, int>(finIds, finId => tess.GetFinVertices(finId).CastArray<int>())
+                                               .DistinctUntilChanged()
+                                               .SkipLast(1));
+
+                    var vertexs = vertexIds
+                        .Select<int, double[]>(vId => tess.GetVertexPoint(vId).CastArray<double>())
+                        .ToList();
+
+                    var normals = vertexIds
+                        .Select<int, double[]>(vId => tess.GetVertexNormal(vId).CastArray<double>())
+                        .ToList();
+
+                    // Unroll loop for performance
+                    r.Add(new PointDirection3(vertexs[0].ToVector3D(), normals[0].ToVector3D()));
+                    r.Add(new PointDirection3(vertexs[1].ToVector3D(), normals[1].ToVector3D()));
+                    r.Add(new PointDirection3(vertexs[2].ToVector3D(), normals[2].ToVector3D()));
+                }
+            }
+
+            return r;
+        }
+
+        public static ITessellation GetTess(IBody2 body, IFace2[] faceList)
+        {
+            var tess = (ITessellation)body.GetTessellation(faceList);
+            tess.NeedFaceFacetMap = true;
+            tess.NeedVertexParams = true;
+            tess.NeedVertexNormal = true;
+            tess.ImprovedQuality = true;
+            tess.NeedEdgeFinMap = true;
+            tess.CurveChordTolerance = 0.001 / 10;
+            tess.SurfacePlaneTolerance = 0.001 / 10;
+            tess.MatchType = (int)swTesselationMatchType_e.swTesselationMatchFacetTopology;
+            tess.Tessellate();
+            return tess;
+
+        }
+
 
         public static IBody2 Add(this IEnumerable<IBody2> bodies)
         {

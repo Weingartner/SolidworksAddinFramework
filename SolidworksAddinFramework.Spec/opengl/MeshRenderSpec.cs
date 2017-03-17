@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 using XUnit.Solidworks.Addin;
 
@@ -23,7 +24,7 @@ namespace SolidworksAddinFramework.Spec.opengl
                 //var clonedFace = (IFace2) face.
                 //var clonedSurface = (ISurface) clonedFace.Copy();
                 var faceBody = (IBody2)face.GetBody();
-                var faceMesh = Mesh.CreateMesh(faceBody, Color.Green, isSolid:false);
+                var faceMesh = faceBody.CreateMesh(Color.Green, isSolid:false);
                 var d1 = faceMesh.DisplayUndoable(modelDoc);
 
                 //return new CompositeDisposable(d, d1);

@@ -7,6 +7,7 @@ using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.Spec.FluentAssertions;
 using Xunit;
 using FsCheck.Xunit;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Spec.Geometry
 {

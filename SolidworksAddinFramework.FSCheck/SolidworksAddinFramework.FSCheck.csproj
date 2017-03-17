@@ -110,6 +110,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Weingartner.WeinCad.Interfaces\Weingartner.WeinCad.Interfaces.csproj">
+      <Project>{5fe360a2-506b-41aa-bdf4-7fea9d247fb2}</Project>
+      <Name>Weingartner.WeinCad.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>

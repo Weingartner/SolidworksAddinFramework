@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.DoubleNumerics;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
-using LanguageExt;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.OpenGl
 {

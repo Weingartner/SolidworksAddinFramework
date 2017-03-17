@@ -8,6 +8,7 @@ using SolidworksAddinFramework.Geometry;
 using WeinCadSW.Spec.FsCheck;
 using static LanguageExt.Prelude;
 using FsCheck.Xunit;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Spec.Geometry
 {

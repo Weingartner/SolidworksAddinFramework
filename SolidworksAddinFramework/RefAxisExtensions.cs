@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 using LanguageExt;
+using Weingartner.WeinCad.Interfaces;
 using static LanguageExt.Prelude;
 
 namespace SolidworksAddinFramework

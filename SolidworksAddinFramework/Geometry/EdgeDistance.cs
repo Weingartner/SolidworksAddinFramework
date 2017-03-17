@@ -1,3 +1,5 @@
+using Weingartner.WeinCad.Interfaces;
+
 namespace SolidworksAddinFramework.Geometry
 {
     public struct EdgeDistance

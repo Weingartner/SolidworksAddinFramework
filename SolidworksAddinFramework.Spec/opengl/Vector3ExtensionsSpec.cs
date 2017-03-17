@@ -3,6 +3,7 @@ using System.DoubleNumerics;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
 using SolidworksAddinFramework.OpenGl;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec.opengl
@@ -27,8 +28,8 @@ namespace SolidworksAddinFramework.Spec.opengl
         [Fact]
         public void OrientationShouldWork()
         {
-            Vector3Extensions.Orientation(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ).Should().Be(1);
-            Vector3Extensions.Orientation(Vector3.UnitY, Vector3.UnitX, Vector3.UnitZ).Should().Be(-1);
+            Vector3.UnitX.Orientation( Vector3.UnitY, Vector3.UnitZ).Should().Be(1);
+            Vector3.UnitY.Orientation( Vector3.UnitX, Vector3.UnitZ).Should().Be(-1);
         }
     }
 }

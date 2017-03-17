@@ -229,6 +229,10 @@
     <Compile Include="BSplineFaceParams Spec.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Weingartner.WeinCad.Interfaces\Weingartner.WeinCad.Interfaces.csproj">
+      <Project>{5FE360A2-506B-41AA-BDF4-7FEA9D247FB2}</Project>
+      <Name>Weingartner.WeinCad.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DemoMacroFeature\DemoMacroFeature.csproj">
       <Project>{A67399BE-AAF7-433F-8F72-9B0424C5BE67}</Project>
       <Name>DemoMacroFeature</Name>
