@@ -4,6 +4,7 @@ using System.Linq;
 using System.DoubleNumerics;
 using FluentAssertions;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 using Xunit;
 using XUnit.Solidworks.Addin;
 

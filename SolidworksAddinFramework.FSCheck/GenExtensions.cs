@@ -4,6 +4,7 @@ using System.DoubleNumerics;
 using FsCheck;
 using LanguageExt;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 
 namespace WeinCadSW.Spec.FsCheck
 {

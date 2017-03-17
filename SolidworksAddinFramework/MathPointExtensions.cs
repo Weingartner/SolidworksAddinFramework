@@ -6,6 +6,7 @@ using System.DoubleNumerics;
 using MathNet.Numerics.LinearAlgebra.Double;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 
 namespace SolidworksAddinFramework
 {

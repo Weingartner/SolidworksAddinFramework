@@ -7,6 +7,7 @@ using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 using Xunit;
 using XUnit.Solidworks.Addin;
 

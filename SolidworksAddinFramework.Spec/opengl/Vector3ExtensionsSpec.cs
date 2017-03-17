@@ -2,6 +2,7 @@
 using System.DoubleNumerics;
 using FluentAssertions;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec.opengl

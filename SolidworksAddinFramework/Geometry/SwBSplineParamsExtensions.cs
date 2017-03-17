@@ -4,7 +4,8 @@ using System.DoubleNumerics;
 
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
-using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
+using Weingartner.WeinCad.Interfaces.Monads;
+using LogViewer = Weingartner.WeinCad.Interfaces.Wpf.LogViewer;
 
 namespace SolidworksAddinFramework.Geometry
 {

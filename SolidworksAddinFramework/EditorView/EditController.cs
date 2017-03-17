@@ -6,6 +6,7 @@ using static LanguageExt.Prelude;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework.EditorView

@@ -8,8 +8,9 @@ using Newtonsoft.Json;
 
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using static LanguageExt.Prelude;
-using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
+using LogViewer = Weingartner.WeinCad.Interfaces.Wpf.LogViewer;
 
 namespace SolidworksAddinFramework.Geometry
 {

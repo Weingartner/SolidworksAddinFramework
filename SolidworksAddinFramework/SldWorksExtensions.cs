@@ -6,6 +6,7 @@ using SolidworksAddinFramework.Events;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 
 namespace SolidworksAddinFramework
 {

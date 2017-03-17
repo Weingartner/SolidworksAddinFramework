@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec

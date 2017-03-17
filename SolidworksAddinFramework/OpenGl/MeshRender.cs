@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 
 namespace SolidworksAddinFramework.OpenGl
 {

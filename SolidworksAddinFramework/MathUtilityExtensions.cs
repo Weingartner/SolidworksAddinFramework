@@ -4,6 +4,7 @@ using System.Linq;
 using System.DoubleNumerics;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 
 namespace SolidworksAddinFramework
 {

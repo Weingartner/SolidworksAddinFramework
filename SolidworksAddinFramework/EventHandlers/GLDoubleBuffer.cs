@@ -7,7 +7,7 @@ using SolidworksAddinFramework.EventHandlers;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
 using Weingartner.WeinCad.Interfaces.Drawing;
-using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
+using LogViewer = Weingartner.WeinCad.Interfaces.Wpf.LogViewer;
 
 namespace SolidworksAddinFramework
 {

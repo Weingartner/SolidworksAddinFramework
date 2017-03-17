@@ -15,8 +15,9 @@ using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using XUnit.Solidworks.Addin;
-using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
+using LogViewer = Weingartner.WeinCad.Interfaces.Wpf.LogViewer;
 
 
 namespace SolidworksAddinFramework.Spec

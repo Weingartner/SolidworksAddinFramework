@@ -10,6 +10,7 @@ using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using Weingartner.Exceptional.Reactive;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 
 namespace DemoMacroFeatures.SampleMacroFeature
 {

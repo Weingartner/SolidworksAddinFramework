@@ -19,6 +19,7 @@ using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
 using Weingartner.ReactiveCompositeCollections;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using Weingartner.WeinCad.Interfaces.Reflection;
 using Unit = System.Reactive.Unit;
 

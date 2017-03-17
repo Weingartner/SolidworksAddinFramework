@@ -5,6 +5,7 @@ using System.DoubleNumerics;
 using JetBrains.Annotations;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
 
 namespace SolidworksAddinFramework.Geometry
 {

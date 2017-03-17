@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Monads;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec

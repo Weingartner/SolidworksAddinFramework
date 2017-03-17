@@ -5,6 +5,8 @@ using FsCheck;
 using SolidworksAddinFramework.Spec.FluentAssertions;
 using FsCheck.Xunit;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Math;
+using Weingartner.WeinCad.Interfaces.Monads;
 
 namespace SolidworksAddinFramework.Spec.Geometry
 {
