@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.DoubleNumerics;
 using System.Linq;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {

@@ -1,5 +1,6 @@
 using System.Drawing;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework
 {

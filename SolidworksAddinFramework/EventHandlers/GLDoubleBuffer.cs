@@ -6,6 +6,7 @@ using SolidworksAddinFramework.EventHandlers;
 using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework
 {

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework.OpenGl
 {

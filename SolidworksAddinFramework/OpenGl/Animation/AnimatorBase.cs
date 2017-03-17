@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using SolidWorks.Interop.sldworks;
 using Weingartner.Exceptional.Reactive;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework.OpenGl.Animation
 {

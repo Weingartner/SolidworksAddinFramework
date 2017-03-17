@@ -14,9 +14,10 @@ using SolidworksAddinFramework.Wpf;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 using Curve = SolidWorks.Interop.sldworks.Curve;
 using ICurve = SolidWorks.Interop.sldworks.ICurve;
-using Mesh = Weingartner.WeinCad.Interfaces.Mesh;
+using Mesh = Weingartner.WeinCad.Interfaces.Drawing.Mesh;
 
 namespace SolidworksAddinFramework
 {
