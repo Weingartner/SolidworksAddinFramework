@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
 using SolidWorks.Interop.sldworks;
-using Weingartner.Numerics;
 using Weingartner.WeinCad.Interfaces;
 using Xunit;
 using XUnit.Solidworks.Addin;

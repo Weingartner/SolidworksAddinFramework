@@ -7,8 +7,8 @@ using Accord.Math.Optimization;
 using AForge;
 using SolidworksAddinFramework.OpenGl;
 using SolidWorks.Interop.sldworks;
-using Weingartner.Numerics;
 using Weingartner.WeinCad.Interfaces;
+using Weingartner.WeinCad.Interfaces.Drawing;
 
 namespace SolidworksAddinFramework.Geometry
 {
@@ -117,7 +117,7 @@ namespace SolidworksAddinFramework.Geometry
             , double lengthTol=0
             , int layer = 0)
         {
-            var wire = new OpenWire(curve,thickness, color, chordTol, lengthTol);
+            var wire = new OpenWire(curve.GetTessPoints(chordTol, lengthTol), thickness, color);
             return wire.DisplayUndoable(doc, layer);
         }
 

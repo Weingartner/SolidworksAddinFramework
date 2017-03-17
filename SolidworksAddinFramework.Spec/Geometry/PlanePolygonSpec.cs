@@ -3,7 +3,7 @@ using System.Linq;
 using System.DoubleNumerics;
 using FluentAssertions;
 using SolidworksAddinFramework.Geometry;
-using Weingartner.Numerics;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 
 namespace SolidworksAddinFramework.Spec.Geometry

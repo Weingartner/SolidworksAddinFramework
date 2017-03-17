@@ -181,6 +181,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Weingartner.WeinCad.Interfaces\Weingartner.WeinCad.Interfaces.csproj">
+      <Project>{5FE360A2-506B-41AA-BDF4-7FEA9D247FB2}</Project>
+      <Name>Weingartner.WeinCad.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SolidworksAddinFramework\SolidworksAddinFramework.csproj">
       <Project>{fe89110c-7405-4070-ab58-c83c12ce6ca5}</Project>
       <Name>SolidworksAddinFramework</Name>

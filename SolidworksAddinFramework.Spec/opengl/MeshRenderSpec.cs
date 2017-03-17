@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 using XUnit.Solidworks.Addin;
 
 namespace SolidworksAddinFramework.Spec.opengl

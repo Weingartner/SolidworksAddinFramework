@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Weingartner.Json.Migration;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

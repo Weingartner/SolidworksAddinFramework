@@ -1,5 +1,6 @@
 using System.Drawing;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

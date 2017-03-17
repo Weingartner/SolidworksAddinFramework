@@ -1,6 +1,7 @@
 ﻿using SolidworksAddinFramework;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
 using Xunit;
 using XUnit.Solidworks.Addin;
 

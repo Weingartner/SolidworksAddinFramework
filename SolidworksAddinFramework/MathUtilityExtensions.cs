@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.DoubleNumerics;
 using SolidWorks.Interop.sldworks;
-using Weingartner.Numerics;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

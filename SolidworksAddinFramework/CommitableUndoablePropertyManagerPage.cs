@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using ReactiveUI;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

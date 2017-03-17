@@ -3,6 +3,7 @@ using System.DoubleNumerics;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework.Geometry
 {

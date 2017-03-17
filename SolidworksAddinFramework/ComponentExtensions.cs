@@ -2,6 +2,7 @@
 using SolidWorks.Interop.swconst;
 using System.Collections.Generic;
 using System.Linq;
+using Weingartner.WeinCad.Interfaces;
 
 namespace SolidworksAddinFramework
 {

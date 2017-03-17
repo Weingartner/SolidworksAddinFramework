@@ -226,27 +226,15 @@
     <Compile Include="Geometry\SwBSplineParamsExtensions.cs" />
     <Compile Include="GetTrimCurves2DataReader.cs" />
     <Compile Include="ObservableExtensionsSW.cs" />
-    <Compile Include="OpenGl\Animation\AnimationData.cs" />
-    <Compile Include="OpenGl\Animation\Animator.cs" />
-    <Compile Include="OpenGl\Animation\AnimatorBase.cs" />
-    <Compile Include="OpenGl\Animation\IAnimationSection.cs" />
-    <Compile Include="OpenGl\Animation\LinearAnimation.cs" />
-    <Compile Include="OpenGl\Animation\MultiAnimator.cs" />
-    <Compile Include="OpenGl\Animation\SectionTime.cs" />
-    <Compile Include="OpenGl\CompositeRenderer.cs" />
-    <Compile Include="OpenGl\EdgeListRenderer.cs" />
+    <Compile Include="OpenGl\AnimatorExtensions.cs" />
     <Compile Include="OpenGl\OpenGLDrawContext.cs" />
+    <Compile Include="OpenGl\PointExtensions.cs" />
     <Compile Include="OpenGl\Vector3Extensions.cs" />
-    <Compile Include="Packing.cs" />
-    <Compile Include="ResourceDisposable.cs" />
     <Compile Include="BodyExtensions.cs" />
     <Compile Include="BodyMaterials.cs" />
     <Compile Include="CommitableUndoablePropertyManagerPage.cs" />
     <Compile Include="ComponentExtensions.cs" />
     <Compile Include="ComWangling.cs" />
-    <Compile Include="CooperativeTask.cs" />
-    <Compile Include="DisposableExtensions.cs" />
-    <Compile Include="DoubleExtensions.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
     <Compile Include="EventHandlers\DoubleBuffer.cs" />
     <Compile Include="EventHandlers\GLDoubleBuffer.cs" />
@@ -255,8 +243,6 @@
     <Compile Include="FeatureManagerExtensions.cs" />
     <Compile Include="FeatureMgrViewObservables.cs" />
     <Compile Include="Geometry\PlanePolygon.cs" />
-    <Compile Include="IInterpolatable.cs" />
-    <Compile Include="Json.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataExtensions.cs" />
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
@@ -274,19 +260,11 @@
     <Compile Include="ModellerExtensions.cs" />
     <Compile Include="ModelViewExtensions.cs" />
     <Compile Include="ModelViewManagerExtensions.cs" />
-    <Compile Include="OpenGl\Point.cs" />
-    <Compile Include="ParserExtensions.cs" />
     <Compile Include="ReactiveObjectPropertyManagerPageBase.cs" />
-    <Compile Include="ReactiveTransaction.cs" />
-    <Compile Include="ReactiveUndo.cs" />
     <Compile Include="RefAxisExtensions.cs" />
     <Compile Include="SelectionBoxExtensions.cs" />
-    <Compile Include="ObjectExtensions.cs" />
-    <Compile Include="OpenGl\Animation\AnimationExtensions.cs" />
-    <Compile Include="OpenGl\FaceTriStrips.cs" />
     <Compile Include="OpenGl\MeshRender.cs" />
     <Compile Include="OpenGl\ModernOpenGl.cs" />
-    <Compile Include="OpenGl\OpenWire.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyManagerGroupExtensions.cs" />
     <Compile Include="PropertyManagerPage2Handler9Wrapper.cs" />
@@ -298,11 +276,9 @@
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SldWorksExtensions.cs" />
     <Compile Include="SolidworksSelectionDataExtensions.cs" />
-    <Compile Include="StringExtensions.cs" />
     <Compile Include="SurfaceExtensions.cs" />
     <Compile Include="SwAddinBase.cs" />
     <Compile Include="SwEq.cs" />
-    <Compile Include="TaskExtensions.cs" />
     <Compile Include="TriadManipulatorExtensions.cs" />
     <Compile Include="SolidworksSchedular.cs" />
   </ItemGroup>
@@ -328,9 +304,7 @@
       <Name>Weingartner.WeinCad.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Reflection\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.dll" />
     <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />

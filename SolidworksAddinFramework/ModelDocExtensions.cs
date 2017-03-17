@@ -533,12 +533,12 @@ namespace SolidworksAddinFramework
                                  from b in asString(many(alphaNum))
                                  select a + b;
 
-                var idParser = nameParser.doubleQuoted().label("Id Parser").skipWhite();
-                var valueParser = SwDoubleParser.label("Value parser").skipWhite();
-                var eq = ch('=').skipWhite();
-                var unitsParser = asString(many1(letter)).label("Unit parser").skipWhite();
+                var idParser = ParserExtensions.skipWhite<string>(nameParser.doubleQuoted<string>().label("Id Parser"));
+                var valueParser = SwDoubleParser.label("Value parser").skipWhite<double>();
+                var eq = ch('=').skipWhite<char>();
+                var unitsParser = asString(many1(letter)).label("Unit parser").skipWhite<string>();
 
-                return from id in idParser.skip(eq)
+                return from id in ParserExtensions.skip<string, char>(idParser, eq)
                        from val in valueParser
                        from units in unitsParser
                        select new SwEq(id, val, units);

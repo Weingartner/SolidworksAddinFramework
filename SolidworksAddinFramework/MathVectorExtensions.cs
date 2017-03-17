@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 using DLA = MathNet.Numerics.LinearAlgebra.Double;
 
 namespace SolidworksAddinFramework
