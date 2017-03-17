@@ -7,6 +7,7 @@ using LanguageExt;
 using Newtonsoft.Json;
 
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 using static LanguageExt.Prelude;
 using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
 

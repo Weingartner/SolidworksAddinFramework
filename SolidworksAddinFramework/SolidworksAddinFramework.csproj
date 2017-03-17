@@ -199,18 +199,15 @@
       <HintPath>$(SolutionDir)packages\Weingartner.Exceptional.1.4.6075.17448\lib\net461\Weingartner.Exceptional.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Weingartner.Json.Migration, Version=0.8.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.9\lib\net45\Weingartner.Json.Migration.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Weingartner.Json.Migration, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Weingartner.Json.Migration.1.0.5\lib\portable-net45+win\Weingartner.Json.Migration.dll</HintPath>
     </Reference>
-    <Reference Include="Weingartner.Json.Migration.Common, Version=0.8.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\Weingartner.Json.Migration.0.8.9\lib\net45\Weingartner.Json.Migration.Common.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Weingartner.Json.Migration.Common, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Weingartner.Json.Migration.1.0.5\lib\portable-net45+win\Weingartner.Json.Migration.Common.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArrayExtensions.cs" />
     <Compile Include="EditorView\Editor.cs" />
     <Compile Include="EditorView\EditorEmpty.cs" />
     <Compile Include="EditorView\IEditable.cs" />
@@ -238,7 +235,6 @@
     <Compile Include="OpenGl\Animation\SectionTime.cs" />
     <Compile Include="OpenGl\CompositeRenderer.cs" />
     <Compile Include="OpenGl\EdgeListRenderer.cs" />
-    <Compile Include="OpenGl\MeshExtensions.cs" />
     <Compile Include="OpenGl\OpenGLDrawContext.cs" />
     <Compile Include="OpenGl\Vector3Extensions.cs" />
     <Compile Include="Packing.cs" />
@@ -251,7 +247,6 @@
     <Compile Include="CooperativeTask.cs" />
     <Compile Include="DisposableExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="EventHandlers\ColorRenderable.cs" />
     <Compile Include="EventHandlers\DoubleBuffer.cs" />
     <Compile Include="EventHandlers\GLDoubleBuffer.cs" />
@@ -262,7 +257,6 @@
     <Compile Include="Geometry\PlanePolygon.cs" />
     <Compile Include="IInterpolatable.cs" />
     <Compile Include="Json.cs" />
-    <Compile Include="ListExtensions.cs" />
     <Compile Include="MacroFeatureBase.cs" />
     <Compile Include="MacroFeatureDataExtensions.cs" />
     <Compile Include="MacroFeatureDataFieldAttribute.cs" />
@@ -329,10 +323,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Common.dll" />
-    <Analyzer Include="$(SolutionDir)packages\Weingartner.Json.Migration.Analyzer.0.8.8.0\analyzers\dotnet\cs\Weingartner.Json.Migration.Roslyn.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Weingartner.WeinCad.Interfaces\Weingartner.WeinCad.Interfaces.csproj">
       <Project>{5fe360a2-506b-41aa-bdf4-7fea9d247fb2}</Project>
       <Name>Weingartner.WeinCad.Interfaces</Name>
@@ -340,6 +330,22 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Reflection\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Workspaces.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Collections.Immutable.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Composition.AttributedModel.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Composition.Convention.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Composition.Hosting.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Composition.Runtime.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Composition.TypedParts.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\System.Reflection.Metadata.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Weingartner.Json.Migration.Common.dll" />
+    <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Weingartner.Json.Migration.Roslyn.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets" Condition="Exists('$(SolutionDir)packages\Accord.3.0.2\build\Accord.targets')" />

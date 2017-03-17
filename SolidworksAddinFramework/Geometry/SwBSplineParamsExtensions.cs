@@ -3,6 +3,7 @@ using System.Linq;
 using System.DoubleNumerics;
 
 using SolidWorks.Interop.sldworks;
+using Weingartner.WeinCad.Interfaces;
 using LogViewer = Weingartner.WeinCad.Interfaces.LogViewer;
 
 namespace SolidworksAddinFramework.Geometry
