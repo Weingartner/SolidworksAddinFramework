@@ -240,7 +240,7 @@ namespace SolidworksAddinFramework
             , bool simplify = true
             , bool closedCurve = false)
         {
-            points = FilterOutShortLines(points, 1e-5).ToList();
+            points = CurveExtensions.FilterOutShortLines(points, 1e-5).ToList();
 
             if (closedCurve)
             {
@@ -258,41 +258,6 @@ namespace SolidworksAddinFramework
             if(simplify)
                 curve = curve.SimplifyBCurve(chordTolerance);
             return curve;
-        }
-
-        public static IEnumerable<Vector3> FilterOutShortLines(List<Vector3> points, double tol)
-        {
-            Vector3?  previous = null;
-            Func<Vector3, Vector3, double> distance = (p0,p1)=>(p0-p1).Length();
-            var result = new List<Vector3>();
-            foreach (var pt in points)
-            {
-                if (previous == null || distance(pt, previous.Value) > tol)
-                {
-                    result.Add(pt);
-                    previous = pt;
-                }
-                
-            }
-            result.Add(points.Last());
-
-            result.Reverse();
-            points = result;
-            result = new List<Vector3>();
-            previous = null;
-            foreach (var pt in points)
-            {
-                if (previous == null || distance(pt, previous.Value) > tol)
-                {
-                    result.Add(pt);
-                    previous = pt;
-                }
-                
-            }
-
-            result.Reverse();
-
-            return result;
         }
 
         public static IBody2 CreateSurfaceBody(this IModeler modeler, ISurface surface)

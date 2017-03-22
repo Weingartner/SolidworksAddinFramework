@@ -13,55 +13,6 @@ using Weingartner.WeinCad.Interfaces.Math;
 
 namespace SolidworksAddinFramework.Geometry
 {
-    public struct PointParamAndDepth
-    {
-        public readonly PointParam PointPar;
-        public readonly double Depth;
-
-        public PointParamAndDepth(PointParam pointPar, double depth)
-        {
-            PointPar = pointPar;
-            Depth = depth;
-        }
-    }
-
-    public struct PointParam
-    {
-        public readonly Vector3 Point;
-        public readonly double T;
-
-        public PointParam(Vector3 point, double t)
-        {
-            Point = point;
-            T = t;
-        }
-    }
-    public struct PointParamUV
-    {
-        public readonly Vector3 Point;
-        public readonly double U;
-        public readonly double V;
-
-        public PointParamUV(Vector3 point, double u, double v)
-        {
-            Point = point;
-            U = u;
-            V = v;
-        }
-    }
-
-    public struct PointParamWithRayProjection
-    {
-        public readonly PointParam PointParam;
-        public readonly Vector3 RayPoint;
-
-        public PointParamWithRayProjection(PointParam pointParam, Vector3 rayPoint)
-        {
-            PointParam = pointParam;
-            RayPoint = rayPoint;
-        }
-    }
-
     public static class CurveExtension
     {
         /// <summary>
@@ -80,7 +31,6 @@ namespace SolidworksAddinFramework.Geometry
                 .ToList();
             return ret;
         }
-
         /// <summary>
         /// Should solve
         /// </summary>

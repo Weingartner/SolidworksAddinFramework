@@ -50,7 +50,7 @@ namespace SolidworksAddinFramework.Spec
         {
             var points = new[] {p0, p1};
 
-            var interpolatedPoints = MathUtility.InterpolatePoints(points, stepSize);
+            var interpolatedPoints = Matrix4X4Extensions.InterpolatePoints(points, stepSize);
             interpolatedPoints.Count.Should().Be(expectedPointCount);
             interpolatedPoints
                 .Buffer(2, 1)
