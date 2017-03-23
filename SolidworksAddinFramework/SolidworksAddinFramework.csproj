@@ -211,12 +211,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditorView\Editor.cs" />
-    <Compile Include="EditorView\EditorEmpty.cs" />
-    <Compile Include="EditorView\IEditable.cs" />
-    <Compile Include="EditorView\IEditor.cs" />
-    <Compile Include="EditorView\ReactiveEditCommand.cs" />
-    <Compile Include="EditorView\EditController.cs" />
     <Compile Include="Geometry\BSpline.cs" />
     <Compile Include="Geometry\BSpline2D.cs" />
     <Compile Include="Geometry\BSpline3D.cs" />
@@ -274,7 +268,6 @@
     <Compile Include="PropertyManagerPageBase.cs" />
     <Compile Include="RevertiblePropertyManagerPage.cs" />
     <Compile Include="RefPlaneExtensions.cs" />
-    <Compile Include="SelectionData.cs" />
     <Compile Include="SelectionException.cs" />
     <Compile Include="SelectionManagerExtensions.cs" />
     <Compile Include="SldWorksExtensions.cs" />
@@ -307,7 +300,9 @@
       <Name>Weingartner.WeinCad.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="EditorView\" />
+  </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.dll" />
     <Analyzer Include="..\..\packages\Weingartner.Json.Migration.Analyzer.1.0.5\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />

@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using ReactiveUI;
 using SolidworksAddinFramework;
+using Weingartner.WeinCad.Interfaces;
 
 namespace DemoMacroFeatures.SampleMacroFeature
 {

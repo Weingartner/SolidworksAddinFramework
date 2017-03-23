@@ -1,5 +1,6 @@
 using ReactiveUI;
 using SolidworksAddinFramework;
+using Weingartner.WeinCad.Interfaces;
 
 namespace DemoMacroFeatures.ManipulatorSample
 {

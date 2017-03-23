@@ -13,7 +13,6 @@ using System.Windows.Forms;
 using DiffLib;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SolidworksAddinFramework.EditorView;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using SolidWorks.Interop.swpublished;
@@ -21,6 +20,7 @@ using Weingartner.ReactiveCompositeCollections;
 using Weingartner.WeinCad.Interfaces;
 using Weingartner.WeinCad.Interfaces.Monads;
 using Weingartner.WeinCad.Interfaces.Reflection;
+using Weingartner.WeinCad.Interfaces.ViewModels.EditorView;
 using Unit = System.Reactive.Unit;
 
 namespace SolidworksAddinFramework
